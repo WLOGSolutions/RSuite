@@ -1,7 +1,7 @@
 ---
 title: "RSuite CLI"
 author: "WLOG Solutions"
-date: "23 july 2017"
+date: "20 september 2017"
 output: html_document
 ---
 
@@ -250,6 +250,42 @@ If you managed to build PKGZIP containing some packages (see pkgzip command) you
 rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip
 ```
 
+#### Adding package from GitHub to repository
+
+If you want to add package available on GitHub repository you can achieve it calling following command:
+
+```{r eval=FALSE} 
+rsuite repo addgithub -d /path/to/your/repository -r github/ProjectName
+```
+
+RSuite CLI will download sources, build package and add it to specified repository.
+
+GitHub repository can be specified in format username/repo[/subdir][@ref|#pull]. 
+
+You can also specify following options to addgithub:
+
+* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, 'github.hostname.com/api/v3'.
+* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be added to the repository: system specific binary of source.
+* --rver wich takes R version number to target built package for (important for binary packages).
+
+#### List contents of repository
+
+You can list packages available on the repository with following command:
+
+```{r eval=FALSE} 
+rsuite repo list -s http://your-s3-bucket.s3.amazonaws.com/path
+```
+
+It will print table with all packages and their versions available in repository. Specifying -b (short for --binary) option to can choose to list binary or source packages.
+
+#### Remove packages from repository
+
+You can also remove packages from repository with following command:
+
+```{r eval=FALSE} 
+rsuite repo remove -s http://your-s3-bucket.s3.amazonaws.com/path -r Package1==Version1,Package2==Version2
+```
+
 ## Building PKGZIP packages
 
 PKGZIPs can be used to create repository in some connection less environment. To create PKGZIPs you can use pkgzip command. All pkgzip sub-commands beside standard -v and -h options accept also -p (short for --path) which takes as parameter folder to put created PKGZIP to.
@@ -307,6 +343,23 @@ You can specify that you want to include source (or binary) version of packages 
 ```{r eval=FALSE} 
 rsuite pkgzip ext -n package1,package2 -b TRUE
 ```
+
+#### Building PKGZIP containing package from GitHub
+
+If you want to create PKGZIP out of available on GitHub repository call following command:
+
+```{r eval=FALSE} 
+rsuite pkgzip github-r github/ProjectName
+```
+
+RSuite CLI will download sources, build package and add create PKGZIP out of it.
+
+GitHub repository can be specified in format username/repo[/subdir][@ref|#pull]. 
+
+You can also specify following options to github:
+
+* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, 'github.hostname.com/api/v3'.
+* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be included in PKGZIP: system specific binary of source.
 
 ## Getting help
 

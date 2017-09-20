@@ -11,7 +11,7 @@
 
 <meta name="author" content="WLOG Solutions" />
 
-<meta name="date" content="2017-07-23" />
+<meta name="date" content="2017-09-20" />
 
 <title>RSuite CLI</title>
 
@@ -119,7 +119,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">RSuite CLI</h1>
 <h4 class="author"><em>WLOG Solutions</em></h4>
-<h4 class="date"><em>23 july 2017</em></h4>
+<h4 class="date"><em>20 september 2017</em></h4>
 
 </div>
 
@@ -253,6 +253,30 @@ $(document).ready(function () {
 <p>If you managed to build PKGZIP containing some packages (see pkgzip command) you can add its content to repository:</p>
 <pre class="r"><code>rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip</code></pre>
 </div>
+<div id="adding-package-from-github-to-repository" class="section level4">
+<h4>Adding package from GitHub to repository</h4>
+<p>If you want to add package available on GitHub repository you can achieve it calling following command:</p>
+<pre class="r"><code>rsuite repo addgithub -d /path/to/your/repository -r github/ProjectName</code></pre>
+<p>RSuite CLI will download sources, build package and add it to specified repository.</p>
+<p>GitHub repository can be specified in format username/repo[/subdir]<span class="citation">[@ref|#pull]</span>.</p>
+<p>You can also specify following options to addgithub:</p>
+<ul>
+<li>-H (short for –host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, ‘github.hostname.com/api/v3’.</li>
+<li>-b (short for –binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be added to the repository: system specific binary of source.</li>
+<li>–rver wich takes R version number to target built package for (important for binary packages).</li>
+</ul>
+</div>
+<div id="list-contents-of-repository" class="section level4">
+<h4>List contents of repository</h4>
+<p>You can list packages available on the repository with following command:</p>
+<pre class="r"><code>rsuite repo list -s http://your-s3-bucket.s3.amazonaws.com/path</code></pre>
+<p>It will print table with all packages and their versions available in repository. Specifying -b (short for –binary) option to can choose to list binary or source packages.</p>
+</div>
+<div id="remove-packages-from-repository" class="section level4">
+<h4>Remove packages from repository</h4>
+<p>You can also remove packages from repository with following command:</p>
+<pre class="r"><code>rsuite repo remove -s http://your-s3-bucket.s3.amazonaws.com/path -r Package1==Version1,Package2==Version2</code></pre>
+</div>
 </div>
 <div id="building-pkgzip-packages" class="section level2">
 <h2>Building PKGZIP packages</h2>
@@ -281,6 +305,18 @@ $(document).ready(function () {
 <p>Packages are searched in repositories project is configured to use (Repositories entry in project PARAMETERS file) for looking for dependencies.</p>
 <p>You can specify that you want to include source (or binary) version of packages in PKGZIP with -b (short for –binary) option:</p>
 <pre class="r"><code>rsuite pkgzip ext -n package1,package2 -b TRUE</code></pre>
+</div>
+<div id="building-pkgzip-containing-package-from-github" class="section level4">
+<h4>Building PKGZIP containing package from GitHub</h4>
+<p>If you want to create PKGZIP out of available on GitHub repository call following command:</p>
+<pre class="r"><code>rsuite pkgzip github-r github/ProjectName</code></pre>
+<p>RSuite CLI will download sources, build package and add create PKGZIP out of it.</p>
+<p>GitHub repository can be specified in format username/repo[/subdir]<span class="citation">[@ref|#pull]</span>.</p>
+<p>You can also specify following options to github:</p>
+<ul>
+<li>-H (short for –host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, ‘github.hostname.com/api/v3’.</li>
+<li>-b (short for –binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be included in PKGZIP: system specific binary of source.</li>
+</ul>
 </div>
 </div>
 </div>

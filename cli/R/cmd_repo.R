@@ -69,8 +69,8 @@ sub_commands <- list(
       ra_mng <- start_management(opts, rver = rver, types = pkg_type)
 
       pkgs <- NULL
-      if (!is.null(opts$pkgs)) {
-        pkgs <- unlist(strsplit(opts$pkgs, split=","))
+      if (!is.null(opts$names)) {
+        pkgs <- unlist(strsplit(opts$names, split=","))
       }
 
       RSuite::repo_upload_prj_packages(repo_manager = ra_mng,
@@ -217,27 +217,31 @@ sub_commands <- list(
   remove = list(
     help = "Removes specified packages from repository.",
     options = c(
-      make_option(c("-f", "--file"), dest = "file", type = "character",
-                  help = paste0("Path to file with packages to remove description. ",
-                                "data.frame with same structure as available.packages returns. ",
-                                "At lease Package and Version columns must be present.")),
+      make_option(c("-r", "--toremove"), dest = "toremove", type = "character",
+                  help = "Comma separated list of Package==Version pairs to remove from repository."),
       make_option(c("-b", "--binary"), dest = "binary", type = "logical", default = (.Platform$pkgType != "source"),
                   help = "Retrieve list of binary packages (default: %default)"),
       common_options
     ),
     run = function(opts) {
-      if (is.null(opts$file)) {
-        stop("--file option is required")
+      if (is.null(opts$toremove)) {
+        stop("--toremove option is required")
       }
-      if (!file.exists(opts$file)) {
-        stop(sprintf("file does not exist %s", opts$file))
+
+      pkgs <- c()
+      vers <- c()
+      for (p in unlist(strsplit(opts$toremove, split=","))) {
+        pair <- unlist(strsplit(p, split = "=="))
+
+        pkgs <- c(pkgs, pair[1])
+        vers <- c(vers, pair[2])
       }
+      toremove <- data.frame(Package = pkgs, Version = vers)
 
       pkg_type <- get_pkg_type(opts$binary)
 
       ra_mng <- start_management(opts, rver = NULL, types = pkg_type)
 
-      toremove <- source(opts$file)$value
       RSuite::repo_mng_remove(ra_mng, toremove, pkg_type = pkg_type)
 
       RSuite::repo_mng_stop(ra_mng)
