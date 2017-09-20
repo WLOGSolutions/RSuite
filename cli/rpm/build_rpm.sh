@@ -6,7 +6,7 @@ base_dir=`realpath ${base_dir}`
 basever=`cat ${base_dir}/../version.txt`
 gittag=`git tag | tail -n 1`
 if [ -z "$gittag" ]; then
-	echo "Failed to detect git tag"
+	echo "ERROR: RFailed to detect git tag"
 	exit 1
 fi
 
@@ -37,6 +37,7 @@ pushd ${build_dir}/rpmbuild/SPECS > /dev/null
 rpmbuild -ba "-D ver ${ver}" "-D _topdir ${build_dir}/rpmbuild" rsuitecli.spec
 popd > /dev/null
 
-mv ${build_dir}/rpmbuild/RPMS/noarch/rsuitecli-${ver}*.noarch.rpm ${base_dir}
+mkdir -p ${base_dir}/rpms
+mv ${build_dir}/rpmbuild/RPMS/noarch/rsuitecli-${ver}*.noarch.rpm ${base_dir}/rpms/
 rm -rf ${build_dir}
 

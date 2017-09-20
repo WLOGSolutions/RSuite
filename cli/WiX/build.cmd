@@ -2,14 +2,19 @@
 
 SET /P majver=<../version.txt
 
-FOR /F "tokens=* USEBACKQ" %%F IN (`svnversion`) DO (
-    SET svnver=%%F
+FOR /F "tokens=* USEBACKQ" %%F IN (`git tag`) DO (
+    SET gitver=%%F
+)
+
+if "%gitver%" == "" (
+    echo No tag detected.
+    goto error
 )
 
 mkdir build 2> nul
-echo %majver%-%svnver%> build/version.txt
+echo %majver%-%gitver%> build/version.txt
 
-SET ver=%majver%.%svnver%
+SET ver=%majver%.%gitver%
 
 echo %ver%| findstr /r /c:"^[0-9][0-9]*[.][0-9][0-9]*[.][0-9][0-9]*$" > nul
 if ERRORLEVEL 1 (
