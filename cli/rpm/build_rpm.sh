@@ -4,8 +4,13 @@ base_dir=$(dirname $0)
 base_dir=`realpath ${base_dir}`
 
 basever=`cat ${base_dir}/../version.txt`
-svnver=`svnversion`
-ver=${basever}.${svnver}
+gittag=`git tag | tail -n 1`
+if [ -z "$gittag" ]; then
+	echo "Failed to detect git tag"
+	exit 1
+fi
+
+ver=${basever}.${gittag}
 
 build_dir=${base_dir}/build
 rm -rf ${build_dir}
