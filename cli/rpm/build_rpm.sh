@@ -6,7 +6,7 @@ base_dir=`realpath ${base_dir}`
 basever=`cat ${base_dir}/../version.txt`
 gittag=`git tag | tail -n 1`
 if [ -z "$gittag" ]; then
-	echo "ERROR: RFailed to detect git tag"
+	echo "ERROR: Failed to detect git tag"
 	exit 1
 fi
 

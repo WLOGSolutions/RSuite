@@ -4,8 +4,12 @@ base_dir=$(dirname $0)
 base_dir=`realpath ${base_dir}`
 
 basever=`cat ${base_dir}/../version.txt`
-svnver=`svnversion`
-ver=${basever}.${svnver}
+gittag=`git tag | tail -n 1`
+if [ -z "$gittag" ]; then
+	echo "ERROR: Failed to detect git tag"
+	exit 1
+fi
+ver=${basever}.${gittag}
 
 build_dir=${base_dir}/build
 rm -rf ${build_dir}
@@ -35,6 +39,7 @@ pushd ${orig_dir} > /dev/null
 debuild -us -uc 
 popd > /dev/null
 
-mv ${build_dir}/rsuitecli_${ver}*.deb ${base_dir}
+mkdir ${base_dir}/debs
+mv ${build_dir}/rsuitecli_${ver}*.deb ${base_dir}/debs/
 rm -rf ${build_dir}
 
