@@ -1,8 +1,8 @@
 Package: RSuite
 Type: Package
 Title: Supports developing, building and deploying R solution.
-Version: 0.8
-Date: 2017-09-14
+Version: 0.9
+Date: 2017-09-20
 Author: WLOG Solutions
 Maintainer: WLOG Solutions <info@wlogsolutions.com>
 Description: The main package purpose is to support safe and supportable 

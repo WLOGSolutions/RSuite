@@ -1,3 +1,6 @@
+VERSION 0.9 (2017-09-20)
+  * Minor fixes related to installation of RSuite
+  
 VERSION 0.8 (2017-09-13)
   * Dependencies are checked both binary and source iteratively until they are 
        all satisfied (deep dependency search).
