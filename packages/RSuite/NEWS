@@ -1,0 +1,58 @@
+VERSION 0.8 (2017-09-13)
+  * Dependencies are checked both binary and source iteratively until they are 
+       all satisfied (deep dependency search).
+  * Repository order is important: former repositories are checked for 
+       dependencies before later ones. If proper version is found latter 
+       repositories will not be checked to satisfy it.
+
+VERSION 0.7 (2017-09-12)
+  * Packages are not detached during build if they are loaded from another
+       location then project environment
+  * Repository manager is separated out of repository adapter.
+  * Packages from github can be uploaded into a repository or packed into PKGZIP.
+  * Setting RVersion for package added into API.
+  * License changed to MIT + LICENSE
+  * Listing and removing packges from repositories added.
+  * It does not require optparse any more
+  * While building pkg zip from external packages it can include binary versions
+       build out of sources.
+  * Installing binary packages from repository on linux fixed.
+
+VERSION 0.6 (2017-08-10)
+  * R version consistency check and enforcement on project level
+  * Issues in upgrade of old deployment structure fixed
+
+VERSION 0.5 (2017-07-22)
+  * Added cleaninig non required packages from project local environment.
+  * PKGZIP creation and upload implemented
+  * Proper checking for SNV if update is required
+
+VERSION 0.4 (2017-07-18)
+  * Got rid of checkpoint dependency
+  * Support for specific package installing requirements adde like configure.args
+      and configure.vars and checking for environment variables.
+
+VERSION 0.3 (2017-07-14)
+  * SVN adapter fixed to properly detect if project is under RC then creating
+  * SVN adapter fixed to properly remove svn:externals from project directory
+  * Fixed deployment scripts to properly reference logging package
+  * Documentation fixed not to contain internals
+  * Dependencies consistency detection while building project implemented
+  * Project packages are built before building zip package. If RC revision is
+      detected it is added to versions of project backages before building.
+  * Repository adapters added for CRAN and MRAN. Detection if repository is
+      reliable realized. Warning is logged if any of repositories is not.
+  * Got rid of miniCRAN dependency.
+  * S3 and Dir repository management added. Project packages can be uploaded
+      into repository as binary or source packages. User also can upload
+      arbitrary package files into repository.
+  * RSuite version check and update implemented.
+
+VERSION 0.2 (2017-07-05)
+  * Adapter mechanizm implemented: RC adapters for Git and Svn, Local and S3
+    repository adapters.
+  * Tests revieved and adapted to Rsuite.
+  * Logginig is consistent: all messages are logged into rsuite logger
+
+VERSION 0.1 (2017-06-23)
+  * Initial version

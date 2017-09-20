@@ -1,0 +1,9 @@
+Package: ROracle
+Source: TRUE
+InstallOpts: --force-biarch
+# It will require in env
+# - Rtools to build package (path should have Rtools/bin and gcc folder)
+# - OCI_LIB32 should point to Instant Client Basic x86
+# - OCI_LIB64 should point to Instant Client Basic x64
+# - OCI_INC should point to includes in Instant Client SDK
+EnvVariablePatterns: PATH[instantclient], OCI_LIB64[.+], OCI_LIB32[.+], OCI_INC[.+]

@@ -1,0 +1,16 @@
+Package: ROracle
+Source: TRUE
+InstallOpts: --force-biarch
+# It will require in env
+# - OCI_LIB should point to Instant Client Basic platform compatible
+# - OCI_INC should point to includes in Instant Client SDK
+# Here is check for LD_LIBRARY_PATH contains instant client or some oracle installation
+EnvVariablePatterns: LD_LIBRARY_PATH[instantclient|/oracle/product/[0-9\.]+_client/]
+
+Package: stringi
+Source: TRUE
+ConfigureVars: ICUDT_DIR=Sys.getenv('ICUDT_DIR')
+
+Package: nloptr
+Source: TRUE
+ConfigureArgs: --with-nlopt-libs=-lnlopt

@@ -1,0 +1,29 @@
+#----------------------------------------------------------------------------
+# RSuite
+# Copyright (c) 2017, WLOG Solutions
+#----------------------------------------------------------------------------
+
+library(RSuite)
+library(testthat)
+
+source("R/test_utils.R")
+source("R/project_management.R")
+
+context("Testing if building succeeds for package dependant on stringr (roxygen issue)")
+
+test_that_managed("Build package which dependents on stringr", {
+  prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))
+  create_test_package("TestPackage", prj, deps = "stringr")
+
+  RSuite::prj_install_deps(prj, clean = T)
+
+  expect_that_packages_installed(
+    c("stringr", "magrittr", "stringi", "logging"),
+    prj)
+
+  RSuite::prj_build(prj)
+
+  expect_that_packages_installed(
+    c("TestPackage", "stringr", "magrittr", "stringi", "logging"),
+    prj)
+})

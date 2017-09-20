@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Name='RSuite CLI v$(var.VERSION)' Manufacturer='WLOG Solutions' Id='*' 
+            UpgradeCode='af7b4234-60c2-4fea-9b43-8c6b2deaed6e'
+            Language='1033' Codepage='1252' Version='$(var.VERSION)'>
+        <Package Id='*' Keywords='Installer' Description='RSuite CLI Installer' Manufacturer='WLOG Solutions'
+            InstallerVersion='200' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+            
+        <Media Id='1' Cabinet='RSuite.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+        <Property Id='DiskPrompt' Value='RSuite CLI Installation [1]' />
+        
+        <Property Id="REINSTALLMODE" Value="amus" />
+        <MajorUpgrade AllowDowngrades="yes" />
+        
+        <?if $(sys.BUILDARCH) = x64 ?>
+            <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+        <?else ?>
+            <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+        <?endif ?>        
+        
+        
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
+                <Directory Id='R' Name='R'>
+                    <Directory Id="APPLICATIONFOLDER" Name="RSuiteCLI" />
+                </Directory>
+            </Directory>
+            <Directory Id='ProgramMenuFolder' Name='Programs' />
+        </Directory>
+        
+        <DirectoryRef Id='APPLICATIONFOLDER'>
+            <Component Id='MainCMD' Guid='927416cf-eaa6-4152-b3bc-b039c2d50103'>
+                <File Id='RSuiteCMD' Name='rsuite.cmd' DiskId='1' Source='../rsuite.cmd' KeyPath='yes' />
+                <File Id='version.txt' Name='version.txt' DiskId='1' Source='build/version.txt' />
+                <Environment Id="PATH" Name="PATH" Value="[APPLICATIONFOLDER]" Permanent="no" Part="last" Action="set" System="yes" />
+            </Component>
+            
+            <Directory Id='RSources' Name='R'>
+                <Component Id='RSources' Guid='31197745-41cb-4323-9f3e-ccfdc7a5d2f7'>
+                    <File Id='command_mgr.R' Name='command_mgr.R' DiskId='1' Source='../R/command_mgr.R' KeyPath='yes' />
+                    <File Id='cmd_install.R' Name='cmd_install.R' DiskId='1' Source='../R/cmd_install.R' />
+                    <File Id='cmd_proj.R' Name='cmd_proj.R' DiskId='1' Source='../R/cmd_proj.R' />
+                    <File Id='cmd_repo.R' Name='cmd_repo.R' DiskId='1' Source='../R/cmd_repo.R' />
+                    <File Id='cmd_pkgzip.R' Name='cmd_pkgzip.R' DiskId='1' Source='../R/cmd_pkgzip.R' />                              
+                </Component>
+                <Directory Id='packages' Name='packages'>
+                    <Directory Id='packages_src' Name='src'>
+                        <Directory Id='packages_src_contrib' Name='contrib'>
+                            <Component Id='RRepo' Guid='36783041-b7e7-46e6-a28a-36eb774ebebb'>
+                                <File Id='PACKAGES' Name='PACKAGES' DiskId='1' Source='../R/packages/src/contrib/PACKAGES'  KeyPath='yes'  />
+                                <File Id='PACKAGES.gz' Name='PACKAGES.gz' DiskId='1' Source='../R/packages/src/contrib/PACKAGES.gz' />
+                                <File Id='getopt_1.20.0.tar.gz' Name='getopt_1.20.0.tar.gz' DiskId='1' Source='../R/packages/src/contrib/getopt_1.20.0.tar.gz'/>
+                                <File Id='optparse_1.4.4.tar.gz' Name='optparse_1.4.4.tar.gz' DiskId='1' Source='../R/packages/src/contrib/optparse_1.4.4.tar.gz' />
+                                <File Id='logging_0.7.103.tar.gz' Name='logging_0.7-103.tar.gz' DiskId='1' Source='../R/packages/src/contrib/logging_0.7-103.tar.gz' />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id='RSuiteCLIDoc' Name='doc'>
+                <Component Id='RSuiteCLIDoc' Guid='ab92c6cf-6fe0-11e7-ab17-d4bed9505ac7'>
+                    <File Id='RSuiteCLI.html' Name='RSuite CLI.html' DiskId='1' Source='../doc/RSuite_CLI.html' KeyPath='yes' />
+                </Component>
+            </Directory>
+        </DirectoryRef>
+           
+        <DirectoryRef Id='ProgramMenuFolder'>
+            <Directory Id='ProgramMenuDir' Name='RSuite CLI'>
+                <Component Id='ProgramMenuDir' Guid='25352f27-06b4-4079-af6c-bb89297b957c'>
+                    <Shortcut Id="RSuiteCLIManualShortcut"
+                          Name="RSuite CLI Manual"
+                          Description="HTML Manual for RSuite CLI"
+                          Target="[#RSuiteCLI.html]" />
+                    <Shortcut Id="UninstallProduct"
+                          Name="Uninstall RSuite CLI"
+                          Description="Uninstalls RSuite CLI"
+                          Target="[System64Folder]msiexec.exe"
+                          Arguments="/x [ProductCode]" />                          
+                    <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+                    <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
+                </Component>
+            </Directory>
+        </DirectoryRef>
+        
+        <Feature Id='Complete' Level='1' Title='Complete installation'>
+            <ComponentRef Id='MainCMD' />
+            <ComponentRef Id='RSources' />
+            <ComponentRef Id='RRepo' />
+            <ComponentRef Id='RSuiteCLIDoc' />
+            <ComponentRef Id='ProgramMenuDir' />
+        </Feature>
+        
+        <Property Id="ApplicationFolderName" Value="RSuiteCLI" />
+        <Property Id="WixAppFolder" Value="WixPerMachineFolder" />             
+
+        <UIRef Id="WixUI_AdvancedFx" />
+        
+        <Icon Id="RSuiteCLI.ico" SourceFile="src/RSuiteCLI.ico" />
+        <Property Id="ARPPRODUCTICON" Value="RSuiteCLI.ico" />
+    </Product>
+</Wix>
+    

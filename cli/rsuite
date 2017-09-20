@@ -1,0 +1,70 @@
+#!/bin/bash
+
+rscript_path=`which Rscript 2> /dev/null`
+if [ -z "$rscript_path" ]; then
+	echo "ERROR: No R installation available."
+	echo "Please install R and verify its location added PATH environment variable."
+	exit 1
+fi
+
+basedir=$(dirname $0)
+basedir=$(realpath $basedir) 
+cmd="$1"
+if [ -z "$cmd" ]; then
+	cmd="help";
+fi
+
+case "$cmd" in
+	install)
+		$rscript_path --no-init-file $basedir/R/cmd_install.R $* || exit 2
+		;;
+	proj)
+                $rscript_path --no-init-file $basedir/R/cmd_proj.R $* || exit 2
+		;;
+	repo)
+                $rscript_path --no-init-file $basedir/R/cmd_repo.R $* || exit 2
+		;;
+	pkgzip)
+                $rscript_path --no-init-file $basedir/R/cmd_pkgzip.R $* || exit 2
+		;;
+	version)
+		ver=`cat ${basedir}/version.txt`
+		echo $ver
+		;;
+	help)
+		ver=`cat ${basedir}/version.txt`
+		echo "Command line utility for R project management with RSuite (v$ver)"
+		echo "Usage: rsuite [command] [args]"
+		echo ""
+		echo ""
+		echo "Commands:"
+		echo "       install"
+		echo "           Install RSuite with all the dependencies."
+		echo ""
+		echo "       proj"
+		echo "           Use it to manage project, its dependencies, and build"
+		echo "           project packages."
+		echo ""
+		echo "       repo"
+		echo "           Use to manage repositories. e.g. upload packages."
+		echo ""
+		echo "       pkgzip"
+		echo "           Use to create PKGZIP packages to fillup remove repository."
+		echo ""
+		echo "       version"
+                echo "           Show RSuite CLI version."
+		echo ""
+		echo "       help"
+		echo "           Show this message and exit."
+		echo ""
+		echo "Call 'rsuite [command] help' to get information on acceptable [args]."
+		echo ""
+		;;
+	*)
+		echo "ERROR: Unexpected command $cmd passed."
+		echo "Please, call 'rsuite help' to see available commands."
+		exit 3
+		;;
+esac
+
+exit 0

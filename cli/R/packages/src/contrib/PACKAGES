@@ -1,0 +1,24 @@
+Package: getopt
+Version: 1.20.0
+Suggests: testthat
+License: GPL (>= 2)
+MD5sum: 0f16ebdf98dd4babbb921d3869826c27
+NeedsCompilation: no
+
+Package: logging
+Version: 0.7-103
+Depends: R (>= 2.12.0), methods
+Suggests: svUnit, XML
+License: GPL (>= 2)
+MD5sum: 09a72bed3d5368c05b80d33557e3d696
+NeedsCompilation: no
+
+Package: optparse
+Version: 1.4.4
+Depends: R (>= 2.9.0)
+Imports: methods, getopt (>= 1.19.0)
+Suggests: knitr (>= 1.15.19), stringr, testthat
+License: GPL (>= 2)
+MD5sum: e8cbd599f047c6d4b14f218575045c4a
+NeedsCompilation: no
+
