@@ -7,7 +7,7 @@ FOR /F "tokens=* USEBACKQ" %%F IN (`git tag`) DO (
 )
 
 if "%gitver%" == "" (
-    echo No tag detected.
+    echo ERROR: No GIT tag detected.
     goto error
 )
 
