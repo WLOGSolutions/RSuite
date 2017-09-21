@@ -39,5 +39,4 @@ popd > /dev/null
 
 mkdir -p ${base_dir}/rpms
 mv ${build_dir}/rpmbuild/RPMS/noarch/rsuitecli-${ver}*.noarch.rpm ${base_dir}/rpms/
-rm -rf ${build_dir}
 

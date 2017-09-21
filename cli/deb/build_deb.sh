@@ -39,7 +39,6 @@ pushd ${orig_dir} > /dev/null
 debuild -us -uc 
 popd > /dev/null
 
-mkdir ${base_dir}/debs
+mkdir -p ${base_dir}/debs
 mv ${build_dir}/rsuitecli_${ver}*.deb ${base_dir}/debs/
-rm -rf ${build_dir}
 
