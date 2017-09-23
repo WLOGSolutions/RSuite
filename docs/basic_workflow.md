@@ -1,12 +1,12 @@
 # Basic R Suite usage
 In this document we present a basic R Suite usage. It covers:
 
-    * creating project
-    * adding custom packages
-    * building custom packages
-	* installing dependencies
-	* developing custom package with `devtools`
-    * understanding loggers
+* creating project
+* adding custom packages
+* building custom packages
+* installing dependencies
+* developing custom package with `devtools`
+* understanding loggers
 
 # Step 1 - start a new project
 
