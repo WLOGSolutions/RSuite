@@ -1,5 +1,6 @@
 # Basic R Suite usage
 In this document we present a basic R Suite usage. It covers:
+
     * creating project
     * adding custom packages
     * building custom packages
