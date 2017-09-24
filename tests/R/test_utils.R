@@ -12,22 +12,22 @@ test_that_managed <- function(desc, ...) {
   tryCatch({
     # setup logging
     root_level <- logging::getLogger()$level
-    rsuite_level <- logging::getLogger("rsuite")$level
+    rsuite_level <- RSuite::rsuite_getLogger()$level
     on_test_exit(function() {
       logging::setLevel(root_level)
-      logging::setLevel(rsuite_level, getLogger('rsuite'))
+      logging::setLevel(rsuite_level, RSuite::rsuite_getLogger())
     })
     
     log_file <- file.path(.get_create_dir("logs"), sprintf("test_%s.log", Sys.Date()))
     cat(sprintf("====> %s <====\n", desc), file = log_file, append = T)
     
     logging::setLevel("CRITICAL")
-    logging::setLevel("DEBUG", getLogger('rsuite'))
+    logging::setLevel("DEBUG", logging::getLogger('rsuite'))
     logging::addHandler(action = logging::writeToFile,
                         file = log_file,
                         handler = "RSuite.tests.file.logger", level = "DEBUG",
-                        logger = "rsuite")
-    
+                        logger = RSuite::rsuite_getLogger())
+
     test_that(desc, ...)
   }, finally = {
     fire_cleanups() 

@@ -14,3 +14,14 @@ pkg_logdebug <- function(msg, ...) { logging::logdebug(msg, ..., logger = .pkg_l
 pkg_logerror <- function(msg, ...) { logging::logerror(msg, ..., logger = .pkg_logger) }
 pkg_logwarn <- function(msg, ...) { logging::logwarn(msg, ..., logger = .pkg_logger) }
 pkg_logfinest <- function(msg, ...) { logging::logfinest(msg, ..., logger = .pkg_logger) }
+
+#'
+#' Retrieves RSuite logger
+#' 
+#' @return logger object
+#' 
+#' @export
+#' 
+rsuite_getLogger <- function() {
+  .pkg_logger
+}

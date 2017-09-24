@@ -1,3 +1,7 @@
+VERSION 0.10 (2017-09-24)
+  * Fixed handling of .libPath during prj_deps_inst and prj_build.
+  * logging moved to Imports in RSuite and created projects.
+  
 VERSION 0.9 (2017-09-20)
   * Minor fixes related to installation of RSuite
   

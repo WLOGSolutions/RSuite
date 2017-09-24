@@ -286,22 +286,22 @@ prj_install_deps <- function(prj = NULL, clean = FALSE) {
 
   params <- prj$load_params()
 
-  prev_lpath <- .libPaths(params$lib_path)
   prev_library <- .Library
-  .Library <- NULL
-
-  tryCatch({
-    if (clean) {
-      pkg_loginfo("Cleaning up local environment...")
-      unlink(file.path(params$lib_path, "*"), recursive = TRUE, force = TRUE)
-      pkg_loginfo("Cleaning up local environment... done")
-    }
-
-    install_prj_deps(params)
-  }, finally = {
+  prev_lpath <- .libPaths()
+  on.exit({
     .Library <- prev_library
     .libPaths(prev_lpath)
   })
+  .libPaths(params$lib_path)
+  .Library <- NULL
+  
+  if (clean) {
+    pkg_loginfo("Cleaning up local environment...")
+    unlink(file.path(params$lib_path, "*"), recursive = TRUE, force = TRUE)
+    pkg_loginfo("Cleaning up local environment... done")
+  }
+
+  install_prj_deps(params)
 }
 
 

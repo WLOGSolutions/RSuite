@@ -125,7 +125,6 @@ handle_subcommands <- function(sub_commands, cmd_help) {
     lev <- "DEBUG"
   }
   logging::setLevel(lev)
-  logging::setLevel(lev, logging::getLogger("rsuite"))
 
   tryCatch({
     sub_commands[[sub_cmd]]$run(opts)

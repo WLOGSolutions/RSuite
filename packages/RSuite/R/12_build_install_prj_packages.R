@@ -47,26 +47,26 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
            paste(unknown_pkgs, collapse = ", "))
   }
 
-  prev_lpath <- .libPaths(params$lib_path)
   prev_library <- .Library
-  .Library <- NULL
-
-  tryCatch({
-    # check if environment has to be rebuilt
-    uninstDeps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
-    uninstDeps <- uninstDeps$rm(prj_pkgs)
-    assert(uninstDeps$is_empty(),
-           paste0("Some dependencies are not installed in project env: %s.",
-                  " Please, install dependencies(Call RSuite::prj_install_deps)"),
-           paste(uninstDeps$get_names(), collapse = ", "))
-
-    build_install_prj_packages(params, build_type)
-  }, finally = {
+  prev_lpath <- .libPaths()
+  on.exit({
     .Library <- prev_library
     .libPaths(prev_lpath)
-
+    
     restore_pkgs()
   })
+  .Library <- NULL
+  .libPaths(params$lib_path)
+  
+  # check if environment has to be rebuilt
+  uninstDeps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
+  uninstDeps <- uninstDeps$rm(prj_pkgs)
+  assert(uninstDeps$is_empty(),
+         paste0("Some dependencies are not installed in project env: %s.",
+                " Please, install dependencies(Call RSuite::prj_install_deps)"),
+         paste(uninstDeps$get_names(), collapse = ", "))
+
+  build_install_prj_packages(params, build_type)
 
   # remove packages which are not supposed to be build
   .file_is_one_of_tobuild <- function(f) {

@@ -10,11 +10,11 @@ Description: The main package purpose is to support safe and supportable
   project, dependency management, local packages creation and preparing 
   deployment packs for you solutions.
 License: MIT + file LICENSE
-Depends: logging,
-  devtools,
+Depends: devtools,
   roxygen2,
   testthat,
   knitr,
   rmarkdown,
   git2r
+Imports: logging
 RoxygenNote: 6.0.1
