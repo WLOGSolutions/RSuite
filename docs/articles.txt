@@ -1,0 +1,2 @@
+basic_workflow.md: Basic R Suite usage
+rsuite_cli_reference.md: R Suite CLI reference manual

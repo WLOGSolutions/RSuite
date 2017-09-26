@@ -1,0 +1,366 @@
+# R Suite CLI reference manual
+
+RSuite CLI is command line utility to manage you R projects.
+
+It helps you with number of tasks like
+
+* installing (upgrading to newest version) of RSuite package
+* creating projects and packages inside them
+* building project internal environment, project packages and packaging them into deployment zip
+* managing you own local (Dir) or S3 package repositories
+* building PKGZIP to transfer packages and build repositories in connection less environment.
+
+RSuite supports you in developing you R projects in standardized way and help with dependencies control and project consistency management while preparing to deploy on production.
+
+## Requirements
+
+RSuite CLI requires R being available on your machine. Any version will do, but we tested it mostly on v3.2+.
+
+For working with Subversion and/or Git revision control command line clients respectively svn and git are required.
+
+To manage S3 repositories you will need aws command line client and aws credentials (.aws folder in you home directory).
+
+## Installing RSuite
+
+To install RSuite just open you command line (terminal) and run 
+
+```bash
+rsuite install 
+```
+
+It accepts some advanced options. If you call 
+
+```bash
+rsuite install -v
+```
+
+It will log lots of messages on console which can be used to detect reason if any problem with installing RSuite will occur.
+
+If you would like to use some specific repository to look for RSuite package instead of default (http://wlog-rsuite.s3.amazonaws.com) you can call it like this
+
+```bash
+rsuite install -u http://url.to.your.repository
+```
+
+If you prefer to use (or not) installing binary RSuite package call
+
+```bash
+rsuite install -b TRUE
+```
+
+Using binary package is default for Windows and using source package is default of Linuxes.
+
+You can also see all supported options 'rsuite install' supports please call
+
+```bash
+rsuite install -h
+```
+
+## Project management
+
+After you have installed RSuite you are ready to start developing your projects.
+Command proj gives you access to all related RSuite functionalities.
+
+It accepts -h option which prints all accepted sub-commands with brief description.
+
+#### Starting project 
+
+To start project, create it's structure and properly put created files under revision control (Git or Subversion)
+just call 
+
+```bash
+rsuite proj start -n MyProject
+```
+
+It will create project MyProject in current directory. Default content of PROPERTIES file will created and all other administrative folders to support project development.
+
+It will also add created project under revision control if detects current folder to be under revision control. It will also configure appropriate RC ignores so non required files created during development (like installed packages or auto generated man packages) will be omitted while checking if project needs to be committed before generating deployment package or uploading project packages into repository.
+
+If you do not want adding project under revision control call it following way
+
+```bash
+rsuite proj start -n MyProject --skip_rc
+```
+
+As all other commands proj accepts -v (short for --verbose) to print lots of messages during project creation and -h (short for --help) to print all accepted options with some short description.
+
+#### Creating package
+
+After you have created project you can add packages to it. Just call (project folder should be your current directory)
+
+```bash
+rsuite proj pkgadd -n MyPackage
+```
+
+It will create package MyPackage inside the project in packages folder. The package will contain standard content like package internal logging tools, package imports and some simple argument validation utilities. 
+
+It will also add created package under revision control if detect project to be under revision control. 
+
+If you do not want adding package under revision control for some reason call it following way
+
+```bash
+rsuite proj pkgadd -n MyPackage --skip_rc
+```
+
+As all other commands proj accepts -v (short for --verbose) to print lots of messages during project creation and -h (short for --help) to print all accepted options with some short description.
+
+#### Building project local enviroment
+
+Then project is created it already has logging installed as master scripts and all packages are supposed to use logging.
+
+If you have any other dependencies (required libraries) you have to build internal project environment to have them available. To achieve it call somewhere inside your project folder
+
+```bash
+rsuite proj depsinst 
+```
+
+Beside standard -v and -h options depsinst sub-command accepts also -c (short for --clean) to clean up internal project environment before installing all required packages. You call it like this
+
+```bash
+rsuite proj depsinst -c
+```
+
+#### Building project packages
+
+After building local project environment you can build project packages by calling
+
+```bash
+rsuite proj build
+```
+
+It does not accept any special options except standard -v and -h.
+
+#### Cleaning unused project dependencies
+
+If some project dependencies are not required any more you can remove them from local project environment by calling
+
+```bash
+rsuite proj depsclean
+```
+
+It does not accept any special options except standard -v and -h.
+
+#### Building deployment package
+
+To build deployment packages simply call
+
+```bash
+rsuite proj zip
+```
+
+It checks project consistency if it is under version control to make sure all changes are committed and source revision is inline with repository. Created package will be tagged with ZipVersion taken from project PARAMETERS file with revision number appended. All project packages get rebuilt with revision number appended to their version.
+
+Local project environment together with rebuilt project packages and master scripts is included in deployment package so in production environment (assuming it is binary compatible with development environment) you can just unzip it to have everything required to run your project functionalities.
+
+zip sub-command accepts also -p (short for --path) which specifies there to put created deployment package:
+
+```bash
+rsuite proj zip -p /path/to/put/deployment/package
+```
+
+If you do not want project consistency check for some reason (or if project is not under version control) you can enforce deployment package version passing --version option following way:
+
+```bash
+rsuite proj zip --version=1.0
+```
+
+Version number should be in form NN.NN.
+
+It also accepts standard options -v and -h.
+
+## Repository management
+
+You can also manage content of local (Dir) and S3 repositories with RSuite CLI. For that purpose repo command should be used.
+
+All repo sub-commands accept beside standard -v and -h following options 
+
+* -d (short for --dir) which takes as parameter path to local (in directory) repository
+* -s (short for --s3_url) which takes as parameter url to S3 repository
+
+For local repository it is check if you have permissions to modify it.
+
+For S3 repository it is required to have repository credentials in your user home directory and S3 command line client available in your run environment (PATH environment variable should point to folder containing aws utility).
+
+#### Adding project packages to repository
+
+During adding project packages to repository project consistency is checked the same way it is done during building deployment package: it is checked if uncommitted changes exists and if project source revision is consistent with repository. Project packages are rebuilt with revision number appended to project version number.
+
+To add project packages to a repository execute following
+
+```bash
+rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path
+```
+
+It will add all your project packages to the repository. You can specify which packages should be added following way
+
+```bash
+rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -n Package1,Package2
+```
+
+If for some reason you do not want check project source consistency while rebuilding project packages you can skip RC checks:
+
+```bash
+rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path --skip_rc
+```
+
+You can also decide which kind of packages will be built and added to repository (source or binary) with -b (short for --binary) option:
+
+```bash
+rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -b FALSE
+```
+
+#### Adding in file packages to repository
+
+If you have some specific packages downloaded as files (source or binary) you can upload then following way:
+
+```bash
+rsuite repo addfile -d /path/to/your/repository -f /path/to/file1.tar.gz,/path/to/file2.tar.gz
+```
+
+#### Adding external packages to repository
+
+If you need for some reason add external packages (from CRAN, MRAN or any other repository) you can do it with following command
+
+```bash
+rsuite repo addext -d /path/to/your/repository -n package1,package2
+```
+
+Packages are searched in repositories project is configured to use (Repositories entry in project PARAMETERS file) for looking for dependencies.
+
+You can specify that you want to add source (or binary) version of packages to repository with -b (short for --binary) option:
+
+```bash
+rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE
+```
+
+#### Adding content of PKGZIP to repository
+
+If you managed to build PKGZIP containing some packages (see pkgzip command) you can add its content to repository:
+
+```bash
+rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip
+```
+
+#### Adding package from GitHub to repository
+
+If you want to add package available on GitHub repository you can achieve it calling following command:
+
+```bash
+rsuite repo addgithub -d /path/to/your/repository -r github/ProjectName
+```
+
+RSuite CLI will download sources, build package and add it to specified repository.
+
+GitHub repository can be specified in format username/repo[/subdir][@ref|#pull]. 
+
+You can also specify following options to addgithub:
+
+* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, 'github.hostname.com/api/v3'.
+* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be added to the repository: system specific binary of source.
+* --rver wich takes R version number to target built package for (important for binary packages).
+
+#### List contents of repository
+
+You can list packages available on the repository with following command:
+
+```bash
+rsuite repo list -s http://your-s3-bucket.s3.amazonaws.com/path
+```
+
+It will print table with all packages and their versions available in repository. Specifying -b (short for --binary) option to can choose to list binary or source packages.
+
+#### Remove packages from repository
+
+You can also remove packages from repository with following command:
+
+```bash
+rsuite repo remove -s http://your-s3-bucket.s3.amazonaws.com/path -r Package1==Version1,Package2==Version2
+```
+
+## Building PKGZIP packages
+
+PKGZIPs can be used to create repository in some connection less environment. To create PKGZIPs you can use pkgzip command. All pkgzip sub-commands beside standard -v and -h options accept also -p (short for --path) which takes as parameter folder to put created PKGZIP to.
+
+### Building PKGZIP containing project packages
+
+During creating PKGZIP with project packages included project consistency is checked the same way it is done during building deployment package: it is checked if uncommitted changes exists and if project source revision is consistent with repository. Project packages are rebuilt with revision number appended to project version number and rebuilt versions are included into PKGZIP.
+
+You can create PKGZIP containing project packages with command
+
+```bash
+rsuite pkgzip proj
+```
+
+It will include all your project packages into PKGZIP. You can specify which packages should be included following way
+
+```bash
+rsuite pkgzip proj -n Package1,Package2
+```
+
+If for some reason you do not want check project source consistency you can enforce PKGZIP version following way:
+
+```bash
+rsuite pkgzip proj --version=1.0
+```
+
+Version number should be in form NN.NN.
+
+You can also decide which kind of packages will be built and included in PKGZIP (source or binary) with -b (short for --binary) option:
+
+```bash
+rsuite pkgzip proj -b TRUE
+```
+
+#### Building PKGZIP containing in file packages
+
+If you have some specific packages downloaded as files (source or binary) you can create PKGZIP containing them following way:
+
+```bash
+rsuite pkgzip proj -f /path/to/file1.tar.gz,/path/to/file2.tar.gz
+```
+
+#### Building PKGZIP containing external packages
+
+If you need to create PKGZIP containing external packages (from CRAN, MRAN or any other repository) you can do it with following command
+
+```bash
+rsuite pkgzip ext -n package1,package2
+```
+
+Packages are searched in repositories project is configured to use (Repositories entry in project PARAMETERS file) for looking for dependencies.
+
+You can specify that you want to include source (or binary) version of packages in PKGZIP with -b (short for --binary) option:
+
+```bash
+rsuite pkgzip ext -n package1,package2 -b TRUE
+```
+
+#### Building PKGZIP containing package from GitHub
+
+If you want to create PKGZIP out of available on GitHub repository call following command:
+
+```bash
+rsuite pkgzip github-r github/ProjectName
+```
+
+RSuite CLI will download sources, build package and add create PKGZIP out of it.
+
+GitHub repository can be specified in format username/repo[/subdir][@ref|#pull]. 
+
+You can also specify following options to github:
+
+* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, 'github.hostname.com/api/v3'.
+* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be included in PKGZIP: system specific binary of source.
+
+## Getting help
+
+You can find your which commands do rsuite accept calling 
+
+```bash
+rsuite help
+```
+
+Each command accepts -h (short for --help) option as well as help sub-command which will provide you with brief information of command purpose and sub-commands supported.
+
+Each sub-command accepts -h (short for --help) which will provide you with brief information on sub-command and all the options sub-command accepts with description.
+
