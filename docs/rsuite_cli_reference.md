@@ -188,25 +188,25 @@ During adding project packages to repository project consistency is checked the 
 To add project packages to a repository execute following
 
 ```bash
-rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path
+rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path
 ```
 
 It will add all your project packages to the repository. You can specify which packages should be added following way
 
 ```bash
-rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -n Package1,Package2
+rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -n Package1,Package2
 ```
 
 If for some reason you do not want check project source consistency while rebuilding project packages you can skip RC checks:
 
 ```bash
-rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path --skip_rc
+rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path --skip_rc
 ```
 
 You can also decide which kind of packages will be built and added to repository (source or binary) with -b (short for --binary) option:
 
 ```bash
-rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -b FALSE
+rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -b FALSE
 ```
 
 #### Adding in file packages to repository
@@ -238,7 +238,7 @@ rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE
 If you managed to build PKGZIP containing some packages (see pkgzip command) you can add its content to repository:
 
 ```bash
-rsuite repo addprj -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip
+rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip
 ```
 
 #### Adding package from GitHub to repository
