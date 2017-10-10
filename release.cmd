@@ -61,7 +61,7 @@ IF "%rpm%" == "" (
 )
 aws s3 cp rpms\%rpm% s3://wlog-rsuite/cli/redhat/
 IF ERRORLEVEL 1 goto popd_error
-echo rpm: rpm/%rpm% >> "%pkg_index%"
+echo rpm: redhat/%rpm% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% RPM package onto S3 repository ... done
@@ -80,7 +80,7 @@ IF "%deb%" == "" (
 )
 aws s3 cp debs\%deb% s3://wlog-rsuite/cli/debian/ --acl public-read
 IF ERRORLEVEL 1 goto popd_error
-echo deb: dev/%deb% >> "%pkg_index%"
+echo deb: debian/%deb% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% DEB package onto S3 repository ... done
