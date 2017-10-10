@@ -42,6 +42,7 @@ install -m 755 rsuite %{buildroot}/usr/bin/rsuite
 /usr/share/rsuitecli/rsuite.sh
 /usr/share/rsuitecli/version.txt
 /usr/share/rsuitecli/R/command_mgr.R
+/usr/share/rsuitecli/R/command_utils.R
 /usr/share/rsuitecli/R/cmd_repo.R
 /usr/share/rsuitecli/R/cmd_proj.R
 /usr/share/rsuitecli/R/cmd_pkgzip.R
