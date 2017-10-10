@@ -1,10 +1,18 @@
 @echo off
 
 Rscript --version 1> nul 2>&1
-if %ERRORLEVEL% GTR 0 (
-    echo ERROR: No R installation available.
-    echo Please install R and verify its location added PATH environment variable.
-    exit /B 1
+if ERRORLEVEL 1 (
+    for /f "skip=1 tokens=2* " %%a in ('reg query HKLM\SOFTWARE\R-core\R /v InstallPath') do (
+        echo R detected at %%b. Will update PATH variable.
+        path %%~sb\bin;%PATH%
+    )
+
+    Rscript.exe --version 1> nul 2>&1
+    if ERRORLEVEL 1 (
+        echo ERROR: No R installation available. Failed to detect R path in registry.
+        echo Please install R and verify its location added PATH environment variable.
+        exit /B 1
+    )
 )
 
 set base_dir=%~dp0

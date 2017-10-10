@@ -1,7 +1,7 @@
 ---
 title: "RSuite CLI"
 author: "WLOG Solutions"
-date: "20 september 2017"
+date: "10 october 2017"
 output: html_document
 ---
 
@@ -50,14 +50,6 @@ If you would like to use some specific repository to look for RSuite package ins
 ```{r eval=FALSE} 
 rsuite install -u http://url.to.your.repository
 ```
-
-If you prefer to use (or not) installing binary RSuite package call
-
-```{r eval=FALSE} 
-rsuite install -b TRUE
-```
-
-Using binary package is default for Windows and using source package is default of Linuxes.
 
 You can also see all supported options 'rsuite install' supports please call
 

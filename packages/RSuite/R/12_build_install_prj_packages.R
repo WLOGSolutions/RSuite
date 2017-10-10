@@ -30,9 +30,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
                        F = function(ver) { paste0(ver, "-", revision) })
     update_project_pkgsvers(params$pkgs_path, pkg_revs) # from 51_pkg_info.R
 
-    restore_pkgs <- function() { restore_pkgdesc_files(bkp_info) }
-  } else {
-    restore_pkgs <- function() {}
+    on.exit({ restore_pkgdesc_files(bkp_info) }, add = T)
   }
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path)
@@ -47,16 +45,14 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
            paste(unknown_pkgs, collapse = ", "))
   }
 
-  prev_library <- .Library
-  prev_lpath <- .libPaths()
-  on.exit({
-    .Library <- prev_library
-    .libPaths(prev_lpath)
-    
-    restore_pkgs()
-  })
-  .Library <- NULL
-  .libPaths(params$lib_path)
+#  prev_library <- .Library
+#  prev_lpath <- .libPaths()
+#  on.exit({
+#    .Library <- prev_library
+#    .libPaths(prev_lpath)
+#  })
+#  .Library <- NULL
+#  .libPaths(params$lib_path)
   
   # check if environment has to be rebuilt
   uninstDeps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
@@ -121,7 +117,8 @@ build_install_prj_packages <- function(params, build_type) {
                    pkg_file <- pkg_build(pkg_path,
                                          dest_dir = contrib_url,
                                          binary = (build_type != "source"),
-                                         rver = params$r_ver)
+                                         rver = params$r_ver,
+                                         libpath = params$lib_path)
                    if (is.null(pkg_file)) {
                      return() # Failed to build package
                    }

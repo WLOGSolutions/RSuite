@@ -1,3 +1,7 @@
+VERSION 0.11 (2017-10-10)
+  * Handling of .libPath during project package build: it currently contains 
+     also user library path.
+
 VERSION 0.10 (2017-09-24)
   * Fixed handling of .libPath during prj_deps_inst and prj_build.
   * logging moved to Imports in RSuite and created projects.

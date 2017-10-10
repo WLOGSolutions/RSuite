@@ -103,10 +103,11 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #'   there so the folder must exist.
 #' @param binary if TRUE will build binary package. (type: logical)
 #' @param rver R version to build package with. (type: character)
+#' @param libpath library path to use during building. (type: character)
 #'
 #' @return Full path to builded package or NULL if failed to build. (type: character)
 #'
-pkg_build <- function(pkg_path, dest_dir, binary, rver) {
+pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
   stopifnot(length(pkg_path) == 1 && dir.exists(pkg_path))
   stopifnot(length(dest_dir) == 1 && dir.exists(dest_dir))
   pkg_path <- rsuite_fullUnifiedPath(pkg_path)
@@ -164,8 +165,11 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver) {
   ou_file <- tempfile(fileext = ".RData")
   on.exit(unlink(ou_file, force = T))
   
-  bld_res <- run_rscript(c("ou_path <- devtools::build(%s)",
+  bld_res <- run_rscript(c("library(devtools);",
+                           ".libPaths(%s);",
+                           "ou_path <- build(%s)",
                            "save(ou_path, %s)"), 
+                         rscript_arg("new", rsuite_fullUnifiedPath(libpath)),
                          paste(bld_args, collapse = ", "),
                          rscript_arg("file", ou_file),
                          rver = rver)

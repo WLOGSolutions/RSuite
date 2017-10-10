@@ -42,14 +42,6 @@ If you would like to use some specific repository to look for RSuite package ins
 rsuite install -u http://url.to.your.repository
 ```
 
-If you prefer to use (or not) installing binary RSuite package call
-
-```bash
-rsuite install -b TRUE
-```
-
-Using binary package is default for Windows and using source package is default of Linuxes.
-
 You can also see all supported options 'rsuite install' supports please call
 
 ```bash

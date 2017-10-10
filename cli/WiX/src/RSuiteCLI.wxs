@@ -31,6 +31,7 @@
         <DirectoryRef Id='APPLICATIONFOLDER'>
             <Component Id='MainCMD' Guid='927416cf-eaa6-4152-b3bc-b039c2d50103'>
                 <File Id='RSuiteCMD' Name='rsuite.cmd' DiskId='1' Source='../rsuite.cmd' KeyPath='yes' />
+                <File Id='zip.exe' Name='zip.exe' DiskId='1' Source='zip.exe' />
                 <File Id='version.txt' Name='version.txt' DiskId='1' Source='build/version.txt' />
                 <Environment Id="PATH" Name="PATH" Value="[APPLICATIONFOLDER]" Permanent="no" Part="last" Action="set" System="yes" />
             </Component>
