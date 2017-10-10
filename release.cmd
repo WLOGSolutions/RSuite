@@ -26,23 +26,23 @@ pushd cli\WiX
 del *.msi 2> nul 
 call build.cmd 
 
-FOR /R %%F IN (RSuiteCLI_v*.%gitver%_x64.msi) DO set msi_x64=%%F
+FOR /R %%F IN (RSuiteCLI_v*.%gitver%_x64.msi) DO set msi_x64=%%~nxF
 IF "%msi_x64%" == "" (
 	echo ERROR: failed to build x64 MSI package for RSuite CLI tag %gitver%.
 	goto popd_error
 )
-rem aws s3 cp "%msi_x64%" s3://wlog-rsuite/cli/windows/
+rem aws s3 cp %msi_x64% s3://wlog-rsuite/cli/windows/
 rem IF ERRORLEVEL 1 goto popd_error
-echo win-x64: %msi_x64% >> "%pkg_index%"
+echo win-x64: windows/%msi_x64% >> "%pkg_index%"
 
-FOR /R %%F IN (RSuiteCLI_v*.%gitver%_x86.msi) DO set msi_x86=%%F
+FOR /R %%F IN (RSuiteCLI_v*.%gitver%_x86.msi) DO set msi_x86=%%~nxF
 IF "%msi_x86%" == "" (
 	echo ERROR: failed to build x86 MSI package for RSuite CLI tag %gitver%.
 	goto popd_error
 )
-rem aws s3 cp "%msi_x86%"" s3://wlog-rsuite/cli/windows/
+rem aws s3 cp %msi_x86% s3://wlog-rsuite/cli/windows/
 rem IF ERRORLEVEL 1 goto popd_error
-echo win-x86: %msi_x86% >> "%pkg_index%"
+echo win-x86: windows/%msi_x86% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% MSI onto S3 repository ... done
@@ -54,14 +54,14 @@ pushd cli\rpm
 rmdir /s/q rpms 2> nul
 call create_rpm.cmd
 
-FOR /R %%F IN (rpms\rsuitecli-*.%gitver%-1.noarch.rpm) DO set rpm=%%F
+FOR /R %%F IN (rpms\rsuitecli-*.%gitver%-1.noarch.rpm) DO set rpm=%%~nxF
 IF "%rpm%" == "" (
 	echo ERROR: failed to build RPM package for RSuite CLI tag %gitver%.
 	goto popd_error
 )
-rem aws s3 cp "%rpm%" s3://wlog-rsuite/cli/redhat/
+rem aws s3 cp rpms\%rpm% s3://wlog-rsuite/cli/redhat/
 rem IF ERRORLEVEL 1 goto popd_error
-echo rpm: %rpm% >> "%pkg_index%"
+echo rpm: rpm/%rpm% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% RPM package onto S3 repository ... done
@@ -73,14 +73,14 @@ pushd cli\deb
 rmdir /s/q debs 2> nul
 call create_deb.cmd
 
-FOR /R %%F IN (debs\rsuitecli_*.%gitver%-1_all.deb) DO set deb=%%F
+FOR /R %%F IN (debs\rsuitecli_*.%gitver%-1_all.deb) DO set deb=%%~nxF
 IF "%deb%" == "" (
 	echo ERROR: failed to build DEB package for RSuite CLI tag %gitver%.
 	goto popd_error
 )
-rem aws s3 cp "%deb%" s3://wlog-rsuite/cli/debian/
+rem aws s3 cp debs\%deb% s3://wlog-rsuite/cli/debian/
 rem IF ERRORLEVEL 1 goto popd_error
-echo deb: %deb% >> "%pkg_index%"
+echo deb: dev/%deb% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% DEB package onto S3 repository ... done
