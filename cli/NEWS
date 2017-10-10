@@ -5,6 +5,9 @@ VERSION 0.11 (2017-10-10)
      is exposed as in source only version.
   * zip.exe is installed by MSI together with RSuite CLI for building 
      binary project packages on clean Windows.
+  * Creation of user libs folder if not exists while running rsuite 
+     install
+  * rsuite install uses optparse to parse arguments.
 
 VERSION 0.10 (2017-09-24)
   * Logger configuration update to properly support -v and -q options

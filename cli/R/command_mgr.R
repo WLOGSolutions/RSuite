@@ -5,47 +5,7 @@
 # Generic command management utility.
 #----------------------------------------------------------------------------
 
-.fatal_error <- function(messages) {
-  for(m in messages) {
-    write(sprintf("ERROR: %s", m), stderr())
-  }
-  quit(save = "no", status = 1, runLast = FALSE)
-}
-.base_dir <- normalizePath(".")
-if (.Platform$OS.type == "windows") {
-  .base_dir <- shortPathName(.base_dir)
-}
-
-tryCatch({
-  suppressWarnings({
-    suppressPackageStartupMessages({
-      if (!require(optparse)) {
-        c_url <- sprintf("file:///%s", contrib.url(file.path(.base_dir, "packages"), type = "source"))
-        install.packages(c("optparse", "getopt"), contriburl = c_url, type = "source", quiet = T)
-      }
-      library(optparse)
-    })
-  })
-}, error = function(e) {
-  .fatal_error(c(geterrmessage(),
-                 "optparse is required for RSuite CLI to work. Tried to install it but failed."))
-})
-
-tryCatch({
-  suppressWarnings({
-    suppressPackageStartupMessages({
-      if (!require(logging)) {
-        c_url <- sprintf("file:///%s", contrib.url(file.path(.base_dir, "packages"), type = "source"))
-        install.packages(c("logging"), contriburl = c_url, type = "source", quiet = T)
-      }
-      library(optparse)
-    })
-  })
-}, error = function(e) {
-  .fatal_error(c(geterrmessage(),
-                 "logging is required for RSuite CLI to work. Tried to install it but failed."))
-})
-
+source('command_utils.R')
 
 handle_subcommands <- function(sub_commands, cmd_help) {
   args <- commandArgs(trailingOnly = T)
