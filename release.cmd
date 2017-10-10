@@ -33,7 +33,7 @@ IF "%msi_x64%" == "" (
 )
 rem aws s3 cp "%msi_x64%" s3://wlog-rsuite/cli/windows/
 rem IF ERRORLEVEL 1 goto popd_error
-echo win-x64: %msi_x64% >> "%pkg_index%"
+echo win-x64: windows/%~nxmsi_x64% >> "%pkg_index%"
 
 FOR /R %%F IN (RSuiteCLI_v*.%gitver%_x86.msi) DO set msi_x86=%%F
 IF "%msi_x86%" == "" (
@@ -42,7 +42,7 @@ IF "%msi_x86%" == "" (
 )
 rem aws s3 cp "%msi_x86%"" s3://wlog-rsuite/cli/windows/
 rem IF ERRORLEVEL 1 goto popd_error
-echo win-x86: %msi_x86% >> "%pkg_index%"
+echo win-x86: windows/%~nxmsi_x86% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% MSI onto S3 repository ... done
@@ -61,7 +61,7 @@ IF "%rpm%" == "" (
 )
 rem aws s3 cp "%rpm%" s3://wlog-rsuite/cli/redhat/
 rem IF ERRORLEVEL 1 goto popd_error
-echo rpm: %rpm% >> "%pkg_index%"
+echo rpm: rpm/%~nxrpm% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% RPM package onto S3 repository ... done
@@ -80,7 +80,7 @@ IF "%deb%" == "" (
 )
 rem aws s3 cp "%deb%" s3://wlog-rsuite/cli/debian/
 rem IF ERRORLEVEL 1 goto popd_error
-echo deb: %deb% >> "%pkg_index%"
+echo deb: dev/%~nxdeb% >> "%pkg_index%"
 
 popd
 echo Building/uploading RSuite CLI tag %gitver% DEB package onto S3 repository ... done
