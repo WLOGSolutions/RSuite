@@ -59,7 +59,7 @@ IF "%rpm%" == "" (
 	echo ERROR: failed to build RPM package for RSuite CLI tag %gitver%.
 	goto popd_error
 )
-aws s3 cp rpms\%rpm% s3://wlog-rsuite/cli/redhat/
+aws s3 cp rpms\%rpm% s3://wlog-rsuite/cli/redhat/ --acl public-read
 IF ERRORLEVEL 1 goto popd_error
 echo rpm: redhat/%rpm% >> "%pkg_index%"
 
