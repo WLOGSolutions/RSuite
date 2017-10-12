@@ -129,4 +129,22 @@ expect_that_packages_installed <- function(names, prj, versions = NULL) {
   invisible(installed)
 }
 
-
+expect_that_has_docs <- function(topics, pkg_name, prj) {
+  doc_path <- file.path(prj$path, "deployment", "libs", pkg_name, "help", "AnIndex")
+  if (!file.exists(doc_path)) {
+    pass <- F
+    msg <- sprintf("No documentation index found for %s", pkg_name)
+  } else {
+    lines <- readLines(doc_path)
+    all_topics <- unlist(lapply(strsplit(lines, "\t"), function(ent) { ent[1] }))
+    
+    pass <- all(topics %in% all_topics)
+    if (!pass) {
+      msg <- sprintf("Documetation topics not found in %s: %s", 
+                     pkg_name, paste(setdiff(topics, all_topics), collapse = ", "))
+    } else {
+      msg <- ""
+    }
+  }
+  expect(pass, msg)
+}

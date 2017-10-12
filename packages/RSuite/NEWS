@@ -1,6 +1,7 @@
-VERSION 0.11 (2017-10-10)
+VERSION 0.11 (2017-10-12)
   * Handling of .libPath during project package build: it currently contains 
      also user library path.
+  * #140: Building package documentation then package has dependencies fixed.
 
 VERSION 0.10 (2017-09-24)
   * Fixed handling of .libPath during prj_deps_inst and prj_build.

@@ -112,7 +112,8 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
   stopifnot(length(dest_dir) == 1 && dir.exists(dest_dir))
   pkg_path <- rsuite_fullUnifiedPath(pkg_path)
   dest_dir <- rsuite_fullUnifiedPath(dest_dir)
-
+  libpath <- rsuite_fullUnifiedPath(libpath)
+  
   pkg_name <- basename(pkg_path)
   makevars <- file.path(pkg_path, "src", 
                         ifelse(.Platform$OS.type == "windows", "Makevars.win", "Makevars.in"))
@@ -133,7 +134,11 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
                       return(TRUE)
                     })
   if (length(removed) == 0 || any(unlist(removed))) {
-    doc_res <- run_rscript("devtools::document(%s)", rscript_arg("pkg", pkg_path),
+    doc_res <- run_rscript(c("library(devtools)",
+                             ".libPaths(%s)",
+                             "document(%s)"), 
+                           rscript_arg("new", libpath),
+                           rscript_arg("pkg", pkg_path),
                            rver = rver)
     if (!is.null(doc_res)) {
       if (doc_res == FALSE) {
@@ -145,8 +150,13 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
   }
 
   if (devtools::uses_testthat(pkg = pkg_path)) {
-    test_res <- run_rscript(c("test_results <- devtools::test(%s)",
-                              "if (!testthat:::all_passed(test_results)) { stop('Tests failed') }"),
+    test_res <- run_rscript(c("library(devtools)",
+                              "library(testthat)",
+                              "all_passed <- testthat:::all_passed",
+                              ".libPaths(%s)",
+                              "test_results <- test(%s)",
+                              "if (!all_passed(test_results)) { stop('Tests failed') }"),
+                            rscript_arg("new", libpath),
                             rscript_arg("pkg", pkg_path),
                             rver = rver)
     if (!is.null(test_res)) {
@@ -165,11 +175,11 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
   ou_file <- tempfile(fileext = ".RData")
   on.exit(unlink(ou_file, force = T))
   
-  bld_res <- run_rscript(c("library(devtools);",
-                           ".libPaths(%s);",
+  bld_res <- run_rscript(c("library(devtools)",
+                           ".libPaths(%s)",
                            "ou_path <- build(%s)",
                            "save(ou_path, %s)"), 
-                         rscript_arg("new", rsuite_fullUnifiedPath(libpath)),
+                         rscript_arg("new", libpath),
                          paste(bld_args, collapse = ", "),
                          rscript_arg("file", ou_file),
                          rver = rver)
