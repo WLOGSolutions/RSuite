@@ -1,24 +1,25 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-    <Product Name='RSuite CLI v$(var.VERSION)' Manufacturer='WLOG Solutions' Id='*' 
+    <Product Name='RSuite CLI v$(var.VERSION)' Manufacturer='WLOG Solutions' Id='*'
             UpgradeCode='af7b4234-60c2-4fea-9b43-8c6b2deaed6e'
             Language='1033' Codepage='1252' Version='$(var.VERSION)'>
         <Package Id='*' Keywords='Installer' Description='RSuite CLI Installer' Manufacturer='WLOG Solutions'
             InstallerVersion='200' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
-            
+
         <Media Id='1' Cabinet='RSuite.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
         <Property Id='DiskPrompt' Value='RSuite CLI Installation [1]' />
-        
+
         <Property Id="REINSTALLMODE" Value="amus" />
+        <Property Id="REINSTALL" Value="ALL" />
         <MajorUpgrade AllowDowngrades="yes" />
-        
+
         <?if $(sys.BUILDARCH) = x64 ?>
             <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
         <?else ?>
             <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
-        <?endif ?>        
-        
-        
+        <?endif ?>
+
+
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
                 <Directory Id='R' Name='R'>
@@ -27,7 +28,7 @@
             </Directory>
             <Directory Id='ProgramMenuFolder' Name='Programs' />
         </Directory>
-        
+
         <DirectoryRef Id='APPLICATIONFOLDER'>
             <Component Id='MainCMD' Guid='927416cf-eaa6-4152-b3bc-b039c2d50103'>
                 <File Id='RSuiteCMD' Name='rsuite.cmd' DiskId='1' Source='../rsuite.cmd' KeyPath='yes' />
@@ -35,7 +36,7 @@
                 <File Id='version.txt' Name='version.txt' DiskId='1' Source='build/version.txt' />
                 <Environment Id="PATH" Name="PATH" Value="[APPLICATIONFOLDER]" Permanent="no" Part="last" Action="set" System="yes" />
             </Component>
-            
+
             <Directory Id='RSources' Name='R'>
                 <Component Id='RSources' Guid='31197745-41cb-4323-9f3e-ccfdc7a5d2f7'>
                     <File Id='command_mgr.R' Name='command_mgr.R' DiskId='1' Source='../R/command_mgr.R' KeyPath='yes' />
@@ -43,7 +44,7 @@
                     <File Id='cmd_install.R' Name='cmd_install.R' DiskId='1' Source='../R/cmd_install.R' />
                     <File Id='cmd_proj.R' Name='cmd_proj.R' DiskId='1' Source='../R/cmd_proj.R' />
                     <File Id='cmd_repo.R' Name='cmd_repo.R' DiskId='1' Source='../R/cmd_repo.R' />
-                    <File Id='cmd_pkgzip.R' Name='cmd_pkgzip.R' DiskId='1' Source='../R/cmd_pkgzip.R' />                              
+                    <File Id='cmd_pkgzip.R' Name='cmd_pkgzip.R' DiskId='1' Source='../R/cmd_pkgzip.R' />
                 </Component>
                 <Directory Id='packages' Name='packages'>
                     <Directory Id='packages_src' Name='src'>
@@ -65,7 +66,7 @@
                 </Component>
             </Directory>
         </DirectoryRef>
-           
+
         <DirectoryRef Id='ProgramMenuFolder'>
             <Directory Id='ProgramMenuDir' Name='RSuite CLI'>
                 <Component Id='ProgramMenuDir' Guid='25352f27-06b4-4079-af6c-bb89297b957c'>
@@ -77,13 +78,13 @@
                           Name="Uninstall RSuite CLI"
                           Description="Uninstalls RSuite CLI"
                           Target="[System64Folder]msiexec.exe"
-                          Arguments="/x [ProductCode]" />                          
+                          Arguments="/x [ProductCode]" />
                     <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
                     <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
         </DirectoryRef>
-        
+
         <Feature Id='Complete' Level='1' Title='Complete installation'>
             <ComponentRef Id='MainCMD' />
             <ComponentRef Id='RSources' />
@@ -91,14 +92,13 @@
             <ComponentRef Id='RSuiteCLIDoc' />
             <ComponentRef Id='ProgramMenuDir' />
         </Feature>
-        
+
         <Property Id="ApplicationFolderName" Value="RSuiteCLI" />
-        <Property Id="WixAppFolder" Value="WixPerMachineFolder" />             
+        <Property Id="WixAppFolder" Value="WixPerMachineFolder" />
 
         <UIRef Id="WixUI_AdvancedFx" />
-        
+
         <Icon Id="RSuiteCLI.ico" SourceFile="src/RSuiteCLI.ico" />
         <Property Id="ARPPRODUCTICON" Value="RSuiteCLI.ico" />
     </Product>
 </Wix>
-    

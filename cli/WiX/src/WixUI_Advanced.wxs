@@ -2,13 +2,13 @@
 
 <!--
     Copyright (c) Microsoft Corporation.  All rights reserved.
-    
+
     The use and distribution terms for this software are covered by the
     Common Public License 1.0 (http://opensource.org/licenses/cpl1.0.php)
     which can be found in the file CPL.TXT at the root of this distribution.
     By using this software in any fashion, you are agreeing to be bound by
     the terms of this license.
-    
+
     You must not remove this notice, or any other, from this software.
 -->
 <!--
@@ -19,7 +19,7 @@ installs, install path, and features.
 WiX variables used:
  - WixUISupportPerMachine
  - WixUISupportPerUser
- 
+
 Todo:
  - Clicking Install doesn't work! - APPLICATIONFOLDER isn't set; need to accept another "incoming" property.
  - Replace this dialog set UI fragment with the UI extension.
@@ -41,7 +41,7 @@ Todo:
             <?define PlatformProgramFilesFolder = "[ProgramFiles64Folder]" ?>
         <?else ?>
             <?define PlatformProgramFilesFolder = "[ProgramFilesFolder]" ?>
-        <?endif ?>        
+        <?endif ?>
 
         <CustomAction Id="WixSetDefaultPerUserFolderFx" Property="WixPerUserFolder" Value="[LocalAppDataFolder]Apps\[ApplicationFolderName]" Execute="immediate" />
         <CustomAction Id="WixSetDefaultPerMachineFolderFx" Property="WixPerMachineFolder" Value="$(var.PlatformProgramFilesFolder)R\[ApplicationFolderName]" Execute="immediate" />
@@ -83,7 +83,7 @@ Todo:
             <DialogRef Id="WelcomeDlg"/>
 
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-            
+
             <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="1">1</Publish>
             <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="2"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
 
@@ -125,6 +125,6 @@ Todo:
         </UI>
 
         <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONFOLDER" />
-        <UIRef Id="WixUI_Common" />        
+        <UIRef Id="WixUI_Common" />
     </Fragment>
 </Wix>
