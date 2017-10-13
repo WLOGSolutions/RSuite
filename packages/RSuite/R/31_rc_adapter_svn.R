@@ -202,6 +202,9 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) 
   svn$add_dir(file.path(params$prj_path, "deployment", "libs"))
   svn$prop_set(file.path(params$prj_path, "deployment", "libs"), "svn:ignore", c("*.*", "*"))
 
+  svn$add_dir(file.path(params$prj_path, "deployment", "sbox"))
+  svn$prop_set(file.path(params$prj_path, "deployment", "sbox"), "svn:ignore", c("*.*", "*"))
+  
   svn$add_dir(file.path(params$prj_path, "logs"))
   svn$prop_set(file.path(params$prj_path, "logs"), "svn:ignore", c("*.*", "*"))
 

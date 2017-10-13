@@ -39,6 +39,8 @@ load_prj_parameters <- function(prj_path) {
 
     # Specifies there to put local project environment
     lib_path = rsuite_fullUnifiedPath(file.path(prj_path, "deployment", "libs")),
+    # Specifies there to put user installed libraries
+    sbox_path = rsuite_fullUnifiedPath(file.path(prj_path, "deployment", "sbox")),
 
     zip_version = ifelse('ZipVersion' %in% colnames(dcf), dcf[1, 'ZipVersion'], ''),
     project = ifelse("Project" %in% colnames(dcf), dcf[1, 'Project'], basename(prj_path)),
@@ -54,6 +56,10 @@ load_prj_parameters <- function(prj_path) {
     bin_pkgs_type = ifelse(.Platform$OS.type == "windows", "win.binary", "binary")
   )
 
+  if (!dir.exists(params$sbox_path)) {
+    dir.create(params$sbox_path, recursive = T, showWarnings = F)
+  }
+  
   params$get_repo_adapter_names <- function(repo_adapter_name, default) {
     specs <- unlist(strsplit(params$repo_adapters, ","))
     return(names(parse_repo_adapters_spec(specs)))

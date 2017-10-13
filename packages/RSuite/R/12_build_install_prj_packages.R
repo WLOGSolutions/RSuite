@@ -45,15 +45,6 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
            paste(unknown_pkgs, collapse = ", "))
   }
 
-#  prev_library <- .Library
-#  prev_lpath <- .libPaths()
-#  on.exit({
-#    .Library <- prev_library
-#    .libPaths(prev_lpath)
-#  })
-#  .Library <- NULL
-#  .libPaths(params$lib_path)
-  
   # check if environment has to be rebuilt
   uninstDeps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
   uninstDeps <- uninstDeps$rm(prj_pkgs)

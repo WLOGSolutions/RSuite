@@ -1,23 +1,24 @@
-VERSION 0.12 (2017-10-??)
-  * rsuite install installs latest supported RSuite version.
-  
+VERSION 0.12 (2017-10-13)
+  * RStudio basic integration implemented. Dependency to rstudioapi added.
+  * sbox folder added beside deployment/libs for libraries installed by the user.
+
 VERSION 0.11 (2017-10-12)
-  * Handling of .libPath during project package build: it currently contains 
+  * Handling of .libPath during project package build: it currently contains
      also user library path.
   * #140: Building package documentation then package has dependencies fixed.
 
 VERSION 0.10 (2017-09-24)
   * Fixed handling of .libPath during prj_deps_inst and prj_build.
   * logging moved to Imports in RSuite and created projects.
-  
+
 VERSION 0.9 (2017-09-20)
   * Minor fixes related to installation of RSuite
-  
+
 VERSION 0.8 (2017-09-13)
-  * Dependencies are checked both binary and source iteratively until they are 
+  * Dependencies are checked both binary and source iteratively until they are
        all satisfied (deep dependency search).
-  * Repository order is important: former repositories are checked for 
-       dependencies before later ones. If proper version is found latter 
+  * Repository order is important: former repositories are checked for
+       dependencies before later ones. If proper version is found latter
        repositories will not be checked to satisfy it.
 
 VERSION 0.7 (2017-09-12)

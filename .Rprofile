@@ -1,1 +1,1 @@
-.libPaths(c("deployment/libs", .libPaths()))
+.libPaths(c("deployment/sbox", "deployment/libs", .libPaths()))

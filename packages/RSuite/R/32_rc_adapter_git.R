@@ -67,6 +67,10 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) 
   git2r::add(repo, git_path("deployment", "libs", ".gitignore"))
 
   writeLines(c("*", "!.gitignore"),
+             con = file.path(params$prj_path, "deployment", "sbox", ".gitignore"))
+  git2r::add(repo, git_path("deployment", "sbox", ".gitignore"))
+  
+  writeLines(c("*", "!.gitignore"),
              con = file.path(params$prj_path, "logs", ".gitignore"))
   git2r::add(repo, git_path("logs", ".gitignore"))
 
@@ -138,10 +142,10 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, 
 #'
 rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   repo <- git2r::repository(dir, discover = T)
-  st <- status(repo)
+  st <- git2r::status(repo)
 
   # detect head target
-  head_branch <- head(repo)
+  head_branch <- git2r::head(repo)
   head_target <- git2r::branch_target(head_branch)
 
   # detect if HEAD commit is tagged

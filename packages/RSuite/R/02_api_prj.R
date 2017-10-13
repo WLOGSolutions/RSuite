@@ -258,9 +258,9 @@ prj_load <- function(path, prj = NULL) {
   prev_prj <- set_loaded_prj(prj)
 
   cur_lpath <- .libPaths()
-  cur_lpath <- cur_lpath[!grepl("[\\/]deployment[\\/]libs[\\/]?$", cur_lpath)]
+  cur_lpath <- cur_lpath[!grepl("[\\/]deployment[\\/](libs|sbox)[\\/]?$", cur_lpath)]
 
-  .libPaths(c(params$lib_path, cur_lpath))
+  .libPaths(c(params$sbox_path, params$lib_path, cur_lpath))
 
   invisible(prev_prj)
 }
