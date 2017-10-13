@@ -198,16 +198,14 @@ sub_commands <- list(
     options = c(
       make_option(c("-b", "--binary"), dest = "binary", type = "logical", default = (.Platform$pkgType != "source"),
                   help = "Retrieve list of binary packages (default: %default)"),
-      make_option(c("-c", "--cache"), dest = "cache", type = "logical", default = TRUE,
-                  help = "If FALSE will delete cached list before retrieving (default: TRUE)"),
       common_options
     ),
     run = function(opts) {
       pkg_type <- get_pkg_type(opts$binary)
 
       ra_mng <- start_management(opts, rver = NULL, types = pkg_type)
-
-      avail_pkgs <- RSuite::repo_mng_list(ra_mng, pkg_type, !opts$cache)
+      
+      avail_pkgs <- RSuite::repo_mng_list(ra_mng, pkg_type)
       write(sprintf("%-40s%-40s", "Package", "Version"), stdout())
       by(avail_pkgs, 1:nrow(avail_pkgs), function(row) write(sprintf("%-40s%-40s", row$Package, row$Version), stdout()))
 
