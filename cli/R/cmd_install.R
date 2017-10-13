@@ -42,14 +42,37 @@ for(n in names(all_repos)) {
   message(sprintf("\t%10s = %s", n, all_repos[[n]]))
 }
 
+cli_ver <- suppressWarnings(readLines(file.path(base_dir, "..", "version.txt")))
+vbase <- gsub("^(\\d+[.]\\d+)[.-]\\d+$", "\\1", cli_ver)
 
-message("Installing RSuite package...")
+message(sprintf("Installing RSuite(v%sx) package ...", vbase))
 
-required_pkgs <- c("RSuite")
 wd <- setwd(.libPaths()[1]) # set wd to place there .Rprofile does not exist
 tryCatch({
-  utils::install.packages(required_pkgs,
-                          repos = all_repos,
+  # detect latest supported version to install
+  avails <- data.frame(utils::available.packages(repos = opts$url, filter = list()),
+                       row.names = NULL, stringsAsFactors = F)
+  ver_re <- sprintf("^%s[.-]", gsub("[.]", "[.]", vbase))
+  avails <- avails[avails$Package == 'RSuite' & grepl(ver_re, avails$Version), ]
+  if (nrow(avails) < 1) {
+    .fatal_error(sprintf("Failed to detect RSuite(v%sx) package at %s", vbase, opts$url))
+  }
+  avails <- avails[order(avails$Version, decreasing = T), ][1, ] # latest supported version
+  
+  # download it
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir, recursive = T)
+  on.exit({ unlink(tmp_dir, force = T, recursive = T) }, add = T)
+  dloaded <- utils::download.packages("RSuite", destdir = tmp_dir, available = avails, 
+                                      quiet = !opts$verbose)
+  if (nrow(dloaded) != 1) {
+    pkg_url <- sprintf("%s/%s", avails$Repository, paste(avails$File, collapse = " "))
+    .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
+  }
+  
+  # install it
+  utils::install.packages(dloaded[1,2],
+                          available = utils::available.packages(all_repos),
                           quiet = !opts$verbose,
                           verbose = opts$verbose)
 }, finally = { setwd(wd) })

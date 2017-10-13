@@ -16,7 +16,7 @@ fi
 
 case "$cmd" in
 	install)
-		$rscript_path --no-init-file $basedir/R/cmd_install.R $* || exit 2
+                $rscript_path --no-init-file $basedir/R/cmd_install.R $* || exit 2
 		;;
 	proj)
                 $rscript_path --no-init-file $basedir/R/cmd_proj.R $* || exit 2
@@ -28,8 +28,8 @@ case "$cmd" in
                 $rscript_path --no-init-file $basedir/R/cmd_pkgzip.R $* || exit 2
 		;;
 	version)
-		ver=`cat ${basedir}/version.txt`
-		echo $ver
+                ver=`cat ${basedir}/version.txt`
+                echo $ver
 		;;
 	help)
 		ver=`cat ${basedir}/version.txt`
@@ -52,7 +52,7 @@ case "$cmd" in
 		echo "           Use to create PKGZIP packages to fillup remove repository."
 		echo ""
 		echo "       version"
-                echo "           Show RSuite CLI version."
+		echo "           Show RSuite CLI version."
 		echo ""
 		echo "       help"
 		echo "           Show this message and exit."
