@@ -51,14 +51,15 @@ handle_subcommands <- function(sub_commands, cmd_help) {
       })
     }, error = function(e) {
       .fatal_error(c(geterrmessage(),
-                     "RSuite seems not to be available. Please run rsuite install to install it.",
+                     "RSuite seems not to be available. Please run 'rsuite install' to install it.",
                      sprintf("Failed to find it at: %s", rsuite_libloc)))
     })
 
     rsuite_ver <- packageVersion("RSuite", lib.loc = rsuite_libloc)
     cli_ver <- suppressWarnings(readLines(file.path(.base_dir, "..", "version.txt")))
     if (gsub("^(\\d+[.]\\d+)[.-]\\d+$", "\\1", rsuite_ver) != gsub("^(\\d+[.]\\d+)[.-]\\d+$", "\\1", cli_ver)) {
-      .fatal_error(sprintf("RSuite v%s is not compatible with RSuite cli v%s", rsuite_ver, cli_ver))
+      .fatal_error(c(sprintf("RSuite v%s is not compatible with RSuite cli v%s", rsuite_ver, cli_ver),
+                     "Execute 'rsuite install' to install RSuite cli compatible version"))
     }
 
     sub_commands[[sub_cmd]]$options <- c(

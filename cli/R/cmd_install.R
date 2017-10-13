@@ -52,7 +52,8 @@ rsuite_pkg <- "RSuite"
 wd <- setwd(.libPaths()[1]) # set wd to place there .Rprofile does not exist
 tryCatch({
   # detect latest supported version to install
-  rsuite_avails <- data.frame(utils::available.packages(repos = opts$url, filter = list()),
+  rsuite_curl <- utils::contrib.url(repos = opts$url, type = "source")
+  rsuite_avails <- data.frame(utils::available.packages(contriburl = rsuite_curl, filter = list()),
                               row.names = NULL, stringsAsFactors = F)
   ver_re <- sprintf("^%s[.-]", gsub("[.]", "[.]", vbase))
   rsuite_avails <- rsuite_avails[rsuite_avails$Package == rsuite_pkg & grepl(ver_re, rsuite_avails$Version), ]
