@@ -21,66 +21,75 @@ tryCatch({
                                   usage = "rsuite install [options]",
                                   description = "Install RSuite package with all its required dependencies."),
                      args = commandArgs(trailingOnly = T)[-1] # reg rid of 'install' command
-                     )
+  )
 }, error = function(e){
   .fatal_error(geterrmessage())
 })
 
 message("Detecting repositories ...")
 
-get_cran_path <- function() {
+cran_path <- (function() {
   official_repo_path <- getOption('repos') # This can point to CRAN mirror
   if ('@CRAN@' %in% official_repo_path) {
     official_repo_path <- getCRANmirrors()$URL[[1]]
   }
   return(official_repo_path)
-}
-all_repos <- c(CRAN = get_cran_path(), Other = opts$url)
+})()
+all_repos <- c(CRAN = cran_path, Other = opts$url)
 
 message("Will use repositories:")
 for(n in names(all_repos)) {
   message(sprintf("\t%10s = %s", n, all_repos[[n]]))
 }
 
-cli_ver <- suppressWarnings(readLines(file.path(base_dir, "..", "version.txt")))
+cli_ver <- suppressWarnings(readLines(file.path(base, "..", "version.txt")))
 vbase <- gsub("^(\\d+[.]\\d+)[.-]\\d+$", "\\1", cli_ver)
 
 message(sprintf("Installing RSuite(v%sx) package ...", vbase))
 
+rsuite_pkg <- "RSuite"
+
 wd <- setwd(.libPaths()[1]) # set wd to place there .Rprofile does not exist
 tryCatch({
   # detect latest supported version to install
-  avails <- data.frame(utils::available.packages(repos = opts$url, filter = list()),
-                       row.names = NULL, stringsAsFactors = F)
+  rsuite_avails <- data.frame(utils::available.packages(repos = opts$url, filter = list()),
+                              row.names = NULL, stringsAsFactors = F)
   ver_re <- sprintf("^%s[.-]", gsub("[.]", "[.]", vbase))
-  avails <- avails[avails$Package == 'RSuite' & grepl(ver_re, avails$Version), ]
-  if (nrow(avails) < 1) {
+  rsuite_avails <- rsuite_avails[rsuite_avails$Package == rsuite_pkg & grepl(ver_re, rsuite_avails$Version), ]
+  if (nrow(rsuite_avails) < 1) {
     .fatal_error(sprintf("Failed to detect RSuite(v%sx) package at %s", vbase, opts$url))
   }
-  avails <- avails[order(avails$Version, decreasing = T), ][1, ] # latest supported version
+  rsuite_avails <- rsuite_avails[order(rsuite_avails$Version, decreasing = T), ][1, ] # latest supported version
   
-  # download it
+  # prepare local repository and download RSuite
   tmp_dir <- tempfile()
   dir.create(tmp_dir, recursive = T)
   on.exit({ unlink(tmp_dir, force = T, recursive = T) }, add = T)
-  dloaded <- utils::download.packages("RSuite", destdir = tmp_dir, available = avails, 
+  if (.Platform$pkgType != "source") {  
+    bin_dir <- contrib.url(repos = tmp_dir, type = .Platform$pkgType)
+    dir.create(bin_dir, recursive = T)
+    write.dcf(NULL, file.path(bin_dir, "PACKAGES"))
+  }
+  
+  src_dir <- utils::contrib.url(repos = tmp_dir, type = "source")
+  dir.create(src_dir, recursive = T)
+  dloaded <- utils::download.packages(rsuite_pkg, destdir = src_dir, available = rsuite_avails, repos = NULL,
                                       quiet = !opts$verbose)
   if (nrow(dloaded) != 1) {
     pkg_url <- sprintf("%s/%s", avails$Repository, paste(avails$File, collapse = " "))
     .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
   }
+  tools::write_PACKAGES(dir = src_dir, type = "source")
   
-  # install it
-  utils::install.packages(dloaded[1,2],
-                          available = utils::available.packages(all_repos),
+  # install it from local repository, dependencies are from CRAN
+  utils::install.packages("RSuite",
+                          repos = c(CRAN = cran_path, Local = paste0("file:///", tmp_dir)),
                           quiet = !opts$verbose,
                           verbose = opts$verbose)
 }, finally = { setwd(wd) })
-  
-installed_pkgs <- installed.packages()[, "Package"]
-uninstalled <- setdiff(required_pkgs, installed_pkgs)
-if (length(uninstalled)) {
-  .fatal_error(sprintf("Failed to install %s", paste(uninstalled, collapse = ", ")))
+
+if (!(rsuite_pkg %in% installed.packages()[, "Package"])) {
+  .fatal_error(sprintf("Failed to install %s", rsuite_pkg))
 }
 
 message("All done.")
