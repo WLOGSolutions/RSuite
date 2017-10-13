@@ -56,3 +56,6 @@ tryCatch({
                  "logging is required for RSuite CLI to work. Tried to install it but failed."))
 })
 
+if (suppressWarnings(Sys.timezone()) == "unknown") {
+  Sys.setenv(TZ = "UTC")
+}
