@@ -17,5 +17,5 @@ Depends: devtools,
   rmarkdown,
   git2r
 Imports: logging, 
-  rstudioapi
+  rstudioapi (>= 0.7)
 RoxygenNote: 6.0.1
