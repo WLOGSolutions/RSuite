@@ -56,6 +56,9 @@ tryCatch({
                  "logging is required for RSuite CLI to work. Tried to install it but failed."))
 })
 
-if (suppressWarnings(Sys.timezone()) == "unknown") {
-  Sys.setenv(TZ = "UTC")
-}
+(function(){
+  tz <- suppressWarnings(Sys.timezone())
+  if (is.na(tz) || tz == "unknown") {
+    Sys.setenv(TZ = "UTC")
+  }
+})()
