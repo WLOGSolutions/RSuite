@@ -18,7 +18,12 @@ Description: Build and install project packages.
 Binding: rstudio_04_prj_build
 Interactive: true
 
+Name: Clean dependencies
+Description: Remove unused libraries installed in project environment.
+Binding: rstudio_05_prj_clean_deps
+Interactive: true
+
 Name: Build ZIP
 Description: Build project depoloyment ZIP.
-Binding: rstudio_05_prj_zip
+Binding: rstudio_06_prj_zip
 Interactive: true

@@ -128,13 +128,34 @@ rstudio_04_prj_build <- function() {
 }
 
 #'
+#' RStudio addin which cleans up project dependencies.
+#'
+#' If no project in context shows dialog to select project directory.
+#'
+#' @export
+#'
+rstudio_05_prj_clean_deps <- function() {
+  assert(isAvailable(), "No RStudio available")
+  rstudio_ver <- as.character(getVersion())
+  assert(compareVersion(rstudio_ver, "1.1.287") >= 0,
+         "RStudio version(%s) is too old. RStudio v1.1.287 at least is required.",
+         rstudio_ver)
+
+  prj <- .rstudio_get_prj()
+  if (!is.null(prj)) {
+    prj_clean_deps(prj = prj)
+  }
+}
+
+
+#'
 #' RStudio addin which creates project deployment zip.
 #'
 #' If no project in context shows dialog to select project directory.
 #'
 #' @export
 #'
-rstudio_05_prj_zip <- function() {
+rstudio_06_prj_zip <- function() {
   assert(isAvailable(), "No RStudio available")
   rstudio_ver <- as.character(getVersion())
   assert(compareVersion(rstudio_ver, "1.1.287") >= 0,

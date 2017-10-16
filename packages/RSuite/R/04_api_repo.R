@@ -184,6 +184,8 @@ repo_upload_prj_packages <- function(repo_manager,
   revision <- NULL
   if (!skip_rc) {
     revision <- detect_consistent_revision(params) # from 15_zip_project.R
+    assert(!is.null(revision),
+           "Project is not under revision control so revision number cannot be detected")
   }
 
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
@@ -338,13 +340,13 @@ repo_upload_ext_packages <- function(repo_manager,
   tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, mgr_info$rver)
   repo_manager_init(tmp_mgr)
 
-  pkg_download(avail_pkgs, 
+  pkg_download(avail_pkgs,
                dest_dir = rsuite_contrib_url(tmp_path, pkg_type, mgr_info$rver))
   if (nrow(src_avail_pkgs) > 0) {
     build_source_packages(src_avail_pkgs, # from 17_build_src_packages.R
                           tmp_path, pkg_type, params, mgr_info$rver)
   }
-  
+
   pkg_loginfo("... done.")
 
   repo_manager_upload(repo_manager, tmp_path, pkg_type)

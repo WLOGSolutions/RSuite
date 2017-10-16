@@ -45,8 +45,12 @@ detect_zip_version <- function(params, zip_ver) {
   }
 
   revision <- detect_consistent_revision(params)
-  return(list(ver = paste0(zip_ver, "_", revision),
-              rev = revision))
+  if (is.null(revision)) {
+    ver <- paste0(zip_ver, "x")
+  } else {
+    ver <- paste0(zip_ver, "_", revision)
+  }
+  return(list(ver = ver, rev = revision))
 }
 
 #'
@@ -61,8 +65,9 @@ detect_zip_version <- function(params, zip_ver) {
 #'
 detect_consistent_revision <- function(params) {
   rc_adapter <- detect_rc_adapter(params$prj_path)
-  assert(!is.null(rc_adapter),
-         paste0("Project is not under revision control so revision number cannot be detected"))
+  if (is.null(rc_adapter)) {
+    return(NULL)
+  }
 
   rc_ver <- rc_adapter_get_version(rc_adapter, params$prj_path)
 
