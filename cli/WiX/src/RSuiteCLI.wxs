@@ -3,14 +3,18 @@
     <Product Name='RSuite CLI v$(var.VERSION)' Manufacturer='WLOG Solutions' Id='*'
             UpgradeCode='af7b4234-60c2-4fea-9b43-8c6b2deaed6e'
             Language='1033' Codepage='1252' Version='$(var.VERSION)'>
-        <Package Id='*' Keywords='Installer' Description='RSuite CLI Installer' Manufacturer='WLOG Solutions'
+        <Package Keywords='Installer' Description='RSuite CLI Installer' Manufacturer='WLOG Solutions'
             InstallerVersion='200' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
 
         <Media Id='1' Cabinet='RSuite.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
         <Property Id='DiskPrompt' Value='RSuite CLI Installation [1]' />
 
+        <Property Id='ALLUSERS' Value='2'/>
+        <SetProperty Id='ALLUSERS' Value='1' Before="CostFinalize" >
+            <![CDATA[Privileged]]>
+        </SetProperty>
+        
         <Property Id="REINSTALLMODE" Value="amus" />
-        <Property Id="REINSTALL" Value="ALL" />
         <MajorUpgrade AllowDowngrades="yes" />
 
         <?if $(sys.BUILDARCH) = x64 ?>
