@@ -230,7 +230,7 @@ rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE
 If you managed to build PKGZIP containing some packages (see pkgzip command) you can add its content to repository:
 
 ```bash
-rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip
+rsuite repo addpkgzip -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip
 ```
 
 #### Adding package from GitHub to repository
