@@ -1,6 +1,7 @@
-VERSION 0.12 (2017-10-13)
+VERSION 0.12 (2017-10-16)
   * RStudio basic integration implemented. Dependency to rstudioapi added.
   * sbox folder added beside deployment/libs for libraries installed by the user.
+  * #147: Building package documentation for unpriviledged user fixed.
 
 VERSION 0.11 (2017-10-12)
   * Handling of .libPath during project package build: it currently contains

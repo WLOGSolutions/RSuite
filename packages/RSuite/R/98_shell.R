@@ -51,15 +51,16 @@ get_cmd_lines <- function(desc, cmd, ...) {
 #' @param ... parameters to build script_code using sprintf.
 #' @param rver R vestion to run rscript with. If not passed (or NA) current
 #'   R version will be used. (type: character, default: NA)
+#' @param ex_libpath extra path to add to .libPaths. (type: character, default: NULL)
 #'
 #' @return NULL if succeded, if failed returns FALSE or error string.
 #'
-run_rscript <- function(script_code, ..., rver = NA) {
+run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL) {
   full_code <- sprintf(paste0(script_code, collapse = ";"), ...)
 
   cmd0 <- get_rscript_path(rver = ifelse(is.na(rver), current_rver(), rver))
 
-  libs <- .libPaths()
+  libs <- c(ex_libpath, .libPaths())
   libs <- libs[-length(libs)] # last is always .Library
 
   script <- sprintf(paste0(".Library <- NULL;",
@@ -109,7 +110,7 @@ run_rscript <- function(script_code, ..., rver = NA) {
 rscript_arg <- function(name, val) {
   if (is.null(val)) {
     return(sprintf("%s=NULL", name))
-  } 
+  }
 
   val <- gsub("\\\\", "/", val)
   val <- gsub("\"", "\\\"", val, fixed = T)
