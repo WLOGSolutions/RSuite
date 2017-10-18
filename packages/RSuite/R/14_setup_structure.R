@@ -76,7 +76,7 @@ check_project_structure <- function(prj_dir) {
   }
 
   create_rproj(params$script_path, paste0(prj_name, "_MasterScripts"))
-  create_rprofile(params$script_path, text = "source('set_env.r', chdir = T)")
+  create_rprofile(params$script_path, text = "source('set_env.R', chdir = T)")
 
   set_env_r <- file.path(params$script_path, "set_env.R")
   if (!file.exists(set_env_r)) {
