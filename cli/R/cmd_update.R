@@ -76,12 +76,20 @@ platform_dict <- list(
   debian = list(
     get_platform_id = function() { "deb" },
     installer = "dpkg",
-    get_install_args = function(url) { c("-i", url) }
+    get_install_args = function(url) {
+      dest_file <- file.path(dirname(tempdir()), basename(url))
+      errcode <- download.file(url, destfile = dest_file,
+                               mode = "wb", quiet = any(opts$quiet))
+      if (errcode != 0) {
+        .fatal_error(sprintf("Failed to download package from %s.", url))
+      }
+      c("-i", dest_file)
+    }
   )
 )
 
 platform <- .Platform$OS.type
-if (platform == "linux") {
+if (platform == "unix") {
   if (file.exists("/etc/redhat-release")) {
     platform <- "redhat"
   } else if (file.exists("/etc/debian_version")) {
