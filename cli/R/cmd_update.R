@@ -71,7 +71,7 @@ platform_dict <- list(
   redhat = list(
     get_platform_id = function() { "rpm" },
     installer = "rpm",
-    get_install_args = function(url) { c("-i", url) }
+    get_install_args = function(url) { c("-i", "--replacepkgs", url) }
   ),
   debian = list(
     get_platform_id = function() { "deb" },
