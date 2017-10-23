@@ -8,13 +8,16 @@ if [ -z "$rscript_path" ]; then
 fi
 
 basedir=$(dirname $0)
-basedir=$(readlink -f $basedir) 
+basedir=$(readlink -f $basedir)
 cmd="$1"
 if [ -z "$cmd" ]; then
 	cmd="help";
 fi
 
 case "$cmd" in
+	update)
+                $rscript_path --no-init-file $basedir/R/cmd_update.R $* || exit 2
+		;;
 	install)
                 $rscript_path --no-init-file $basedir/R/cmd_install.R $* || exit 2
 		;;
@@ -38,6 +41,11 @@ case "$cmd" in
 		echo ""
 		echo ""
 		echo "Commands:"
+    echo "       update"
+    echo "          Checks if newest version of RSuite CLI is installed. If not"
+    echo "          installer for newest version is downloaded and installation"
+    echo "          is initiated."
+    echo ""
 		echo "       install"
 		echo "           Install RSuite with all the dependencies."
 		echo ""

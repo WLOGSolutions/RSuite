@@ -27,6 +27,12 @@ set cmd="%1"
 if %cmd%=="" goto help
 if %cmd%=="help" goto help
 
+if %cmd%=="update" (
+    Rscript --no-init-file "%base_dir%/R/cmd_update.R" %*
+    if ERRORLEVEL 1 exit /B 2
+    exit /b 0
+)
+
 if %cmd%=="install" (
     Rscript --no-init-file "%base_dir%/R/cmd_install.R" %*
     if ERRORLEVEL 1 exit /B 2
@@ -67,6 +73,11 @@ exit /B 3
     echo.
     echo.
     echo Commands:
+    echo        update
+    echo            Checks if newest version of RSuite CLI is installed. If not
+    echo            installer for newest version is downloaded and installation
+    echo            is initiated.
+    echo.
     echo        install
     echo            Install RSuite with all the dependencies.
     echo.

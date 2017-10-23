@@ -13,7 +13,7 @@
         <SetProperty Id='ALLUSERS' Value='1' Before="CostFinalize" >
             <![CDATA[Privileged]]>
         </SetProperty>
-        
+
         <Property Id="REINSTALLMODE" Value="amus" />
         <MajorUpgrade AllowDowngrades="yes" />
 
@@ -45,6 +45,7 @@
                 <Component Id='RSources' Guid='31197745-41cb-4323-9f3e-ccfdc7a5d2f7'>
                     <File Id='command_mgr.R' Name='command_mgr.R' DiskId='1' Source='../R/command_mgr.R' KeyPath='yes' />
                     <File Id='command_utils.R' Name='command_utils.R' DiskId='1' Source='../R/command_utils.R' />
+                    <File Id='cmd_update.R' Name='cmd_update.R' DiskId='1' Source='../R/cmd_update.R' />
                     <File Id='cmd_install.R' Name='cmd_install.R' DiskId='1' Source='../R/cmd_install.R' />
                     <File Id='cmd_proj.R' Name='cmd_proj.R' DiskId='1' Source='../R/cmd_proj.R' />
                     <File Id='cmd_repo.R' Name='cmd_repo.R' DiskId='1' Source='../R/cmd_repo.R' />

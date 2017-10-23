@@ -47,6 +47,7 @@ install -m 755 rsuite %{buildroot}/usr/bin/rsuite
 /usr/share/rsuitecli/R/cmd_proj.R
 /usr/share/rsuitecli/R/cmd_pkgzip.R
 /usr/share/rsuitecli/R/cmd_install.R
+/usr/share/rsuitecli/R/cmd_update.R
 /usr/share/rsuitecli/R/packages/src/contrib/getopt_1.20.0.tar.gz
 /usr/share/rsuitecli/R/packages/src/contrib/logging_0.7-103.tar.gz
 /usr/share/rsuitecli/R/packages/src/contrib/optparse_1.4.4.tar.gz
