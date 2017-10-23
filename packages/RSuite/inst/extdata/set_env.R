@@ -1,8 +1,15 @@
 lib_path <- file.path("..", "libs")
+sbox_path <- file.path("..", "sbox")
 if (!file.exists(lib_path)) {
   lib_path <- file.path("..", "deployment", "libs")
+  sbox_path <- file.path("..", "deployment", "sbox")
 }
-.libPaths(c(normalizePath(lib_path), .libPaths()))
+
+if (!dir.exists(sbox_path)) {
+  dir.create(sbox_path, recursive = T)
+}
+
+.libPaths(c(normalizePath(sbox_path), normalizePath(lib_path), .libPaths()))
 
 library(logging)
 logging::logReset()
@@ -10,7 +17,11 @@ logging::setLevel(level = "FINEST")
 logging::addHandler(logging::writeToConsole, level = "INFO")
 
 log_file <- gsub("-", "_", sprintf("%s.log", Sys.Date()))
-log_dir <- normalizePath(file.path("..", "logs"))
+log_dir <- file.path("..", "logs")
+if (!dir.exists(log_dir)) {
+  dir.create(log_dir, recursive = T)
+}
+log_dir <- normalizePath(log_dir)
 logging::addHandler(logging::writeToFile, level = "FINEST", file = file.path(log_dir, log_file))
 
 script_path <- getwd()
