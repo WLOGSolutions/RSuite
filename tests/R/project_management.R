@@ -19,7 +19,7 @@ init_test_project <- function(repo_adapters = c("Dir")) {
   params_df$SnapshotDate <- NULL
   write.dcf(params_df, file = params_path)
 
-  on_test_exit(function() { 
+  on_test_exit(function() {
     unlink(prj$path, recursive = T, force = T)
   })
   return(prj)
@@ -51,6 +51,10 @@ create_test_package <- function(name, prj, ver = "1.0", deps = "", imps = "") {
   invisible(pkg_path)
 }
 
+set_test_package_ns_imports <- function(name, prj, imps) {
+  imp_path <- file.path(prj$path, "packages", name, "R", "packages_import.R")
+  writeLines(c(sprintf("#' @import %s", imps), "NULL"), con = imp_path)
+}
 
 create_test_master_script <- function(code, prj) {
   fn <- tempfile(pattern = "test_", fileext = ".R", tmpdir = file.path(prj$path, "R"))
@@ -61,9 +65,10 @@ create_test_master_script <- function(code, prj) {
 }
 
 create_package_deploy_to_lrepo <- function(name, prj, ver = "1.0", type = .Platform$pkgType,
-                                           deps = "", imps = "") {
+                                           deps = "", imps = "logging") {
   pkg_path <- create_test_package(name, prj, ver, deps = deps, imps = imps)
-  
+  set_test_package_ns_imports(name, prj, unlist(strsplit(imps, ",")))
+
   params <- prj$load_params()
   on.exit({
     unlink(pkg_path, recursive = T, force = T)
@@ -137,10 +142,10 @@ expect_that_has_docs <- function(topics, pkg_name, prj) {
   } else {
     lines <- readLines(doc_path)
     all_topics <- unlist(lapply(strsplit(lines, "\t"), function(ent) { ent[1] }))
-    
+
     pass <- all(topics %in% all_topics)
     if (!pass) {
-      msg <- sprintf("Documetation topics not found in %s: %s", 
+      msg <- sprintf("Documetation topics not found in %s: %s",
                      pkg_name, paste(setdiff(topics, all_topics), collapse = ", "))
     } else {
       msg <- ""

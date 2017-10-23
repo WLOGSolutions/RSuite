@@ -1,3 +1,13 @@
+VERSION 0.13 (2017-10-23)
+  * #146: After installing package it is checked if it was built for proper
+     R version. MRAN has packages built under 3.3.2 presented as built for 3.4.
+  * Failure of building documentation for package is considered major error as
+     roxygen also builds NAMESPACE file which is responsible for project exports
+     and imports. Failure to properly declare NAMESPACE will make package unusable.
+  * Detection if post documentation build imports in package DESCRIPTION file and
+     NAMESPACE file are consistent. NAMESPACE is updated if has some packages
+     declared in DESCRIPTION missing.
+
 VERSION 0.12 (2017-10-16)
   * RStudio basic integration implemented. Dependency to rstudioapi added.
   * sbox folder added beside deployment/libs for libraries installed by the user.
