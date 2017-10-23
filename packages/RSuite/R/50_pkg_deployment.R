@@ -255,7 +255,7 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
              pkg_logwarn("= Restarting build of %s (succeded but no folder created)", basename(pkg))
              bld_res <- install_package(pkg)
            }
-           if (bld_res) {
+           if (bld_res && dir.exists(pkg_path)) {
              # verify if package is built for proper R version
              pkg_rver <- get_package_build_rver(lib_dir, pkg_name)
              if (majmin_rver(pkg_rver) != majmin_rver(rver)) {
