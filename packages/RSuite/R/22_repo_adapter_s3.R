@@ -76,13 +76,17 @@ repo_adapter_create_manager.rsuite_repo_adapter_s3 <- function(repo_adapter, ...
     params <- dots$params
     assert(!is.null(params) && "rsuite_project_params" %in% class(params),
            "rsuite_project_params expected for params")
+    assert("ix" %in% names(dots),
+           paste0("Either prj/params and ix or url and rver must be provided to",
+                  " repo_adapter_start_management.rsuite_repo_adapter_s3"))
 
-    url <- repo_adapter_get_path.rsuite_repo_adapter_s3(repo_adapter, params)
+    ix <- dots$ix
+    url <- repo_adapter_get_path.rsuite_repo_adapter_s3(repo_adapter, params, ix = ix)
     types <- c(params$pkgs_type, params$aux_pkgs_type)
     rver <- params$r_ver
   } else {
     assert(all(c("url", "rver") %in% names(dots)),
-           paste0("Either prj, params or url and rver must be provided to",
+           paste0("Either prj/params and ix or url and rver must be provided to",
                   " repo_adapter_start_management.rsuite_repo_adapter_s3"))
     url <- dots$url
     rver <- dots$rver

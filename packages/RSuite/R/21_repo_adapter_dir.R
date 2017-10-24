@@ -10,7 +10,7 @@
 }
 
 .can_eventualy_have_rw_access <- function(full_path) {
-  unlist(lapply(full_path, 
+  unlist(lapply(full_path,
                 function(base_dir) {
                   while(!dir.exists(base_dir)) {
                     base_dir <- dirname(base_dir)
@@ -81,8 +81,8 @@ repo_adapter_get_path.rsuite_repo_adapter_dir <- function(repo_adapter, params, 
 #'   adapter working on directory).
 #'
 #' @param repo_adapter repo adapter object.
-#' @param ... should contain prj of class rsuite_project or path to repository
-#'    and rver. It also can contain types, a vector of types to be managed
+#' @param ... should contain prj of class rsuite_project and repo ix
+#'    or path to repository and rver. It also can contain types, a vector of types to be managed
 #'   (default: .Platform$pkgType)
 #'
 #' @export
@@ -99,8 +99,11 @@ repo_adapter_create_manager.rsuite_repo_adapter_dir <- function(repo_adapter, ..
     params <- dots$params
     assert(!is.null(params) && "rsuite_project_params" %in% class(params),
            "rsuite_project_params expected for params")
-
-    full_path <- repo_adapter$get_full_path(params)
+    assert("ix" %in% names(dots),
+           paste0("Either prj/params and ix or path and rver must be provided to",
+                  " repo_adapter_create_manager.rsuite_repo_adapter_dir"))
+    ix <- dots$ix
+    full_path <- repo_adapter$get_full_path(params, ix)
 
     rver <- params$r_ver
 
@@ -108,7 +111,7 @@ repo_adapter_create_manager.rsuite_repo_adapter_dir <- function(repo_adapter, ..
     types <- c(params$pkgs_type, params$aux_pkgs_type)
   } else {
     assert(all(c("rver", "path") %in% names(dots)),
-           paste0("Either prj, params or path and rver must be provided to",
+           paste0("Either prj/params and ix or path and rver must be provided to",
                   " repo_adapter_create_manager.rsuite_repo_adapter_dir"))
 
     full_path <- dots$path

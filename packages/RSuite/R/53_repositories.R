@@ -88,12 +88,12 @@ parse_repo_adapters_spec <- function(specs) {
 #'
 make_detached_repos <- function(params) {
   urls <- c()
-  
+
   ra_names <- params$get_repo_adapter_names()
   if (length(ra_names) < 1) {
     return(urls)
   }
-  
+
   for(ix in 1:length(ra_names)) {
     ra_name <- ra_names[[ix]]
     repo_adapter <- find_repo_adapter(ra_name)
@@ -103,7 +103,7 @@ make_detached_repos <- function(params) {
     repo_path <- repo_adapter_get_path(repo_adapter, params, ix)
     urls <- c(urls, repo_path)
   }
-  
+
   result <- sprintf("Url[%s]", urls)
   return(result)
 }
@@ -125,32 +125,34 @@ get_all_repo_infos <- function(params, rver = NULL) {
   if (length(ra_names) < 1) {
     return(repos)
   }
-  
+
   non_reliable <- c()
   seen_adapters <- list()
   for(ix in 1:length(ra_names)) {
     ra_name <- ra_names[ix]
     if (!(ra_name %in% names(seen_adapters))) {
       repo_adapter <- find_repo_adapter(ra_name)
+      seen_adapters[[ra_name]] <- repo_adapter
       if (is.null(repo_adapter)) {
         pkg_logwarn("Project is configured to use unknown repo adapter %s", ra_name)
         next
       }
-      ra_info <- repo_adapter_get_info(repo_adapter, params)
-  
-      if (!ra_info$readonly) {
-        mgr <- repo_adapter_create_manager(repo_adapter, params = params)
-        repo_manager_init(mgr)
-        repo_manager_destroy(mgr)
-      }
-      if (!ra_info$reliable) {
-        non_reliable <- c(non_reliable, ra_name)
-      }
-      seen_adapters[[ra_name]] <- repo_adapter
-    } else {
-      repo_adapter <- seen_adapters[[ra_name]]
     }
-    
+    repo_adapter <- seen_adapters[[ra_name]]
+    if (is.null(repo_adapter)) {
+      next
+    }
+
+    ra_info <- repo_adapter_get_info(repo_adapter, params)
+    if (!ra_info$readonly) {
+      mgr <- repo_adapter_create_manager(repo_adapter, params = params, ix = ix)
+      repo_manager_init(mgr)
+      repo_manager_destroy(mgr)
+    }
+    if (!ra_info$reliable) {
+      non_reliable <- c(non_reliable, ra_name)
+    }
+
     repo_path <- repo_adapter_get_path(repo_adapter, params, ix)
     if (is.null(names(repo_path))) {
       if (length(repo_path) == 1) { names(repo_path) <- sprintf("%s#%s", ra_name, ix) }

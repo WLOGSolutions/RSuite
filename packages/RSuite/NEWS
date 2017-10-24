@@ -1,3 +1,6 @@
+VERSION 0.14 (2017-10-??)
+  * Handling of multiple Dir repositories in project fixed.
+
 VERSION 0.13 (2017-10-23)
   * #146: After installing package it is checked if it was built for proper
      R version. MRAN has packages built under 3.3.2 presented as built for 3.4.

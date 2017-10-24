@@ -28,10 +28,10 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
          "character(N) vector expected for repos")
 
   known_ra_names <- reg_repo_adapter_names()
-  names <- names(parse_repo_adapters_spec(repos))
-  assert(all(names %in% known_ra_names),
+  ra_specs <- parse_repo_adapters_spec(repos)
+  assert(all(names(ra_specs) %in% known_ra_names),
          "Unknown repo adapter names detected: %s",
-         paste(setdiff(names, known_ra_names), collapse = ", "))
+         paste(setdiff(unique(names(ra_specs)), known_ra_names), collapse = ", "))
 
   prj <- safe_get_prj(prj)
 
@@ -46,13 +46,14 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
   write.dcf(params_dt, file = params_file)
 
   params <- prj$load_params()
-  for(ra_name in names) {
+  for(ra_ix in 1:length(ra_specs)) {
+    ra_name <- names(ra_specs)[[ra_ix]]
     repo_adapter <- find_repo_adapter(ra_name)
     stopifnot(!is.null(repo_adapter))
 
     ra_info <- repo_adapter_get_info(repo_adapter, params)
     if (!ra_info$readonly) {
-      mgr <- repo_adapter_create_manager(repo_adapter, params = params)
+      mgr <- repo_adapter_create_manager(repo_adapter, params = params, ix = ra_ix)
       repo_manager_init(mgr)
       repo_manager_destroy(mgr)
     }
@@ -72,15 +73,15 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
 #'
 prj_config_set_rversion <- function(rver, prj = NULL) {
   assert(is_nonempty_char1(rver), "Non empty character(1) expected for rver")
-  
+
   tryCatch({
     get_rscript_path(rver)
   }, error = function(e) {
     assert(FALSE, "Could not find valid R %s in path", rver)
   })
-  
+
   prj <- safe_get_prj(prj)
-  
+
   params_file <- file.path(prj$path, 'PARAMETERS')
   params_dt <- read.dcf(params_file)
   if (!('RVersion' %in% colnames(params_dt))) {
@@ -89,6 +90,6 @@ prj_config_set_rversion <- function(rver, prj = NULL) {
     params_dt[, 'RVersion'] <- majmin_rver(rver)
   }
   write.dcf(params_dt, file = params_file)
-  
+
   pkg_loginfo("Package R version set to %s", params_dt[1, 'RVersion'])
 }

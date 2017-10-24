@@ -67,7 +67,7 @@ repo_adapter_get_info.default <- function(repo_adapter, params) {
 #' @param params rsuite_project_params object
 #' @param ix repo adapter index in project repositories or NA to retrieve all
 #'  paths for the adapter. (type: integer, default: NA)
-#' 
+#'
 #' @return path to repository for the project.
 #'
 #' @export

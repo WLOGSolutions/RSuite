@@ -11,7 +11,6 @@
 #' @param ra_name name of repository to re-initialize adapter. (type: character)
 #' @param ... repository specific parameters. See repo_adapter_create_manager
 #'   for concrete implementation of repo adapter for more details.
-#'
 #' @return repo manager object.
 #'
 #' @export

@@ -21,7 +21,7 @@ load_prj_parameters <- function(prj_path) {
          "No project PARAMETERS file found at %s", prj_path)
 
   dcf <- read.dcf(file.path(prj_path, 'PARAMETERS'))
-  
+
   params <- list(
     prj_path = rsuite_fullUnifiedPath(prj_path),
     rsuite_ver = ifelse('RSuiteVersion' %in% colnames(dcf), dcf[1, 'RSuiteVersion'], NA),
@@ -59,8 +59,8 @@ load_prj_parameters <- function(prj_path) {
   if (!dir.exists(params$sbox_path)) {
     dir.create(params$sbox_path, recursive = T, showWarnings = F)
   }
-  
-  params$get_repo_adapter_names <- function(repo_adapter_name, default) {
+
+  params$get_repo_adapter_names <- function() {
     specs <- unlist(strsplit(params$repo_adapters, ","))
     return(names(parse_repo_adapters_spec(specs)))
   }
