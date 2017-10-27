@@ -57,6 +57,29 @@ sub_commands <- list(
       RSuite::prj_build()
     }
   ),
+  test = list(
+    help = "Run tests in tests folder.",
+    options = list(
+      make_option(c("-d", "--dir"), dest = "tests_dir", 
+                  help="Folder name relative to project base directory to look for tests. (default: tests)")
+    ),
+    run = function(opts) {
+      if (is.null(opts$tests_dir) || is.na(opts$tests_dir)) {
+        opts$tests_dir <- "tests"
+      }
+        
+      prj <- RSuite::prj_init()
+      tests_path <- file.path(prj$path, opts$tests_dir)
+      if (!dir.exists(tests_path)) {
+        stop(sprintf("Tests folder %s does not exists. Tests cannot be run.", tests_path))
+      }
+      RSuite::prj_load(prj = prj)   
+      test_res <- testthat::test_dir(tests_path)
+      if (!testthat:::all_passed(test_res)) { 
+        stop('Tests failed') 
+      }
+    }
+  ),
   depsclean = list(
     help = "Uninstall unused dependencies from project local environment.",
     options = list(),

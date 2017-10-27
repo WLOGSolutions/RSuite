@@ -3,14 +3,15 @@
 
 Rscript.exe --version 1> nul 2>&1
 if ERRORLEVEL 1 (
-    for /f "skip=1 tokens=2* " %%a in ('reg query HKLM\SOFTWARE\R-core\R /v InstallPath') do set r_bin_path=%%~sb\bin
-    if "%r_bin_path%"=="" (
+    for /f "skip=1 tokens=2* " %%a in ('reg query HKLM\SOFTWARE\R-core\R /v InstallPath') do (
+		path "%%~sb\bin;%PATH%"
+	)
+	Rscript.exe --version 1> nul 2>&1
+    if ERRORLEVEL 1 (
         echo ERROR: Failed to detect R path in registry. R is required to use RSuite CLI.
         exit /B 1
     )
 )
-if "%r_bin_path%"=="" goto rscript_found
-path %r_bin_path%;%PATH%
 
 Rscript.exe --version 1> nul 2>&1
 if ERRORLEVEL 1 (

@@ -14,13 +14,13 @@ test_that_managed <- function(desc, ...) {
     init_test()
     test_that(desc, ...)
   }, finally = {
-    fire_cleanups() 
+    fire_cleanups()
   })
 }
 
 init_test <- function() {
   path <- Sys.getenv("PATH")
-  
+
   base_dir <- normalizePath(dirname(getwd()))
   in_path_base <- paste0(base_dir, .Platform$path.sep)
   if (substring(path, 1, nchar(in_path_base)) == in_path_base) {
@@ -29,7 +29,7 @@ init_test <- function() {
       Sys.setenv(PATH = path)
     })
   }
-  
+
   unlink(get_wspace_dir(), recursive = T, force = T)
 }
 
@@ -63,23 +63,26 @@ get_log_file <- function() { file.path(get_log_dir(), sprintf("test_log_%s.log",
 rsuite_run <- function(args, wd) {
   log_file <- get_log_file()
 
-  rsuite_cmd <- Sys.which("rsuite")
-  cat(sprintf("----> Running '%s %s' in %s ...\n", 
-              rsuite_cmd, paste(args, collapse = " "), wd), 
+  rsuite_cmd <- normalizePath(file.path(getwd(), "..", "rsuite.cmd"))
+  cat(sprintf("----> Running '%s %s' in %s ...\n",
+              rsuite_cmd, paste(args, collapse = " "), wd),
       file = log_file, append = T)
 
   rsuite_libpath <- dirname(system.file(package = "RSuite"))
   Sys.setenv(RSUITE_LIBLOC=rsuite_libpath)
   on.exit(Sys.unsetenv("RSUITE_LIBLOC"), add = T)
   unlink(file.path(wd, ".Rprofile"), force = T, recursive = T)
-  
+
+  cat(sprintf("----> \t... using RSuite from %s ...\n", rsuite_libpath),
+      file = log_file, append = T)
+
   old_wd <- setwd(wd)
   on.exit(setwd(old_wd), add = T)
-  
+
   stderr_file <- tempfile()
   on.exit(unlink(stderr_file, force = T), add = T)
-  
-  retcode <- system2(rsuite_cmd, args = c(args, ">>", log_file), 
+
+  retcode <- system2(rsuite_cmd, args = c(args, ">>", log_file),
                      stderr = stderr_file, stdout = NULL)
   has_error <- F
   if (file.exists(stderr_file)) {
@@ -101,8 +104,8 @@ create_test_project <- function(name) {
   on_test_exit(function() {
     unlink(file.path(wspace_dir, name), force = T, recursive = T)
   })
-  
-  retcode <- rsuite_run(args = c("proj", "start", "-v", "-n", name, "--skip_rc"), 
+
+  retcode <- rsuite_run(args = c("proj", "start", "-v", "-n", name, "--skip_rc"),
                         wd = wspace_dir)
   return(retcode)
 }
@@ -112,21 +115,21 @@ create_test_package <- function(proj_name, pkg_name) {
   if (retcode != 0) {
     return(NULL)
   }
-  
+
   proj_path <- file.path(get_wspace_dir(), proj_name)
-  retcode <- rsuite_run(args = c("proj", "pkgadd", "-v", "-n", pkg_name, "--skip_rc"), 
+  retcode <- rsuite_run(args = c("proj", "pkgadd", "-v", "-n", pkg_name, "--skip_rc"),
                         wd = proj_path)
   if (retcode != 0) {
     return(NULL)
   }
-  
+
   return(file.path(proj_path, "packages", pkg_name))
 }
 
 setup_package <- function(pkg_path, ...) {
   dcf <- data.frame(read.dcf(file.path(pkg_path, "DESCRIPTION")), stringsAsFactors = F)
   dots <- list(...)
-  
+
   cols <- colnames(dcf)
   dcf <- cbind(dcf[, cols[!(cols %in% names(dots))]], dots)
   write.dcf(dcf, file = file.path(pkg_path, "DESCRIPTION"))
@@ -134,7 +137,7 @@ setup_package <- function(pkg_path, ...) {
 
 expect_that_packages_installed <- function(names, prj_path, versions = NULL) {
   stopifnot(is.null(versions) || length(names) == length(versions))
-  
+
   lib_path <- file.path(prj_path, "deployment", "libs")
   installed <- installed.packages(lib.loc = lib_path, noCache = T)[, "Package"]
   pass <- setequal(installed, names)
@@ -147,13 +150,13 @@ expect_that_packages_installed <- function(names, prj_path, versions = NULL) {
   } else {
     stop(sprintf("Unexpected condition occured: %s != %s!!!", paste(names, collapse = ", "), paste(installed, collapse = ", ")))
   }
-  
+
   if (pass && !is.null(versions)) {
     inst_vers <- as.data.frame(installed.packages(lib.loc = lib_path, noCache = T), stringsAsFactors = F)[, c("Package", "Version")]
     expt_vers <- data.frame(Package = names, Expected = versions)
     failed_vers <- merge(x = inst_vers, y = expt_vers, by.x = "Package", by.y = "Package")
     failed_vers <- failed_vers[!is.na(failed_vers$Expected) & failed_vers$Version != failed_vers$Expected, ]
-    
+
     pass <- nrow(failed_vers) == 0
     if (!pass) {
       msg <- sprintf("Unexpected versions installed ([pkg]ver!=exp): %s",
@@ -161,16 +164,16 @@ expect_that_packages_installed <- function(names, prj_path, versions = NULL) {
                            collapse = ", "))
     }
   }
-  
+
   expect(pass, msg)
   invisible(installed)
 }
 
 
 create_test_repo <- function(name) {
-  repo_path <- file.path(get_wspace_dir(), "repo") 
+  repo_path <- file.path(get_wspace_dir(), "repo")
   dir.create(repo_path, recursive = T)
-  on_test_exit(function() { 
+  on_test_exit(function() {
     unlink(repo_path, force = T, recursive = T)
   })
   return(repo_path)
@@ -182,8 +185,8 @@ expect_that_repo_contains <- function(names, repo_path, type) {
                        type = type)
   })
   failed <- names[!(names %in% pkgs[, 'Package'])]
-  
-  expect(length(failed) == 0, 
-         sprintf("Expected packages not available in repository: %s", 
-                 paste(failed, collapse = ", "))) 
+
+  expect(length(failed) == 0,
+         sprintf("Expected packages not available in repository: %s",
+                 paste(failed, collapse = ", ")))
 }
