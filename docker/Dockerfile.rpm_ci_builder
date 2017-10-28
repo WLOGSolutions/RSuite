@@ -1,0 +1,32 @@
+FROM centos
+
+# installing supervisord
+RUN yum install -y python-setuptools \
+    && easy_install supervisor \
+    && echo_supervisord_conf > /etc/supervisord.conf \
+    && mkdir -p /etc/supervisord \
+    && echo -e "[include]\nfiles = supervisord/*.conf" >> /etc/supervisord.conf
+
+# installing sshd
+RUN yum install -y openssh-server openssh-clients \
+    && /usr/bin/ssh-keygen -A \
+    && echo -e "[program:sshd]\ncommand=/usr/sbin/sshd -D -e\nautorestart=true\nstartretries=3" > /etc/supervisord/sshd.conf
+
+EXPOSE 22
+
+# installing jenkins requirements
+RUN yum install -y java git sudo \
+    && useradd jenkins \
+    && echo -e "WLOGsc2017\nWLOGsc2017" | passwd jenkins \
+    && mkdir -p /opt/jenkins \
+    && chown jenkins:jenkins /opt/jenkins
+
+# installing R and RSuite
+RUN yum install -y epel-release \
+    && yum install -y R openssl-devel libxml2-devel libcurl-devel \
+    && rpm -i http://wlog-rsuite.s3.amazonaws.com/cli/`curl -q http://wlog-rsuite.s3.amazonaws.com/cli/PKG_INDEX | grep rpm | sed -e "s/^rpm: //" | tr -d '\r\n'` \
+    && rsuite install -v
+
+
+WORKDIR /opt/jenkins
+CMD [ "supervisord", "-n" ]

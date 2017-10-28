@@ -1,0 +1,33 @@
+FROM ubuntu
+
+# installing supervisord
+RUN apt-get update \
+    && apt-get install -y git supervisor vim
+    
+# installing sshd
+RUN apt-get install -y openssh-server openssh-client \
+    && mkdir -p /var/run/sshd \
+    && echo "[program:sshd]" > /etc/supervisor/conf.d/sshd.conf \
+    && echo "command=/usr/sbin/sshd -D -e" >> /etc/supervisor/conf.d/sshd.conf \ 
+    && echo "autorestart=true" >> /etc/supervisor/conf.d/sshd.conf \
+    && echo "startretries=3" >> /etc/supervisor/conf.d/sshd.conf
+
+EXPOSE 22
+
+# installing jenkins requirements
+RUN apt-get install -y default-jre sudo \
+    && useradd -m jenkins \
+    && echo "jenkins:WLOGsc2017" | chpasswd \
+    && mkdir -p /opt/jenkins \
+    && chown jenkins:jenkins /opt/jenkins
+
+# installing R and RSuite
+RUN apt-get install -y r-base libssl-dev libxml2-dev libcurl4-openssl-dev \
+    && wget http://wlog-rsuite.s3.amazonaws.com/cli/`wget -q -O /dev/stdout http://wlog-rsuite.s3.amazonaws.com/cli/PKG_INDEX | grep -e "^deb:" | sed -e "s/^deb: //" | tr -d "\n\r"` \
+    && dpkg -i rsuitecli_*.deb \
+    && rm -rf rsiuitecli_*.deb \
+    && rsuite install -v
+
+
+WORKDIR /opt/jenkins
+CMD [ "supervisord", "-n" ]

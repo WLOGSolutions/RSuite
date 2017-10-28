@@ -17,7 +17,7 @@ $ sudo yum install -y openssl-devel libxml2-devel libcurl-devel
 On Debian like systems (Debian/Ubuntu) you can install them executing:
 
 ```bash
-$ sudo apt-get install -y ????
+$ sudo apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev 
 ```
 
 ## Basic installation

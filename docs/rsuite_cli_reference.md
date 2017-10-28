@@ -15,6 +15,9 @@ RSuite supports you in developing you R projects in standardized way and help wi
 ## Requirements
 
 RSuite CLI requires R being available on your machine. Any version will do, but we tested it mostly on v3.2+.
+While running RSuite CLI checks if R is available in PATH environment variable. If it's not it will try 
+to detect R base folder from standard locations. On Windows it will also look in registry to find 
+installed R version.
 
 For working with Subversion and/or Git revision control command line clients respectively svn and git are required.
 
@@ -47,6 +50,27 @@ You can also see all supported options 'rsuite install' supports please call
 ```bash
 rsuite install -h
 ```
+
+#### Updating RSuite CLI
+
+RSuite CLI works with compatible version of RSuite. Compatibility is determined by
+two higher numbers in versions of both: they should match. While installing RSuite
+RSuite CLI picks the lastes available but still compatible version of RSuite to 
+install.
+
+You can update RSuite CLI with following command:
+
+```bash
+rsuite update
+```
+
+The command checks that version of RSuite CLI is installed and if newer version is
+available. If so it will download installer and commit installation process. You
+will probably need elevated privileges to upgrade RSuite CLI properly.
+
+Pay attention that new version of RSuite CLI will need newer version of RSuite
+to work. You will need to issue RSuite insllation (update to compatible version)
+just after RSuite CLI gets updated.
 
 ## Project management
 
@@ -159,6 +183,22 @@ rsuite proj zip --version=1.0
 Version number should be in form NN.NN.
 
 It also accepts standard options -v and -h.
+
+#### Testing project
+
+RSuite CLI can run testthat tests for you. Just execute following command:
+
+```bash
+rsuite proj test 
+```
+
+It will look for tests in 'tests' folder under project base folder. If your tests
+are located elsewhere in project folder you can inform the command on that 
+following way:
+
+```bash
+rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
+```
 
 ## Repository management
 
