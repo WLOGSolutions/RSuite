@@ -63,7 +63,8 @@ get_log_file <- function() { file.path(get_log_dir(), sprintf("test_log_%s.log",
 rsuite_run <- function(args, wd) {
   log_file <- get_log_file()
 
-  rsuite_cmd <- normalizePath(file.path(getwd(), "..", "rsuite.cmd"))
+  rsuite_cmd <- file.path(getwd(), "..", ifelse(.Platform$OS.type == "windows", "rsuite.cmd", "rsuite"))
+  rsuite_cmd <- normalizePath(rsuite_cmd)
   cat(sprintf("----> Running '%s %s' in %s ...\n",
               rsuite_cmd, paste(args, collapse = " "), wd),
       file = log_file, append = T)
