@@ -6,12 +6,12 @@
 #----------------------------------------------------------------------------
 
 #'
+#' @keywords internal
+#'
 #' Creates RC adapter to handle GIT repos.
 #'
 #' @param name under which RC adapter will be registered in RSuite.
 #' @return object of type rsuite_rc_adapter
-#'
-#' @export
 #'
 rc_adapter_create_git <- function(name) {
   result <- rc_adapter_create_base(name)
@@ -21,13 +21,12 @@ rc_adapter_create_git <- function(name) {
 }
 
 #'
+#' @keywords internal
+#'
 #' Implementation of rc_adapter_is_under_control for GIT RC adapted.
 #'
 #' Checks if folder is under GIT version control: contains administrative .git
 #' folder inside or up folder tree. If not, the folder is not under VC.
-#'
-#'
-#' @export
 #'
 rc_adapter_is_under_control.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   tryCatch({
@@ -40,9 +39,9 @@ rc_adapter_is_under_control.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
 }
 
 #'
-#' Implementation of rc_adapter_prj_struct_add for GIT RC adapted.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of rc_adapter_prj_struct_add for GIT RC adapted.
 #'
 rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) {
   repo <- git2r::repository(params$prj_path, discover = T)
@@ -69,7 +68,7 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) 
   writeLines(c("*", "!.gitignore"),
              con = file.path(params$prj_path, "deployment", "sbox", ".gitignore"))
   git2r::add(repo, git_path("deployment", "sbox", ".gitignore"))
-  
+
   writeLines(c("*", "!.gitignore"),
              con = file.path(params$prj_path, "logs", ".gitignore"))
   git2r::add(repo, git_path("logs", ".gitignore"))
@@ -97,9 +96,9 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) 
 
 
 #'
-#' Implementation of rc_adapter_pkg_struct_add for GIT rc adapted.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of rc_adapter_pkg_struct_add for GIT rc adapted.
 #'
 rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, name) {
   pkg_dir <- file.path(params$pkgs_path, name)
@@ -136,9 +135,9 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, 
 
 
 #'
-#' Implementation of rc_adapter_get_version for GIT rc adapted.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of rc_adapter_get_version for GIT rc adapted.
 #'
 rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   repo <- git2r::repository(dir, discover = T)
@@ -177,9 +176,9 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
 
 
 #'
-#' Implementation of rc_adapter_remove_admins for GIT rc adapted.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of rc_adapter_remove_admins for GIT rc adapted.
 #'
 rc_adapter_remove_admins.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   admins <- list.files(dir, pattern = ".gitignore", recursive = TRUE, all.files = TRUE)

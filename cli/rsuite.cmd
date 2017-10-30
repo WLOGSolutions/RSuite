@@ -4,7 +4,7 @@
 Rscript.exe --version 1> nul 2>&1
 if ERRORLEVEL 1 (
     for /f "skip=1 tokens=2* " %%a in ('reg query HKLM\SOFTWARE\R-core\R /v InstallPath') do (
-		path %%~sb\bin;%PATH%
+		set PATH="%%~sb\bin;%PATH%"
 	)
 	Rscript.exe --version 1> nul 2>&1
     if ERRORLEVEL 1 (

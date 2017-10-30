@@ -12,7 +12,7 @@ source("R/project_management.R")
 context("Testing if package install validations works properly")
 
 test_that_managed("Post-install R version check works", {
-  skip_if_not(.Platform$OS.type != "source")
+  skip_if_not(.Platform$pkgType != "source")
 
   prj <- init_test_project(repo_adapters = c("Dir", "MRAN[2017-01-08]"))
   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")

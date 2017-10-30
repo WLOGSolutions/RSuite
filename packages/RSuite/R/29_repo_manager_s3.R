@@ -84,9 +84,9 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
 }
 
 #'
-#' Implementation of repo_manager_get_info for rsuite_repo_manager_s3.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_get_info for rsuite_repo_manager_s3.
 #'
 repo_manager_get_info.rsuite_repo_manager_s3 <- function(repo_manager) {
   return(list(
@@ -98,9 +98,9 @@ repo_manager_get_info.rsuite_repo_manager_s3 <- function(repo_manager) {
 
 
 #'
-#' Implementation of repo_manager_init for rsuite_repo_manager_s3.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_init for rsuite_repo_manager_s3.
 #'
 repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
   if (missing(types)) {
@@ -167,9 +167,9 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
 
 
 #'
-#' Implementation of repo_manager_upload for rsuite_repo_manager_s3.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_upload for rsuite_repo_manager_s3.
 #'
 repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, types) {
   if (missing(types)) {
@@ -272,9 +272,9 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
 
 
 #'
-#' Implementation of repo_adapter_stop_management for rsuite_repo_manager_s3.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_adapter_stop_management for rsuite_repo_manager_s3.
 #'
 repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, type) {
   dst_url <- rsuite_contrib_url(repo_manager$bucket_url, type = type, rver = repo_manager$rver)
@@ -349,9 +349,9 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
 }
 
 #'
-#' Implementation of repo_manager_destroy for rsuite_repo_manager_s3.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_destroy for rsuite_repo_manager_s3.
 #'
 repo_manager_destory.rsuite_repo_manager_s3 <- function(repo_manager) {
   # noop

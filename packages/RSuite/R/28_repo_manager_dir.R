@@ -38,9 +38,9 @@ repo_manager_dir_create <- function(path, types, rver) {
 }
 
 #'
-#' Implementation of repo_manager_get_info for rsuite_repo_manager_dir.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_get_info for rsuite_repo_manager_dir.
 #'
 repo_manager_get_info.rsuite_repo_manager_dir <- function(repo_manager) {
   return(list(
@@ -51,9 +51,9 @@ repo_manager_get_info.rsuite_repo_manager_dir <- function(repo_manager) {
 }
 
 #'
-#' Implementation of repo_manager_init for rsuite_repo_manager_dir.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_init for rsuite_repo_manager_dir.
 #'
 repo_manager_init.rsuite_repo_manager_dir <- function(repo_manager, types) {
   if (missing(types)) {
@@ -79,9 +79,9 @@ repo_manager_init.rsuite_repo_manager_dir <- function(repo_manager, types) {
 
 
 #'
-#' Implementation of repo_manager_upload for rsuite_repo_manager_dir..
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_upload for rsuite_repo_manager_dir..
 #'
 repo_manager_upload.rsuite_repo_manager_dir <- function(repo_manager, src_dir, types) {
   if (missing(types)) {
@@ -118,19 +118,19 @@ repo_manager_upload.rsuite_repo_manager_dir <- function(repo_manager, src_dir, t
 }
 
 #'
-#' Implementation of repo_adapter_stop_management for rsuite_repo_manager_dir.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_adapter_stop_management for rsuite_repo_manager_dir.
 #'
 repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, type) {
   path <- rsuite_contrib_url(repo_manager$path, type = type, rver = repo_manager$rver)
   if (!dir.exists(path)) {
     return(data.frame(Package = as.character(), Version = as.character()))
   }
-  
+
   toremove$Removed <- unlist(
-    lapply(X = sprintf("%s_%s.*", toremove$Package, toremove$Version), 
-           F = function(pattern) { 
+    lapply(X = sprintf("%s_%s.*", toremove$Package, toremove$Version),
+           F = function(pattern) {
              file <- list.files(path = path, pattern = pattern, full.names = T)
              if (length(file) > 0) {
                unlink(file, force = T) == 0
@@ -139,17 +139,17 @@ repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, 
              }
            })
   )
-  
-  rsuite_write_PACKAGES(path, type)  
-  
+
+  rsuite_write_PACKAGES(path, type)
+
   res <- toremove[toremove$Removed, c('Package', 'Version')]
   return(res)
 }
 
 #'
-#' Implementation of repo_manager_destroy for rsuite_repo_manager_dir.
+#' @keywords internal
 #'
-#' @export
+#' Implementation of repo_manager_destroy for rsuite_repo_manager_dir.
 #'
 repo_manager_destory.rsuite_repo_manager_dir <- function(repo_manager) {
   # noop

@@ -162,9 +162,11 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
 
   bld_res <- run_rscript(c("library(devtools)",
                            ".libPaths(%s)",
+                           "setwd(%s)", # to prevent loading .Rprofile by R CMD
                            "ou_path <- build(%s)",
                            "save(ou_path, %s)"),
                          rscript_arg("new", libpath),
+                         rscript_arg("dir", libpath),
                          paste(bld_args, collapse = ", "),
                          rscript_arg("file", ou_file),
                          rver = rver)
@@ -231,7 +233,9 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
     pkg_args <- c(common_args, rscript_arg("pkgs", pkg))
     pkg_args <- c(pkg_args, get_specific_args(pkg, spec_desc))
 
-    build_result <- run_rscript("utils::install.packages(%s)",
+    build_result <- run_rscript(c("setwd(%s)", # to prevent loading .Rprofile by R CMD
+                                  "utils::install.packages(%s)"),
+                                rscript_arg("dir", lib_dir),
                                 paste(pkg_args, collapse = ", "),
                                 rver = rver)
     if (is.null(build_result)) {
@@ -258,7 +262,7 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
            if (bld_res && dir.exists(pkg_path)) {
              # verify if package is built for proper R version
              pkg_rver <- get_package_build_rver(lib_dir, pkg_name)
-             if (majmin_rver(pkg_rver) != majmin_rver(rver)) {
+             if (is.na(pkg_rver) || majmin_rver(pkg_rver) != majmin_rver(rver)) {
                pkg_logwarn("Package %s is succesfully installed but R version it is build for(%s) is not the one requested(%s).",
                            pkg_name, pkg_rver, rver)
                pkg_logwarn("It is propably cause of inconsistent repository state. Package %s will be deleted as it is unusable.",
@@ -401,7 +405,9 @@ get_specific_args <- function(pkg_file, spec_desc) {
 #'
 get_package_build_rver <- function(lib_dir, pkg_name) {
   installed <- data.frame(installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Built")]
-  stopifnot(pkg_name %in% installed$Package)
+  if (!(pkg_name %in% installed$Package)) {
+    return(NA)
+  }
   pkg_rver <- installed[pkg_name == installed$Package, "Built"][1]
   return(pkg_rver)
 }

@@ -29,9 +29,9 @@ repo_manager_get_info <- function(repo_manager) {
 }
 
 #'
-#' Default implementation of repo_manager_get_info.
+#' @keywords internal
 #'
-#' @export
+#' Default implementation of repo_manager_get_info.
 #'
 repo_manager_get_info.default <- function(repo_manager) {
   assert(FALSE,
@@ -63,9 +63,9 @@ repo_manager_init <- function(repo_manager, types) {
 }
 
 #'
-#' Default implementation of repo_manager_init
+#' @keywords internal
 #'
-#' @export
+#' Default implementation of repo_manager_init
 #'
 repo_manager_init.default <- function(repo_manager, types) {
   assert(FALSE,
@@ -99,9 +99,9 @@ repo_manager_upload <- function(repo_manager, src_dir, types) {
 }
 
 #'
-#' Default implementation of repo_manager_upload
+#' @keywords internal
 #'
-#' @export
+#' Default implementation of repo_manager_upload
 #'
 repo_manager_upload.default <- function(repo_manager, src_dir, types) {
   assert(FALSE,
@@ -111,24 +111,24 @@ repo_manager_upload.default <- function(repo_manager, src_dir, types) {
 
 #'
 #' Removes specified packages of specified types from the repository.
-#' 
+#'
 #' @param repo_manager repo manager object.
-#' @param toremove data.frame with at lease Package(type:character) and 
+#' @param toremove data.frame with at lease Package(type:character) and
 #'   Version(type: character) columns. (type: data.frame)
 #' @param type package type to remove
-#' 
+#'
 #' @return data.frame containig packages removed with Package and Version columns.
 #'
 #' @export
-#' 
+#'
 repo_manager_remove <- function(repo_manager, toremove, type) {
   assert(is_repo_manager(repo_manager), "rsuite_repo_manager object expected for repo_manager")
   assert(is.data.frame(toremove) && all(c('Package', 'Version') %in% colnames(toremove)),
          "data.frame with at least colums Package and Version expected for toremove")
   assert(is_nonempty_char1(type), "non empty character(1) expected for type")
-  
+
   res <- UseMethod("repo_manager_remove")
-  
+
   assert(is.data.frame(res) && all(c('Package', 'Version') %in% colnames(toremove)),
          "Unexpected result of repo_manager_remove for %s implementation",
          paste(class(repo_manager), collapse = " "))
@@ -136,16 +136,16 @@ repo_manager_remove <- function(repo_manager, toremove, type) {
 }
 
 #'
-#' Default implementation of repo_manager_remove.
+#' @keywords internal
 #'
-#' @export
+#' Default implementation of repo_manager_remove.
 #'
 repo_manager_remove.default <- function(repo_manager, toremove, type) {
   assert(FALSE,
          "repo_manager_destory not implemented by %s",
          paste(class(repo_manager), collapse = " "))
 }
-  
+
 
 #'
 #' For repositories which needs some kind of connection to manage it cleans up
@@ -161,9 +161,9 @@ repo_manager_destroy <- function(repo_manager) {
 }
 
 #'
-#' Default implementation of repo_manager_destory
+#' @keywords internal
 #'
-#' @export
+#' Default implementation of repo_manager_destory
 #'
 repo_manager_destory.default <- function(repo_manager) {
   assert(FALSE,
