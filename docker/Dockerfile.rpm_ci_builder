@@ -27,6 +27,8 @@ RUN yum install -y epel-release \
     && rpm -i http://wlog-rsuite.s3.amazonaws.com/cli/`curl -q http://wlog-rsuite.s3.amazonaws.com/cli/PKG_INDEX | grep rpm | sed -e "s/^rpm: //" | tr -d '\r\n'` \
     && rsuite install -v
 
+# installing test requirements
+RUN yum install -y libaio subversion 
 
 WORKDIR /opt/jenkins
 CMD [ "supervisord", "-n" ]

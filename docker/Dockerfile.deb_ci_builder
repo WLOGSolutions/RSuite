@@ -28,6 +28,8 @@ RUN apt-get install -y r-base libssl-dev libxml2-dev libcurl4-openssl-dev \
     && rm -rf rsiuitecli_*.deb \
     && rsuite install -v
 
-
+# installing test requirements
+RUN apt-get install -y libaio1 libaio-dev subversion 
+    
 WORKDIR /opt/jenkins
 CMD [ "supervisord", "-n" ]
