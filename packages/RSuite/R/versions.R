@@ -8,15 +8,16 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
+#' Normalizes passed versions: 1.2.3 is converted to 001.002.003.
 #'
-#' Normalizes passed versions: 1.2.3 is converted to 001.002.003. Normalized
-#' versions can be compared in lexical order. Conversion is vectorized.
+#' Normalized versions can be compared in lexical order. The conversion is vectorized.
 #'
 #' @param ver version which can contain blocks of digits separeded with any non
 #' digit character (type: character).
 #'
 #' @return vector of normalized versions. (type: character)
+#'
+#' @keywords internal
 #'
 norm_version <- function(ver) {
   ver <- as.character(ver)
@@ -29,16 +30,16 @@ norm_version <- function(ver) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Denormalizes passed versions: 001.002.000 is converted to 1.2.
 #'
-#' It's reverse operation to norm_version. Denormalization is vectorized.
+#' It's reverse operation to norm_version. The conversion is vectorized.
 #'
 #' @param ver version which can contain blocks of digits separeded with any non
 #' digit character (type: character).
 #'
 #' @return vector of denormalized versions. (type: character)
+#'
+#' @keywords internal
 #'
 denorm_version <- function(ver) {
   ver <- as.character(ver)
@@ -54,16 +55,19 @@ denorm_version <- function(ver) {
 }
 
 #'
-#' @keywords internal
+#' Builds version object containing names with specified reqiurements.
 #'
-#' Builds version object containing names with specified reqiurements
+#' version object can have information on available packages or it can contain
+#' just bare version requirements.
 #'
 #' @param pkg_names vector of package names (type: character)
 #' @param vmin minimal version acceptable or NA if not limited (type: character)
 #' @param vmax maximal version acceptable or NA if not limited (type: character)
 #' @param avails data.frame in form available.packages return or NULL.
-#' 
+#'
 #' @return version object which contains passed packages with requirements
+#'
+#' @keywords internal
 #'
 versions.build <- function(pkg_names = c(), vmin = NA, vmax = NA, avails = NULL) {
   versions.diff <- function(ver1, ver2) {
@@ -155,25 +159,25 @@ versions.build <- function(pkg_names = c(), vmin = NA, vmax = NA, avails = NULL)
   .df2ver <- function(df, avails = NULL) {
     stopifnot(is.data.frame(df) && all(c('pkg', 'vmin', 'vmax') %in% colnames(df)))
     df <- df[, c('pkg', 'vmin', 'vmax')]
-    
+
     if (!is.null(avails)) {
-      stopifnot(is.data.frame(avails) 
+      stopifnot(is.data.frame(avails)
                 && all(.standard_avail_columns() %in% colnames(avails)))
       avails <- avails[avails$Package %in% df$pkg, ]
       avails <- avails[!duplicated(avails[, c('Package', 'Version')]), ]
-      
+
       stopifnot(all(df$pkg %in% avails$Package                                   # present in avails
                     | (!is.na(df$vmin) & !is.na(df$vmax) && df$vmin > df$vmax))) # or infeasible
-      
+
       avails$NVersion <- norm_version(avails$Version)
       avails <- merge(x = avails, y = df, by.x = "Package", by.y = "pkg", all.x = F, all.y = T)
-      
+
       avails <- avails[!is.na(avails$NVersion)
                        & (is.na(avails$vmin) | avails$vmin <= avails$NVersion)
                        & (is.na(avails$vmax) | avails$vmax >= avails$NVersion), ]
       avails <- avails[, c(.standard_avail_columns(), 'NVersion')]
     }
-    
+
     res <- list(pkgs = df,
                 avails = avails,
                 .df2ver = .df2ver)
@@ -217,15 +221,18 @@ versions.build <- function(pkg_names = c(), vmin = NA, vmax = NA, avails = NULL)
 }
 
 #'
-#' @keywords internal
-#'
 #' Collects requirements out of data frame passed or available at contrib url packages.
+#'
+#' It retrieves available packages under passed contrib urls and detects lowest and
+#' highes version available for each of them.
 #'
 #' @param pkgs data.frame containing at least columns Package, Version, Repository and File
 #' @param contrib_urls if pkgs is NULL will be used to retrieve available packages from the urls.
-#' 
+#'
 #' @return version object wich contains all packages with vmin and vmax set to
 #'   same version value together with available packages data.frame.
+#'
+#' @keywords internal
 #'
 versions.collect <- function(contrib_urls, pkgs = NULL) {
   if (is.null(pkgs)) {
@@ -253,13 +260,17 @@ versions.collect <- function(contrib_urls, pkgs = NULL) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Joins version objects the way to make version requirements more restrictive
+#'
+#' Result version object contains all packages with version information satisfying
+#' requirements of all the input version objects. If some requiremets cannot be
+#' satisfied appropriate packages will have vmin > vmax.
 #'
 #' @param ... version objects to union
 #' @return version object containing all packages with maximal vmin
 #'   and minimal vmax if they occure multiple times.
+#'
+#' @keywords internal
 #'
 versions.union <- function(...) {
   vers <- list(...)
@@ -273,11 +284,11 @@ versions.union <- function(...) {
     ver2 <- vers[[i]]
     stopifnot(is.versions(ver2))
     stopifnot(ver1$has_avails() == ver2$has_avails())
-    
+
     df <- merge(x = ver1$pkgs, y = ver2$pkgs, by.x = "pkg", by.y = "pkg", all.x = T, all.y = T)
     df$vmin <- ifelse(!is.na(df$vmin.x) & (is.na(df$vmin.y) | df$vmin.x > df$vmin.y), df$vmin.x, df$vmin.y)
     df$vmax <- ifelse(!is.na(df$vmax.x) & (is.na(df$vmax.y) | df$vmax.x < df$vmax.y), df$vmax.x, df$vmax.y)
-    
+
     ver1 <- ver1$.df2ver(df, avails = rbind(ver1$get_avails(), ver2$get_avails()))
   }
 
@@ -291,12 +302,12 @@ versions.get_available_pkgs <- function(pkgs, contrib_urls) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Check if object is version object.
 #'
 #' @param ver object to check
 #' @return TRUE if version object.
+#'
+#' @keywords internal
 #'
 is.versions <- function(ver) {
   return(class(ver) == "versions")

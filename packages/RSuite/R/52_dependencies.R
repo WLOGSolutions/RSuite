@@ -7,14 +7,14 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Detects direct uninstalled project dependencies
 #'
 #' @param params object of rsuite_project_params class
 #'
 #' @return object of versions class containing direct project dependencies
 #'   which are not installed in prject local environment.
+#'
+#' @keywords internal
 #'
 collect_uninstalled_direct_deps <- function(params) {
   depVers <- collect_prj_direct_deps(params)
@@ -23,14 +23,14 @@ collect_uninstalled_direct_deps <- function(params) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Detects all project (project packages and master scripts) direct dependencies.
 #'
 #' @param params object of rsuite_project_params class
 #'
 #' @return object of versions class containing all direct project dependencies
 #'   together with their version requirements.
+#'
+#' @keywords internal
 #'
 collect_prj_direct_deps <- function(params) {
   pkgVers <- collect_pkgs_direct_deps(params)
@@ -40,16 +40,16 @@ collect_prj_direct_deps <- function(params) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Looks for package DESCRIPTION files and retrieves direct dependencies from them.
 #'
 #' @param params object of rsuite_project_params class
-#' @param prj_pkgs detect dependencies only for specified project packages. If 
+#' @param prj_pkgs detect dependencies only for specified project packages. If
 #'   NULL detect for all. (type: character, default: NULL)
 #'
 #' @return object of versions class containing all direct dependencies of project
 #'   packages together with their version requirements.
+#'
+#' @keywords internal
 #'
 collect_pkgs_direct_deps <- function(params) {
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
@@ -84,8 +84,6 @@ collect_pkgs_direct_deps <- function(params) {
 
 
 #'
-#' @keywords internal
-#'
 #' Retrieve dependencies with requirements for a single project package
 #'
 #' @param params object of rsuite_project_params class
@@ -93,6 +91,8 @@ collect_pkgs_direct_deps <- function(params) {
 #'
 #' @return object of versions class containing all direct dependencies of package
 #'   together with their version requirements.
+#'
+#' @keywords internal
 #'
 collect_single_pkg_direct_deps <- function(params, pkg_name) {
   pkgs <- desc_retrieve_dependencies(params$pkgs_path, pkg_name) # from 51_pkg_info.R
@@ -104,7 +104,7 @@ collect_single_pkg_direct_deps <- function(params, pkg_name) {
                      return(versions.build(pdesc))
                    }
                    ver <- sub(pattern = ".+\\([><=]+(.+)\\)", replacement = "\\1", x = pdesc)
-                   pdesc <- sub(patter = "(.+)\\(.+\\)", replacement = "\\1", x = pdesc)
+                   pdesc <- sub(pattern = "(.+)\\(.+\\)", replacement = "\\1", x = pdesc)
                    if (ver_op == "==") {
                      return(versions.build(pdesc, vmin = ver, vmax = ver))
                    }
@@ -117,14 +117,12 @@ collect_single_pkg_direct_deps <- function(params, pkg_name) {
 
                    assert(FALSE,
                           "Usupported version specification(%s %s) for %s in DESCRIPTION of %s",
-                          vep_op, ver, pdesc, pkg_name)
+                          ver_op, ver, pdesc, pkg_name)
                  })
   do.call("versions.union", pdfs)
 }
 
 
-#'
-#' @keywords internal
 #'
 #' Looks for master scripts and retrieves all direct dependencies from them.
 #'
@@ -133,6 +131,8 @@ collect_single_pkg_direct_deps <- function(params, pkg_name) {
 #' @return object of versions class containing all direct dependencies of master
 #'   scripts. Of cause master scrips cannot enforce version requirements so
 #'   versions object does not contain requirements on package versions.
+#'
+#' @keywords internal
 #'
 collect_mscs_direct_deps <- function(params) {
   script_files <- list.files(path = params$script_path, pattern = "*.(r|R|Rmd)$",
@@ -146,17 +146,15 @@ collect_mscs_direct_deps <- function(params) {
              gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
            }))
   mscs_vers <- versions.build(unique(pkgs))
-  
+
   # Remove base packages from dependencies
   base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
   mscs_vers <- mscs_vers$rm(base_pkgs)
-  
+
   return(mscs_vers)
 }
 
 
-#'
-#' @keywords internal
 #'
 #' Retrieves all subsequent dependencies for packages described by version
 #' object passed.
@@ -170,6 +168,8 @@ collect_mscs_direct_deps <- function(params) {
 #'
 #' @return pkgSearchResult object containing packages from vers and all their
 #'    subsequent dependencies.
+#'
+#' @keywords internal
 #'
 collect_all_subseq_deps <- function(vers, repo_infos, type, all_pkgs = NULL) {
   stopifnot(is.versions(vers))

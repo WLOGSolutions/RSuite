@@ -38,10 +38,10 @@ rstudio_01_prj_start <- function() {
 }
 
 #'
-#' @keywords internal
-#'
 #' Loads project in context. If fails to load asks user to select the project
 #' folder.
+#'
+#' @keywords internal
 #'
 .rstudio_get_prj <- function() {
   prj <- tryCatch({

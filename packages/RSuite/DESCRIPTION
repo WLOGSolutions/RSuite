@@ -1,6 +1,6 @@
 Package: RSuite
 Type: Package
-Title: Supports developing, building and deploying R solution.
+Title: Supports developing, building and deploying R solution
 Version: 0.14
 Date: 2017-10-40
 Author: WLOG Solutions
@@ -10,12 +10,12 @@ Description: The main package purpose is to support safe and supportable
   project, dependency management, local packages creation and preparing 
   deployment packs for you solutions.
 License: MIT + file LICENSE
-Depends: devtools,
+Imports: logging, 
+  devtools,
   roxygen2,
-  testthat,
   knitr,
   rmarkdown,
-  git2r
-Imports: logging, 
+  git2r,
+  testthat,
   rstudioapi (>= 0.7)
 RoxygenNote: 6.0.1

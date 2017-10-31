@@ -6,9 +6,9 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Detect project base dir in parents of path.
+#'
+#' @keywords internal
 #'
 detect_prj_path <- function(path) {
   stopifnot(is.character(path) && length(path) == 1)
@@ -25,12 +25,12 @@ detect_prj_path <- function(path) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Validates if prj is project.
 #' If prj is NULL tries initilize project at working dir.
 #' If fails tries loaded project.
 #' If no loaded project asserts that could not detect project out of context.
+#'
+#' @keywords internal
 #'
 safe_get_prj <- function(prj, prj_param_name = "prj") {
   assert(is.null(prj) || is_prj(prj),
@@ -73,7 +73,9 @@ safe_get_prj <- function(prj, prj_param_name = "prj") {
 #' @return object of type rsuite_project
 #'
 #' @examples
+#' \dontrun{
 #' prj <- prj_init() # tries to init project somethere from working folder up.
+#' }
 #'
 #' @export
 #'
@@ -294,7 +296,7 @@ prj_install_deps <- function(prj = NULL, clean = FALSE) {
   })
   .libPaths(params$lib_path)
   .Library <- NULL
-  
+
   if (clean) {
     pkg_loginfo("Cleaning up local environment...")
     unlink(file.path(params$lib_path, "*"), recursive = TRUE, force = TRUE)

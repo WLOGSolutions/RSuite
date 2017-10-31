@@ -6,8 +6,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Downloads packages to the folder.
 #'
 #' @param avail_pkgs data frame containing packages to download of structure
@@ -15,6 +13,8 @@
 #' @param dest_dir folder to download packages to. Folder must exist.
 #'
 #' @return data frame with columns Package and Path.
+#'
+#' @keywords internal
 #'
 pkg_download <- function(avail_pkgs, dest_dir) {
   stopifnot(is.data.frame(avail_pkgs) && "Package" %in% colnames(avail_pkgs))
@@ -53,7 +53,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
                                 rscript_arg("file", ou_file))
     if (!is.null(build_result)) {
       if (build_result == FALSE) {
-        pkg_logwarn("Downloading aborted", basename(pkg))
+        pkg_logwarn("Downloading aborted")
       } else {
         pkg_logwarn("Downloading failed: %s", build_result)
       }
@@ -94,8 +94,6 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Build a single package.
 #'
 #' @param pkg_path path to package folder.
@@ -106,6 +104,8 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #' @param libpath library path to use during building. (type: character)
 #'
 #' @return Full path to builded package or NULL if failed to build. (type: character)
+#'
+#' @keywords internal
 #'
 pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
   stopifnot(length(pkg_path) == 1 && dir.exists(pkg_path))
@@ -179,21 +179,22 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
     return(NULL)
   }
 
+  ou_path <- NULL # to prevent warning on ou_path not visible
   load(ou_file)
   return(ou_path)
 }
 
-#'
-#' @keywords internal
 #'
 #' Removes package or packages(and detaches it to be sure).
 #'
 #' @param pkgs packages to remove  (type: character).
 #' @param lib_dir directory to reinstall packages in (type: character).
 #'
+#' @keywords internal
+#'
 pkg_remove <- function(pkgs, lib_dir) {
   void <- lapply(X = pkgs,
-                 F = function(pkg) {
+                 FUN = function(pkg) {
                    search_item <- paste("package", pkg, sep = ":")
                    while (search_item %in% search()) {
                      attch_pkg_path <- rsuite_fullUnifiedPath(system.file(package = pkg))
@@ -213,10 +214,10 @@ pkg_remove <- function(pkgs, lib_dir) {
 
 
 #'
-#' @keywords internal
-#'
 #' Simple wrapped around utils::install.packages with consideration
 #' of specific package pecularities.
+#'
+#' @keywords internal
 #'
 pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
   common_args <- c(rscript_arg("lib", lib_dir), 'quiet = F')
@@ -251,7 +252,7 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
   }
 
   lapply(X = pkgs,
-         F = function(pkg) {
+         FUN = function(pkg) {
            bld_res <- install_package(pkg)
            pkg_name <- gsub("^([^_]+)_.+$", "\\1", basename(pkg))
            pkg_path <- file.path(lib_dir, pkg_name)
@@ -275,11 +276,11 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Loads specificts for the platform.
 #'
 #' @return data.frame describing all specificts
+#'
+#' @keywords internal
 #'
 load_specifics <- function() {
   spec_files <- c(
@@ -315,8 +316,6 @@ load_specifics <- function() {
 }
 
 #'
-#' @keywords internal
-#'
 #' Retrieves specifics for package passed.
 #'
 #' @param pkg_name name of package to retrieve specifics for. (type: character)
@@ -324,6 +323,8 @@ load_specifics <- function() {
 #' @param spec_desc data.frame describing specifics as returned by load_specifics.
 #'
 #' @return data.frame describing specifics for concrete package.
+#'
+#' @keywords internal
 #'
 get_pkg_specifics <- function(pkg_name, for_source, spec_desc) {
   spec_desc <- spec_desc[spec_desc$Package == pkg_name, ]
@@ -337,11 +338,11 @@ get_pkg_specifics <- function(pkg_name, for_source, spec_desc) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Builds specifics for concrete package file.
 #'
 #' @return character vector to add to install.packages script args.
+#'
+#' @keywords internal
 #'
 get_specific_args <- function(pkg_file, spec_desc) {
   pkg_file <- basename(pkg_file)
@@ -394,14 +395,14 @@ get_specific_args <- function(pkg_file, spec_desc) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Retrieves R version package is built for.
 #'
 #' @param lib_dir path there package is installed. (type: character)
 #' @param pkg_name name of package to get information for. (type: character)
 #'
 #' @return R version number the packages is built for.
+#'
+#' @keywords internal
 #'
 get_package_build_rver <- function(lib_dir, pkg_name) {
   installed <- data.frame(installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Built")]

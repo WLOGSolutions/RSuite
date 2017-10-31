@@ -6,18 +6,16 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Retrieves current R version numeber in form X.X.
 #'
 #' @return version number detected (type: character)
+#'
+#' @keywords internal
 #'
 current_rver <- function() {
   paste(c(R.version$major, unlist(strsplit(R.version$minor, ".", fixed = T))[1]), collapse = ".")
 }
 
-#'
-#' @keywords internal
 #'
 #' Takes R version and changes extracts major and first minor part of it.
 #'
@@ -25,12 +23,12 @@ current_rver <- function() {
 #'
 #' @return version number in form X.X (type: character)
 #'
+#' @keywords internal
+#'
 majmin_rver <- function(rver) {
   gsub("(\\d+\\.\\d+)\\.\\d+", "\\1", rver)
 }
 
-#'
-#' @keywords internal
 #'
 #' Detects RScript path for R verion passed. If exact version not found detects
 #' version compatible on major.minor version number.
@@ -40,6 +38,8 @@ majmin_rver <- function(rver) {
 #' @param rver R version number to detect Rscript path for (type: character)
 #'
 #' @return full path to Rscript command with appropriate version.
+#'
+#' @keywords internal
 #'
 get_rscript_path <- function(rver) {
   stopifnot(is_nonempty_char1(rver))
@@ -84,14 +84,14 @@ get_rscript_path <- function(rver) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Retrieves all path to check Rscripts from. All paths returned are ensured to
 #' contain passed command.
 #'
 #' @param rscript_cmd command to check for existance in candidate folders. (type: character)
 #'
 #' @return vertor of paths containing command. (type: character)
+#'
+#' @keywords internal
 #'
 get_rscript_search_paths <- function(rscript_cmd) {
   paths <- unlist(strsplit(Sys.getenv("PATH"), split = .Platform$path.sep, fixed = T))

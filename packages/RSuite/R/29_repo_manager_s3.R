@@ -7,8 +7,6 @@
 
 
 #'
-#' @keywords internal
-#'
 #' Create repo manager to manager repository in directory.
 #'
 #' @param url url to S3 repository (type: character)
@@ -17,6 +15,8 @@
 #'   source packages (type: character).
 #'
 #' @return object of type rsuite_repo_manager
+#'
+#' @keywords internal
 #'
 repo_manager_s3_create <- function(url, types, rver, s3_profile) {
   assert(is_nonempty_char1(url), "Non empty character(1) expected for url")
@@ -39,7 +39,7 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
                      perl = T)
   aws_cmd <- Sys.which("aws")
   assert(aws_cmd != "",
-         "Failed to detect AWS CLI for management of S3 %s bucket.", bucket)
+         "Failed to detect AWS CLI for management of S3 %s bucket.", bucket_url)
 
 
   # Create temporary file, upload it and delete. If succeeds bucket is potentially RW.
@@ -84,9 +84,9 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_manager_get_info for rsuite_repo_manager_s3.
+#'
+#' @keywords internal
 #'
 repo_manager_get_info.rsuite_repo_manager_s3 <- function(repo_manager) {
   return(list(
@@ -98,9 +98,9 @@ repo_manager_get_info.rsuite_repo_manager_s3 <- function(repo_manager) {
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_manager_init for rsuite_repo_manager_s3.
+#'
+#' @keywords internal
 #'
 repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
   if (missing(types)) {
@@ -108,14 +108,14 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
   }
 
   tmp_file <- tempfile("PACKAGES_")
-  rver <-
+  rver <- repo_manager$rver
+  inited_types <- c()
 
   # detect which types must be initialized
   tryCatch({
     for(tp in types) {
-
       s3_pkgs_url <- paste0(
-        rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = repo_manager$rver),
+        rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver),
         "/PACKAGES")
       dld_lines <- get_cmd_lines("aws cp",
                                  "%s s3 --profile=%s cp %s %s",
@@ -125,7 +125,8 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
                                  tmp_file)
       dld_success <- any(grepl("^download: ", dld_lines))
       if (dld_success) {
-        types <- setdiff(type, tp)
+        types <- setdiff(types, tp)
+        inited_types <- c(inited_types, tp)
       }
     }
   }, finally = {
@@ -167,9 +168,9 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_manager_upload for rsuite_repo_manager_s3.
+#'
+#' @keywords internal
 #'
 repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, types) {
   if (missing(types)) {
@@ -241,13 +242,13 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
 }
 
 #'
-#' @keywords internal
-#'
 #' Merges two dsfs into one. Converts them to data.frame before.
 #'
 #' Needs to control if they have same columns.
 #'
 #' Result is data.frame.
+#'
+#' @keywords internal
 #'
 .merge_dcfs <- function(dcf1, dcf2) {
   dcf1 <- as.data.frame(dcf1, stringsAsFactors = F)
@@ -272,9 +273,9 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_adapter_stop_management for rsuite_repo_manager_s3.
+#'
+#' @keywords internal
 #'
 repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, type) {
   dst_url <- rsuite_contrib_url(repo_manager$bucket_url, type = type, rver = repo_manager$rver)
@@ -296,7 +297,7 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
     pkg_loginfo(paste0("Failed to retrieve PACKAGES for %s from %s.",
                        " Repository probably not inited.",
                        " Will assume it is empty."),
-                tp, repo_manager$bucket_url)
+                type, repo_manager$bucket_url)
     return(data.frame(Package = as.character(), Version = as.character()))
   }
 
@@ -328,7 +329,7 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
                               dst_url)
   assert(any(grepl("^upload: ", sync_lines)),
          "Failed to syncronize repository at %s for %s",
-         repo_manager$bucket_url, tp)
+         repo_manager$bucket_url, type)
 
   pkg_loginfo("... done; removing package files ...")
 
@@ -349,9 +350,9 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
 }
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_manager_destroy for rsuite_repo_manager_s3.
+#'
+#' @keywords internal
 #'
 repo_manager_destory.rsuite_repo_manager_s3 <- function(repo_manager) {
   # noop

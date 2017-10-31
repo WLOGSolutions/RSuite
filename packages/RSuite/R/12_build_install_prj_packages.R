@@ -6,8 +6,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Builds and installs project packages.
 #'
 #' Performes check if all dependencies are installed in local project environment.
@@ -22,12 +20,14 @@
 #'    afterwards removes other project packages from internal repository. In
 #'    NULL all project packages will be built/installed (type: characted, default: NULL)
 #'
+#' @keywords internal
+#'
 build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs = NULL) {
   if (!is.null(revision)) {
     bkp_info <- backup_pkgdesc_files(params$pkgs_path) # from 51_pkg_info.R
 
     pkg_revs <- lapply(X = retrieve_project_pkgsvers(params$pkgs_path), # from 51_pkg_info.R
-                       F = function(ver) { paste0(ver, "-", revision) })
+                       FUN = function(ver) { paste0(ver, "-", revision) })
     update_project_pkgsvers(params$pkgs_path, pkg_revs) # from 51_pkg_info.R
 
     on.exit({ restore_pkgdesc_files(bkp_info) }, add = T)
@@ -58,11 +58,11 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
   # remove packages which are not supposed to be build
   .file_is_one_of_tobuild <- function(f) {
     matches_pkgs <- lapply(
-      X = pkgs, 
-      F = function(p) { grepl(paste0("^",p,"_"), f) })
+      X = pkgs,
+      FUN = function(p) { grepl(paste0("^",p,"_"), f) })
     return(any(unlist(matches_pkgs)))
   }
-  
+
   pkgs_path <- rsuite_contrib_url(params$irepo_path, build_type, params$r_ver)
   for(f in list.files(pkgs_path, full.names = F)) {
     if (grepl("^PACKAGES", f)) {
@@ -77,10 +77,10 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
 }
 
 #'
-#' @keywords internal
-#'
 #' Clears internal repository, builds project packages, installs them
 #' into environment. Raises exception if failed to build anything.
+#'
+#' @keywords internal
 #'
 build_install_prj_packages <- function(params, build_type) {
   # Cleaning previous build results
@@ -121,10 +121,10 @@ build_install_prj_packages <- function(params, build_type) {
                    repo_url <- sprintf("file:///%s", params$get_intern_repo_path())
                    # this type = "source" does not matter, it is passed just to prevent complaining
                    #  on windows that "both" type cannot be used with repos = NULL
-                   pkg_install(pkg_file, 
-                               lib_dir = params$lib_path, 
-                               type = "source", 
-                               repos = NULL, 
+                   pkg_install(pkg_file,
+                               lib_dir = params$lib_path,
+                               type = "source",
+                               repos = NULL,
                                rver = params$r_ver)
                  })
 

@@ -6,8 +6,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Detects zip_ver for the project based on enforced zip version,
 #' ZipVersion from project PARAMETERS file or from versions of project packages.
 #'
@@ -18,10 +16,12 @@
 #' performed.
 #'
 #' @return named list with following structure
-#' \describe {
+#' \describe{
 #'   \item{ver}{Version detected (type: character)}
 #'   \item{rev}{RC revision or NULL (type: character)}
 #' }
+#'
+#' @keywords internal
 #'
 detect_zip_version <- function(params, zip_ver) {
   if (!is.null(zip_ver)) {
@@ -54,14 +54,14 @@ detect_zip_version <- function(params, zip_ver) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Detects revision of the project and checks if it is consistent:
 #' project does not have changes and project revision is latest.
 #'
 #' @param params rsuite_project_params object.
 #'
 #' @return revision number detected (type: character)
+#'
+#' @keywords internal
 #'
 detect_consistent_revision <- function(params) {
   rc_adapter <- detect_rc_adapter(params$prj_path)
@@ -83,13 +83,13 @@ detect_consistent_revision <- function(params) {
 
 
 #'
-#' @keywords internal
-#'
 #' Builds project zip file.
 #'
 #' @param params rsuite_project_params object.
 #' @param version package version to use.
 #' @param odir otput dir path.
+#'
+#' @keywords internal
 #'
 zip_project <- function(params, version, odir) {
   wdir <- tempfile()
@@ -159,14 +159,14 @@ zip_project <- function(params, version, odir) {
 
 
 #'
-#' @keywords internal
-#'
 #' Creates zip archive out passed directory.
 #'
 #' @param wspace folder to create archive from
 #' @param zip_file_path name of zip file to create in working directory
 #'
 #' @return TRUE if all ziped successfuly.
+#'
+#' @keywords internal
 #'
 zip_folder <- function(wspace, zip_file_path) {
   wd <- setwd(wspace)
@@ -192,14 +192,14 @@ zip_folder <- function(wspace, zip_file_path) {
 
 
 #'
-#' @keywords internal
-#'
 #' Extracts zip archive into passed directory.
 #'
 #' @param dest_dir folder to create extract to
 #' @param zip_file_path name of zip file to extract.
 #'
 #' @return TRUE if all unziped successfuly.
+#'
+#' @keywords internal
 #'
 unzip_folder <- function(dest_dir, zip_file_path) {
   zip_res <- run_rscript("utils::unzip(%s, %s)",
@@ -215,5 +215,4 @@ unzip_folder <- function(dest_dir, zip_file_path) {
     pkg_logwarn("Unzip failed: %s", zip_res)
   }
   return(FALSE)
-
 }

@@ -6,11 +6,11 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' This provides support for binary package installation from local CRAN on Linux.
 #'
-rsuite_contrib_url <- function(repos, type = pkgs_type, rver = NA) {
+#' @keywords internal
+#'
+rsuite_contrib_url <- function(repos, type, rver = NA) {
   rver <- ifelse(is.na(rver), current_rver(), majmin_rver(rver))
 
   if (.Platform$pkgType != "source" || type != "binary" || .Platform$OS.type != "unix") {
@@ -25,14 +25,14 @@ rsuite_contrib_url <- function(repos, type = pkgs_type, rver = NA) {
     rel_str <- readLines('/etc/redhat-release')[[1]]
     toks <- unlist(strsplit(rel_str, " "))
     ver <- toks[grep("^\\d+[.]\\d+$", toks)][1]
-    
+
     rel <- paste0("rhel", ver)
   } else if (file.exists('/etc/debian_version')) {
     rel_str <- readLines('/etc/issue')[[1]]
     toks <- unlist(strsplit(rel_str, " "))
     toks <- toks[grep("^\\d+[.]\\d+[.]\\d+$", toks)]
     ver <- gsub("^(\\d+[.]\\d+)[.].+$", "\\1", toks)[1]
-    
+
     rel <- paste0("deb", ver)
   } else {
     rel <- .Platform$OS.type
@@ -45,11 +45,11 @@ rsuite_contrib_url <- function(repos, type = pkgs_type, rver = NA) {
 }
 
 #'
-#' @keywords internal
-#'
 #' In R3.4 they changed write_PACKAGES not to create intex files if repository is
 #' empty. It causes problems then using such an empty repository. This function
 #' wraps write_PACKAGES and ensures index files exist.
+#'
+#' @keywords internal
 #'
 rsuite_write_PACKAGES <- function(url, type) {
   if (!dir.exists(url)) {
@@ -80,9 +80,9 @@ rsuite_write_PACKAGES <- function(url, type) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Converts passed path to full path and replaces it to short names on Windows.
+#'
+#' @keywords internal
 #'
 rsuite_fullUnifiedPath <- function(path) {
   path <- suppressWarnings(normalizePath(path))

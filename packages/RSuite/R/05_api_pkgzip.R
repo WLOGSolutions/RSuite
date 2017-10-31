@@ -21,7 +21,6 @@
 #' @param pkg_type type of packages to build (type: character, default: platform default)
 #' @param path folder path to put output zip into. The folder must exist.
 #'    (type: characted: default: getwd())
-#' @param inc_deps flag desiding if dependencies should be included (type: logical: default: FALSE)
 #'
 #' @return created pkgzip file path (invisible).
 #'
@@ -31,13 +30,10 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
                                       prj = NULL,
                                       zip_ver = NULL,
                                       pkg_type = .Platform$pkgType,
-                                      path = getwd() #, inc_deps = FALSE
-                                      ) {
+                                      path = getwd()) {
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
-#  assert(!missing(inc_deps) && length(inc_deps) == 1 && is.logical(inc_deps),
-#         "logical(1) expected for inc_deps")
-  
+
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
@@ -58,15 +54,6 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
                                     build_type = pkg_type,
                                     pkgs = pkgs)
 
-#  if (inc_deps) {
-#    pkg_loginfo("... done. Downloading dependencies ...")
-#    
-#    repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
-#    log_repo_infos(repo_infos) # from 53_repositories.R
-#    typedVers <- resolve_prj_deps(repo_infos, params,  # from 11_install_prj_deps.R
-#                                  only_source = (pkg_type == "source"))
-#  }
-  
   zip_file_name <- sprintf("%s_pkgzip_%s_%s.zip", Sys.Date(), all_names, ver_inf$ver)
   pkg_loginfo("... done. Creating PKGZIP file %s ...", zip_file_name)
 
@@ -174,14 +161,14 @@ pkgzip_build_ext_packages <- function(pkgs,
   assert(!missing(pkgs) && is.character(pkgs) && length(pkgs) > 0,
          "Non empty character(N) expected for pkgs")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
-  
+
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
 
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
-  
+
   repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
   log_repo_infos(repo_infos) # from 53_repositories.R
 
@@ -205,7 +192,7 @@ pkgzip_build_ext_packages <- function(pkgs,
   all_names <- c(avail_pkgs$Package, src_avail_pkgs$Package)
   all_names <- all_names[order(all_names)]
   if (length(all_names) > 5) {
-    zip_file_name <- sprintf("%s_pkgzip_%s_and_%sothers.zip", 
+    zip_file_name <- sprintf("%s_pkgzip_%s_and_%sothers.zip",
                              Sys.Date(), paste(all_names[1:5], collapse = "_"), length(all_names) - 5)
   } else {
     zip_file_name <- sprintf("%s_pkgzip_%s.zip", Sys.Date(), paste(all_names, collapse = "_"))
@@ -213,7 +200,7 @@ pkgzip_build_ext_packages <- function(pkgs,
 
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
-  
+
   pkg_loginfo("Preparing temp repository for packages ...")
 
   tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, params$r_ver)
@@ -223,9 +210,9 @@ pkgzip_build_ext_packages <- function(pkgs,
                dest_dir = rsuite_contrib_url(tmp_path, pkg_type, params$r_ver))
   if (nrow(src_avail_pkgs) > 0) {
     build_source_packages(src_avail_pkgs, # from 17_build_src_packages.R
-                          tmp_path, pkg_type, params, mgr_info$rver)
+                          tmp_path, pkg_type, params, params$r_ver)
   }
-  
+
   dest_path <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
   rsuite_write_PACKAGES(dest_path, pkg_type)
 
@@ -242,9 +229,9 @@ pkgzip_build_ext_packages <- function(pkgs,
 
 #'
 #' Loads package from github repository, packages it into package file and builds
-#' PKGZIP out of it. It uses project to detect repositories to look for dependencies 
+#' PKGZIP out of it. It uses project to detect repositories to look for dependencies
 #' and to detect rversion if required.
-#' 
+#'
 #' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
 #' verbosity.
 #'
@@ -261,35 +248,35 @@ pkgzip_build_ext_packages <- function(pkgs,
 #'
 #' @export
 #'
-pkgzip_build_github_package <- function(repo, ..., 
+pkgzip_build_github_package <- function(repo, ...,
                                         prj = NULL,
                                         pkg_type = .Platform$pkgType,
                                         path = getwd()) {
   assert(is_nonempty_char1(repo), "Non empty character(1) expected for repo")
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
-  
+
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
-  
+
   params <- prj$load_params()
 
-  bld_prj <- prj_start(name = basename(tempfile(pattern = "srcrepo_proj_")), 
+  bld_prj <- prj_start(name = basename(tempfile(pattern = "srcrepo_proj_")),
                        path = tempdir(),
                        skip_rc = T)
   on.exit({ unlink(bld_prj$path, recursive = T, force = T) }, add = TRUE)
-  
+
   prj_config_set_rversion(rver = params$r_ver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
-  
+
   pkg_name <- get_srcrepo_package(bld_prj, "github", repo, ...)
-  
+
   bld_params <- bld_prj$load_params()
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = T),  force = T) # not to include default packages
   prj_install_deps(bld_prj)
-  
+
   pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_name, "DESCRIPTION"))[1, 'Version']
-  
-  pkgzip_build_prj_packages(pkgs = pkg_name, prj = bld_prj, 
+
+  pkgzip_build_prj_packages(pkgs = pkg_name, prj = bld_prj,
                             zip_ver = pkg_ver, pkg_type = pkg_type, path = path)
 }

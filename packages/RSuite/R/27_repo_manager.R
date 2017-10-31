@@ -10,7 +10,6 @@
 #' Returns informations on repo manager.
 #'
 #' @param repo_manager repo manager object
-#' @param params rsuite_project_params object
 #'
 #' @return named list with following entries:
 #' \describe{
@@ -29,9 +28,9 @@ repo_manager_get_info <- function(repo_manager) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Default implementation of repo_manager_get_info.
+#'
+#' @keywords internal
 #'
 repo_manager_get_info.default <- function(repo_manager) {
   assert(FALSE,
@@ -63,9 +62,9 @@ repo_manager_init <- function(repo_manager, types) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Default implementation of repo_manager_init
+#'
+#' @keywords internal
 #'
 repo_manager_init.default <- function(repo_manager, types) {
   assert(FALSE,
@@ -99,9 +98,9 @@ repo_manager_upload <- function(repo_manager, src_dir, types) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Default implementation of repo_manager_upload
+#'
+#' @keywords internal
 #'
 repo_manager_upload.default <- function(repo_manager, src_dir, types) {
   assert(FALSE,
@@ -136,9 +135,9 @@ repo_manager_remove <- function(repo_manager, toremove, type) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Default implementation of repo_manager_remove.
+#'
+#' @keywords internal
 #'
 repo_manager_remove.default <- function(repo_manager, toremove, type) {
   assert(FALSE,
@@ -161,9 +160,9 @@ repo_manager_destroy <- function(repo_manager) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Default implementation of repo_manager_destory
+#'
+#' @keywords internal
 #'
 repo_manager_destory.default <- function(repo_manager) {
   assert(FALSE,

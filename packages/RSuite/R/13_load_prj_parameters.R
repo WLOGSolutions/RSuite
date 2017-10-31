@@ -6,13 +6,13 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Loads project parameters from specified path.
 #'
 #' @param prj_path path to base directory of project (the one containing
 #'   PARAMETERS file). (type: character)
 #' @return object of rsuite_project_parameters
+#'
+#' @keywords internal
 #'
 load_prj_parameters <- function(prj_path) {
   assert(is.character(prj_path) && length(prj_path) == 1,

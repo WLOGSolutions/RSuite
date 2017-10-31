@@ -6,9 +6,9 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Detects svn command line client path
+#'
+#' @keywords internal
 #'
 .get_svn_cmd <- function() {
   svn_cmd <- Sys.which("svn")
@@ -19,12 +19,12 @@
 }
 
 #'
-#' @keywords internal
-#'
 #' Creates RC adapter to handle SVN repos.
 #'
 #' @param name under which RC adapter will be registered in RSuite.
 #' @return object of type rsuite_rc_adapter
+#'
+#' @keywords internal
 #'
 rc_adapter_create_svn <- function(name) {
   result <- rc_adapter_create_base(name)
@@ -33,8 +33,6 @@ rc_adapter_create_svn <- function(name) {
   return(result)
 }
 
-#'
-#' @keywords internal
 #'
 #' Implementation of rc_adapter_is_under_control for SVN rc adapted.
 #'
@@ -45,6 +43,8 @@ rc_adapter_create_svn <- function(name) {
 #'
 #' With detected svn client checks if folder is indeed under version control or
 #' if it is just created inside working copy. If so warning is commited.
+#'
+#' @keywords internal
 #'
 rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   # check if there is administrative .svn somethere up folder structure
@@ -96,9 +96,9 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
 
 #'
-#' @keywords internal
-#'
 #' Object performing operations on SVN working copy
+#'
+#' @keywords internal
 #'
 .svn_manager <- function() {
   svn_cmd <- .get_svn_cmd()
@@ -176,9 +176,9 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of rc_adapter_prj_struct_add for SVN rc adapted.
+#'
+#' @keywords internal
 #'
 rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) {
   svn <- .svn_manager()
@@ -227,9 +227,9 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) 
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of rc_adapter_pkg_struct_add for SVN rc adapted.
+#'
+#' @keywords internal
 #'
 rc_adapter_pkg_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params, name) {
   pkg_dir <- file.path(params$pkgs_path, name)
@@ -257,9 +257,9 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params, 
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of rc_adapter_get_version for SVN rc adapted.
+#'
+#' @keywords internal
 #'
 rc_adapter_get_version.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   svn_cmd <- .get_svn_cmd()
@@ -288,9 +288,9 @@ rc_adapter_get_version.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of rc_adapter_remove_admins for SVN rc adapted.
+#'
+#' @keywords internal
 #'
 rc_adapter_remove_admins.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   admins <- list.files(dir, pattern = ".svn", recursive = TRUE, include.dirs = TRUE, all.files = TRUE)

@@ -6,8 +6,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Creates repository info object.
 #'
 #' It contains information on about path, and provided parameters.
@@ -19,6 +17,8 @@
 #' @param rver R version to create repositories for
 #'
 #' @return object of type rsuite_repo_info.
+#'
+#' @keywords internal
 #'
 .create_repo_info <- function(path, expected_types, rver) {
   stopifnot(regexpr("^(https?|ftp|file)(://.*)", path) != -1) # url path expected
@@ -58,8 +58,6 @@
 }
 
 #'
-#' @keywords internal
-#'
 #' Parses repository adapter configuration and extracts repository arguments.
 #'
 #' @param spec character vector specifying repositories in form <name>[<arg>]
@@ -67,6 +65,8 @@
 #'
 #' @return character vector which values are repository arguments and names are
 #'   repository names.
+#'
+#' @keywords internal
 #'
 parse_repo_adapters_spec <- function(specs) {
   specs <- trimws(specs)
@@ -77,14 +77,14 @@ parse_repo_adapters_spec <- function(specs) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Creates repos specification based on Url for repositories specified in params.
 #'
 #' @param params project parameters to extract repositories from. (type: rsuit_proj_params)
 #'
 #' @return character vector with values in form Url[<url>] for each repository path
 #'   in params.
+#'
+#' @keywords internal
 #'
 make_detached_repos <- function(params) {
   urls <- c()
@@ -109,11 +109,11 @@ make_detached_repos <- function(params) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Retrieves all the repositories infos to use for project.
 #'
 #' @return non empty named list of repository descriptions as rsuite_repo_info object.
+#'
+#' @keywords internal
 #'
 get_all_repo_infos <- function(params, rver = NULL) {
   if (is.null(rver)) {
@@ -177,8 +177,6 @@ get_all_repo_infos <- function(params, rver = NULL) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Based on names pathes to repositories build named list of repository infos.
 #'
 #' @param spec names list with pathes to repositories
@@ -187,16 +185,18 @@ get_all_repo_infos <- function(params, rver = NULL) {
 #'
 #' @return named list with appropriate rsuite_repo_info objects.
 #'
+#' @keywords internal
+#'
 build_repo_infos <- function(spec, types, rver) {
-  result <- lapply(X = spec, F = function(path) { .create_repo_info(path, types, rver) })
+  result <- lapply(X = spec, FUN = function(path) { .create_repo_info(path, types, rver) })
   names(result) <- names(spec)
   return(result)
 }
 
 #'
-#' @keywords internal
-#'
 #' Logs information on repository infos,
+#'
+#' @keywords internal
 #'
 log_repo_infos <- function(repo_infos) {
   pkg_loginfo("Will look for dependencies in ...")
@@ -206,8 +206,6 @@ log_repo_infos <- function(repo_infos) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Retrieves contrib_urls for provided type out of list of repository infos.
 #'
 #' @param repo_infos list of objects of rsuite_repo_info class.
@@ -215,8 +213,10 @@ log_repo_infos <- function(repo_infos) {
 #'
 #' @return character(N) containing retrieved contrib_urls
 #'
+#' @keywords internal
+#'
 retrieve_contrib_urls <- function(repo_infos, type) {
   result <- unlist(lapply(X = repo_infos,
-                          F = function(ri) { ri$get_contrib_url(type) }))
+                          FUN = function(ri) { ri$get_contrib_url(type) }))
   return(result)
 }

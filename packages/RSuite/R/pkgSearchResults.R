@@ -7,8 +7,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#' 
 #' Builds search results object.
 #'
 #' It contains versions found and versions describing dependencies
@@ -20,6 +18,8 @@
 #'
 #' @return pkgSearchResults object
 #'
+#' @keywords internal
+#'
 build.pkgSearchResults <- function(found, missing) {
   if (missing(found)) {
     found <- versions.build(avails = data.frame())
@@ -28,7 +28,7 @@ build.pkgSearchResults <- function(found, missing) {
   if (!found$is_empty()) {
     stopifnot(found$has_avails() && all(c("Package", "Version", "Repository", "File") %in% colnames(found$get_avails())))
   }
-  
+
   if (base::missing(missing)) {
     missing <- versions.build()
   }
@@ -77,12 +77,12 @@ build.pkgSearchResults <- function(found, missing) {
 }
 
 #'
-#' @keywords internal
-#' 
 #' Check if object is pkgSearchResults object.
 #'
 #' @param psr object to check
 #' @return TRUE if version object.
+#'
+#' @keywords internal
 #'
 is.pkgSearchResults <- function(psr) {
   return(class(psr) == "pkgSearchResults")

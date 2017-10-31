@@ -43,11 +43,11 @@ repo_mng_stop <- function(repo_manager) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Removes cache of available.packages.
 #'
 #' @param contrib_url contrib url with cached results for available.packages.
+#'
+#' @keywords internal
 #'
 .remove_avails_cache <- function(contrib_url) {
   cache_file <- file.path(tempdir(), paste0("repos_", URLencode(contrib_url, TRUE), ".rds"))

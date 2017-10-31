@@ -6,8 +6,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Runs command and collects it's output lines
 #'
 #' Logs command to run and all output to finest level.
@@ -17,6 +15,8 @@
 #' @param ... parameters to build cmd using sprintf.
 #'
 #' @return character(N) containing command output lines.
+#'
+#' @keywords internal
 #'
 get_cmd_lines <- function(desc, cmd, ...) {
   full_cmd <- paste0(sprintf(cmd, ...), " 2>&1")
@@ -41,8 +41,6 @@ get_cmd_lines <- function(desc, cmd, ...) {
 
 
 #'
-#' @keywords internal
-#'
 #' Executes R script code in RScript subprocess collecting it's output
 #' and logging it on DEBUG level.
 #'
@@ -54,6 +52,8 @@ get_cmd_lines <- function(desc, cmd, ...) {
 #' @param ex_libpath extra path to add to .libPaths. (type: character, default: NULL)
 #'
 #' @return NULL if succeded, if failed returns FALSE or error string.
+#'
+#' @keywords internal
 #'
 run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL) {
   full_code <- sprintf(paste0(script_code, collapse = ";"), ...)
@@ -103,9 +103,9 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Creates string which can be passed as parameter to script code.
+#'
+#' @keywords internal
 #'
 rscript_arg <- function(name, val) {
   if (is.null(val)) {

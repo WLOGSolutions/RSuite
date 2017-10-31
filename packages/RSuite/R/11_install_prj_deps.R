@@ -6,8 +6,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Builds local project environment.
 #'
 #' @param params prject parameters(type: rsuite_project_params)
@@ -16,6 +14,8 @@
 #' It collects packages the project depends on and installs them in local
 #' project environment. ependencies are collected from packages and master
 #' scripts.
+#'
+#' @keywords internal
 #'
 install_prj_deps <- function(params, ...) {
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
@@ -28,8 +28,6 @@ install_prj_deps <- function(params, ...) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Runs overall project dependency resolving.
 #' Resolves all the project dependencies (from packages and master scripts).
 #'
@@ -39,6 +37,8 @@ install_prj_deps <- function(params, ...) {
 #' @param only_source detect only source type dependencies
 #'
 #' @return version object describing available project dependencies.
+#'
+#' @keywords internal
 #'
 resolve_prj_deps <- function(repo_infos, params, only_source = F) {
   if(only_source) {
@@ -61,8 +61,6 @@ resolve_prj_deps <- function(repo_infos, params, only_source = F) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Installs dependencies specified by typedVers from reposistories specified by
 #'   repo_infos. First tries to install fst_type packages then  base and aux types
 #'   as specified by typedVers.
@@ -70,6 +68,8 @@ resolve_prj_deps <- function(repo_infos, params, only_source = F) {
 #' @param avail_vers version object describing resolved dependencies to install.
 #' @param lib_dir directory to install into. Must not be NULL.
 #' @param rver R version to install dependencies for. (type: character)
+#'
+#' @keywords internal
 #'
 install_dependencies <- function(avail_vers, lib_dir, rver) {
   stopifnot(is.versions(avail_vers))
@@ -81,24 +81,24 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
     installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
     return(vers$rm_acceptable(installed))
   }
-  
+
   avail_vers <- remove_installed(avail_vers)
   if (avail_vers$is_empty()) {
     pkg_loginfo("No dependencies to install.")
     return(invisible())
   }
-  
+
   pkg_loginfo("Detected %s dependencies to install. Installing...", length(avail_vers$get_names()))
 
   tmp_dir <- tempfile()
   dir.create(tmp_dir, recursive = T)
   on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
-  
+
   avail_deps <- avail_vers$pick_available_pkgs()
   dloaded <- pkg_download(avail_deps, dest_dir = tmp_dir)
   # sort them for installation (in dependency order)
   dloaded <- dloaded[ pkg_inst_order(dloaded$Package, db = avail_deps), ]
-  
+
   # this type = "source" does not matter, it is passed just to prevent complaining
   #  on windows that "both" type cannot be used with repos = NULL
   pkg_install(dloaded$Path, lib_dir = lib_dir, type = "source", repos = NULL, rver = rver)
@@ -110,18 +110,18 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Resolves missing dependencies using provided repos.
 #' Raises assertion if failes to find some of dependencies.
 #'
 #' @param vers versions object describing packages to resolve missings for.
 #' @param repo_infos list of description of repositories (object of rsuite_repo_info)
 #'    to resolve dependencies with
-#' @param pkg_types types of packages which are tried for dependencies in order 
+#' @param pkg_types types of packages which are tried for dependencies in order
 #'    to check. (type: character)
 #'
 #' @return versions object describing all resolved dependencies.
+#'
+#' @keywords internal
 #'
 resolve_missings <- function(vers, repo_infos, pkg_types) {
   stopifnot(is.versions(vers))
@@ -139,35 +139,33 @@ resolve_missings <- function(vers, repo_infos, pkg_types) {
         if (!any(curr_missings$get_names() %in% tp_psr$get_found_names())) {
           next
         }
-        
+
         all_deps <- versions.union(all_deps, tp_psr$get_found()$rm_avails(), tp_psr$get_missing())
-        
+
         # remove new dependencies: these must be searched again from the beginning of pkg_types
         tp_psr <- tp_psr$exclude(setdiff(tp_psr$get_found_names(), curr_missings$get_names()))
         tp_psr <- tp_psr$exclude(setdiff(tp_psr$get_missing_names(), curr_missings$get_names()))
         curr_psr <- tp_psr$join(curr_psr)
-        
+
         curr_missings <- curr_missings$rm(curr_psr$get_found_names())
         if (curr_missings$is_empty()) {
           break
         }
       }
-      
+
       if (curr_missings$is_empty()) {
         break
       }
     }
-    
-    assert(curr_missings$is_empty(), 
+
+    assert(curr_missings$is_empty(),
            "Required dependencies are not available: %s", paste(curr_missings$get_names(), collapse = ", "))
   }
-  
+
   return(curr_psr$get_found())
 }
 
 
-#'
-#' @keywords internal
 #'
 #' Detects order of installation of packages as permutation of input vector
 #'
@@ -176,6 +174,8 @@ resolve_missings <- function(vers, repo_infos, pkg_types) {
 #'
 #' @return numeric vertor which is defining permutation of packages ta align
 #' them in order of installation (less dependent to more dependent).
+#'
+#' @keywords internal
 #'
 pkg_inst_order <- function(pkgs, db) {
   pkg2deps <- tools::package_dependencies(pkgs, db = db)
@@ -204,11 +204,11 @@ pkg_inst_order <- function(pkgs, db) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Cleans unrequired installed packages from project local environment.
 #'
 #' @param params prject parameters(type: rsuite_project_params)
+#'
+#' @keywords internal
 #'
 clean_prj_deps <- function(params) {
   all_installed <- data.frame(utils::installed.packages(lib.loc = params$lib_path), stringsAsFactors = F)
@@ -221,7 +221,7 @@ clean_prj_deps <- function(params) {
   # to satisfy collect_all_subseq_deps requirements
   installed$Repository <- rep(params$lib_path, nrow(installed))
   installed$File <- rep(NA, nrow(installed))
-  
+
   psr <- collect_all_subseq_deps(deps, all_pkgs = installed) # from 52_dependencies.R
 
   proj_pkgs <- build_project_pkgslist(params$pkgs_path)

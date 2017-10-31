@@ -6,8 +6,9 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
 #' Structure compliance table
+#'
+#' @keywords internal
 #'
 rsuite_strver_compliance <- list(
   "0.1" = c("0.1", "0.2"),
@@ -16,10 +17,10 @@ rsuite_strver_compliance <- list(
 )
 
 #'
-#' @keywords internal
-#'
 #' Retrieves earliest RSuite compliant version for the version passed.
 #' The result is normalized version.
+#'
+#' @keywords internal
 #'
 get_earliest_strver_comliant <- function(ver) {
   for(v in names(rsuite_strver_compliance)) {
@@ -31,10 +32,10 @@ get_earliest_strver_comliant <- function(ver) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Checks project structure and parameters and adapts them to RSuite
 #' requirements.
+#'
+#' @keywords internal
 #'
 check_project_structure <- function(prj_dir) {
   stopifnot(dir.exists(prj_dir))
@@ -106,8 +107,6 @@ check_project_structure <- function(prj_dir) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Loads parameters file and verified if its registered RSuite version against
 #' current.
 #'
@@ -118,6 +117,8 @@ check_project_structure <- function(prj_dir) {
 #' @param rsuite_ver current version of RSuite
 #'
 #' @return project parameters (rsuite_project_params object)
+#'
+#' @keywords internal
 #'
 force_load_PARAMETERS <- function(params_file, prj_name, rsuite_ver) {
   prj_dir <- dirname(params_file)
@@ -160,12 +161,12 @@ force_load_PARAMETERS <- function(params_file, prj_name, rsuite_ver) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Updates project PARAMETERS file
 #'
 #' @param  params_file path to project PARAMETERS file to update
 #' @param  rsuite_ver version of RSuite.
+#'
+#' @keywords internal
 #'
 update_PARAMETERS <- function(params_file, rsuite_ver) {
   params_dt <- data.frame(read.dcf(params_file), stringsAsFactors = F)
@@ -204,9 +205,9 @@ update_PARAMETERS <- function(params_file, rsuite_ver) {
 
 
 #'
-#' @keywords internal
-#'
 #' Creates project structure out of project template.
+#'
+#' @keywords internal
 #'
 create_package_structure <- function(pkg_dir) {
   stopifnot(!dir.exists(pkg_dir))
@@ -237,24 +238,24 @@ create_package_structure <- function(pkg_dir) {
 
 
 #'
-#' @keywords internal
-#'
 #' Creates folder if does not exists.
 #' Asserts that folder is created.
+#'
+#' @keywords internal
 #'
 create_struct_dir <- function(dir, desc) {
   if (!dir.exists(dir)) {
     created <- dir.create(dir, recursive = T)
-    assert(created, "Failed to create %s directory: %s.", desc, tests_dir)
+    assert(created, "Failed to create %s directory: %s.", desc, dir)
   }
 }
 
 #'
-#' @keywords internal
-#'
 #' Copy template Rproj into specified folder under specified name.
 #' Does not copy if any Rproj exists already in the folder.
 #' Logs warning if failed to copy.
+#'
+#' @keywords internal
 #'
 create_rproj <- function(dir, name) {
   if (length(list.files(path = dir, pattern = "*.Rproj", recursive = F)) > 0) {
@@ -278,9 +279,9 @@ create_rproj <- function(dir, name) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Creates .Rprofile at specified location with specified contents if not exists.
+#'
+#' @keywords internal
 #'
 create_rprofile <- function(dir, text = "RSuite::prj_load()") {
   rprof_file <- file.path(dir, ".Rprofile")
@@ -290,9 +291,9 @@ create_rprofile <- function(dir, text = "RSuite::prj_load()") {
 }
 
 #'
-#' @keywords internal
-#'
 #' Copies folder from onto folder to if to not exists.
+#'
+#' @keywords internal
 #'
 copy_folder <- function(from, to) {
   if (dir.exists(to)) {
@@ -314,11 +315,11 @@ copy_folder <- function(from, to) {
 
 
 #'
-#' @keywords internal
-#'
 #' Detects which RC system project is beeing managed with.
 #'
 #' @return rc_adapter or NULL
+#'
+#' @keywords internal
 #'
 detect_rc_adapter <- function(prj_dir) {
   for(rc_name in reg_rc_adapter_names()) {

@@ -6,9 +6,9 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#' 
 #' Internal env for storing default project
+#'
+#' @keywords internal
 #'
 internal_env <- new.env()
 assign('loaded_prj', NULL, envir = internal_env)
@@ -17,11 +17,11 @@ assign('repo_adapter_reg', list(), envir = internal_env)
 assign('rc_adapter_reg', list(), envir = internal_env)
 
 #'
-#' @keywords internal
-#' 
 #' If no default project, set argument as default project.
 #' If argument is default project, update it in internal env.
 #' Register(or update) project in project registry.
+#'
+#' @keywords internal
 #'
 register_prj <- function(prj) {
   stopifnot(is_prj(prj))
@@ -40,9 +40,9 @@ register_prj <- function(prj) {
 }
 
 #'
-#' @keywords internal
-#' 
 #' Finds project in project registry by it's base path.
+#'
+#' @keywords internal
 #'
 find_prj <- function(path) {
   stopifnot(is.character(path) && length(path) == 1)
@@ -54,10 +54,10 @@ find_prj <- function(path) {
 }
 
 #'
-#' @keywords internal
-#' 
 #' Register project as loaded.
 #' If prj is NULL unsets loaded prj.
+#'
+#' @keywords internal
 #'
 set_loaded_prj <- function(prj) {
   if (!is.null(prj)) {
@@ -71,9 +71,9 @@ set_loaded_prj <- function(prj) {
 }
 
 #'
-#' @keywords internal
-#' 
 #' Return loaded project or NULL if none loaded.
+#'
+#' @keywords internal
 #'
 get_loaded_prj <- function() {
   prj <- get('loaded_prj', envir = internal_env)
@@ -82,9 +82,9 @@ get_loaded_prj <- function() {
 
 
 #'
-#' @keywords internal
-#' 
 #' Register repo_adapter in internal environment under name.
+#'
+#' @keywords internal
 #'
 reg_repo_adapter <- function(name, repo_adapter) {
   stopifnot(is_repo_adapter(repo_adapter))
@@ -95,18 +95,18 @@ reg_repo_adapter <- function(name, repo_adapter) {
 }
 
 #'
-#' @keywords internal
-#' 
 #' Get all registered repo adapter names.
+#'
+#' @keywords internal
 #'
 reg_repo_adapter_names <- function() {
   names(get('repo_adapter_reg', envir = internal_env))
 }
 
 #'
-#' @keywords internal
-#' 
 #' Get all registered repo adapter names.
+#'
+#' @keywords internal
 #'
 reg_repo_adapter_names <- function() {
   names(get('repo_adapter_reg', envir = internal_env))
@@ -114,9 +114,9 @@ reg_repo_adapter_names <- function() {
 
 
 #'
-#' @keywords internal
-#' 
 #' Return repo adapter under the name.
+#'
+#' @keywords internal
 #'
 find_repo_adapter <- function(name) {
   reg <- get('repo_adapter_reg', envir = internal_env)
@@ -125,31 +125,31 @@ find_repo_adapter <- function(name) {
 
 
 #'
-#' @keywords internal
-#' 
 #' Register rc_adapter in internal environment under name.
+#'
+#' @keywords internal
 #'
 reg_rc_adapter <- function(name, rc_adapter) {
   stopifnot(is_rc_adapter(rc_adapter))
-  
+
   reg <- get('rc_adapter_reg', envir = internal_env)
   reg[[name]] <- rc_adapter
   assign('rc_adapter_reg', reg, envir = internal_env)
 }
 
 #'
-#' @keywords internal
-#' 
 #' Get all registered rc adapter names.
+#'
+#' @keywords internal
 #'
 reg_rc_adapter_names <- function() {
   names(get('rc_adapter_reg', envir = internal_env))
 }
 
 #'
-#' @keywords internal
-#' 
 #' Return repo adapter under the name.
+#'
+#' @keywords internal
 #'
 find_rc_adapter <- function(name) {
   reg <- get('rc_adapter_reg', envir = internal_env)

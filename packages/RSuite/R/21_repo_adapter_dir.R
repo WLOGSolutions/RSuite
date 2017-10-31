@@ -20,8 +20,6 @@
 }
 
 #'
-#' @keywords internal
-#'
 #' Creates repo adapter providing repository under path passed.
 #'
 #' The adapter can use argument which is interpreted as repository path. If not
@@ -30,6 +28,8 @@
 #' @param name under which repo adapter will be registered in RSuite.
 #'
 #' @return object of type rsuite_repo_adapter_dir
+#'
+#' @keywords internal
 #'
 repo_adapter_create_dir <- function(name) {
   result <- repo_adapter_create_base(name)
@@ -49,10 +49,10 @@ repo_adapter_create_dir <- function(name) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_adapter_get_info for rsuite_repo_adapter_dir (repo
 #'   adapter working on directory).
+#'
+#' @keywords internal
 #'
 repo_adapter_get_info.rsuite_repo_adapter_dir <- function(repo_adapter, params) {
   full_path <- repo_adapter$get_full_path(params)
@@ -66,18 +66,16 @@ repo_adapter_get_info.rsuite_repo_adapter_dir <- function(repo_adapter, params) 
 }
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_adapter_get_path for rsuite_repo_adapter_dir (repo
 #'   adapter working on directory).
+#'
+#' @keywords internal
 #'
 repo_adapter_get_path.rsuite_repo_adapter_dir <- function(repo_adapter, params, ix = NA) {
   full_path <- repo_adapter$get_full_path(params, ix)
   return(paste0("file:///", full_path))
 }
 
-#'
-#' @keywords internal
 #'
 #' Implementation of repo_adapter_start_management for rsuite_repo_adapter_dir (repo
 #'   adapter working on directory).
@@ -86,6 +84,8 @@ repo_adapter_get_path.rsuite_repo_adapter_dir <- function(repo_adapter, params, 
 #' @param ... should contain prj of class rsuite_project and repo ix
 #'    or path to repository and rver. It also can contain types, a vector of types to be managed
 #'   (default: .Platform$pkgType)
+#'
+#' @keywords internal
 #'
 repo_adapter_create_manager.rsuite_repo_adapter_dir <- function(repo_adapter, ...) {
   dots <- list(...)
@@ -136,6 +136,3 @@ repo_adapter_create_manager.rsuite_repo_adapter_dir <- function(repo_adapter, ..
   repo_manager <- repo_manager_dir_create(path = full_path, types = types, rver = rver)
   return(repo_manager)
 }
-
-
-

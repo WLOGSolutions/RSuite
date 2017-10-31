@@ -6,13 +6,13 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Creates repo adapter providing repository to CRAN access.
 #'
 #' @param name under which repo adapter will be registered in RSuite.
 #'
 #' @return object of type rsuite_repo_adapter_cran
+#'
+#' @keywords internal
 #'
 repo_adapter_create_cran <- function(name) {
   result <- repo_adapter_create_base(name)
@@ -39,10 +39,10 @@ repo_adapter_create_cran <- function(name) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_adapter_get_info for rsuite_repo_adapter_cran (repo
 #'   adapter working on CRAN).
+#'
+#' @keywords internal
 #'
 repo_adapter_get_info.rsuite_repo_adapter_cran <- function(repo_adapter, params) {
   return(list(
@@ -52,10 +52,10 @@ repo_adapter_get_info.rsuite_repo_adapter_cran <- function(repo_adapter, params)
 }
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_adapter_get_path for rsuite_repo_adapter_cran (repo
 #'   adapter working on CRAN).
+#'
+#' @keywords internal
 #'
 repo_adapter_get_path.rsuite_repo_adapter_cran <- function(repo_adapter, params, ix = NA) {
   return(repo_adapter$get_repo_path())
@@ -63,11 +63,11 @@ repo_adapter_get_path.rsuite_repo_adapter_cran <- function(repo_adapter, params,
 
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_adapter_create_manager for rsuite_repo_adapter_cran.
 #'
 #' Just informs that CRAN is not manageable
+#'
+#' @keywords internal
 #'
 repo_adapter_create_manager.rsuite_repo_adapter_cran <- function(repo_adapter, ...) {
   assert(FALSE, "CRAN is readonly and cannot be managed")

@@ -6,14 +6,14 @@
 #----------------------------------------------------------------------------
 
 #'
-#' @keywords internal
-#'
 #' Creates repo adapter providing repository on S3 access.
 #' It based on Url adapter, just adds some functionalities and checks.
 #'
 #' @param name under which repo adapter will be registered in RSuite.
 #'
 #' @return object of type rsuite_repo_adapter_s3
+#'
+#' @keywords internal
 #'
 repo_adapter_create_s3 <- function(name) {
   result <- repo_adapter_create_url(name)
@@ -22,8 +22,6 @@ repo_adapter_create_s3 <- function(name) {
 }
 
 #'
-#' @keywords internal
-#'
 #' Implementation of repo_adapter_get_path for rsuite_repo_adapter_s3 (repo
 #'   adapter working on Amazon S3).
 #'
@@ -31,6 +29,8 @@ repo_adapter_create_s3 <- function(name) {
 #'   <schema>://<bucket>.s3.amazonaws.com/<path>, there <schema> is http or
 #'   https, <bucket> is name of bucket, and <path> is optional path to root of
 #'   the repository inside bucket. (type: character).
+#'
+#' @keywords internal
 #'
 repo_adapter_get_path.rsuite_repo_adapter_s3 <- function(repo_adapter, params, ix = NA) {
   url <- repo_adapter_get_path.rsuite_repo_adapter_url(repo_adapter, params, ix)
@@ -42,8 +42,6 @@ repo_adapter_get_path.rsuite_repo_adapter_s3 <- function(repo_adapter, params, i
   return(url)
 }
 
-#'
-#' @keywords internal
 #'
 #' Implementation of repo_adapter_create_manager for rsuite_repo_adapter_s3 (repo
 #'   adapter working on Amazon S3).
@@ -62,6 +60,8 @@ repo_adapter_get_path.rsuite_repo_adapter_s3 <- function(repo_adapter, params, i
 #'   (default: .Platform$pkgType)
 #'
 #' @return manageable repo adapter object.
+#'
+#' @keywords internal
 #'
 repo_adapter_create_manager.rsuite_repo_adapter_s3 <- function(repo_adapter, ...) {
   dots <- list(...)
