@@ -17,10 +17,10 @@ test_that_managed <- function(desc, ...) {
       logging::setLevel(root_level)
       logging::setLevel(rsuite_level, RSuite::rsuite_getLogger())
     })
-    
+
     log_file <- file.path(.get_create_dir("logs"), sprintf("test_%s.log", Sys.Date()))
     cat(sprintf("====> %s <====\n", desc), file = log_file, append = T)
-    
+
     logging::setLevel("CRITICAL")
     logging::setLevel("DEBUG", logging::getLogger('rsuite'))
     logging::addHandler(action = logging::writeToFile,
@@ -28,9 +28,11 @@ test_that_managed <- function(desc, ...) {
                         handler = "RSuite.tests.file.logger", level = "DEBUG",
                         logger = RSuite::rsuite_getLogger())
 
+    unlink(get_wspace_dir(), recursive = T, force = T)
+
     test_that(desc, ...)
   }, finally = {
-    fire_cleanups() 
+    fire_cleanups()
     logging::removeHandler(handler = "RSuite.tests.file.logger")
   })
 }
@@ -65,12 +67,12 @@ get_repo_path <- function(dir) {
   system2("svn", args = c("upgrade", dir), stdout = NULL, stderr = NULL)
 
   cmd <- sprintf("svn info %s", dir)
-  
+
   con <- pipe(cmd, open = "rt")
   lines <- tryCatch({
     readLines(con)
   }, finally = { close(con) })
-  
+
   repo_path <- sub("^Repository Root: ", "", lines[grepl("^Repository Root: ", lines)])
   if (length(repo_path) > 0) {
     return(repo_path[1])
