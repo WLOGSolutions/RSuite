@@ -13,7 +13,6 @@
 #' @import git2r
 #' @import testthat
 #' @import rstudioapi
+#' @import utils
 #' @importFrom stats aggregate
-#' @importFrom utils URLencode available.packages installed.packages compareVersion getAnywhere
-#' @importFrom utils getCRANmirrors packageVersion readRegistry remove.packages unzip
 NULL

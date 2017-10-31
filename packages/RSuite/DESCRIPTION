@@ -17,5 +17,6 @@ Imports: logging,
   rmarkdown,
   git2r,
   testthat,
-  rstudioapi (>= 0.7)
+  rstudioapi (>= 0.7),
+  utils
 RoxygenNote: 6.0.1
