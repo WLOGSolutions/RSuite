@@ -28,6 +28,19 @@ repo_mng_start <- function(ra_name, ...) {
 }
 
 #'
+#' Initializes repository (creates its structure).
+#'
+#' @param repo_manager repo manager object retrieved with repo_mgr_start.
+#'   (type: rsuite_repo_manager)
+#'
+#' @export
+#'
+repo_mng_init <- function(repo_manager) {
+  assert(is_repo_manager(repo_manager), "Repo manager expected for repo_manager")
+  repo_manager_init(repo_manager)
+}
+
+#'
 #' Stops managment over repository.
 #'
 #' @param repo_manager repo manager object retrieved with repo_mgr_start.

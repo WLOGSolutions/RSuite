@@ -141,7 +141,7 @@ repo_manager_remove <- function(repo_manager, toremove, type) {
 #'
 repo_manager_remove.default <- function(repo_manager, toremove, type) {
   assert(FALSE,
-         "repo_manager_destory not implemented by %s",
+         "repo_manager_remove not implemented by %s",
          paste(class(repo_manager), collapse = " "))
 }
 
@@ -156,17 +156,17 @@ repo_manager_remove.default <- function(repo_manager, toremove, type) {
 #'
 repo_manager_destroy <- function(repo_manager) {
   assert(is_repo_manager(repo_manager), "rsuite_repo_manager object expected for repo_manager")
-  UseMethod("repo_manager_destory")
+  UseMethod("repo_manager_destroy")
 }
 
 #'
-#' Default implementation of repo_manager_destory
+#' Default implementation of repo_manager_destroy
 #'
 #' @keywords internal
 #'
-repo_manager_destory.default <- function(repo_manager) {
+repo_manager_destroy.default <- function(repo_manager) {
   assert(FALSE,
-         "repo_manager_destory not implemented by %s",
+         "repo_manager_destroy not implemented by %s",
          paste(class(repo_manager), collapse = " "))
 }
 

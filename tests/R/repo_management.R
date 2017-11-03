@@ -14,10 +14,10 @@ init_test_manager <- function(prj) {
   repo_mgr <- RSuite::repo_mng_start(ra_name = "Dir",
                                      path = repo_path, rver = params$r_ver,
                                      types = types)
-  RSuite::repo_manager_init(repo_mgr, types)
+  RSuite::repo_mng_init(repo_mgr)
 
   on_test_exit(function() {
-    RSuite::repo_manager_destroy(repo_mgr)
+    RSuite::repo_mng_stop(repo_mgr)
     unlink(repo_path, recursive = T, force = T)
   })
 

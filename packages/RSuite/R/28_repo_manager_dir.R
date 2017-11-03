@@ -151,7 +151,7 @@ repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, 
 #'
 #' @keywords internal
 #'
-repo_manager_destory.rsuite_repo_manager_dir <- function(repo_manager) {
+repo_manager_destroy.rsuite_repo_manager_dir <- function(repo_manager) {
   # noop
 }
 

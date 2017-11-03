@@ -354,7 +354,7 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
 #'
 #' @keywords internal
 #'
-repo_manager_destory.rsuite_repo_manager_s3 <- function(repo_manager) {
+repo_manager_destroy.rsuite_repo_manager_s3 <- function(repo_manager) {
   # noop
 }
 
