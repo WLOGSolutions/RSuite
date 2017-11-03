@@ -47,11 +47,11 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
 
   # check if environment has to be rebuilt
   uninstDeps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
-  uninstDeps <- uninstDeps$rm(prj_pkgs)
-  assert(uninstDeps$is_empty(),
+  uninstDeps <- vers.rm(uninstDeps, prj_pkgs)
+  assert(vers.is_empty(uninstDeps),
          paste0("Some dependencies are not installed in project env: %s.",
                 " Please, install dependencies(Call RSuite::prj_install_deps)"),
-         paste(uninstDeps$get_names(), collapse = ", "))
+         paste(vers.get_names(uninstDeps), collapse = ", "))
 
   build_install_prj_packages(params, build_type)
 

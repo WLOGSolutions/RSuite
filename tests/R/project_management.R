@@ -5,10 +5,10 @@
 # Tools for project management during testing.
 #----------------------------------------------------------------------------
 
-init_test_project <- function(repo_adapters = c("Dir")) {
+init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject") {
   RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
 
-  prj <- RSuite::prj_start("TestProject", skip_rc = T, path = get_wspace_dir())
+  prj <- RSuite::prj_start(name, skip_rc = T, path = get_wspace_dir())
   RSuite::prj_config_set_repo_adapters(repos = repo_adapters, prj = prj)
 
   unlink(file.path(prj$path, "deployment", "libs", "logging"), recursive = T, force = T) # remove precreated logger

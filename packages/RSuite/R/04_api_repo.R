@@ -315,12 +315,12 @@ repo_upload_ext_packages <- function(repo_manager,
                                         type = pkg_type)
 
   # retrieves latest versions
-  avail_pkgs <- versions.get_available_pkgs(pkgs, contrib_urls)
+  avail_pkgs <- vers.get_available_pkgs(pkgs, contrib_urls)
 
   unknown_pkgs <- setdiff(pkgs, avail_pkgs$Package)
   if (pkg_type != "source") { # try source packages to build
     src_contrib_urls <- retrieve_contrib_urls(repo_infos, "source") # from 53_repositories.R
-    src_avail_pkgs <- versions.get_available_pkgs(unknown_pkgs, src_contrib_urls)
+    src_avail_pkgs <- vers.get_available_pkgs(unknown_pkgs, src_contrib_urls)
     unknown_pkgs <- setdiff(unknown_pkgs, src_avail_pkgs$Package)
   } else {
     src_avail_pkgs <- data.frame(Package = as.character())

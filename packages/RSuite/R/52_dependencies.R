@@ -19,7 +19,7 @@
 collect_uninstalled_direct_deps <- function(params) {
   depVers <- collect_prj_direct_deps(params)
   installed <- as.data.frame(installed.packages(params$lib_path), stringsAsFactors = F)[, c("Package", "Version")]
-  depVers <- depVers$rm_acceptable(installed)
+  depVers <- vers.rm_acceptable(depVers, installed)
 }
 
 #'
@@ -35,7 +35,7 @@ collect_uninstalled_direct_deps <- function(params) {
 collect_prj_direct_deps <- function(params) {
   pkgVers <- collect_pkgs_direct_deps(params)
   mscVers <- collect_mscs_direct_deps(params)
-  prjVers <- versions.union(pkgVers, mscVers)
+  prjVers <- vers.union(pkgVers, mscVers)
   return(prjVers)
 }
 
@@ -53,22 +53,22 @@ collect_prj_direct_deps <- function(params) {
 #'
 collect_pkgs_direct_deps <- function(params) {
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  pkgs_vers <- do.call("versions.union",
+  pkgs_vers <- do.call("vers.union",
                        lapply(X = prj_packages,
                               FUN = function(name) {
                                 collect_single_pkg_direct_deps(params, name)
                               }))
 
-  colliding <- pkgs_vers$get_colliding()
-  assert(length(colliding) == 0,
-         "Packages with colliding versions detected: %s", paste(colliding, collapse = ", "))
+  unfeasibles <- vers.get_unfeasibles(pkgs_vers)
+  assert(length(unfeasibles) == 0,
+         "Packages with unfeasible requirements detected: %s", paste(unfeasibles$pkg, collapse = ", "))
 
   # Remove base packages from dependencies
   base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
-  pkgs_vers <- pkgs_vers$rm(base_pkgs)
+  pkgs_vers <- vers.rm(pkgs_vers, base_pkgs)
 
   # Check R version
-  req_r_ver <- pkgs_vers$get('R')
+  req_r_ver <- vers.get(pkgs_vers, 'R')
   if (nrow(req_r_ver)) {
     cur_r_ver <- sprintf("%s.%s", R.version$major, R.version$minor)
     assert((is.na(req_r_ver$vmin) || req_r_ver$vmin <= cur_r_ver)
@@ -78,7 +78,7 @@ collect_pkgs_direct_deps <- function(params) {
   }
 
   # Get rid of R version as it is checked
-  pkgs_vers <- pkgs_vers$rm('R')
+  pkgs_vers <- vers.rm(pkgs_vers, 'R')
   return(pkgs_vers)
 }
 
@@ -95,31 +95,8 @@ collect_pkgs_direct_deps <- function(params) {
 #' @keywords internal
 #'
 collect_single_pkg_direct_deps <- function(params, pkg_name) {
-  pkgs <- desc_retrieve_dependencies(params$pkgs_path, pkg_name) # from 51_pkg_info.R
-  pdfs <- lapply(X = gsub("^\\s+|\\s+$", "", pkgs),
-                 FUN = function(pdesc) {
-                   pdesc <- gsub("\\s+", "", pdesc)
-                   ver_op <- sub(pattern = ".+\\(([><=]+).+\\)", replacement = "\\1", x = pdesc)
-                   if (ver_op == pdesc) { # no version infor
-                     return(versions.build(pdesc))
-                   }
-                   ver <- sub(pattern = ".+\\([><=]+(.+)\\)", replacement = "\\1", x = pdesc)
-                   pdesc <- sub(pattern = "(.+)\\(.+\\)", replacement = "\\1", x = pdesc)
-                   if (ver_op == "==") {
-                     return(versions.build(pdesc, vmin = ver, vmax = ver))
-                   }
-                   if (ver_op == ">=") {
-                     return(versions.build(pdesc, vmin = ver, vmax = NA))
-                   }
-                   if (ver_op == "<=") {
-                     return(versions.build(pdesc, vmin = NA, vmax = ver))
-                   }
-
-                   assert(FALSE,
-                          "Usupported version specification(%s %s) for %s in DESCRIPTION of %s",
-                          ver_op, ver, pdesc, pkg_name)
-                 })
-  do.call("versions.union", pdfs)
+  deps <- desc_retrieve_dependencies(params$pkgs_path, pkg_name) # from 51_pkg_info.R
+  vers.from_deps(deps, pkg_name)
 }
 
 
@@ -145,11 +122,11 @@ collect_mscs_direct_deps <- function(params) {
              loads <- gsub("\\s+", "", loads) # remove extra spaces
              gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
            }))
-  mscs_vers <- versions.build(unique(pkgs))
+  mscs_vers <- vers.build(unique(pkgs))
 
   # Remove base packages from dependencies
   base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
-  mscs_vers <- mscs_vers$rm(base_pkgs)
+  mscs_vers <- vers.rm(mscs_vers, base_pkgs)
 
   return(mscs_vers)
 }
@@ -179,44 +156,33 @@ collect_all_subseq_deps <- function(vers, repo_infos, type, all_pkgs = NULL) {
     stopifnot(!missing(type))
 
     contrib_urls <- retrieve_contrib_urls(repo_infos, type)    # from 53_repositories.R
-    avail_vers <- versions.collect(contrib_urls)
+    avail_vers <- vers.collect(contrib_urls)
     all_pkgs <- avail_vers$get_avails()
   } else {
     avail_pkgs <- as.data.frame(all_pkgs, stringsAsFactors = F)
-    avail_vers <- versions.collect(pkgs = avail_pkgs)
+    avail_vers <- vers.collect(pkgs = avail_pkgs)
   }
 
-  vers_psr <- vers$diff(avail_vers)
-  if (!vers_psr$has_found()) {
-    return(vers_psr)
-  }
+  vers_cr <- vers.check_against(vers, avail_vers)
 
   base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
-  dep_pkgs <- vers_psr$get_found_names()
-  while(TRUE) {
-    suppressWarnings({ # supress warnings on non recognized packages
-      next_deps <- tools::package_dependencies(packages = dep_pkgs,
-                                               db = all_pkgs,
-                                               which = c("Depends", "Imports", "LinkingTo"),
-                                               recursive = TRUE)
-    })
+  next_cr <- vers_cr
+  while(check_res.has_found(next_cr)) {
+    dep_avails <- vers.pick_available_pkgs(check_res.get_found(next_cr))
+    stopifnot(nrow(dep_avails) > 0)
 
-    next_deps <- unique(unname(unlist(next_deps)))
-    next_deps <- setdiff(next_deps, base_pkgs)
-    next_deps <- setdiff(next_deps, dep_pkgs)
-    if (!length(next_deps)) {
-      break;
+    dep_vers <- vers.build()
+    for(ix in 1:nrow(dep_avails)) {
+      ix_deps <- unname(unlist(dep_avails[ix, c("Depends", "Imports", "LinkingTo")]))
+      ix_vers <- vers.from_deps(deps = paste(ix_deps[!is.na(ix_deps) & nchar(ix_deps) > 0], collapse = ", "),
+                                pkg_name = dep_avails[ix, "Package"])
+      dep_vers <- vers.union(dep_vers, ix_vers)
     }
-    dep_pkgs <- c(dep_pkgs, next_deps)
+
+    dep_vers <- vers.rm(dep_vers, pkg_names = c(base_pkgs, "R"))
+    next_cr <- vers.check_against(dep_vers, avail_vers)
+    vers_cr <- check_res.union(vers_cr, next_cr)
   }
 
-  dep_pkgs <- setdiff(dep_pkgs, vers_psr$get_found_names())
-  if (!length(dep_pkgs)) {
-    return(vers_psr)
-  }
-
-  dep_vers <- versions.build(dep_pkgs)
-  dep_psr <- dep_vers$diff(avail_vers)
-
-  return(vers_psr$union(dep_psr))
+  return(vers_cr)
 }

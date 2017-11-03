@@ -13,16 +13,19 @@ init_test_pkgzip <- function() {
   on_test_exit(function() {
     unlink(path, recursive = T, force = T)
   })
-  
+
   return(list(
-    path = path
+    path = path,
+    get_pkgzip_fpath = function() {
+      files <- list.files(path, pattern = sprintf("%s_pkgzip_.*[.]zip", Sys.Date()), full.names = T)
+      expect_length(files, 1)
+      return(files)
+    }
   ))
 }
 
 expect_that_pkgzip_contains <- function(names, type, pkgzip) {
-  files <- list.files(pkgzip$path, pattern = sprintf("%s_pkgzip_.*[.]zip", Sys.Date()), full.names = T)
-  expect_length(files, 1)
-
+  files <- pkgzip$get_pkgzip_fpath()
   cont_path <- file.path(pkgzip$path, "cont")
   expect_success({
     unzip(zipfile = files, exdir = file.path(pkgzip$path, "cont"))

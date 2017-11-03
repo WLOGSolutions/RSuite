@@ -20,8 +20,8 @@ init_test_manager <- function(prj) {
     RSuite::repo_manager_destroy(repo_mgr)
     unlink(repo_path, recursive = T, force = T)
   })
-  
-  return(list(repo_mgr = repo_mgr, path = repo_path))
+
+  return(list(repo_mgr = repo_mgr, path = repo_path, url = sprintf("file:///%s", repo_path)))
 }
 
 expect_that_packages_available <- function(names, type, mgr) {
@@ -30,12 +30,12 @@ expect_that_packages_available <- function(names, type, mgr) {
                        stringsAsFactors = F)$Package
 
   not_avail <- setdiff(names, avails)
-  expect(length(not_avail) == 0, 
+  expect(length(not_avail) == 0,
          sprintf("Expected packages are not available in repo: %s",
                  paste(not_avail, collapse = ", ")))
-  
+
   unexpect <- setdiff(avails, names)
-  expect(length(unexpect) == 0, 
+  expect(length(unexpect) == 0,
          sprintf("Unexpected packages found in rep: %s",
                  paste(unexpect, collapse = ", ")))
 }

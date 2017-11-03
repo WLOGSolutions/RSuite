@@ -27,11 +27,8 @@ build_project_pkgslist <- function(pkgs_path) {
 
   deps <- list()
   for (pkg in project_packages) {
-    pkg_deps <- desc_retrieve_dependencies(pkgs_path, pkg)
-    pkg_deps <- gsub("^\\s+|\\s+$", "",
-                     gsub(x = pkg_deps,
-                          pattern = "(.*)(\\(.*\\))",
-                          replacement = "\\1"))
+    pkg_deps <- unlist(strsplit(desc_retrieve_dependencies(pkgs_path, pkg), split = ", "))
+    pkg_deps <- trimws(gsub(x = pkg_deps, pattern = "(.*)(\\(.*\\))", replacement = "\\1"))
     pkg_deps <- pkg_deps[pkg_deps %in% project_packages]
     deps[[pkg]] <- pkg_deps
   }
@@ -106,7 +103,7 @@ update_project_pkgsvers <-function(pkgs_path, pkgsvers) {
 #' @param fields fields to search dependencies in.
 #'   (type: character, default: c("Imports", "Depends", "LinkingTo"))
 #'
-#' @return list of unparsed dependency declarations.
+#' @return comma separated character will all unparsed dependency declarations.
 #'
 #' @keywords internal
 #'
@@ -117,16 +114,11 @@ desc_retrieve_dependencies <- function(pkgs_path, pkg, fields = c("Imports", "De
   stopifnot(file.exists(desc_file))
 
   desc <- read.dcf(desc_file, fields = fields)
-  pkgs <- c()
-  for(f in fields) {
-    if(is.na(desc[1, f])) { next }
-    pkgs <- c(pkgs,
-              strsplit(x = gsub(pattern = "\\n",
-                                replacement = "",
-                                x = desc[1, f]),
-                       split = ",")[[1]])
-  }
-  return(pkgs)
+  pkgs <- unname(unlist(desc[1, fields]))
+  pkgs <- trimws(gsub(pattern = "\\n", replacement = "", x = pkgs))
+  pkgs <- pkgs[!is.na(pkgs) & nchar(pkgs) > 0]
+
+  return(paste(pkgs, collapse = ", "))
 }
 
 #'
@@ -264,6 +256,61 @@ get_pkgzip_info <- function(pkgzip) {
 
   files <- unzip(pkgzip, list = T)$Name
   files <- files[grepl("^.+/[^_]+_[^/]+[.](zip|t(ar[.])?gz)$", files)]
+  dummy_urls <- sprintf("http://repo/%s", files)
+
+  infos <- get_package_url_infos(dummy_urls)
+  infos$File <- files
+  return(infos[, c("Package", "Version", "Type", "RVersion", "File")])
+}
+
+#'
+#' Fills up File column in available packages accoring to Package name, Version
+#'   and Repository it found in.
+#'
+#' Does not change File attribute if it found already.
+#'
+#' @param avail_pkgs data.frame of the same structure as available.packages
+#'   returns. (type: data.frame)
+#'
+#' @return data.frame with File column fullfilled.
+#'
+#' @keywords internal
+#'
+deduce_package_files <- function(avail_pkgs) {
+  stopifnot(is.data.frame(avail_pkgs) &&
+              all(c("Package", "Version", "Repository", "File") %in% colnames(avail_pkgs)))
+
+  no_file <- avail_pkgs[is.na(avail_pkgs$File), ]
+  if (nrow(no_file) > 0) {
+    avail_pkgs[is.na(avail_pkgs$File), ]$File <- paste0(
+      no_file$Package, "_", no_file$Version,
+      ifelse(grepl("[\\/]bin[\\/]windows[\\/]contrib[\\/]", no_file$Repository), ".zip",
+             ifelse(grepl("[\\/]bin[\\/]macosx[\\/]contrib[\\/]", no_file$Repository), ".tgz",
+                    ".tar.gz")))
+  }
+  return(avail_pkgs)
+}
+
+#'
+#' Detects information on packages based on their urls inside repository.
+#'
+#' @param urls package urls inside repository (type: character)
+#'
+#' @return data.table of following structure
+#' \describe{
+#'   \item{Package}{Name of package. (type: character)}
+#'   \item{Version}{Package version. (type: character)}
+#'   \item{Type}{Type of package: source, win.binary, mac.binary. (type: character)}
+#'   \item{RVersion}{Version package was built for or NA if it is source package. (type: character)}
+#'   \item{Url}{Package url inside repository. (type: character)}
+#' }
+#'
+#' @keywords internal
+#'
+get_package_url_infos <- function(urls) {
+  stopifnot(is.character(urls) && length(urls) > 0)
+
+  files <- sub("^.+/((src|bin)/.+)$", "\\1", urls)
   types <- ifelse(grepl("^src/contrib/[^/]+[.]tar[.]gz$", files), "source",
                   ifelse(grepl("^bin/windows/contrib/.+[.]zip$", files), "win.binary",
                          ifelse(grepl("^bin/macosx/contrib/.+$", files), "mac.binary",
@@ -275,7 +322,7 @@ get_pkgzip_info <- function(pkgzip) {
     Version = gsub("^.+/[^_]+_([^/]+)[.](zip|t(ar[.])?gz)$", "\\1", files),
     Type = types,
     RVersion = rvers,
-    File = files,
+    Url = urls,
     stringsAsFactors = F
   ))
 }

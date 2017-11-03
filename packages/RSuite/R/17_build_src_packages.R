@@ -68,7 +68,7 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
                      rsuite_contrib_url(bld_params$irepo_path,
                                         type = pkg_type,
                                         rver = rver))
-  res_avails <- versions.get_available_pkgs(avail_pkgs$Package, res_url)
+  res_avails <- vers.get_available_pkgs(avail_pkgs$Package, res_url)
   failed_pkgs <- setdiff(avail_pkgs$Package, res_avails$Package)
   assert(!length(failed_pkgs),
          "Failed to build packages for %s type: %s",

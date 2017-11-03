@@ -23,15 +23,8 @@ pkg_download <- function(avail_pkgs, dest_dir) {
   if (nrow(avail_pkgs) == 0) {
     return(data.frame(Package = character(), Path = character()))
   }
-  no_file <- avail_pkgs[is.na(avail_pkgs$File), ]
-  if (nrow(no_file) > 0) {
-    avail_pkgs[is.na(avail_pkgs$File), ]$File <- paste0(
-      no_file$Package, "_", no_file$Version,
-      ifelse(grepl("[\\/]bin[\\/]windows[\\/]contrib[\\/]", no_file$Repository), ".zip",
-             ifelse(grepl("[\\/]bin[\\/]macosx[\\/]contrib[\\/]", no_file$Repository), ".tgz",
-                    ".tar.gz")))
-  }
 
+  avail_pkgs <- deduce_package_files(avail_pkgs) # from 51_pkg_info.R
   dloaded <- data.frame()
 
   common_args <- c(rscript_arg("destdir", dest_dir),

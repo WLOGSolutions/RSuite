@@ -49,28 +49,28 @@ rsuite_update <- function() {
   pkg_loginfo("Installing v%s of RSuite...", ver)
 
   rver <- current_rver() # from 97_rversion.R
-  
+
   pkg_types <- unique(c(.Platform$pkgType, "source"))
   repo_infos <- build_repo_infos( # from 53_repositories.R
     spec = list(
       CRAN = "https://cloud.r-project.org/",
-      S3 = "https://wlog-rsuite.s3.amazonaws.com"), 
+      S3 = "https://wlog-rsuite.s3.amazonaws.com"),
     types = pkg_types,
     rver = rver)
   log_repo_infos(repo_infos)     # from 53_repositories.R
 
-  rsuite_ver <- versions.build("RSuite", vmin = ver, vmax = ver)
+  rsuite_ver <- vers.build("RSuite", vmin = ver, vmax = ver)
 
   pkg_loginfo("Resolving dependencies (for R %s)...", rver)
-  avail_vers <- resolve_missings(rsuite_ver, # from 11_install_prj_deps.R
-                                 repo_infos = repo_infos, pkg_types = pkg_types)
+  avail_vers <- resolve_dependencies(rsuite_ver, # from 11_install_prj_deps.R
+                                     repo_infos = repo_infos, pkg_types = pkg_types)
   stopifnot(avail_vers$has_avails())
-  
+
   prev_lib_path <- .libPaths()
   tryCatch({
     .libPaths(Sys.getenv("R_LIBS_USER")) # install it globally or in user env
 
-    install_dependencies(avail_vers, 
+    install_dependencies(avail_vers,
                          lib_dir = .libPaths()[[1]], # install into default location
                          rver = rver)
   }, finally = {
