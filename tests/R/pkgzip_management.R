@@ -36,8 +36,8 @@ expect_that_pkgzip_contains <- function(names, type, pkgzip) {
   avail <- data.frame(available.packages(contriburl = c_url, filters = c()),
                       stringsAsFactors = F)$Package
 
-  avail <- avail[ordered(avail)]
-  names <- names[ordered(names)]
+  avail <- avail[order(avail)]
+  names <- names[order(names)]
 
   expect_equal(object = avail, expected = names)
 }

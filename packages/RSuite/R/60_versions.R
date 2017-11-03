@@ -463,7 +463,9 @@ vers.from_deps <- function(deps, pkg_name = NA) {
   stopifnot(is.character(deps) && length(deps) == 1)
   stopifnot(is.na(pkg_name) || is_nonempty_char1(pkg_name))
 
-  pdfs <- lapply(X = trimws(unlist(strsplit(deps, split = ","))),
+  parsed_deps <- trimws(unlist(strsplit(deps, split = ",")))
+  parsed_deps <- parsed_deps[nchar(parsed_deps) > 0]
+  pdfs <- lapply(X = parsed_deps,
                  FUN = function(pdesc) {
                    pdesc <- gsub("\\s+", "", pdesc)
                    ver_op <- sub(pattern = ".+\\(([><=]+).+\\)", replacement = "\\1", x = pdesc)
