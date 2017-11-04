@@ -188,10 +188,19 @@ repo_upload_prj_packages <- function(repo_manager,
   assert(mgr_info$rver == params$r_ver,
          "Repository is managed for another R vertion (%s) than the project (%s)",
          mgr_info$rver, params$r_ver)
-
   assert(pkg_type %in% mgr_info$types,
          "Repository is not managed for %s. Types manageable: %s",
          pkg_type, paste(mgr_info$types, collapse = ", "))
+
+  prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  if (!is.null(pkgs)) {
+    pkgs <- prj_pkgs
+  }
+  assert(length(prj_pkgs) > 0, "The project does not have packages to upload into repository")
+  assert(all(pkgs %in% prj_pkgs),
+         "Packages requested to upload are not present in project: %s",
+         paste(setdiff(pkgs, prj_pkgs), collapse = ", "))
+
 
   revision <- NULL
   if (!skip_rc) {
@@ -200,12 +209,32 @@ repo_upload_prj_packages <- function(repo_manager,
            "Project is not under revision control so revision number cannot be detected")
   }
 
+  pkg_loginfo("Building project packages ...")
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     revision,
-                                    build_type = pkg_type,
-                                    pkgs = pkgs)
+                                    build_type = pkg_type)
 
-  # sync the repository
+  tmp_path <- tempfile("pkgzip_temp_repo")
+  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+
+  pkg_loginfo("Preparing temp repository for packages ...")
+
+  tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, params$r_ver)
+  repo_manager_init(tmp_mgr)
+
+  # copy into temp repo package files built
+  pkgs_fpath <- list.files(rsuite_contrib_url(params$irepo_path, pkg_type, params$r_ver),
+                           pattern = sprintf("^(%s)_.*", paste(pkgs, collapse = "|")),
+                           full.names = T)
+  dest_curl <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
+  success <- file.copy(from = pkgs_fpath, to = dest_curl)
+  assert(all(success),
+         "Some project packages failed to copy to temp repository: %s",
+         paste(pkgs_fpath[success], collapse = ", "))
+
+  rsuite_write_PACKAGES(dest_curl, type = pkg_type)
+
+  pkg_loginfo("... done. Uploading to repository ...")
   repo_manager_upload(repo_manager, params$irepo_path, pkg_type)
 
   # clear cache

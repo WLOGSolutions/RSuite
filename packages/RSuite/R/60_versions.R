@@ -268,7 +268,7 @@ vers.rm <- function(ver, pkg_names) {
 }
 
 #'
-#' Removes for version object packages from pkgs which satisfy requirements.
+#' Removes from versions object packages from pkgs which satisfy requirements.
 #'
 #' @param ver version object to modify.
 #' @param pkgs data.frame with at least Package and Version columns to check if
@@ -294,6 +294,22 @@ vers.rm_acceptable <- function(ver, pkgs) {
     | (!is.na(res_pkgs$vmin) & res_pkgs$vmin > res_pkgs$Version)    # Version is less then required: unacceptable
     | (!is.na(res_pkgs$vmax) & res_pkgs$vmax < res_pkgs$Version), ] # Version is greater than required: unacceptable
   return(.df2ver(res_pkgs, ver$get_avails()))
+}
+
+#'
+#' Removes from versions object packages which are from R base (including R itself).
+#'
+#' @param ver version object to modify.
+#'
+#' @return versions objects with base (and R) packages removed.
+#'
+#' @keywords internal
+#'
+vers.rm_base <- function(ver) {
+  stopifnot(is.versions(ver))
+
+  base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
+  vers.rm(ver, c(base_pkgs, "R"))
 }
 
 #'
@@ -494,6 +510,31 @@ vers.from_deps <- function(deps, pkg_name = NA) {
                             ver_op, ver, pdesc, pkg_name)
                    }
                  })
+  do.call("vers.union", pdfs)
+}
+
+#'
+#' Builds versions object from dependencies found in avails.
+#'
+#' @param avails data.frame with at least columns Package, Depends, Imports and
+#'   LinkingTo.
+#'
+#' @param versions objects containing packages from dependencies found in avails
+#'    with requirements specified.
+#'
+#' @keywords internal
+#'
+vers.from_deps_in_avails <- function(avails) {
+  stopifnot(is.data.frame(avails)
+            && all(c("Package", "Depends", "Imports", "LinkingTo") %in% colnames(avails)))
+  stopifnot(nrow(avails) > 0)
+
+  pdfs <- by(avails, 1:nrow(avails), FUN = function(deps) {
+    pkg_deps <- unname(unlist(deps[, c("Depends", "Imports", "LinkingTo")]))
+    pkg_vers <- vers.from_deps(deps = paste(pkg_deps[!is.na(pkg_deps)], collapse = ", "),
+                               pkg_name = deps$Package)
+    pkg_vers
+  })
   do.call("vers.union", pdfs)
 }
 

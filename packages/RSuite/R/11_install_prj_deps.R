@@ -127,7 +127,7 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types) {
   stopifnot(is.versions(vers))
   stopifnot(is.character(pkg_types) && length(pkg_types) >= 1)
 
-  curr_cr <- check_res.build(missing = vers)
+  curr_cr <- check_res.build(missing = vers.rm_base(vers))
   all_deps <- check_res.get_missing(curr_cr)
   while(!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
     curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())

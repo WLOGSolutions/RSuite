@@ -226,7 +226,10 @@ get_package_files_info <- function(files) {
       rver <- majmin_rver(gsub('^R ([^;]+);.+$', '\\1', dcf$Built))
     }
 
-    data.frame(Package = pkg_name, Version = dcf$Version, Type = pkg_type, RVersion = rver, File = file,
+    dcf[, setdiff(c("Depends", "Imports", "LinkingTo"), colnames(dcf))] <- NA
+    data.frame(Package = pkg_name, Version = dcf$Version,
+               Depends = dcf$Depends, Imports = dcf$Imports, LinkingTo = dcf$LinkingTo,
+               Type = pkg_type, RVersion = rver, File = file,
                stringsAsFactors = F)
   }
 
@@ -325,4 +328,21 @@ get_package_url_infos <- function(urls) {
     Url = urls,
     stringsAsFactors = F
   ))
+}
+
+#'
+#' Return list of dependency types respected for req_type
+#'
+#' @param req_type package type required (type: character)
+#' @param bin_type platform binary package type (type: character)
+#'
+#' @return character vector with respected dependency types for req_type.
+#'
+#' @keywords internal
+#'
+get_respected_types <- function(req_type, bin_type) {
+  if (req_type == "source") {
+    return("source")
+  }
+  return(c(bin_type, "source")) # source packages can always be build
 }

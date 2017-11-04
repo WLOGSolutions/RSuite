@@ -45,6 +45,8 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
 }
 
 #'
+#' Fail proof writing of PACKAGES files.
+#'
 #' In R3.4 they changed write_PACKAGES not to create intex files if repository is
 #' empty. It causes problems then using such an empty repository. This function
 #' wraps write_PACKAGES and ensures index files exist.

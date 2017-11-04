@@ -10,19 +10,16 @@
 #'
 #' Performes check if all dependencies are installed in local project environment.
 #'
-#' If revision passed (not NULL) tags project packages with revistion as least
+#' If revision passed (not NULL) tags project packages with revision as least
 #' version number before building.
 #'
 #' @param params project parameters(type: rsuite_project_params)
 #' @param revision revision to tag packages with before building (type: character)
 #' @param build_type type of packages to build. (type: character)
-#' @param pkgs project packages to build/install. In fact it builds all but
-#'    afterwards removes other project packages from internal repository. In
-#'    NULL all project packages will be built/installed (type: characted, default: NULL)
 #'
 #' @keywords internal
 #'
-build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs = NULL) {
+build_install_tagged_prj_packages <- function(params, revision, build_type) {
   if (!is.null(revision)) {
     bkp_info <- backup_pkgdesc_files(params$pkgs_path) # from 51_pkg_info.R
 
@@ -34,16 +31,6 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
   }
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path)
-  if (is.null(pkgs)) {
-    pkgs <- prj_pkgs
-  } else {
-    assert(is.character(pkgs), "character(N) expected for pkgs")
-
-    unknown_pkgs <- setdiff(pkgs, prj_pkgs)
-    assert(length(unknown_pkgs) == 0,
-           "Requested to build unknown project packages: %s",
-           paste(unknown_pkgs, collapse = ", "))
-  }
 
   # check if environment has to be rebuilt
   uninstDeps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
@@ -55,25 +42,8 @@ build_install_tagged_prj_packages <- function(params, revision, build_type, pkgs
 
   build_install_prj_packages(params, build_type)
 
-  # remove packages which are not supposed to be build
-  .file_is_one_of_tobuild <- function(f) {
-    matches_pkgs <- lapply(
-      X = pkgs,
-      FUN = function(p) { grepl(paste0("^",p,"_"), f) })
-    return(any(unlist(matches_pkgs)))
-  }
-
-  pkgs_path <- rsuite_contrib_url(params$irepo_path, build_type, params$r_ver)
-  for(f in list.files(pkgs_path, full.names = F)) {
-    if (grepl("^PACKAGES", f)) {
-      next
-    }
-
-    if (!.file_is_one_of_tobuild(f)) {
-      unlink(file.path(pkgs_path, f), force = T)
-    }
-  }
-  rsuite_write_PACKAGES(pkgs_path, build_type)
+  out_path <- rsuite_contrib_url(params$irepo_path, build_type, params$r_ver)
+  rsuite_write_PACKAGES(out_path, build_type)
 }
 
 #'

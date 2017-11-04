@@ -6,6 +6,102 @@
 #----------------------------------------------------------------------------
 
 #'
+#' Build PKGZIP name out of package names with optional prefix and suffix.
+#'
+#' @param pkg_names names of packages (type: character(N))
+#' @param pref prefix to add before pkg_names (type: character(1))
+#' @param suff suffix to add after pkg_names (type: character(1))
+#'
+#' @return name of PKGZIP file.
+#'
+#' @keywords internal
+#'
+.pkgzip_file_name <- function(pkg_names, pref = "", suff = "") {
+  pkg_names <- unique(pkg_names)
+  pkg_names <- pkg_names[order(pkg_names)]
+
+  if (nchar(pref) > 0) {
+    pref <- paste0(pref, "_")
+  }
+  if (nchar(suff) > 0) {
+    suff <- paste0("_", suff)
+  }
+
+  if (length(pkg_names) > 5) {
+    zip_file_name <- sprintf("%s_pkgzip_%s%s_and_%sothers%s.zip",
+                             Sys.Date(),
+                             pref,
+                             paste(pkg_names[1:5], collapse = "_"), length(pkg_names) - 5,
+                             suff)
+  } else {
+    zip_file_name <- sprintf("%s_pkgzip_%s%s%s.zip",
+                             Sys.Date(),
+                             pref,
+                             paste(pkg_names, collapse = "_"),
+                             suff)
+  }
+  return(zip_file_name)
+}
+
+.collect_dependencies <- function(vers, pkg_type, params, filter_repo) {
+  resp_types <- get_respected_types(pkg_type, params$bin_pkgs_type)
+
+  pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
+  repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
+  if (!is.null(filter_repo)) {
+    filter_ris <- build_repo_infos(spec = list(Url = filter_repo), # from 53_repositories.R
+                                   types = resp_types, rver = params$r_ver)
+    repo_infos <- c(filter_ris, repo_infos)
+  }
+  log_repo_infos(repo_infos) # from 53_repositories.R
+
+  pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
+  avail_vers <- resolve_dependencies(vers = vers, # from 11_install_prj_deps.R
+                                     repo_infos = repo_infos,
+                                     pkg_types = resp_types)
+  if (!is.null(filter_repo)) {
+    filter_contrib_urls <- retrieve_contrib_urls(repo_infos[1], pkg_type) # from 53_repositories.R
+    filter_pkgs <- vers.collect(filter_contrib_urls) # from versions.R
+    avail_vers <- vers.rm_acceptable(avail_vers, filter_pkgs$avails)
+  }
+  return(avail_vers)
+}
+
+.collect_packages <- function(vers, pkg_type, params) {
+  resp_types <- get_respected_types(pkg_type, params$bin_pkgs_type)
+
+  pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
+  repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
+  log_repo_infos(repo_infos) # from 53_repositories.R
+
+  avail_vers <- resolve_packages(vers = vers, # from 11_install_prj_deps.R
+                                 repo_infos = repo_infos, pkg_types = resp_types)
+  return(avail_vers)
+}
+
+.prepare_temp_repo <- function(vers, tmp_path, pkg_type, params) {
+  pkg_loginfo("Preparing temp repository for packages ...")
+
+  tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, params$r_ver)
+  repo_manager_init(tmp_mgr)
+
+  if (vers.is_empty(vers)) {
+    return()
+  }
+
+  avail_pkgs <- deduce_package_files(vers.pick_available_pkgs(vers))
+  pkgs_infos <- get_package_url_infos(sprintf("%s/%s", avail_pkgs$Repository, avail_pkgs$File))
+
+  pkg_download(avail_pkgs[pkgs_infos$Type == pkg_type, ],
+               dest_dir = rsuite_contrib_url(tmp_path, pkg_type, params$r_ver))
+  if (pkg_type != "source" && any(pkgs_infos$Type == "source")) {
+    src_avail_pkgs <- avail_pkgs[pkgs_infos$Type == "source", ]
+    build_source_packages(src_avail_pkgs, # from 17_build_src_packages.R
+                          tmp_path, pkg_type, params, params$r_ver)
+  }
+}
+
+#'
 #' Builds PKGZIP out of project packages. PKGZIP will be tagged with the same
 #'   way az project zip.
 #'
@@ -21,6 +117,16 @@
 #' @param pkg_type type of packages to build (type: character, default: platform default)
 #' @param path folder path to put output zip into. The folder must exist.
 #'    (type: characted: default: getwd())
+#' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
+#'    (type: logical, default: FALSE)
+#' @param filter_repo repository address to not include dependencies available in.
+#'     If NULL will not filter dependencies. Will be omited if with_deps is FALSE.
+#'     (type: character(1), default: NULL)
+#' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
+#'    (type: logical, default: FALSE)
+#' @param filter_repo repository address to not include dependencies available in.
+#'     In project dependencies will nether be filtered. If NULL will not filter
+#'     dependencies. Will be omited if with_deps is FALSE. (type: character(1), default: NULL)
 #'
 #' @return created pkgzip file path (invisible).
 #'
@@ -30,35 +136,81 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
                                       prj = NULL,
                                       zip_ver = NULL,
                                       pkg_type = .Platform$pkgType,
-                                      path = getwd()) {
+                                      path = getwd(),
+                                      with_deps = FALSE,
+                                      filter_repo = NULL) {
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
+  assert(is.logical(with_deps), "Logical value expected for with_deps")
+  if (!any(with_deps) && !is.null(filter_repo)) {
+    pkg_logwarn("filter_repo can be used only then building pkgzip with dependencies. Rejecting its value.")
+    filter_repo <- NULL
+  }
+  if (!is.null(filter_repo)) {
+    assert(is_nonempty_char1(filter_repo), "Non empty character(1) expected for filter_repo")
+  }
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
+  ver_inf <- detect_zip_version(params, zip_ver) # from 15_zip_project.R
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  if (!is.null(pkgs)) {
-    all_names <- paste(pkgs, collapse = "_")
+  if (is.null(pkgs)) {
+    pkgs <- prj_pkgs
+  }
+  assert(length(prj_pkgs) > 0, "The project does not have packages to include in PKGZIP")
+  assert(all(pkgs %in% prj_pkgs),
+         "Packages requested to include into PKGZIP are not present in project: %s",
+         paste(setdiff(pkgs, prj_pkgs), collapse = ", "))
+
+  if (any(with_deps)) {
+    raw_vers <- lapply(X = pkgs,
+                       FUN = function(pkg_name) {
+                         collect_single_pkg_direct_deps(params, pkg_name)
+                       })
+    dep_vers <- do.call("vers.union", raw_vers)
+    inproj_deps <- intersect(prj_pkgs, vers.get_names(dep_vers))
+    avail_vers <- .collect_dependencies(vers.rm(dep_vers, inproj_deps),
+                                        pkg_type, params, filter_repo)
+
+
+    zip_pref <- sprintf("%s_v%s", paste(pkgs, collapse = "_"), ver_inf$ver)
+    pkgs <- c(pkgs, inproj_deps) # include also in-project dependencies into PKGZIP
+    zip_file_name <- .pkgzip_file_name(c(vers.get_names(avail_vers), inproj_deps),
+                                       pref = zip_pref)
   } else {
-    assert(length(prj_pkgs) > 0, "The project does not have packages to include in PKGZIP")
-    all_names <- paste(prj_pkgs, collapse = "_")
+    avail_vers <- vers.build(avails = data.frame())
+    zip_file_name <- .pkgzip_file_name(pkgs, suff = paste0("v", ver_inf$ver))
   }
 
   pkg_loginfo("Building project packages ...")
-  ver_inf <- detect_zip_version(params, zip_ver) # from 15_zip_project.R
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     ver_inf$rev,
-                                    build_type = pkg_type,
-                                    pkgs = pkgs)
+                                    build_type = pkg_type)
 
-  zip_file_name <- sprintf("%s_pkgzip_%s_%s.zip", Sys.Date(), all_names, ver_inf$ver)
+  tmp_path <- tempfile("pkgzip_temp_repo")
+  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+
+  .prepare_temp_repo(avail_vers, tmp_path, pkg_type, params)
+
+  # copy into temp repo package files built
+  pkgs_fpath <- list.files(rsuite_contrib_url(params$irepo_path, pkg_type, params$r_ver),
+                           pattern = sprintf("^(%s)_.*", paste(pkgs, collapse = "|")),
+                           full.names = T)
+  dest_curl <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
+  success <- file.copy(from = pkgs_fpath, to = dest_curl)
+  assert(all(success),
+         "Some project packages failed to copy to temp repository: %s",
+         paste(pkgs_fpath[success], collapse = ", "))
+
+  rsuite_write_PACKAGES(dest_curl, type = pkg_type)
+
   pkg_loginfo("... done. Creating PKGZIP file %s ...", zip_file_name)
 
   zip_file_path <- file.path(rsuite_fullUnifiedPath(path), zip_file_name)
-  success <- zip_folder(params$irepo_path, zip_file_path)
+  success <- zip_folder(tmp_path, zip_file_path)
   assert(success, "Failed to create zip file (zip returned non 0 return status).")
 
   pkg_loginfo("Zip file created: %s", zip_file_path)
@@ -101,7 +253,8 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
   tryCatch({
     rvers <- unique(pkg_infos$RVersion)
     for(rver in rvers) {
-      rver_types <- unique(pkg_infos[pkg_infos$RVersion == rver, ]$Type)
+      rver_infos <- pkg_infos[pkg_infos$RVersion == rver, ]
+      rver_types <- unique(rver_infos$Type)
 
       pkg_loginfo("Preparing temp repository for %s types (R %s) ...",
                   paste(rver_types, collapse = ", "), rver)
@@ -168,7 +321,7 @@ pkgzip_build_ext_packages <- function(pkgs,
   assert(!missing(pkgs) && is.character(pkgs) && length(pkgs) > 0,
          "Non empty character(N) expected for pkgs")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
-  assert(is.logical(with_deps), "Logical value expeceted for with_deps")
+  assert(is.logical(with_deps), "Logical value expected for with_deps")
   if (!any(with_deps) && !is.null(filter_repo)) {
     pkg_logwarn("filter_repo can be used only then building pkgzip with dependencies. Rejecting its value.")
     filter_repo <- NULL
@@ -182,32 +335,10 @@ pkgzip_build_ext_packages <- function(pkgs,
 
   params <- prj$load_params()
 
-  if (pkg_type == "source") {
-    req_types <- "source"
-  } else {
-    req_types <- c(params$bin_pkgs_type, "source")
-  }
-
-  pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
-  repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
-  if (!is.null(filter_repo)) {
-    filter_ris <- build_repo_infos(spec = list(Url = filter_repo), types = req_types, rver = params$r_ver) # from 53_repositories.R
-    repo_infos <- c(filter_ris, repo_infos)
-  }
-  log_repo_infos(repo_infos) # from 53_repositories.R
-
   if (any(with_deps)) {
-    pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
-    avail_vers <- resolve_dependencies(vers = vers.build(pkgs), # from 11_install_prj_deps.R
-                                       repo_infos = repo_infos, pkg_types = req_types)
-    if (!is.null(filter_repo)) {
-      filter_contrib_urls <- retrieve_contrib_urls(repo_infos[1], pkg_type) # from 53_repositories.R
-      filter_pkgs <- vers.collect(filter_contrib_urls) # from versions.R
-      avail_vers <- vers.rm_acceptable(avail_vers, filter_pkgs$avails)
-    }
+    avail_vers <- .collect_dependencies(vers.build(pkgs), pkg_type, params, filter_repo)
   } else {
-    avail_vers <- resolve_packages(vers = vers.build(pkgs), # from 11_install_prj_deps.R
-                                   repo_infos = repo_infos, pkg_types = req_types)
+    avail_vers <- .collect_packages(vers.build(pkgs), pkg_type, params)
   }
 
   all_names <- vers.get_names(avail_vers)
@@ -222,21 +353,7 @@ pkgzip_build_ext_packages <- function(pkgs,
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
 
-  pkg_loginfo("Preparing temp repository for packages ...")
-
-  tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, params$r_ver)
-  repo_manager_init(tmp_mgr)
-
-  avail_pkgs <- deduce_package_files(vers.pick_available_pkgs(avail_vers))
-  pkgs_infos <- get_package_url_infos(sprintf("%s/%s", avail_pkgs$Repository, avail_pkgs$File))
-
-  pkg_download(avail_pkgs[pkgs_infos$Type == pkg_type, ],
-               dest_dir = rsuite_contrib_url(tmp_path, pkg_type, params$r_ver))
-  if (pkg_type != "source" && any(pkgs_infos$Type == "source")) {
-    src_avail_pkgs <- avail_pkgs[pkgs_infos$Type == "source", ]
-    build_source_packages(src_avail_pkgs, # from 17_build_src_packages.R
-                          tmp_path, pkg_type, params, params$r_ver)
-  }
+  .prepare_temp_repo(avail_vers, tmp_path, pkg_type, params)
 
   dest_path <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
   rsuite_write_PACKAGES(dest_path, pkg_type)
@@ -268,6 +385,11 @@ pkgzip_build_ext_packages <- function(pkgs,
 #' @param pkg_type type of packages to build (type: character, default: platform default)
 #' @param path folder path to put output zip into. The folder must exist.
 #'    (type: characted: default: getwd())
+#' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
+#'    (type: logical, default: FALSE)
+#' @param filter_repo repository address to not include dependencies available in.
+#'     If NULL will not filter dependencies. Will be omited if with_deps is FALSE.
+#'     (type: character(1), default: NULL)
 #'
 #' @return created pkgzip file path (invisible).
 #'
@@ -276,10 +398,20 @@ pkgzip_build_ext_packages <- function(pkgs,
 pkgzip_build_github_package <- function(repo, ...,
                                         prj = NULL,
                                         pkg_type = .Platform$pkgType,
-                                        path = getwd()) {
+                                        path = getwd(),
+                                        with_deps = FALSE,
+                                        filter_repo = NULL) {
   assert(is_nonempty_char1(repo), "Non empty character(1) expected for repo")
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
+  assert(is.logical(with_deps), "Logical value expected for with_deps")
+  if (!any(with_deps) && !is.null(filter_repo)) {
+    pkg_logwarn("filter_repo can be used only then building pkgzip with dependencies. Rejecting its value.")
+    filter_repo <- NULL
+  }
+  if (!is.null(filter_repo)) {
+    assert(is_nonempty_char1(filter_repo), "Non empty character(1) expected for filter_repo")
+  }
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -303,5 +435,6 @@ pkgzip_build_github_package <- function(repo, ...,
   pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_name, "DESCRIPTION"))[1, 'Version']
 
   pkgzip_build_prj_packages(pkgs = pkg_name, prj = bld_prj,
-                            zip_ver = pkg_ver, pkg_type = pkg_type, path = path)
+                            zip_ver = pkg_ver, pkg_type = pkg_type, path = path,
+                            with_deps = with_deps, filter_repo = filter_repo)
 }

@@ -63,10 +63,6 @@ collect_pkgs_direct_deps <- function(params) {
   assert(length(unfeasibles) == 0,
          "Packages with unfeasible requirements detected: %s", paste(unfeasibles$pkg, collapse = ", "))
 
-  # Remove base packages from dependencies
-  base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
-  pkgs_vers <- vers.rm(pkgs_vers, base_pkgs)
-
   # Check R version
   req_r_ver <- vers.get(pkgs_vers, 'R')
   if (nrow(req_r_ver)) {
@@ -77,8 +73,7 @@ collect_pkgs_direct_deps <- function(params) {
            cur_r_ver, req_r_ver$vmin, req_r_ver$vmax)
   }
 
-  # Get rid of R version as it is checked
-  pkgs_vers <- vers.rm(pkgs_vers, 'R')
+  pkgs_vers <- vers.rm_base(pkgs_vers)
   return(pkgs_vers)
 }
 
@@ -123,11 +118,7 @@ collect_mscs_direct_deps <- function(params) {
              gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
            }))
   mscs_vers <- vers.build(unique(pkgs))
-
-  # Remove base packages from dependencies
-  base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
-  mscs_vers <- vers.rm(mscs_vers, base_pkgs)
-
+  mscs_vers <- vers.rm_base(mscs_vers)
   return(mscs_vers)
 }
 
@@ -163,23 +154,16 @@ collect_all_subseq_deps <- function(vers, repo_infos, type, all_pkgs = NULL) {
     avail_vers <- vers.collect(pkgs = avail_pkgs)
   }
 
+  vers <- vers.rm_base(vers)
   vers_cr <- vers.check_against(vers, avail_vers)
 
-  base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
   next_cr <- vers_cr
   while(check_res.has_found(next_cr)) {
     dep_avails <- vers.pick_available_pkgs(check_res.get_found(next_cr))
-    stopifnot(nrow(dep_avails) > 0)
 
-    dep_vers <- vers.build()
-    for(ix in 1:nrow(dep_avails)) {
-      ix_deps <- unname(unlist(dep_avails[ix, c("Depends", "Imports", "LinkingTo")]))
-      ix_vers <- vers.from_deps(deps = paste(ix_deps[!is.na(ix_deps) & nchar(ix_deps) > 0], collapse = ", "),
-                                pkg_name = dep_avails[ix, "Package"])
-      dep_vers <- vers.union(dep_vers, ix_vers)
-    }
+    dep_vers <- vers.from_deps_in_avails(dep_avails)
+    dep_vers <- vers.rm_base(dep_vers)
 
-    dep_vers <- vers.rm(dep_vers, pkg_names = c(base_pkgs, "R"))
     next_cr <- vers.check_against(dep_vers, avail_vers)
     vers_cr <- check_res.union(vers_cr, next_cr)
   }
