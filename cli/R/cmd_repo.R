@@ -51,6 +51,23 @@ get_pkg_type <- function(binary) {
 }
 
 sub_commands <- list(
+  init = list(
+    help = "Initialize repository structure.",
+    options = c(
+      make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
+                  help="Initialize for binary packages (default: %default)"),
+      make_option(c("--rver"), dest = "rver", default=NULL,
+                  help="R version to intizialize for. If NULL current R version will be assumed. (default: %default)"),
+      common_options
+    ),
+    run = function(opts) {
+      pkg_type <- get_pkg_type(opts$binary)
+      ra_mng <- start_management(opts, rver = opts$rver, types = pkg_type)
+
+      RSuite::repo_mng_init(ra_mng)
+      RSuite::repo_mng_stop(ra_mng)
+    }
+  ),
   addproj = list(
     help = "Upload project packages into repository.",
     options = c(
@@ -61,6 +78,8 @@ sub_commands <- list(
                   help="Do not tag packages with revision number (default: %default)"),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
                   help="Upload binary form of project packages (default: %default)"),
+      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+                  help="If passed will upload also dependencies (default: %default)"),
       common_options
     ),
     run = function(opts) {
@@ -76,7 +95,8 @@ sub_commands <- list(
       RSuite::repo_upload_prj_packages(repo_manager = ra_mng,
                                        pkgs = pkgs,
                                        skip_rc = opts$skip_rc,
-                                       pkg_type = pkg_type)
+                                       pkg_type = pkg_type,
+                                       with_deps = opts$with_deps)
       RSuite::repo_mng_stop(ra_mng)
     }
   ),
@@ -120,6 +140,8 @@ sub_commands <- list(
                   help="Upload binary form of external packages (default: %default)"),
       make_option(c("--rver"), dest = "rver", default=NULL,
                   help="R version to upload package for. If NULL current R version will be assumed. (default: %default)"),
+      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+                  help="If passed will upload also dependencies (default: %default)"),
       common_options
     ),
     run = function(opts) {
@@ -133,7 +155,8 @@ sub_commands <- list(
       pkgs <- unlist(strsplit(opts$pkgs, split=","))
       RSuite::repo_upload_ext_packages(repo_manager = ra_mng,
                                        pkgs = pkgs,
-                                       pkg_type = pkg_type)
+                                       pkg_type = pkg_type,
+                                       with_deps = opts$with_deps)
 
       RSuite::repo_mng_stop(ra_mng)
     }
@@ -178,6 +201,8 @@ sub_commands <- list(
       make_option(c("--rver"), dest = "rver", default=NULL,
                   help = paste0("R version to build and upload package for. If NULL current R version will",
                                 " be assumed. (default: %default)")),
+      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+                  help="If passed will upload also dependencies (default: %default)"),
       common_options
     ),
     run = function(opts) {
@@ -189,7 +214,8 @@ sub_commands <- list(
       ra_mng <- start_management(opts, rver = opts$rver, types = pkg_type)
 
       RSuite::repo_upload_github_package(ra_mng, repo = opts$repo, host = opts$host,
-                                         pkg_type = pkg_type)
+                                         pkg_type = pkg_type,
+                                         with_deps = opts$with_deps)
       RSuite::repo_mng_stop(ra_mng)
     }
   ),
@@ -204,7 +230,7 @@ sub_commands <- list(
       pkg_type <- get_pkg_type(opts$binary)
 
       ra_mng <- start_management(opts, rver = NULL, types = pkg_type)
-      
+
       avail_pkgs <- RSuite::repo_mng_list(ra_mng, pkg_type)
       write(sprintf("%-40s%-40s", "Package", "Version"), stdout())
       by(avail_pkgs, 1:nrow(avail_pkgs), function(row) write(sprintf("%-40s%-40s", row$Package, row$Version), stdout()))

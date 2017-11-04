@@ -18,7 +18,7 @@ source(file.path(base, "command_mgr.R"), chdir = T)
 .common_options <- list(
   make_option(c("-p", "--path"), dest = "path", default = getwd(),
               help="Place created PKGZIP into path provided. (default: %default)")
-)  
+)
 
 sub_commands <- list(
   proj = list(
@@ -33,6 +33,12 @@ sub_commands <- list(
                               " Version is expected in form NN.NN.")),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
                   help="Include binary form of project packages (default: %default)"),
+      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+                  help="If passed will include dependencies into PKGZIP (default: %default)"),
+      make_option(c("--filter-repo"), dest = "filter_repo",
+                  help=paste0("Url to repository. If passed will not include dependencies into PKGZIP",
+                              " which satisfying versions are present in the repository.",
+                              " The parameter should be used together with --with-deps.")),
       .common_options
     ),
     run = function(opts) {
@@ -45,7 +51,9 @@ sub_commands <- list(
       RSuite::pkgzip_build_prj_packages(pkgs = pkgs,
                                         zip_ver = opts$version,
                                         pkg_type = pkg_type,
-                                        path = opts$path)
+                                        path = opts$path,
+                                        with_deps = opts$with_deps,
+                                        filter_repo = opts$filter_repo)
     }
   ),
   file = list(
@@ -72,6 +80,12 @@ sub_commands <- list(
                   help = "Comma separated list of external packages to include in PKGZIP."),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
                   help="Include binary form of external packages (default: %default)"),
+      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+                  help="If passed will include dependencies into PKGZIP (default: %default)"),
+      make_option(c("--filter-repo"), dest = "filter_repo",
+                  help=paste0("Url to repository. If passed will not include dependencies into PKGZIP",
+                              " which satisfying versions are present in the repository.",
+                              " The parameter should be used together with --with-deps.")),
       .common_options
     ),
     run = function(opts) {
@@ -84,7 +98,9 @@ sub_commands <- list(
       pkg_type <- .get_pkg_type(opts$binary)
       RSuite::pkgzip_build_ext_packages(pkgs,
                                         pkg_type = pkg_type,
-                                        path = opts$path)
+                                        path = opts$path,
+                                        with_deps = opts$with_deps,
+                                        filter_repo = opts$filter_repo)
     }
   ),
   github = list(
@@ -97,6 +113,12 @@ sub_commands <- list(
                                 " for example, 'github.hostname.com/api/v3'")),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
                   help="Build and upload binary package (default: %default)"),
+      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+                  help="If passed will include dependencies into PKGZIP (default: %default)"),
+      make_option(c("--filter-repo"), dest = "filter_repo",
+                  help=paste0("Url to repository. If passed will not include dependencies into PKGZIP",
+                              " which satisfying versions are present in the repository.",
+                              " The parameter should be used together with --with-deps.")),
       .common_options
     ),
     run = function(opts) {
@@ -105,9 +127,11 @@ sub_commands <- list(
       }
 
       pkg_type <- .get_pkg_type(opts$binary)
-      RSuite::pkgzip_build_github_package(repo = opts$repo, host = opts$host, 
-                                          pkg_type = pkg_type, 
-                                          path = opts$path)
+      RSuite::pkgzip_build_github_package(repo = opts$repo, host = opts$host,
+                                          pkg_type = pkg_type,
+                                          path = opts$path,
+                                          with_deps = opts$with_deps,
+                                          filter_repo = opts$filter_repo)
     }
   )
 )
