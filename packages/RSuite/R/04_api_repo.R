@@ -167,6 +167,9 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #' @param skip_rc if TRUE skip detection of package revision and package tagging.
 #'    (type: logical, default: FALSE)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into
+#'    repository. Packages in repository satisfying pkgs requirements will not be
+#'    included. (type: logical, default: FALSE)
 #'
 #' @export
 #'
@@ -174,9 +177,11 @@ repo_upload_prj_packages <- function(repo_manager,
                                      pkgs = NULL,
                                      prj = NULL,
                                      skip_rc = FALSE,
-                                     pkg_type = .Platform$pkgType) {
+                                     pkg_type = .Platform$pkgType,
+                                     with_deps = FALSE) {
   assert(is_repo_manager(repo_manager), "Repo manager expected for repo_manager")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
+  assert(is.logical(with_deps), "Logical value expected for with_deps")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -193,7 +198,7 @@ repo_upload_prj_packages <- function(repo_manager,
          pkg_type, paste(mgr_info$types, collapse = ", "))
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  if (!is.null(pkgs)) {
+  if (is.null(pkgs)) {
     pkgs <- prj_pkgs
   }
   assert(length(prj_pkgs) > 0, "The project does not have packages to upload into repository")
@@ -209,6 +214,21 @@ repo_upload_prj_packages <- function(repo_manager,
            "Project is not under revision control so revision number cannot be detected")
   }
 
+  if (any(with_deps)) {
+    raw_vers <- lapply(X = pkgs,
+                       FUN = function(pkg_name) {
+                         collect_single_pkg_direct_deps(params, pkg_name)
+                       })
+    dep_vers <- do.call("vers.union", raw_vers)
+    inproj_deps <- intersect(prj_pkgs, vers.get_names(dep_vers))
+    avail_vers <- collect_dependencies(vers.rm(dep_vers, inproj_deps), # from 18_repo_helpers.R
+                                       pkg_type, params, mgr_info$url)
+
+    pkgs <- c(pkgs, inproj_deps) # include also in-project dependencies
+  } else {
+    avail_vers <- vers.build(avails = data.frame())
+  }
+
   pkg_loginfo("Building project packages ...")
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     revision,
@@ -217,25 +237,12 @@ repo_upload_prj_packages <- function(repo_manager,
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
 
-  pkg_loginfo("Preparing temp repository for packages ...")
-
-  tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, params$r_ver)
-  repo_manager_init(tmp_mgr)
-
-  # copy into temp repo package files built
-  pkgs_fpath <- list.files(rsuite_contrib_url(params$irepo_path, pkg_type, params$r_ver),
-                           pattern = sprintf("^(%s)_.*", paste(pkgs, collapse = "|")),
-                           full.names = T)
-  dest_curl <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
-  success <- file.copy(from = pkgs_fpath, to = dest_curl)
-  assert(all(success),
-         "Some project packages failed to copy to temp repository: %s",
-         paste(pkgs_fpath[success], collapse = ", "))
-
-  rsuite_write_PACKAGES(dest_curl, type = pkg_type)
+  temp_repo_prepare(avail_vers, tmp_path, pkg_type, params) # from 18_repo_helpers.R
+  temp_repo_copy_proj_pkgs(pkgs, tmp_path, pkg_type, params) # from 18_repo_helpers.R
+  temp_repo_write_PACKAGES(tmp_path, pkg_type, rver = params$r_ver) # from 18_repo_helpers.R
 
   pkg_loginfo("... done. Uploading to repository ...")
-  repo_manager_upload(repo_manager, params$irepo_path, pkg_type)
+  repo_manager_upload(repo_manager, tmp_path, pkg_type)
 
   # clear cache
   c_url <- rsuite_contrib_url(repos = mgr_info$url, type = pkg_type)
@@ -323,17 +330,22 @@ repo_upload_package_files <- function(repo_manager, files) {
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into
+#'    repository. Packages in repository satisfying pkgs requirements will not be
+#'    included. (type: logical, default: FALSE)
 #'
 #' @export
 #'
 repo_upload_ext_packages <- function(repo_manager,
                                      pkgs,
                                      prj = NULL,
-                                     pkg_type = .Platform$pkgType) {
+                                     pkg_type = .Platform$pkgType,
+                                     with_deps = FALSE) {
   assert(is_repo_manager(repo_manager), "Repo manager expected for repo_manager")
   assert(!missing(pkgs) && is.character(pkgs) && length(pkgs) > 0,
          "Non empty character(N) expected for pkgs")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
+  assert(is.logical(with_deps), "Logical value expected for with_deps")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -343,52 +355,29 @@ repo_upload_ext_packages <- function(repo_manager,
   mgr_info <- repo_manager_get_info(repo_manager)
   stopifnot(!is.null(mgr_info$rver))
 
-  pkg_loginfo("Detecting repositories (for R %s)...", mgr_info$rver)
-
-  repo_infos <- get_all_repo_infos(params, rver = mgr_info$rver) # from 53_repositories.R
-  log_repo_infos(repo_infos) # from 53_repositories.R
-
   assert(pkg_type %in% mgr_info$types,
          "Repository is not managed for %s. Types manageable: %s",
          pkg_type, paste(mgr_info$types, collapse = ", "))
 
-  stopifnot(!is.null(mgr_info$rver))
-  contrib_urls <- retrieve_contrib_urls(repo_infos,  # from 53_repositories.R
-                                        type = pkg_type)
-
-  # retrieves latest versions
-  avail_pkgs <- vers.get_available_pkgs(pkgs, contrib_urls)
-
-  unknown_pkgs <- setdiff(pkgs, avail_pkgs$Package)
-  if (pkg_type != "source") { # try source packages to build
-    src_contrib_urls <- retrieve_contrib_urls(repo_infos, "source") # from 53_repositories.R
-    src_avail_pkgs <- vers.get_available_pkgs(unknown_pkgs, src_contrib_urls)
-    unknown_pkgs <- setdiff(unknown_pkgs, src_avail_pkgs$Package)
+  if (any(with_deps)) {
+    avail_vers <- collect_dependencies(vers.build(pkgs), # from 18_repo_helpers.R
+                                       pkg_type, params, mgr_info$url,
+                                       rver = mgr_info$rver)
   } else {
-    src_avail_pkgs <- data.frame(Package = as.character())
+    avail_vers <- collect_packages(vers.build(pkgs), # from 18_repo_helpers.R
+                                   pkg_type, params,
+                                   rver = mgr_info$rver)
   }
-  assert(!length(unknown_pkgs),
-         "Some packages are not available for %s type: %s",
-         pkg_type, paste(unknown_pkgs, collapse = ", "))
-
-  all_names <- avail_pkgs$Package[order(avail_pkgs$Package)]
 
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
 
-  pkg_loginfo("Preparing temp repository for packages ...")
+  temp_repo_prepare(avail_vers, # from 18_repo_helpers.R
+                    tmp_path, pkg_type, params,
+                    rver = mgr_info$rver)
+  temp_repo_write_PACKAGES(tmp_path, pkg_type, rver = mgr_info$rver) # from 18_repo_helpers.R
 
-  tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, mgr_info$rver)
-  repo_manager_init(tmp_mgr)
-
-  pkg_download(avail_pkgs,
-               dest_dir = rsuite_contrib_url(tmp_path, pkg_type, mgr_info$rver))
-  if (nrow(src_avail_pkgs) > 0) {
-    build_source_packages(src_avail_pkgs, # from 17_build_src_packages.R
-                          tmp_path, pkg_type, params, mgr_info$rver)
-  }
-
-  pkg_loginfo("... done.")
+  pkg_loginfo("... done. Uploading to repository ...")
 
   repo_manager_upload(repo_manager, tmp_path, pkg_type)
   c_url <- rsuite_contrib_url(repos = mgr_info$url, type = pkg_type)
@@ -457,13 +446,20 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into
+#'    repository. Packages in repository satisfying pkgs requirements will not be
+#'    included. (type: logical, default: FALSE)
 #'
 #' @export
 #'
-repo_upload_github_package <- function(repo_manager, repo, ..., prj = NULL, pkg_type = .Platform$pkgType) {
+repo_upload_github_package <- function(repo_manager, repo, ...,
+                                       prj = NULL,
+                                       pkg_type = .Platform$pkgType,
+                                       with_deps = FALSE) {
   assert(is_repo_manager(repo_manager), "Repo manager expected for repo_manager")
   assert(is_nonempty_char1(repo), "Non empty character(1) expected for repo")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
+  assert(is.logical(with_deps), "Logical value expected for with_deps")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -488,5 +484,6 @@ repo_upload_github_package <- function(repo_manager, repo, ..., prj = NULL, pkg_
   prj_install_deps(bld_prj)
 
   repo_upload_prj_packages(repo_manager, pkgs = pkg_name, prj = bld_prj,
-                           skip_rc = T, pkg_type = pkg_type)
+                           skip_rc = T, pkg_type = pkg_type,
+                           with_deps = with_deps)
 }

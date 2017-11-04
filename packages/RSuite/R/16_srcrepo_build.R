@@ -5,6 +5,15 @@
 # Utilities for building source repository from github, git, svn or other sources.
 #----------------------------------------------------------------------------
 
+#'
+#' Retrieve devtools internal function by name.
+#'
+#' @param name name of function to retrieve
+#'
+#' @return object found in devtools namespace.
+#'
+#' @keywords internal
+#'
 .get_devtools_intern <- function(name) {
   search_res <- getAnywhere(name)
   ixs <- which(search_res$where == "namespace:devtools")

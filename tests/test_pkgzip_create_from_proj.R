@@ -27,7 +27,7 @@ test_that_managed("Create PKGZIP out of project packages (basic)", {
   expect_that_pkgzip_contains("TestPackage", type = "source", pkgzip = pkgzip)
 })
 
-test_that_managed("Create PKGZIP out of project packages (pkg selection)", {
+test_that_managed("Create PKGZIP out of project packages (with pkg selection)", {
   prj <- init_test_project(repo_adapters = c("Dir"))
   pkgzip <- init_test_pkgzip()
 

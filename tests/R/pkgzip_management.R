@@ -32,7 +32,7 @@ expect_that_pkgzip_contains <- function(names, type, pkgzip) {
     succeed()
   })
 
-  c_url <- contrib.url(sprintf("file:///%s", cont_path), type)
+  c_url <- RSuite:::rsuite_contrib_url(repos = sprintf("file:///%s", cont_path), type = type)
   avail <- data.frame(available.packages(contriburl = c_url, filters = c()),
                       stringsAsFactors = F)$Package
 

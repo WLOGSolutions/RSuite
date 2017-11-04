@@ -43,64 +43,6 @@
   return(zip_file_name)
 }
 
-.collect_dependencies <- function(vers, pkg_type, params, filter_repo) {
-  resp_types <- get_respected_types(pkg_type, params$bin_pkgs_type)
-
-  pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
-  repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
-  if (!is.null(filter_repo)) {
-    filter_ris <- build_repo_infos(spec = list(Url = filter_repo), # from 53_repositories.R
-                                   types = resp_types, rver = params$r_ver)
-    repo_infos <- c(filter_ris, repo_infos)
-  }
-  log_repo_infos(repo_infos) # from 53_repositories.R
-
-  pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
-  avail_vers <- resolve_dependencies(vers = vers, # from 11_install_prj_deps.R
-                                     repo_infos = repo_infos,
-                                     pkg_types = resp_types)
-  if (!is.null(filter_repo)) {
-    filter_contrib_urls <- retrieve_contrib_urls(repo_infos[1], pkg_type) # from 53_repositories.R
-    filter_pkgs <- vers.collect(filter_contrib_urls) # from versions.R
-    avail_vers <- vers.rm_acceptable(avail_vers, filter_pkgs$avails)
-  }
-  return(avail_vers)
-}
-
-.collect_packages <- function(vers, pkg_type, params) {
-  resp_types <- get_respected_types(pkg_type, params$bin_pkgs_type)
-
-  pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
-  repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
-  log_repo_infos(repo_infos) # from 53_repositories.R
-
-  avail_vers <- resolve_packages(vers = vers, # from 11_install_prj_deps.R
-                                 repo_infos = repo_infos, pkg_types = resp_types)
-  return(avail_vers)
-}
-
-.prepare_temp_repo <- function(vers, tmp_path, pkg_type, params) {
-  pkg_loginfo("Preparing temp repository for packages ...")
-
-  tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_type, params$r_ver)
-  repo_manager_init(tmp_mgr)
-
-  if (vers.is_empty(vers)) {
-    return()
-  }
-
-  avail_pkgs <- deduce_package_files(vers.pick_available_pkgs(vers))
-  pkgs_infos <- get_package_url_infos(sprintf("%s/%s", avail_pkgs$Repository, avail_pkgs$File))
-
-  pkg_download(avail_pkgs[pkgs_infos$Type == pkg_type, ],
-               dest_dir = rsuite_contrib_url(tmp_path, pkg_type, params$r_ver))
-  if (pkg_type != "source" && any(pkgs_infos$Type == "source")) {
-    src_avail_pkgs <- avail_pkgs[pkgs_infos$Type == "source", ]
-    build_source_packages(src_avail_pkgs, # from 17_build_src_packages.R
-                          tmp_path, pkg_type, params, params$r_ver)
-  }
-}
-
 #'
 #' Builds PKGZIP out of project packages. PKGZIP will be tagged with the same
 #'   way az project zip.
@@ -167,8 +109,8 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
                        })
     dep_vers <- do.call("vers.union", raw_vers)
     inproj_deps <- intersect(prj_pkgs, vers.get_names(dep_vers))
-    avail_vers <- .collect_dependencies(vers.rm(dep_vers, inproj_deps),
-                                        pkg_type, params, filter_repo)
+    avail_vers <- collect_dependencies(vers.rm(dep_vers, inproj_deps), # from 18_repo_helpers.R
+                                       pkg_type, params, filter_repo)
 
 
     zip_pref <- sprintf("%s_v%s", paste(pkgs, collapse = "_"), ver_inf$ver)
@@ -188,19 +130,9 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
 
-  .prepare_temp_repo(avail_vers, tmp_path, pkg_type, params)
-
-  # copy into temp repo package files built
-  pkgs_fpath <- list.files(rsuite_contrib_url(params$irepo_path, pkg_type, params$r_ver),
-                           pattern = sprintf("^(%s)_.*", paste(pkgs, collapse = "|")),
-                           full.names = T)
-  dest_curl <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
-  success <- file.copy(from = pkgs_fpath, to = dest_curl)
-  assert(all(success),
-         "Some project packages failed to copy to temp repository: %s",
-         paste(pkgs_fpath[success], collapse = ", "))
-
-  rsuite_write_PACKAGES(dest_curl, type = pkg_type)
+  temp_repo_prepare(avail_vers, tmp_path, pkg_type, params) # from 18_repo_helpers.R
+  temp_repo_copy_proj_pkgs(pkgs, tmp_path, pkg_type, params) # from 18_repo_helpers.R
+  temp_repo_write_PACKAGES(tmp_path, pkg_type, rver = params$r_ver) # from 18_repo_helpers.R
 
   pkg_loginfo("... done. Creating PKGZIP file %s ...", zip_file_name)
 
@@ -331,9 +263,9 @@ pkgzip_build_ext_packages <- function(pkgs,
   params <- prj$load_params()
 
   if (any(with_deps)) {
-    avail_vers <- .collect_dependencies(vers.build(pkgs), pkg_type, params, filter_repo)
+    avail_vers <- collect_dependencies(vers.build(pkgs), pkg_type, params, filter_repo) # from 18_repo_helpers.R
   } else {
-    avail_vers <- .collect_packages(vers.build(pkgs), pkg_type, params)
+    avail_vers <- collect_packages(vers.build(pkgs), pkg_type, params) # from 18_repo_helpers.R
   }
 
   all_names <- vers.get_names(avail_vers)
@@ -348,10 +280,8 @@ pkgzip_build_ext_packages <- function(pkgs,
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
 
-  .prepare_temp_repo(avail_vers, tmp_path, pkg_type, params)
-
-  dest_path <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
-  rsuite_write_PACKAGES(dest_path, pkg_type)
+  temp_repo_prepare(avail_vers, tmp_path, pkg_type, params) # from 18_repo_helpers.R
+  temp_repo_write_PACKAGES(tmp_path, pkg_type, rver = params$r_ver) # from 18_repo_helpers.R
 
   pkg_loginfo("... done. Creating PKGZIP file %s ...", zip_file_name)
 
