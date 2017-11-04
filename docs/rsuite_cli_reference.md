@@ -213,6 +213,28 @@ For local repository it is check if you have permissions to modify it.
 
 For S3 repository it is required to have repository credentials in your user home directory and S3 command line client available in your run environment (PATH environment variable should point to folder containing aws utility).
 
+#### Initializing repository
+
+To create repository structure execute following
+
+```bash
+rsuite repo init -s http://your-s3-bucket.s3.amazonaws.com/path
+```
+
+It will create required subfolders and package indexes for default R version and type of packages. You can specify
+that you want (or not) initialize it for binary packages with following command
+
+```bash
+rsuite repo init -s http://your-s3-bucket.s3.amazonaws.com/path -b TRUE
+```
+
+You can also force repository structure creation for different R version (which is important for binary packages) 
+with following command
+
+```bash
+rsuite repo init -d /path/to/your/repository --rver 3.4
+```
+
 #### Adding project packages to repository
 
 During adding project packages to repository project consistency is checked the same way it is done during building deployment package: it is checked if uncommitted changes exists and if project source revision is consistent with repository. Project packages are rebuilt with revision number appended to project version number.
@@ -241,6 +263,12 @@ You can also decide which kind of packages will be built and added to repository
 rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -b FALSE
 ```
 
+If you want to add also all dependencies which are not currently present in the repository pass --with-deps option:
+
+```bash
+rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -b TRUE --with-deps
+```
+
 #### Adding in file packages to repository
 
 If you have some specific packages downloaded as files (source or binary) you can upload then following way:
@@ -265,6 +293,13 @@ You can specify that you want to add source (or binary) version of packages to r
 rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE
 ```
 
+If you want to add also all dependencies which are not currently present in the repository pass --with-deps option:
+
+```bash
+rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE --with-deps
+```
+
+
 #### Adding content of PKGZIP to repository
 
 If you managed to build PKGZIP containing some packages (see pkgzip command) you can add its content to repository:
@@ -287,9 +322,12 @@ GitHub repository can be specified in format username/repo[/subdir][@ref|#pull].
 
 You can also specify following options to addgithub:
 
-* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, 'github.hostname.com/api/v3'.
-* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be added to the repository: system specific binary of source.
+* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, 
+  for example, 'github.hostname.com/api/v3'.
+* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what 
+  kind of package will be added to the repository: system specific binary of source.
 * --rver wich takes R version number to target built package for (important for binary packages).
+* --with-deps If passed will upload also dependencies which are not currently present in the repository.
 
 #### List contents of repository
 
@@ -299,7 +337,8 @@ You can list packages available on the repository with following command:
 rsuite repo list -s http://your-s3-bucket.s3.amazonaws.com/path
 ```
 
-It will print table with all packages and their versions available in repository. Specifying -b (short for --binary) option to can choose to list binary or source packages.
+It will print table with all packages and their versions available in repository. 
+Specifying -b (short for --binary) option to can choose to list binary or source packages.
 
 #### Remove packages from repository
 
@@ -343,6 +382,20 @@ You can also decide which kind of packages will be built and included in PKGZIP 
 rsuite pkgzip proj -b TRUE
 ```
 
+If you want to include also all dependencies in PKGZIP pass --with-deps option:
+
+```bash
+rsuite pkgzip proj -b FALSE --with-deps
+```
+
+In case you are building repository of packages (which you have access to while building PKGZIP) you probably would want
+to include into PKGZIP only dependencies which could not be satisfied by current content of the repository. In that case
+you can filter dependencies against contents of the repository:
+
+```bash
+rsuite pkgzip proj -b FALSE --with-deps --filter-repo http://url.to.your.repository
+```
+
 #### Building PKGZIP containing in file packages
 
 If you have some specific packages downloaded as files (source or binary) you can create PKGZIP containing them following way:
@@ -367,12 +420,26 @@ You can specify that you want to include source (or binary) version of packages 
 rsuite pkgzip ext -n package1,package2 -b TRUE
 ```
 
+If you want to include also all dependencies in PKGZIP pass --with-deps option:
+
+```bash
+rsuite pkgzip ext -n package1,package2 -b FALSE --with-deps
+```
+
+In case you are building repository of packages (which you have access to while building PKGZIP) you probably would want
+to include into PKGZIP only dependencies which could not be satisfied by current content of the repository. In that case
+you can filter dependencies against contents of the repository:
+
+```bash
+rsuite pkgzip ext -n package1,package2 --with-deps --filter-repo http://url.to.your.repository
+```
+
 #### Building PKGZIP containing package from GitHub
 
 If you want to create PKGZIP out of available on GitHub repository call following command:
 
 ```bash
-rsuite pkgzip github-r github/ProjectName
+rsuite pkgzip github -r github/ProjectName
 ```
 
 RSuite CLI will download sources, build package and add create PKGZIP out of it.
@@ -381,8 +448,13 @@ GitHub repository can be specified in format username/repo[/subdir][@ref|#pull].
 
 You can also specify following options to github:
 
-* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, for example, 'github.hostname.com/api/v3'.
-* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will be included in PKGZIP: system specific binary of source.
+* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, 
+  for example, 'github.hostname.com/api/v3'.
+* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will 
+  be included in PKGZIP: system specific binary of source.
+* --with-deps If passed will include dependencies into PKGZIP.
+* --filter-repo which takas as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
+  versions are present in the repository. The parameter should be used together with --with-deps.
 
 ## Getting help
 

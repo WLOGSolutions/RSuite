@@ -78,7 +78,7 @@ sub_commands <- list(
                   help="Do not tag packages with revision number (default: %default)"),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
                   help="Upload binary form of project packages (default: %default)"),
-      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+      make_option(c("--with-deps"), dest = "with_deps", action="store_true", default=FALSE,
                   help="If passed will upload also dependencies (default: %default)"),
       common_options
     ),
@@ -140,7 +140,7 @@ sub_commands <- list(
                   help="Upload binary form of external packages (default: %default)"),
       make_option(c("--rver"), dest = "rver", default=NULL,
                   help="R version to upload package for. If NULL current R version will be assumed. (default: %default)"),
-      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+      make_option(c("--with-deps"), dest = "with_deps", action="store_true", default=FALSE,
                   help="If passed will upload also dependencies (default: %default)"),
       common_options
     ),
@@ -201,7 +201,7 @@ sub_commands <- list(
       make_option(c("--rver"), dest = "rver", default=NULL,
                   help = paste0("R version to build and upload package for. If NULL current R version will",
                                 " be assumed. (default: %default)")),
-      make_option(c("--with-deps"), dest = "with_deps", type="logical", default=FALSE,
+      make_option(c("--with-deps"), dest = "with_deps", action="store_true", default=FALSE,
                   help="If passed will upload also dependencies (default: %default)"),
       common_options
     ),
