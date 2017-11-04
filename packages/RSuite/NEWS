@@ -1,6 +1,6 @@
 VERSION 0.15 (2017-11-04)
-  * Creation of PKGZIP with dependencies and filtering against existing packages
-     repository.
+  * Creation of PKGZIP with dependencies and filtering against packages existing
+     in passed repository.
   * Uploading packages into repository together with dependencies and filtering
      against existing packages present in it.
 
