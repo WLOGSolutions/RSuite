@@ -120,11 +120,6 @@
 #' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
 #'    (type: logical, default: FALSE)
 #' @param filter_repo repository address to not include dependencies available in.
-#'     If NULL will not filter dependencies. Will be omited if with_deps is FALSE.
-#'     (type: character(1), default: NULL)
-#' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
-#'    (type: logical, default: FALSE)
-#' @param filter_repo repository address to not include dependencies available in.
 #'     In project dependencies will nether be filtered. If NULL will not filter
 #'     dependencies. Will be omited if with_deps is FALSE. (type: character(1), default: NULL)
 #'
