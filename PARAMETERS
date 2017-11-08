@@ -2,4 +2,4 @@ Project: RSuite
 Artifacts:
 RSuiteVersion: 0.8.197
 Repositories: CRAN
-Excludes: cli docker tests/data/*
+Excludes: cli, docker, tests/data/*
