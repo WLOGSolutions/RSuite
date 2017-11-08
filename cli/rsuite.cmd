@@ -58,6 +58,12 @@ if %cmd%=="pkgzip" (
     exit /b 0
 )
 
+if %cmd%=="docker" (
+    Rscript --no-init-file "%base_dir%/R/cmd_docker.R" %*
+    if ERRORLEVEL 1 exit /B 2
+    exit /b 0
+)
+
 if %cmd%=="version" (
     type "%base_dir%/version.txt"
     exit /b 0

@@ -397,3 +397,65 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
   zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
 }
 
+
+#'
+#' Prepares project source pack tagged with version.
+#'
+#' It collects all sources and assemblies found in project folder and packs them
+#' into single zip file.
+#'
+#' Pack generated is stamped with version. It can be enforced with pack_ver
+#' parameter (zip will have suffix <pack_ver>x in the case). If version is not
+#' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
+#' from maximal project packages version number. In that case revision numer is
+#' appended to version: version number will be <ZipVersion>_<rc_ver>. Check for
+#' changes in project sources is performed for pack consistency. Resulted pack
+#' is marked with the version detected so while buiding zip after unpacking will
+#' have the same version as original project.
+#'
+#' Before building pack project packages will have version altered: revision will
+#' be added as least number to package version.
+#'
+#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs verbosity.
+#'
+#' @param prj project object to pack. if not passed will pack loaded project or
+#'    default whichever exists. Will init default project from working
+#'    directory if no default project exists. (type: rsuite_project, default: NULL)
+#' @param path folder path to put output pack into. The folder must exist.
+#'    (type: characted: default: getwd())
+#' @param pack_ver if passed enforce version of pack to passed value.
+#'    Expected form of version is DD.DD. (type: character, default: NULL)
+#'
+#' @return invisible file path to pack file created. The file name will be
+#'    in form prjpack_<ProjectName>_<version>.zip
+#'
+#' @export
+#'
+prj_pack <- function(prj = NULL, path = getwd(), pack_ver = NULL) {
+  assert(dir.exists(path), "Existing folder expected for path")
+
+  prj <- safe_get_prj(prj)
+  stopifnot(!is.null(prj))
+
+  params <- prj$load_params()
+  ver_inf <- detect_zip_version(params, pack_ver) # from 15_zip_project.R
+
+  tmp_dir <- tempfile("pkgpack_")
+  on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
+
+  exp_params <- export_tagged_prj(params, # from 19_pack_helpers.R
+                                  ver_inf$rev,
+                                  tmp_dir)
+  assert(!is.null(exp_params), "Failed to create project export")
+
+  create_prjinfo(exp_params, ver_inf$rev) # from 19_pack_helpers.R
+
+  prj_name <- gsub("[\\/\"\'<>]+", "_", params$project)
+  pack_fpath <- file.path(rsuite_fullUnifiedPath(path),
+                          sprintf("prjpack_%s_%s.zip", prj_name, ver_inf$ver))
+
+  success <- zip_folder(wspace = tmp_dir, zip_file_path = pack_fpath) # from 15_zip_project.R
+  assert(success, "Failed to create pack file (zip returned non 0 return status).")
+
+  invisible(pack_fpath)
+}

@@ -45,12 +45,16 @@ detect_zip_version <- function(params, zip_ver) {
   }
 
   revision <- detect_consistent_revision(params)
-  if (is.null(revision)) {
-    ver <- paste0(zip_ver, "x")
-  } else {
-    ver <- paste0(zip_ver, "_", revision)
+  if (!is.null(revision)) {
+    return(list(ver = paste0(zip_ver, "_", revision), rev = revision))
   }
-  return(list(ver = ver, rev = revision))
+
+  prjinfo_rev <- retrieve_consistent_prjinfo_rev(params) # from 19_pack_helpers.R
+  if (!is.null(prjinfo_rev)) {
+    return(list(ver = paste0(zip_ver, "_", prjinfo_rev), rev = NULL))
+  }
+
+  return(list(ver = paste0(zip_ver, "x"), rev = NULL))
 }
 
 #'
@@ -117,9 +121,11 @@ zip_project <- function(params, version, odir) {
     assert(success,
            "Failed to copy project libraries to temporary folder")
 
-    success <- file.copy(params$script_path, root_dir, recursive = T)
-    assert(success,
-           "Failed to copy scripts to temporary folder")
+    if (dir.exists(params$script_path)) {
+      success <- file.copy(params$script_path, root_dir, recursive = T)
+      assert(success,
+             "Failed to copy scripts to temporary folder")
+    }
 
     for(a in gsub("^\\s+|\\s+$", "", unlist(strsplit(params$artifacts, ",")))) {
       apath <- file.path(params$prj_path, a)

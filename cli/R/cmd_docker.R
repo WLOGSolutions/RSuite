@@ -1,0 +1,146 @@
+#----------------------------------------------------------------------------
+# RSuite
+# Copyright (c) 2017, WLOG Solutions
+#
+# Handles 'pkgzip' command of CLI utility.
+#----------------------------------------------------------------------------
+
+args <- commandArgs()
+base <- dirname(gsub("--file=", "", args[grepl("^--file=", args)]))[1]
+source(file.path(base, "command_mgr.R"), chdir = T)
+source(file.path(base, "docker_utils.R"))
+
+.build_prj_zip <- function(platform, version, dont_rm, dest_dir) {
+  if (is.null(version) || is.na(version)) {
+    version <- NULL
+  }
+  prj <- RSuite::prj_init()
+  docker_image <- get_docker_image(prj, platform) # from docker_utils.R
+
+  pack_fpath <- RSuite::prj_pack(prj = prj, path = tempdir(), pack_ver = version)
+
+  cont_name <- run_container(docker_image) # from docker_utils.R
+  on.exit({
+    if (is.null(dont_rm) || !dont_rm) {
+      stop_container(cont_name) # from docker_utils.R
+    } else {
+      loginfo("Container %s not removed (--dont-rm passed).", cont_name)
+    }
+  }, add = T)
+
+  loginfo("Copying project pack into container %s ...", cont_name)
+  exec_docker_cmd(c("cp", pack_fpath, sprintf("%s:/opt/", cont_name)), # from docker_utils.R
+                  "Copying project pack into container")
+  loginfo("... done.")
+
+
+  run_incont_cmd(cont_name, sprintf("unzip %s", basename(pack_fpath))) # from docker_utils.R
+  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj depsinst -v", basename(prj$path))) # ...
+  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj build -v", basename(prj$path))) # ...
+  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj zip -v -p /opt", basename(prj$path))) # ...
+
+  zip_name <- gsub("^[^_]+_", "", basename(pack_fpath))
+  zip_fpath <- file.path(dest_dir, zip_name)
+
+  loginfo("Copying project deployment zip back from container %s ...", cont_name)
+  exec_docker_cmd(c("cp", sprintf("%s:/opt/%s", cont_name, zip_name), dest_dir), # from docker_utils.R
+                  "Copying project deployment zip back from container")
+  loginfo("... done.")
+
+  return(zip_fpath)
+}
+
+sub_commands <- list(
+  zip = list(
+    help = "Build project and generate deployment zip in docker container.",
+    options = list(
+      make_option(c("-p", "--platform"), dest = "platform", default = "ubuntu",
+                  help="Build project for plaform passed. One of ubuntu or centos (default: %default)"),
+      make_option(c("--dont-rm"), dest = "dont_rm", action="store_true", default=FALSE,
+                  help="If passed will not remove build container on error or success."),
+      make_option(c("--version"), dest = "version",
+                  help="Version to use for project pack tagging (default: use ZipVersion form PARAMETERS and revision from RC)"),
+      make_option(c("-d", "--dest"), dest = "dest",
+                  help="Directory to put built deployment zip into. It must exist. (default: current directory)")
+    ),
+    run = function(opts) {
+      if (is.null(opts$dest) || is.na(opts$dest)) {
+        opts$dest <- getwd()
+      }
+      if (!dir.exists(opts$dest)) {
+        stop(sprintf("Destination folder does not exist: %s", opts$dest))
+      }
+
+      .build_prj_zip(opts$platform, opts$version, opts$dont_rm, opts$dest)
+      invisible()
+    }
+  ),
+  img = list(
+    help = "Build docker image containg deployed project.",
+    options = list(
+      make_option(c("-t", "--tag"), dest = "tag",
+                  help="Tag for newly created image. (required)"),
+      make_option(c("-f", "--from"), dest = "from",
+                  help=paste0("Image to use as base container(FROM clause) for the debloyment.",
+                              " If not passed will use wlog/rsuite:<platform>_r<rver> as default")),
+      make_option(c("-z", "--zip"), dest = "zip",
+                  help=paste0("Project zip to deploy.",
+                              " If not passed zip will be created and deployed from project in context.",
+                              " The file must exists.")),
+      make_option(c("-p", "--platform"), dest = "platform", default = "ubuntu",
+                  help=paste0("Will be used if -z (--zip) is not passed or no -f (--from) passed.",
+                              " Build project zip for plaform passed. One of ubuntu or centos (default: %default)")),
+      make_option(c("--version"), dest = "version",
+                  help=paste0("Will be used if -z (--zip) is not passed.",
+                              " Version to use for project pack tagging (default: use ZipVersion form PARAMETERS and revision from RC)"))
+    ),
+    run = function(opts) {
+      if (is.null(opts$tag)) {
+        stop("Image tag is required. Provide --tag argument.")
+      }
+
+      if (is.null(opts$from)) {
+        prj <- RSuite::prj_init()
+        opts$from <- get_docker_base_image(prj, opts$platform) # from docker_utils.R
+        loginfo("Will use %s as base image!", opts$from)
+      }
+
+      tmp_dir <- tempfile("imgbuild_")
+      dir.create(tmp_dir, showWarnings = F, recursive = T)
+      on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
+
+      if (is.null(opts$zip)) {
+        opts$zip <- .build_prj_zip(platform = opts$platform,
+                                   version = opts$version,
+                                   dont_rm = NULL,
+                                   dest_dir = tmp_dir)
+      } else {
+        if (!file.exists(opts$zip)) {
+          stop("Project zip file passed does not exist: %s.", opts$zip)
+        }
+        success <- file.copy(from = opts$zip, to = tmp_dir, overwrite = T, recursive = T)
+        if (!success) {
+          stop("Failed to prepare build env. Could not copy %s.", opts$zip)
+        }
+      }
+
+      # create Dockerfile
+      docker_fpath <- file.path(tmp_dir, "Dockerfile")
+      writeLines(c(sprintf("FROM %s", opts$from),
+                   sprintf("COPY %s /tmp/", basename(opts$zip)),
+                   sprintf("RUN unzip /tmp/%s && rm -rf /tmp/%s",
+                           basename(opts$zip), basename(opts$zip))),
+                 con = docker_fpath)
+
+      loginfo("Building image %s ...", opts$tag)
+      exec_docker_cmd(c("build", "-t", opts$tag, "-f", docker_fpath, tmp_dir), # from docker_utils.R
+                      "Building image")
+      loginfo("... done.")
+    }
+  )
+)
+
+handle_subcommands(
+  sub_commands = sub_commands,
+  cmd_help = "The command helps you handle building for other platform with use of docker."
+)

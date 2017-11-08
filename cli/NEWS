@@ -1,3 +1,9 @@
+VERSION 0.16 (2017-11-08)
+  * 'proj pack' added which exposes RSuite::prj_path functionality.
+  * docker command added which enables build zip in docker container and create
+     docker image with deployed project. It's simplistic yet and will need
+     to be extended.
+
 VERSION 0.15 (2017-11-04)
   * added --with-deps and --filter-repo options which are supported from v0.15
     of RSuite

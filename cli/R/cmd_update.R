@@ -39,29 +39,6 @@ suppressPackageStartupMessages({
 
 basicConfig(level = lev)
 
-get_latest_release <- function(platform_id) {
-  # check available versions
-  loginfo("Retrieving exposed package index ...")
-
-  pkg_idx_conn <- url("http://wlog-rsuite.s3.amazonaws.com/cli/PKG_INDEX", open = "r")
-  tryCatch({
-    pkg_idx_lines <- readLines(pkg_idx_conn)
-  }, error = function(e) {
-    .fatal_error(geterrmessage())
-  }, finally = close(pkg_idx_conn))
-
-  pkg_idx_lines <- trimws(pkg_idx_lines)
-  plat_pkgs <- pkg_idx_lines[grepl(sprintf("^%s: ", platform_id), pkg_idx_lines)]
-  if (length(plat_pkgs) < 1) {
-    .fatal_error(sprintf("No RSuite CLI package for %s platform exposed", platform_id))
-  }
-
-  return(list(
-    url = paste0("http://wlog-rsuite.s3.amazonaws.com/cli/", gsub("^[^:]+: ", "", plat_pkgs[1])),
-    ver = gsub("^.+rsuitecli[-_]v?([\\.0-9]+)[-_].+$", "\\1", plat_pkgs[1], ignore.case = T)
-  ))
-}
-
 platform_dict <- list(
   windows = list(
     get_platform_id = function() { sprintf("win-%s", .Platform$r_arch) },

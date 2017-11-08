@@ -30,6 +30,9 @@ case "$cmd" in
 	pkgzip)
                 $rscript_path --no-init-file $basedir/R/cmd_pkgzip.R $* || exit 2
 		;;
+	docker)
+                $rscript_path --no-init-file $basedir/R/cmd_docker.R $* || exit 2
+		;;
 	version)
                 ver=`cat ${basedir}/version.txt`
                 echo $ver

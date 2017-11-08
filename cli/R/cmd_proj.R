@@ -60,23 +60,23 @@ sub_commands <- list(
   test = list(
     help = "Run tests in tests folder.",
     options = list(
-      make_option(c("-d", "--dir"), dest = "tests_dir", 
+      make_option(c("-d", "--dir"), dest = "tests_dir",
                   help="Folder name relative to project base directory to look for tests. (default: tests)")
     ),
     run = function(opts) {
       if (is.null(opts$tests_dir) || is.na(opts$tests_dir)) {
         opts$tests_dir <- "tests"
       }
-        
+
       prj <- RSuite::prj_init()
       tests_path <- file.path(prj$path, opts$tests_dir)
       if (!dir.exists(tests_path)) {
         stop(sprintf("Tests folder %s does not exists. Tests cannot be run.", tests_path))
       }
-      RSuite::prj_load(prj = prj)   
+      RSuite::prj_load(prj = prj)
       test_res <- testthat::test_dir(tests_path)
-      if (!testthat:::all_passed(test_res)) { 
-        stop('Tests failed') 
+      if (!testthat:::all_passed(test_res)) {
+        stop('Tests failed')
       }
     }
   ),
@@ -103,6 +103,24 @@ sub_commands <- list(
         opts$version <- NULL
       }
       RSuite::prj_zip(path = opts$path, zip_ver = opts$version)
+    }
+  ),
+  pack = list(
+    help = "Build project sources pack.",
+    options = list(
+      make_option(c("-p", "--path"), dest = "path",
+                  help="Directory to put built pack into (default: current directory)"),
+      make_option(c("--version"), dest = "version",
+                  help="Version to use for pack tagging (default: use ZipVersion form PARAMETERS and revision from RC)")
+    ),
+    run = function(opts) {
+      if (is.null(opts$path) || is.na(opts$path)) {
+        opts$path <- getwd()
+      }
+      if (is.null(opts$version) || is.na(opts$version)) {
+        opts$version <- NULL
+      }
+      RSuite::prj_pack(path = opts$path, pack_ver = opts$version)
     }
   )
 )

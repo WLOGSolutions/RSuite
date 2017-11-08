@@ -23,7 +23,6 @@
             <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
         <?endif ?>
 
-
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
                 <Directory Id='R' Name='R'>
@@ -45,11 +44,13 @@
                 <Component Id='RSources' Guid='31197745-41cb-4323-9f3e-ccfdc7a5d2f7'>
                     <File Id='command_mgr.R' Name='command_mgr.R' DiskId='1' Source='../R/command_mgr.R' KeyPath='yes' />
                     <File Id='command_utils.R' Name='command_utils.R' DiskId='1' Source='../R/command_utils.R' />
+                    <File Id='docker_utils.R' Name='docker_utils.R' DiskId='1' Source='../R/docker_utils.R' />
                     <File Id='cmd_update.R' Name='cmd_update.R' DiskId='1' Source='../R/cmd_update.R' />
                     <File Id='cmd_install.R' Name='cmd_install.R' DiskId='1' Source='../R/cmd_install.R' />
                     <File Id='cmd_proj.R' Name='cmd_proj.R' DiskId='1' Source='../R/cmd_proj.R' />
                     <File Id='cmd_repo.R' Name='cmd_repo.R' DiskId='1' Source='../R/cmd_repo.R' />
                     <File Id='cmd_pkgzip.R' Name='cmd_pkgzip.R' DiskId='1' Source='../R/cmd_pkgzip.R' />
+                    <File Id='cmd_docker.R' Name='cmd_docker.R' DiskId='1' Source='../R/cmd_docker.R' />
                 </Component>
                 <Directory Id='packages' Name='packages'>
                     <Directory Id='packages_src' Name='src'>

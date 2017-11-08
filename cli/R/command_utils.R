@@ -62,3 +62,39 @@ tryCatch({
     Sys.setenv(TZ = "UTC")
   }
 })()
+
+#'
+#' Retrieves latest RSuite CLI version exposed on S3.
+#'
+#' @param platform_id one of rpm, deb, win-x32 or win-x64.
+#' @return named list containing
+#' \describe{
+#'   \item{ver}{Version number of latest RSuite CLI exposed on S3 for the platform}
+#'   \item{url}{Full url to retrieve installation package.}
+#' }
+#'
+get_latest_release <- function(platform_id) {
+  # check available versions
+  loginfo("Retrieving RSuite CLI exposed on S3 package index ...")
+
+  pkg_idx_conn <- url("http://wlog-rsuite.s3.amazonaws.com/cli/PKG_INDEX", open = "r")
+  tryCatch({
+    pkg_idx_lines <- readLines(pkg_idx_conn)
+  }, error = function(e) {
+    .fatal_error(geterrmessage())
+  }, finally = close(pkg_idx_conn))
+
+  pkg_idx_lines <- trimws(pkg_idx_lines)
+  plat_pkgs <- pkg_idx_lines[grepl(sprintf("^%s: ", platform_id), pkg_idx_lines)]
+  if (length(plat_pkgs) < 1) {
+    .fatal_error(sprintf("No RSuite CLI package for %s platform exposed on S3", platform_id))
+  }
+
+  path <- gsub("^[^:]+: ", "", plat_pkgs[1])
+  ver <- gsub("^.+rsuitecli[-_]v?([\\.0-9]+)[-_].+$", "\\1", plat_pkgs[1], ignore.case = T)
+  loginfo("... found v%s (%s)", ver, path)
+  return(list(
+    url = paste0("http://wlog-rsuite.s3.amazonaws.com/cli/", path),
+    ver = ver
+  ))
+}

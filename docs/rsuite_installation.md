@@ -5,19 +5,19 @@ RSuite is R package so it is platform independent.
 ## Requirements
 
 RSuite depends on number of other R packages. On Linux systems they require
-libxml2-devel, libssl-devel and libcurl-devel system packages.
+libxml2-devel, libssl-devel, libcurl-devel and zlib-devel system packages.
 
 On RedHat like systems (RedHat/Fedora/CentOS) executing you can install them 
 with following command:
 
 ```bash
-$ sudo yum install -y openssl-devel libxml2-devel libcurl-devel
+$ sudo yum install -y openssl-devel libxml2-devel libcurl-devel zlib-devel
 ```
 
 On Debian like systems (Debian/Ubuntu) you can install them executing:
 
 ```bash
-$ sudo apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev 
+$ sudo apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev
 ```
 
 ## Basic installation
