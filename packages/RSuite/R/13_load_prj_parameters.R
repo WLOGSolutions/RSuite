@@ -61,6 +61,10 @@ load_prj_parameters <- function(prj_path) {
     dir.create(params$sbox_path, recursive = T, showWarnings = F)
   }
 
+  params$get_safe_project_name <- function() {
+    gsub("[\\/\"\'<>]+", "_", params$project)
+  }
+
   params$get_repo_adapter_names <- function() {
     specs <- unlist(strsplit(params$repo_adapters, ","))
     return(names(parse_repo_adapters_spec(specs)))

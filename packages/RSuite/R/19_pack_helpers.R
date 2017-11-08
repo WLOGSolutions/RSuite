@@ -22,8 +22,7 @@ export_prj <- function(params, dest_dir) {
 
   tocopy <- list.files(params$prj_path, all.files = T, include.dirs = T)
 
-  prj_name <- gsub("[\\/\"\'<>]+", "_", params$project)
-  base_dir <- file.path(dest_dir, prj_name)
+  base_dir <- file.path(dest_dir, params$get_safe_project_name())
   success <- dir.create(base_dir, recursive = T, showWarnings = F)
   if (!success) {
     pkg_logwarn("Failed to create base folder for project export")

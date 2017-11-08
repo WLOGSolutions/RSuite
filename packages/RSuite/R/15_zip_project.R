@@ -102,7 +102,7 @@ zip_project <- function(params, version, odir) {
     assert(success, "Failed to create temporary folder %s", wdir)
   }
 
-  prj_name <- gsub("[\\/\"\'<>]+", "_", params$project)
+  prj_name <- params$get_safe_project_name()
   root_dir <- file.path(wdir, prj_name)
 
   pkg_loginfo("Preparing files for zipping...")

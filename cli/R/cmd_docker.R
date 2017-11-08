@@ -33,11 +33,11 @@ source(file.path(base, "docker_utils.R"))
                   "Copying project pack into container")
   loginfo("... done.")
 
-
+  prj_name <- prj$load_params()$get_safe_project_name()
   run_incont_cmd(cont_name, sprintf("unzip %s", basename(pack_fpath))) # from docker_utils.R
-  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj depsinst -v", basename(prj$path))) # ...
-  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj build -v", basename(prj$path))) # ...
-  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj zip -v -p /opt", basename(prj$path))) # ...
+  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj depsinst -v", prj_name)) # ...
+  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj build -v", prj_name)) # ...
+  run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj zip -v -p /opt", prj_name)) # ...
 
   zip_name <- gsub("^[^_]+_", "", basename(pack_fpath))
   zip_fpath <- file.path(dest_dir, zip_name)
@@ -79,7 +79,11 @@ sub_commands <- list(
     help = "Build docker image containg deployed project.",
     options = list(
       make_option(c("-t", "--tag"), dest = "tag",
-                  help="Tag for newly created image. (required)"),
+                  help=paste0("Tag for newly created image.",
+                              " It tag does not contain version part project version number will added.",
+                              " (required)")),
+      make_option(c("--tag-latest"), dest = "tag_latest", action="store_true", default=FALSE,
+                  help = "If passed generated image will be also tagged with :latest"),
       make_option(c("-f", "--from"), dest = "from",
                   help=paste0("Image to use as base container(FROM clause) for the debloyment.",
                               " If not passed will use wlog/rsuite:<platform>_r<rver> as default")),
@@ -131,11 +135,24 @@ sub_commands <- list(
                    sprintf("RUN unzip /tmp/%s && rm -rf /tmp/%s",
                            basename(opts$zip), basename(opts$zip))),
                  con = docker_fpath)
+      nover_tag <- gsub(":.+$", "", opts$tag)
+      if (nover_tag == opts$tag) {
+        image_tag <- paste0(opts$tag, ":", gsub("^.+_([0-9.-]+[-_.][0-9]+x?)[.]zip$", "\\1", opts$zip))
+      } else {
+        image_tag <- opts$tag
+      }
 
-      loginfo("Building image %s ...", opts$tag)
-      exec_docker_cmd(c("build", "-t", opts$tag, "-f", docker_fpath, tmp_dir), # from docker_utils.R
+      loginfo("Building image %s ...", image_tag)
+      exec_docker_cmd(c("build", "-t", image_tag, "-f", docker_fpath, tmp_dir), # from docker_utils.R
                       "Building image")
       loginfo("... done.")
+
+      if (opts$tag_latest) {
+        loginfo("Tagging %s as %s:latest ...", image_tag, nover_tag)
+        exec_docker_cmd(c("tag", image_tag, paste0(nover_tag, ":latest")), # from docker_utils.R
+                        "Tagging built image as latest")
+        loginfo("... done.")
+      }
     }
   )
 )

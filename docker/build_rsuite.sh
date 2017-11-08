@@ -10,7 +10,8 @@ rsuite_ver=${ver_base}.${git_tag}
 
 for rver in 3.2 3.3 3.4; do 
     echo "Building wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} ..."
-    docker build -t wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} -f Dockerfile.ubuntu_rsuite . --build-arg rver=$rver --build-arg rsuite_ver=$rsuite_ver 
+    docker rmi -f wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} > /dev/nul 2>&1
+    docker build -t wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} -f Dockerfile.ubuntu_rsuite . --build-arg rver=$rver --build-arg rsuite_ver=$rsuite_ver $*
     if [ "$?" != "0" ]; then echo "Failed to build rsuite v${rsuite_ver} (R$rver) for Ubuntu"; exit 1; fi
     
     echo "... pushing wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} ..."
