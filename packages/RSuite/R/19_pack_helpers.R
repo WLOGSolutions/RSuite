@@ -30,7 +30,7 @@ export_prj <- function(params, dest_dir) {
     return()
   }
 
-  excludes <- trimws(unlist(strsplit(params$artifacts, ",")))
+  excludes <- trimws(unlist(strsplit(params$excludes, ",")))
 
   tocopy <- tocopy[!grepl("^[.]$|^[.][.]$|^[.](git|svn|Rproj[.]user|Rhistory|RData)|deployment", tocopy)]
   tocopy <- tocopy[!(tocopy %in% excludes)]

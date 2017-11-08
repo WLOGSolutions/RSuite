@@ -45,7 +45,7 @@ load_prj_parameters <- function(prj_path) {
     zip_version = ifelse('ZipVersion' %in% colnames(dcf), dcf[1, 'ZipVersion'], ''),
     project = ifelse("Project" %in% colnames(dcf), dcf[1, 'Project'], basename(prj_path)),
     artifacts = ifelse("Artifacts" %in% colnames(dcf), dcf[1, 'Artifacts'], ''),
-    exculudes = ifelse("Excludes" %in% colnames(dcf), dcf[1, 'Excludes'], ''),
+    excludes = ifelse("Excludes" %in% colnames(dcf), dcf[1, 'Excludes'], ''),
 
     # repo_adapters to use for the project
     repo_adapters = ifelse('Repositories' %in% colnames(dcf), dcf[1, 'Repositories'], 'CRAN'),
