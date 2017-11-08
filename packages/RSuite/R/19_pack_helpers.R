@@ -6,18 +6,16 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Exports project sources into folder passed and tags packages in exported project.
+#' Exports project sources into folder passed.
 #'
 #' @param params parameters of project to export. (type: rsuite_project_params)
-#' @param revision revision to tag exported packages with. Can be NULL if
-#'   packages are not supposed to be tagged. (type: character)
 #' @param dest_dir destination folder path to export project to. (type: character)
 #'
 #' @return parameters object of exported project or NULL if failed to export.
 #'
 #' @keywords internal
 #'
-export_tagged_prj <- function(params, revision, dest_dir) {
+export_prj <- function(params, dest_dir) {
   pkg_loginfo("Exporting project from %s ...", params$pkgs_path)
 
   stopifnot(is_nonempty_char1(dest_dir))
@@ -32,7 +30,10 @@ export_tagged_prj <- function(params, revision, dest_dir) {
     return()
   }
 
+  excludes <- trimws(unlist(strsplit(params$artifacts, ",")))
+
   tocopy <- tocopy[!grepl("^[.]$|^[.][.]$|^[.](git|svn|Rproj[.]user|Rhistory|RData)|deployment", tocopy)]
+  tocopy <- tocopy[!(tocopy %in% excludes)]
   success <- file.copy(from = file.path(params$prj_path, tocopy),
                        to = base_dir,
                        recursive = T)
@@ -59,7 +60,8 @@ export_tagged_prj <- function(params, revision, dest_dir) {
   )
   unlink(file.path(base_dir, to_rem), recursive = T, force = T)
 
-  # TODO: remove ignores
+  # cleanup: removing excludes
+  unlink(file.path(base_dir, excludes), recursive = T, force = T)
 
   # cleanup: clear man for packages processed with roxygen
   lapply(X = list.files(base_dir, pattern = "NAMESPACE", recursive = TRUE, full.names = T),
@@ -69,16 +71,9 @@ export_tagged_prj <- function(params, revision, dest_dir) {
            }
          })
 
-  exp_params <- prj_init(base_dir)$load_params()
-
-  # tag project
-  if (!is.null(revision)) {
-    pkg_revs <- lapply(X = retrieve_project_pkgsvers(exp_params$pkgs_path), # from 51_pkg_info.R
-                       FUN = function(ver) { paste0(ver, "-", revision) })
-    update_project_pkgsvers(exp_params$pkgs_path, pkg_revs) # from 51_pkg_info.R
-  }
-
   pkg_loginfo("Exporting project from %s ... done", params$pkgs_path)
+
+  exp_params <- prj_init(base_dir)$load_params()
   return(exp_params)
 }
 

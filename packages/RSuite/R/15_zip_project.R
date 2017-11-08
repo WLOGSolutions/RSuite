@@ -51,7 +51,7 @@ detect_zip_version <- function(params, zip_ver) {
 
   prjinfo_rev <- retrieve_consistent_prjinfo_rev(params) # from 19_pack_helpers.R
   if (!is.null(prjinfo_rev)) {
-    return(list(ver = paste0(zip_ver, "_", prjinfo_rev), rev = NULL))
+    return(list(ver = paste0(zip_ver, "_", prjinfo_rev), rev = prjinfo_rev))
   }
 
   return(list(ver = paste0(zip_ver, "x"), rev = NULL))

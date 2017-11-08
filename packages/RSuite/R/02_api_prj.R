@@ -443,9 +443,8 @@ prj_pack <- function(prj = NULL, path = getwd(), pack_ver = NULL) {
   tmp_dir <- tempfile("pkgpack_")
   on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
 
-  exp_params <- export_tagged_prj(params, # from 19_pack_helpers.R
-                                  ver_inf$rev,
-                                  tmp_dir)
+  exp_params <- export_prj(params, # from 19_pack_helpers.R
+                           tmp_dir)
   assert(!is.null(exp_params), "Failed to create project export")
 
   create_prjinfo(exp_params, ver_inf$rev) # from 19_pack_helpers.R
