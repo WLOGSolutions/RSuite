@@ -1,0 +1,11 @@
+ARG rver=3.3
+
+FROM wlog/rsuite:centos_r${rver}
+
+ARG rsuite_ver
+ENV rsuite_ver ${rsuite_ver:-0.15.220}
+
+RUN wget http://wlog-rsuite.s3.amazonaws.com/cli/redhat/rsuitecli-${rsuite_ver}-1.noarch.rpm \
+    && rpm -i rsuitecli-${rsuite_ver}-1.noarch.rpm \
+    && rm -rf rsuitecli-${rsuite_ver}-1.noarch.rpm \
+    && rsuite install -v
