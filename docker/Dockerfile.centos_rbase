@@ -7,7 +7,7 @@ COPY centos/jpegsrc.v6b.tar.gz /tmp
 RUN yum install -y \
         curl wget which python-setuptools git subversion \
         make gcc gcc-c++ gcc-gfortran \
-        cairo-devel openssl-devel libtiff-devel libicu-devel java-1.8.0-openjdk-devel \
+        cairo-devel openssl-devel libtiff-devel libicu-devel bzip2-devel java-1.8.0-openjdk-devel \
         texinfo texlive-latex-bin \
         libxml2-devel libcurl-devel zlib-devel \
     && export CPPFLAGS="$CPPFLAGS -fPIC" \

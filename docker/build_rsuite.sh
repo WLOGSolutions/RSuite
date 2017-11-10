@@ -8,15 +8,25 @@ if [ -z "$git_tag" ]; then
 fi
 rsuite_ver=${ver_base}.${git_tag}
 
+plat=$1
+if [ -z "$plat" ]; then
+    plat="ubuntu"
+fi
+
+if [ ! -f "Dockerfile.${plat}_rsuite" ]; then
+    echo "Dockerfile.${plat}_rsuite not found"
+    exit 1
+fi
+
+
 for rver in 3.2 3.3 3.4; do 
-    echo "Building wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} ..."
-    docker rmi -f wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} > /dev/nul 2>&1
-    docker build -t wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} -f Dockerfile.ubuntu_rsuite . --build-arg rver=$rver --build-arg rsuite_ver=$rsuite_ver $*
-    if [ "$?" != "0" ]; then echo "Failed to build rsuite v${rsuite_ver} (R$rver) for Ubuntu"; exit 1; fi
+    echo "Building wlog/rsuite:${plat}_r${rver}_v${rsuite_ver} ..."
+    docker rmi -f wlog/rsuite:${plat}_r${rver}_v${rsuite_ver} > /dev/nul 2>&1
+    docker build -t wlog/rsuite:${plat}_r${rver}_v${rsuite_ver} -f Dockerfile.${plat}_rsuite . --build-arg rver=$rver --build-arg rsuite_ver=$rsuite_ver
+    if [ "$?" != "0" ]; then echo "Failed to build centos v${rsuite_ver} (R$rver) for ${plat}"; exit 1; fi
     
-    echo "... pushing wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver} ..."
-    docker push wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver}
+    echo "... pushing wlog/rsuite:${plat}_r${rver}_v${rsuite_ver} ..."
+    docker push wlog/rsuite:${plat}_r${rver}_v${rsuite_ver}
 
-    echo "... done. (wlog/rsuite:ubuntu_r${rver}_v${rsuite_ver})"
+    echo "... done. (wlog/rsuite:${plat}_r${rver}_v${rsuite_ver})"
 done
-
