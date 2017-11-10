@@ -3,9 +3,13 @@ FROM centos
 ARG rver=3.3
 ENV rver ${rver:-3.3}
 
+
+LABEL name="R${rver} build under base CentOS"
+LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
+
 COPY centos/jpegsrc.v6b.tar.gz /tmp
 RUN yum install -y \
-        curl wget which python-setuptools git subversion \
+        curl wget which python-setuptools unzip git subversion \
         make gcc gcc-c++ gcc-gfortran \
         cairo-devel openssl-devel libtiff-devel libicu-devel bzip2-devel java-1.8.0-openjdk-devel \
         texinfo texlive-latex-bin \

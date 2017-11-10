@@ -422,7 +422,11 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #'    default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
 #' @param path folder path to put output pack into. The folder must exist.
-#'    (type: characted: default: getwd())
+#'    (type: character, default: getwd())
+#' @param pkgs names of packages to include into pack. If NULL will include all
+#'    project packages (type: character, default: NULL)
+#' @param inc_master if TRUE will include master scripts into pack.
+#'    (type: logical, default: TRUE)
 #' @param pack_ver if passed enforce version of pack to passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
 #'
@@ -431,19 +435,33 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #'
 #' @export
 #'
-prj_pack <- function(prj = NULL, path = getwd(), pack_ver = NULL) {
+prj_pack <- function(prj = NULL, path = getwd(),
+                     pkgs = NULL, inc_master = TRUE,
+                     pack_ver = NULL) {
   assert(dir.exists(path), "Existing folder expected for path")
+  assert(is.logical(inc_master), "Logical value expected for inc_master")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
+
+  prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  if (is.null(pkgs)) {
+    pkgs <- prj_packages
+  }
+  assert(all(pkgs %in% prj_packages),
+         sprintf("Some packages requiested to include not found in project: %s",
+                 paste(setdiff(pkgs, prj_packages), collapse = ", ")))
+
   ver_inf <- detect_zip_version(params, pack_ver) # from 15_zip_project.R
 
   tmp_dir <- tempfile("pkgpack_")
   on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
 
   exp_params <- export_prj(params, # from 19_pack_helpers.R
+                           pkgs,
+                           inc_master,
                            tmp_dir)
   assert(!is.null(exp_params), "Failed to create project export")
 

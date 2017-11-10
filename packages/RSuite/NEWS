@@ -2,6 +2,8 @@ VERSION 0.16 (2017-11-08)
   * Project zip can be created for projects without master scripts.
   * prj_pack function added to export project sources. It is usefull for building
      project in docker and for giving project sources your peers to play with it.
+  * prj_pack can be told to pack only selected project packages or not to include
+     master scripts in the pack.
 
 VERSION 0.15 (2017-11-04)
   * Creation of PKGZIP with dependencies and filtering against packages existing

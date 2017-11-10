@@ -2,6 +2,9 @@ ARG rver=3.3
 
 FROM rocker/r-ver:${rver}
 
+LABEL name="R${rver} build under base Ubunbtu"
+LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
+
 RUN apt-get update \
 	&& apt-get install -y \
         libxml2-dev \

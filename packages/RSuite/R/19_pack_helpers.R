@@ -9,14 +9,18 @@
 #' Exports project sources into folder passed.
 #'
 #' @param params parameters of project to export. (type: rsuite_project_params)
+#' @param pkgs names of project packages to include. (type: character)
 #' @param dest_dir destination folder path to export project to. (type: character)
 #'
 #' @return parameters object of exported project or NULL if failed to export.
 #'
 #' @keywords internal
 #'
-export_prj <- function(params, dest_dir) {
-  pkg_loginfo("Exporting project from %s ...", params$pkgs_path)
+export_prj <- function(params, pkgs, inc_master, dest_dir) {
+  stopifnot(is.character(pkgs))
+  stopifnot(is.logical(inc_master))
+
+  pkg_loginfo("Exporting project from %s ...", params$prj_path)
 
   stopifnot(is_nonempty_char1(dest_dir))
 
@@ -62,6 +66,26 @@ export_prj <- function(params, dest_dir) {
   # cleanup: removing excludes
   unlink(file.path(base_dir, excludes), recursive = T, force = T)
 
+  exp_params <- prj_init(base_dir)$load_params()
+
+  # cleanup: clear packages not to be included
+  pkgs_toremove <- list.dirs(exp_params$pkgs_path, recursive = F, full.names = F)
+  pkgs_toremove <- pkgs_toremove[!(pkgs_toremove %in% pkgs)]
+  success <- unlink(file.path(exp_params$pkgs_path, pkgs_toremove), recursive = T, force = T)
+  if (success != 0) {
+    pkg_logwarn("Failed to exclude some excluded packages.")
+    return()
+  }
+
+  # cleanup: master scripts (if required)
+  if (!any(inc_master)) {
+    success <- unlink(file.path(exp_params$script_path, c("*.R", "*.r")), recursive = T, force = T)
+    if (success != 0) {
+      pkg_logwarn("Failed to remove master scripts as requested")
+      return()
+    }
+  }
+
   # cleanup: clear man for packages processed with roxygen
   lapply(X = list.files(base_dir, pattern = "NAMESPACE", recursive = TRUE, full.names = T),
          FUN = function(ns_file) {
@@ -70,9 +94,8 @@ export_prj <- function(params, dest_dir) {
            }
          })
 
-  pkg_loginfo("Exporting project from %s ... done", params$pkgs_path)
+  pkg_loginfo("Exporting project from %s ... done", params$prj_path)
 
-  exp_params <- prj_init(base_dir)$load_params()
   return(exp_params)
 }
 
@@ -108,7 +131,7 @@ create_prjinfo <- function(params, revision) {
 #'
 #' @param params parameters of project to retrieve revision for. (type: rsuite_project_params)
 #'
-#' @retrun revision retrieved and checked or NULL if no .prjinfo present or rev
+#' @return revision retrieved and checked or NULL if no .prjinfo present or rev
 #'   not specified in the .prjinfo file. (type: character)
 #'
 #' @keywords internal
