@@ -10,14 +10,20 @@ base <- dirname(gsub("--file=", "", args[grepl("^--file=", args)]))[1]
 source(file.path(base, "command_mgr.R"), chdir = T)
 source(file.path(base, "docker_utils.R"))
 
-.build_prj_zip <- function(platform, version, dont_rm, dest_dir) {
+.build_prj_zip <- function(platform, version, dont_rm, pkgs, exc_master, dest_dir) {
   if (is.null(version) || is.na(version)) {
     version <- NULL
   }
+
+  if (!is.null(pkgs)) {
+    pkgs <- trimws(unlist(strsplit(pkgs, ",")))
+  }
+
   prj <- RSuite::prj_init()
   docker_image <- get_docker_image(prj, platform) # from docker_utils.R
 
-  pack_fpath <- RSuite::prj_pack(prj = prj, path = tempdir(), pack_ver = version)
+  pack_fpath <- RSuite::prj_pack(prj = prj, path = tempdir(), pack_ver = version,
+                                 pkgs = pkgs, inc_master = !exc_master)
 
   cont_name <- run_container(docker_image) # from docker_utils.R
   on.exit({
@@ -50,6 +56,8 @@ source(file.path(base, "docker_utils.R"))
   return(zip_fpath)
 }
 
+build_dockerfile <-
+
 sub_commands <- list(
   zip = list(
     help = "Build project and generate deployment zip in docker container.",
@@ -59,7 +67,15 @@ sub_commands <- list(
       make_option(c("--dont-rm"), dest = "dont_rm", action="store_true", default=FALSE,
                   help="If passed will not remove build container on error or success."),
       make_option(c("--version"), dest = "version",
-                  help="Version to use for project pack tagging (default: use ZipVersion form PARAMETERS and revision from RC)"),
+                  help=paste("Version to use for project pack tagging.",
+                             "(default: use ZipVersion form PARAMETERS and revision from RC)",
+                             sep = "\n\t\t")),
+      make_option(c("--packages"), dest = "pkgs",
+                  help=paste("Comma separated list of project packages to include into project pack.",
+                             "If not passed all project packages will be included.",
+                             sep = "\n\t\t")),
+      make_option(c("--exc-master"), dest = "exc_master", action="store_true", default=FALSE,
+                  help="If passed will exclude master scripts from project pack created. (default: %default)"),
       make_option(c("-d", "--dest"), dest = "dest",
                   help="Directory to put built deployment zip into. It must exist. (default: current directory)")
     ),
@@ -71,7 +87,8 @@ sub_commands <- list(
         stop(sprintf("Destination folder does not exist: %s", opts$dest))
       }
 
-      .build_prj_zip(opts$platform, opts$version, opts$dont_rm, opts$dest)
+      .build_prj_zip(opts$platform, opts$version, opts$dont_rm, opts$pkgs, opts$exc_master,
+                     opts$dest)
       invisible()
     }
   ),
@@ -79,29 +96,61 @@ sub_commands <- list(
     help = "Build docker image containg deployed project.",
     options = list(
       make_option(c("-t", "--tag"), dest = "tag",
-                  help=paste0("Tag for newly created image.",
-                              " It tag does not contain version part project version number will added.",
-                              " (required)")),
+                  help=paste("Tag for newly created image.",
+                             "It tag does not contain version part project version number will added.",
+                             " (required)",
+                             sep = "\n\t\t")),
       make_option(c("--tag-latest"), dest = "tag_latest", action="store_true", default=FALSE,
                   help = "If passed generated image will be also tagged with :latest"),
       make_option(c("-f", "--from"), dest = "from",
-                  help=paste0("Image to use as base container(FROM clause) for the debloyment.",
-                              " If not passed will use wlog/rsuite:<platform>_r<rver> as default")),
+                  help=paste("Image to use as base container(FROM clause) for the debloyment.",
+                             "If not passed will use wlog/rsuite:<platform>_r<rver> as default",
+                             sep = "\n\t\t")),
+      make_option(c("--templ"), dest = "templ",
+                  help=paste("Template of Dockerfile to use for image building.",
+                             "If not passed will create default just with project deployment.",
+                             "It should exist.",
+                             sep = "\n\t\t")),
+      make_option(c("--templ-ctx"), dest = "templ_ctx",
+                  help=paste("Folder containing context for Dockerfile to use for image building.",
+                             "It should exist.",
+                             sep = "\n\t\t")),
       make_option(c("-z", "--zip"), dest = "zip",
-                  help=paste0("Project zip to deploy.",
-                              " If not passed zip will be created and deployed from project in context.",
-                              " The file must exists.")),
+                  help=paste("Project zip to deploy.",
+                             "If not passed zip will be created and deployed from project in context.",
+                             "The file must exists.",
+                             sep = "\n\t\t")),
       make_option(c("-p", "--platform"), dest = "platform", default = "ubuntu",
-                  help=paste0("Will be used if -z (--zip) is not passed or no -f (--from) passed.",
-                              " Build project zip for plaform passed. One of ubuntu or centos (default: %default)")),
+                  help=paste("Will be used if -z (--zip) is not passed or no -f (--from) passed.",
+                             "Build project zip for plaform passed. One of ubuntu or centos (default: %default)",
+                             sep = "\n\t\t")),
       make_option(c("--version"), dest = "version",
-                  help=paste0("Will be used if -z (--zip) is not passed.",
-                              " Version to use for project pack tagging (default: use ZipVersion form PARAMETERS and revision from RC)"))
+                  help=paste("Will be used if -z (--zip) is not passed.",
+                             "Version to use for project pack tagging.",
+                             "(default: use ZipVersion form PARAMETERS and revision from RC)",
+                             sep = "\n\t\t")),
+      make_option(c("--packages"), dest = "pkgs",
+                  help=paste("Will be used if -z (--zip) is not passed.",
+                             "Comma separated list of project packages to deploy with project.",
+                             "If not passed all project packages will be deployed.",
+                             sep = "\n\t\t")),
+      make_option(c("--exc-master"), dest = "exc_master", action="store_true", default=FALSE,
+                  help=paste("Will be used if -z (--zip) is not passed.",
+                             "If passed will not deploy master scripts. (default: %default)",
+                             sep = "\n\t\t"))
     ),
     run = function(opts) {
       if (is.null(opts$tag)) {
         stop("Image tag is required. Provide --tag argument.")
       }
+
+      if (!is.null(opts$templ) && !file.exists(opts$templ)) {
+        stop(sprintf("Template file does not exist: %s", opts$templ))
+      }
+      if (!is.null(opts$templ_ctx) && !dir.exists(opts$templ_ctx)) {
+        stop(sprintf("Template context folder does not exist: %s", opts$templ_ctx))
+      }
+
 
       if (is.null(opts$from)) {
         prj <- RSuite::prj_init()
@@ -117,6 +166,8 @@ sub_commands <- list(
         opts$zip <- .build_prj_zip(platform = opts$platform,
                                    version = opts$version,
                                    dont_rm = NULL,
+                                   pkgs = opts$pkgs,
+                                   exc_master = opts$exc_master,
                                    dest_dir = tmp_dir)
       } else {
         if (!file.exists(opts$zip)) {
@@ -128,13 +179,26 @@ sub_commands <- list(
         }
       }
 
+      # copy template context
+      if (!is.null(opts$templ_ctx)) {
+        to_copy <- list.files(opts$templ_ctx, include.dirs = T, full.names = T)
+        success <- file.copy(from = to_copy, to = tmp_dir, recursive = T)
+        if (!all(success)) {
+          stop(sprintf("Failed to copy some files from template context: %s",
+                       paste(to_copy[!success], collapse = ", ")))
+        }
+      }
+
       # create Dockerfile
       docker_fpath <- file.path(tmp_dir, "Dockerfile")
-      writeLines(c(sprintf("FROM %s", opts$from),
-                   sprintf("COPY %s /tmp/", basename(opts$zip)),
-                   sprintf("RUN unzip /tmp/%s && rm -rf /tmp/%s",
-                           basename(opts$zip), basename(opts$zip))),
-                 con = docker_fpath)
+      build_dockerfile(opts$templ, docker_fpath,
+                       tags = list(
+                         From = opts$from,
+                         DeployProject = c(sprintf("COPY %s /tmp/", basename(opts$zip)),
+                                           sprintf("RUN unzip /tmp/%s && rm -rf /tmp/%s",
+                                                   basename(opts$zip), basename(opts$zip)))
+                        ))
+
       nover_tag <- gsub(":.+$", "", opts$tag)
       if (nover_tag == opts$tag) {
         image_tag <- paste0(opts$tag, ":", gsub("^.+_([0-9.-]+[-_.][0-9]+x?)[.]zip$", "\\1", opts$zip))

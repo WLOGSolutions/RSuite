@@ -121,3 +121,41 @@ stop_container <- function(cont_name) {
                   sprintf("Removing container %s", cont_name))
   loginfo("... done.")
 }
+
+#'
+#' Builds Dockerfile out of template replacing RSuite tags
+#'
+build_dockerfile <- function(templ_fpath, docker_fpath, tags) {
+  create_default_dockerfile <- function() {
+    writeLines(c(paste0("FROM ", tags$From),
+                 tags$DeployProject),
+               con = docker_fpath)
+  }
+  if (is.null(templ_fpath)) {
+    create_default_dockerfile()
+    return()
+  }
+
+  templ_lines <- readLines(templ_fpath, warn = F)
+  if (length(templ_lines) == 0) {
+    create_default_dockerfile()
+    return()
+  }
+
+  dfile_lines <- c()
+  for(ix in 1:length(templ_lines)) {
+    ln <- templ_lines[ix]
+
+    extra_lines <- c()
+    for(nm in names(tags)) {
+      next_ln <- gsub(paste0("<RSuite:", nm, ">"), tags[[nm]][1], ln)
+      if (next_ln != ln) {
+        ln <- next_ln
+        extra_lines <- c(extra_lines, tags[[nm]][-1])
+      }
+    }
+    dfile_lines <- c(dfile_lines, ln, extra_lines)
+  }
+
+  writeLines(dfile_lines, con = docker_fpath)
+}

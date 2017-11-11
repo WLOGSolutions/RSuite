@@ -406,7 +406,7 @@ vers.collect <- function(contrib_urls, pkgs = NULL) {
     return(vers.build(avails = data.frame()))
   }
 
-  vers <- vers.build(pkgs$Package, avails = pkgs)
+  vers <- vers.build(unique(pkgs$Package), avails = pkgs)
   return(vers)
 }
 

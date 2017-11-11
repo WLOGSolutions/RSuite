@@ -17,7 +17,7 @@
 #' @keywords internal
 #'
 export_prj <- function(params, pkgs, inc_master, dest_dir) {
-  stopifnot(is.character(pkgs))
+  stopifnot(is.null(pkgs) || is.character(pkgs))
   stopifnot(is.logical(inc_master))
 
   pkg_loginfo("Exporting project from %s ...", params$prj_path)
