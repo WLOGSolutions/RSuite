@@ -217,12 +217,15 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
     # remove all subsequent duplicates
     pkgs_dcf <- pkgs_dcf[!duplicated(pkgs_dcf[, c("Package", "Version")]), ]
 
-    # ... write result to PACKAGES and PACKAGES.gz
+    # ... write result to PACKAGES, PACKAGES.gz, PACKAGES.rds
     write.dcf(pkgs_dcf, file = file.path(src_path, "PACKAGES"))
     pkgsgz_con <- gzfile(file.path(src_path, "PACKAGES.gz"), "wt")
     tryCatch({
       write.dcf(pkgs_dcf, file = pkgsgz_con)
     }, finally = close(pkgsgz_con))
+
+    rownames(pkgs_dcf) <- NULL
+    saveRDS(pkgs_dcf, file.path(src_path, "PACKAGES.rds"), compress = "xz")
 
     dst_url <- rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver)
     pkg_loginfo("... done; synchronizing to %s ...", dst_url)

@@ -37,7 +37,7 @@ test_that_managed("Post building docs imports in NAMESPACE shoud get fixed", {
   RSuite::prj_install_deps(prj)
   expect_that_packages_installed(c("logging", "TestPackage1"), prj)
 
-  prj_build(prj = prj)
+  RSuite::prj_build(prj = prj)
   expect_that_packages_installed(c("logging", "TestPackage1", "TestPackage2"), prj)
 })
 
@@ -51,5 +51,20 @@ test_that_managed("Post building docs declared imports should confirm to NAMESPA
   RSuite::prj_install_deps(prj)
   expect_that_packages_installed(c("logging"), prj) # dependency to TestPackage1 is detected base on DESCRIPTION
 
-  expect_error(prj_build(prj = prj), "Failed to install .*: TestPackage1")
+  expect_error(RSuite::prj_build(prj = prj), "Failed to install .*: TestPackage1")
+})
+
+test_that_managed("Post building docs declared imports should handle names with . properly", {
+  prj <- init_test_project(repo_adapters = "Dir")
+  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  create_package_deploy_to_lrepo(name = "Package.With.Dot.In.Name", prj)
+
+  create_test_package("TestPackage", prj, imps = "Package.With.Dot.In.Name")
+  set_test_package_ns_imports("TestPackage", prj, c("Package.With.Dot.In.Name"))
+
+  RSuite::prj_install_deps(prj)
+  expect_that_packages_installed(c("logging", "Package.With.Dot.In.Name"), prj)
+
+  RSuite::prj_build(prj = prj)
+  expect_that_packages_installed(c("logging", "TestPackage", "Package.With.Dot.In.Name"), prj)
 })

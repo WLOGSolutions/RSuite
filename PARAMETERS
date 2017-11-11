@@ -1,5 +1,5 @@
 Project: RSuite
 Artifacts:
 RSuiteVersion: 0.8.197
-Repositories: CRAN
+Repositories: S3[http://wlog-cran.s3.amazonaws.com], CRAN
 Excludes: cli, docker, tests/data/*

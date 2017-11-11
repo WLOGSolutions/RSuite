@@ -57,12 +57,12 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
          })
 
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = T),  force = T) # not to include default packages
-  prj_install_deps(bld_prj) # build enbvironment
+  prj_install_deps(bld_prj) # build environment
 
   # build packages itself
-  build_install_tagged_prj_packages(bld_params, # from 12_build_install_prj_pacakges.R
-                                    revision = NULL,
-                                    pkg_type)
+  build_install_prj_packages(bld_params, # from 12_build_install_prj_pacakges.R
+                             pkg_type,
+                             pre_build_steps = c("specs", "tests")) # do not build documentation of check imports
 
   res_url <- sprintf("file:///%s",
                      rsuite_contrib_url(bld_params$irepo_path,

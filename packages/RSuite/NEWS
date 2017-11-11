@@ -3,6 +3,14 @@ VERSION 0.17 (2017-11-11)
      master scripts in the pack.
   * fixed bug in package version requirements detection. It used to create large
      available packages set with duplicates.
+  * fixed error with handling imports with dot in name.
+  * debian OS version detection corrected
+  * non clearing package NAMESPACE before building documentation if it is not
+     empty even if generated with roxygen.
+  * while building source packages to binary form neither documentation is
+     rebuilded nor imports validity testing is performed.
+     e.g. withr source package does not have all requirements to build documentation.
+  * updating of PACKAGES.rds fixed while uploading to S3 repository.
 
 VERSION 0.16 (2017-11-08)
   * Project zip can be created for projects without master scripts.

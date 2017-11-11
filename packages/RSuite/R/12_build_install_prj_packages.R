@@ -52,7 +52,8 @@ build_install_tagged_prj_packages <- function(params, revision, build_type) {
 #'
 #' @keywords internal
 #'
-build_install_prj_packages <- function(params, build_type) {
+build_install_prj_packages <- function(params, build_type,
+                                       pre_build_steps = c("specs", "docs", "imps", "tests")) {
   # Cleaning previous build results
   intern_repo_path <- params$get_intern_repo_path()
   unlink(file.path(intern_repo_path, "*"), recursive = TRUE, force = TRUE)
@@ -75,11 +76,12 @@ build_install_prj_packages <- function(params, build_type) {
                    pkg_loginfo("Installing %s (for R %s) ...", p, params$r_ver)
                    pkg_path <- file.path(params$pkgs_path, p)
 
-                   pkg_file <- pkg_build(pkg_path,
+                   pkg_file <- pkg_build(pkg_path, # from 50_pkg_deployment.R
                                          dest_dir = contrib_url,
                                          binary = (build_type != "source"),
                                          rver = params$r_ver,
-                                         libpath = params$lib_path)
+                                         libpath = params$lib_path,
+                                         pre_build_steps = pre_build_steps)
                    if (is.null(pkg_file)) {
                      return() # Failed to build package
                    }

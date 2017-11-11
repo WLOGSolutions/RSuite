@@ -21,18 +21,24 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
     return(gsub("\\d+\\.\\d+$", rver, url))
   }
 
-  if (file.exists('/etc/redhat-release')) {
-    rel_str <- readLines('/etc/redhat-release')[[1]]
+  get_os_version <- function(rel_file) {
+    rel_str <- readLines(rel_file)[[1]]
     toks <- unlist(strsplit(rel_str, " "))
     ver <- toks[grep("^\\d+[.]\\d+$", toks)][1]
-
+    return(ver)
+  }
+  if (file.exists('/etc/redhat-release')) {
+    ver <- get_os_version('/etc/redhat-release')
     rel <- paste0("rhel", ver)
   } else if (file.exists('/etc/debian_version')) {
-    rel_str <- readLines('/etc/issue')[[1]]
-    toks <- unlist(strsplit(rel_str, " "))
-    toks <- toks[grep("^\\d+[.]\\d+[.]\\d+$", toks)]
-    ver <- gsub("^(\\d+[.]\\d+)[.].+$", "\\1", toks)[1]
-
+    ver <- get_os_version('/etc/debian_version')
+    if (is.na(ver)) {
+      rel_str <- readLines('/etc/issue')[[1]]
+      toks <- unlist(strsplit(rel_str, " "))
+      toks <- toks[grep("^\\d+[.]\\d+[.]\\d+$", toks)]
+      ver <- gsub("^(\\d+[.]\\d+)[.].+$", "\\1", toks)[1]
+    }
+    assert(!is.na(ver), "Failed to detect os version. Tried /etc/debian_version and /etc/issue.")
     rel <- paste0("deb", ver)
   } else {
     rel <- .Platform$OS.type

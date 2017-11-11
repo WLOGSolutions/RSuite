@@ -95,12 +95,21 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #' @param binary if TRUE will build binary package. (type: logical)
 #' @param rver R version to build package with. (type: character)
 #' @param libpath library path to use during building. (type: character)
+#' @param pre_build_steps additional steps to perform before building. Should contain only
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#' }
+#' If not passed will perform all pre_build_steps (type: character(N)).
 #'
 #' @return Full path to builded package or NULL if failed to build. (type: character)
 #'
 #' @keywords internal
 #'
-pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
+pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath,
+                      pre_build_steps = c("specs", "docs", "imps", "tests")) {
   stopifnot(length(pkg_path) == 1 && dir.exists(pkg_path))
   stopifnot(length(dest_dir) == 1 && dir.exists(dest_dir))
 
@@ -113,27 +122,32 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath) {
     unlink(file.path(libpath, pkg_name), recursive = T, force = T)
   }
 
-  makevars <- file.path(pkg_path, "src",
-                        ifelse(.Platform$OS.type == "windows", "Makevars.win", "Makevars.in"))
-  if (file.exists(makevars)) {
-    spec_desc <- get_pkg_specifics(pkg_name, for_source = T, load_specifics())
-    if (!is.null(spec_desc$Makefile)) {
-      lines <- unlist(strsplit(spec_desc$Makefile[!is.na(spec_desc$Makefile)], "\\n", fixed = T))
-      cat(lines, file = makevars, sep = "\n", append = T)
+  if ("specs" %in% pre_build_steps) {
+    makevars <- file.path(pkg_path, "src",
+                          ifelse(.Platform$OS.type == "windows", "Makevars.win", "Makevars.in"))
+    if (file.exists(makevars)) {
+      spec_desc <- get_pkg_specifics(pkg_name, for_source = T, load_specifics())
+      if (!is.null(spec_desc$Makefile)) {
+        lines <- unlist(strsplit(spec_desc$Makefile[!is.na(spec_desc$Makefile)], "\\n", fixed = T))
+        cat(lines, file = makevars, sep = "\n", append = T)
+      }
     }
   }
 
-  if (!pkg_build_docs(pkg_name, pkg_path, rver, libpath)) { # from 54_pkg_document.R
+  if ("docs" %in% pre_build_steps
+      && !pkg_build_docs(pkg_name, pkg_path, rver, libpath)) { # from 54_pkg_document.R
     # package without documentation is unuseable due to NAMESPACE is not generated also
     return(NULL)
   }
 
-  if (!validate_package_imports(pkg_name, pkg_path)) {  # from 54_pkg_document.R
+  if ("imps" %in% pre_build_steps
+      && !validate_package_imports(pkg_name, pkg_path)) {  # from 54_pkg_document.R
     return(NULL)
   }
 
-  if (devtools::uses_testthat(pkg = pkg_path)) {
-    test_res <- run_rscript(c("test_results <- testthat::test(%s)",
+  if ("tests" %in% pre_build_steps
+      && devtools::uses_testthat(pkg = pkg_path)) {
+    test_res <- run_rscript(c("test_results <- devtools::test(%s)",
                               "if (!testthat:::all_passed(test_results)) { stop('Tests failed') }"),
                             rscript_arg("pkg", pkg_path),
                             rver = rver, ex_libpath = libpath)
