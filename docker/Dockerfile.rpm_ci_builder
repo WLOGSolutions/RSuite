@@ -1,4 +1,4 @@
-FROM wlog/rsuite:centos_r3.3_v0.17.223
+FROM wlog/rsuite:centos_r3.4_v0.17.223
 
 LABEL name="Jenkins slave under CentOS with R3.3 and RSuite"
 LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
@@ -6,7 +6,7 @@ LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
 # installing sshd
 RUN yum install -y openssh-server openssh-clients \
     && /usr/bin/ssh-keygen -A \
-    && echo -e "[program:sshd]\ncommand=/usr/sbin/sshd -D -e\nautorestart=true\nstartretries=3" > /etc/supervisord/sshd.conf
+    && echo -e "[program:sshd]\ncommand=/usr/sbin/sshd -D -e\nautorestart=true\nstartretries=3" > /etc/supervisor/conf.d/sshd.conf
 
 EXPOSE 22
 
