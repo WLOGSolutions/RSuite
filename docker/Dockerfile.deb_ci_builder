@@ -1,11 +1,11 @@
-FROM ubuntu
+FROM wlog/rsuite:ubuntu_r3.3_v0.17.223
 
-# installing supervisord
-RUN apt-get update \
-    && apt-get install -y git supervisor vim
-    
+LABEL name="Jenkins slave under Ubuntu with R3.3 and RSuite"
+LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
+
 # installing sshd
-RUN apt-get install -y openssh-server openssh-client \
+RUN apt-get update \
+    && apt-get install -y openssh-server openssh-client \
     && mkdir -p /var/run/sshd \
     && echo "[program:sshd]" > /etc/supervisor/conf.d/sshd.conf \
     && echo "command=/usr/sbin/sshd -D -e" >> /etc/supervisor/conf.d/sshd.conf \ 
@@ -15,21 +15,15 @@ RUN apt-get install -y openssh-server openssh-client \
 EXPOSE 22
 
 # installing jenkins requirements
-RUN apt-get install -y default-jre sudo \
+RUN apt-get install -y default-jre \
     && useradd -m jenkins \
     && echo "jenkins:WLOGsc2017" | chpasswd \
     && mkdir -p /opt/jenkins \
     && chown jenkins:jenkins /opt/jenkins
 
-# installing R and RSuite
-RUN apt-get install -y r-base libssl-dev libxml2-dev libcurl4-openssl-dev \
-    && wget http://wlog-rsuite.s3.amazonaws.com/cli/`wget -q -O /dev/stdout http://wlog-rsuite.s3.amazonaws.com/cli/PKG_INDEX | grep -e "^deb:" | sed -e "s/^deb: //" | tr -d "\n\r"` \
-    && dpkg -i rsuitecli_*.deb \
-    && rm -rf rsiuitecli_*.deb \
-    && rsuite install -v
-
 # installing test requirements
-RUN apt-get install -y libaio1 libaio-dev subversion 
+RUN apt-get install -y libaio1 libaio-dev \
+    && echo "options(repos = c(WLOG = 'http://wlog-cran.s3.amazonaws.com', CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl')" > /usr/local/lib/R/etc/Rprofile.site
     
 WORKDIR /opt/jenkins
 CMD [ "supervisord", "-n" ]

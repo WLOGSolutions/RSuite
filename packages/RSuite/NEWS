@@ -4,7 +4,7 @@ VERSION 0.17 (2017-11-11)
   * fixed bug in package version requirements detection. It used to create large
      available packages set with duplicates.
   * fixed error with handling imports with dot in name.
-  * debian OS version detection corrected
+  * debian & redhat OS version detection corrected
   * non clearing package NAMESPACE before building documentation if it is not
      empty even if generated with roxygen.
   * while building source packages to binary form neither documentation is
