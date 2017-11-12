@@ -3,9 +3,12 @@ FROM wlog/rsuite:ubuntu_r3.3_v0.17.223
 LABEL name="Jenkins slave under Ubuntu with R3.3 and RSuite"
 LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
 
-# installing sshd
 RUN apt-get update \
-    && apt-get install -y openssh-server openssh-client \
+    && echo "deb http://http.debian.net/debian jessie-backports main" | sudo tee --append /etc/apt/sources.list.d/jessie-backports.list > /dev/null \
+    && apt-get update
+    
+# installing sshd
+RUN apt-get install -y openssh-server openssh-client \
     && mkdir -p /var/run/sshd \
     && echo "[program:sshd]" > /etc/supervisor/conf.d/sshd.conf \
     && echo "command=/usr/sbin/sshd -D -e" >> /etc/supervisor/conf.d/sshd.conf \ 
@@ -15,7 +18,7 @@ RUN apt-get update \
 EXPOSE 22
 
 # installing jenkins requirements
-RUN apt-get install -y default-jre \
+RUN apt-get install -y -t jessie-backports openjdk-8-jdk \
     && useradd -m jenkins \
     && echo "jenkins:WLOGsc2017" | chpasswd \
     && mkdir -p /opt/jenkins \

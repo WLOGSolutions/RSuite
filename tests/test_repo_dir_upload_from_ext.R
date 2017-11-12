@@ -35,3 +35,14 @@ test_that_managed("Uploading external packages (with deps)", {
 
   expect_that_packages_available(c("logging", "TestPackage"), "source", mgr)
 })
+
+test_that_managed("Uploading external packages (withr - building source cannot rebuild docs)", {
+  prj <- init_test_project(repo_adapters = c("CRAN"))
+  bin_type <- prj$load_params()$bin_pkgs_type
+
+  mgr <- init_test_manager(prj)
+
+  RSuite::repo_upload_ext_packages(mgr$repo_mgr, pkgs = "withr", prj = prj, pkg_type = bin_type)
+
+  expect_that_packages_available("withr", bin_type, mgr)
+})

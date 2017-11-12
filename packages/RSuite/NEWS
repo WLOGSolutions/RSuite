@@ -5,8 +5,9 @@ VERSION 0.17 (2017-11-11)
      available packages set with duplicates.
   * fixed error with handling imports with dot in name.
   * debian & redhat OS version detection corrected
-  * non clearing package NAMESPACE before building documentation if it is not
-     empty even if generated with roxygen.
+  * if NAMESPACE file of source package is built with roxygen, before building
+     documentation non present imports from DESCRIPTIO are appended. Previously
+     they replaced content.
   * while building source packages to binary form neither documentation is
      rebuilded nor imports validity testing is performed.
      e.g. withr source package does not have all requirements to build documentation.
