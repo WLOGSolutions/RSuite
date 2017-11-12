@@ -37,7 +37,7 @@ test_that_managed("Uploading external packages (with deps)", {
 })
 
 test_that_managed("Uploading external packages (withr - building source cannot rebuild docs)", {
-  prj <- init_test_project(repo_adapters = c("CRAN"))
+  prj <- init_test_project(repo_adapters = c("Url[https://cran.rstudio.com/]"))
   bin_type <- prj$load_params()$bin_pkgs_type
 
   mgr <- init_test_manager(prj)

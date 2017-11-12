@@ -26,7 +26,7 @@ init_test_manager <- function(prj) {
 
 expect_that_packages_available <- function(names, type, mgr) {
   repo_url <- sprintf("file:///%s", mgr$path)
-  avails <- data.frame(available.packages(contriburl = contrib.url(repo_url, type), filters = c()),
+  avails <- data.frame(available.packages(contriburl = RSuite:::rsuite_contrib_url(repo_url, type), filters = c()),
                        stringsAsFactors = F)$Package
 
   not_avail <- setdiff(names, avails)
