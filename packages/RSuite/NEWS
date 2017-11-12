@@ -11,6 +11,8 @@ VERSION 0.17 (2017-11-11)
   * while building source packages to binary form neither documentation is
      rebuilded nor imports validity testing is performed.
      e.g. withr source package does not have all requirements to build documentation.
+  * while building source packages to binary form Rcpp:compileAttributes is skipped.
+     It does not not work properly with newest Rcpp (e.g. for plyr).
   * updating of PACKAGES.rds fixed while uploading to S3 repository.
 
 VERSION 0.16 (2017-11-08)

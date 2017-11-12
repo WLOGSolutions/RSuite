@@ -109,7 +109,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #' @keywords internal
 #'
 pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath,
-                      pre_build_steps = c("specs", "docs", "imps", "tests")) {
+                      pre_build_steps = c("specs", "docs", "imps", "tests", "rcpp_attribs")) {
   stopifnot(length(pkg_path) == 1 && dir.exists(pkg_path))
   stopifnot(length(dest_dir) == 1 && dir.exists(dest_dir))
 
@@ -145,9 +145,16 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath,
     return(NULL)
   }
 
+  if (!('rcpp_attribs' %in% pre_build_steps)) {
+    rcpp_attribs_skip_cmd <- c("assignInNamespace('compile_rcpp_attributes', function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )}, 'devtools')")
+  } else {
+    rcpp_attribs_skip_cmd <- c()
+  }
+
   if ("tests" %in% pre_build_steps
       && devtools::uses_testthat(pkg = pkg_path)) {
-    test_res <- run_rscript(c("test_results <- devtools::test(%s)",
+    test_res <- run_rscript(c(rcpp_attribs_skip_cmd, # it roughly builds package before testing, so skiping Rcpp here also required
+                              "test_results <- devtools::test(%s)",
                               "if (!testthat:::all_passed(test_results)) { stop('Tests failed') }"),
                             rscript_arg("pkg", pkg_path),
                             rver = rver, ex_libpath = libpath)
@@ -170,6 +177,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath,
   bld_res <- run_rscript(c("library(devtools)",
                            ".libPaths(%s)",
                            "setwd(%s)", # to prevent loading .Rprofile by R CMD
+                           rcpp_attribs_skip_cmd,
                            "ou_path <- build(%s)",
                            "save(ou_path, %s)"),
                          rscript_arg("new", libpath),
