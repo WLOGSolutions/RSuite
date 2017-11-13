@@ -58,7 +58,7 @@ get_cmd_lines <- function(desc, cmd, ...) {
 run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL) {
   full_code <- sprintf(paste0(script_code, collapse = ";"), ...)
 
-  cmd0 <- get_rscript_path(rver = ifelse(is.na(rver), current_rver(), rver))
+  cmd0 <- get_rscript_path(rver = ifelse(is.na(rver), current_rver(), rver)) # from 97_rversion.R
 
   libs <- c(ex_libpath, .libPaths())
   libs <- libs[-length(libs)] # last is always .Library

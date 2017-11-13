@@ -287,6 +287,7 @@ prj_install_deps <- function(prj = NULL, clean = FALSE) {
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
+  get_rscript_path(params$r_ver) # from 97_rversion.R; ensure R version is available
 
   prev_library <- .Library
   prev_lpath <- .libPaths()
@@ -321,6 +322,8 @@ prj_clean_deps <- function(prj = NULL) {
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
+  get_rscript_path(params$r_ver) # from 97_rversion.R; ensure R version is available
+
   clean_prj_deps(params) # from 11_install_prj_deps.R
 }
 
@@ -343,6 +346,8 @@ prj_build <- function(prj = NULL, type = NULL) {
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
+  get_rscript_path(params$r_ver) # from 97_rversion.R; ensure R version is available
+
   if (is.null(type)) {
     type <- params$pkgs_type
   }
@@ -389,6 +394,8 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
+  get_rscript_path(params$r_ver) # from 97_rversion.R; ensure R version is available
+
   ver_inf <- detect_zip_version(params, zip_ver) # from 15_zip_project.R
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     ver_inf$rev,
@@ -445,6 +452,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
+  get_rscript_path(params$r_ver) # from 97_rversion.R; ensure R version is available
 
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   if (is.null(pkgs)) {
