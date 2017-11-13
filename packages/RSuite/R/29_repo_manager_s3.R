@@ -224,9 +224,6 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
       write.dcf(pkgs_dcf, file = pkgsgz_con)
     }, finally = close(pkgsgz_con))
 
-    rownames(pkgs_dcf) <- NULL
-    saveRDS(pkgs_dcf, file.path(src_path, "PACKAGES.rds"), compress = "xz")
-
     dst_url <- rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver)
     pkg_loginfo("... done; synchronizing to %s ...", dst_url)
 
@@ -239,6 +236,12 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
     assert(any(grepl("^upload: ", sync_lines)),
            "Failed to syncronize repository at %s for %s",
            repo_manager$bucket_url, tp)
+
+    # remove PACKAGES.rds as it does not support package history
+    get_cmd_lines("aws rm", "%s s3 --profile=%s rm %s",
+                  repo_manager$aws_cmd,
+                  repo_manager$s3_profile,
+                  paste0(dst_url, "/PACKAGES.rds"))
 
     pkg_loginfo("... done")
   }

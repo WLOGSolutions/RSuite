@@ -88,6 +88,11 @@ rsuite_write_PACKAGES <- function(url, type) {
     write.dcf(NULL, con)
     close(con)
   }
+
+  if (file.exists(file.path(url, "PACKAGES.rds"))) {
+    # get rid of PACKAGES.rds as it does not support package version history
+    unlink(file.path(url, "PACKAGES.rds"), recursive = T, force = T)
+  }
 }
 
 #'
