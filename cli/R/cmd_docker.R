@@ -10,7 +10,7 @@ base <- dirname(gsub("--file=", "", args[grepl("^--file=", args)]))[1]
 source(file.path(base, "command_mgr.R"), chdir = T)
 source(file.path(base, "docker_utils.R"))
 
-.build_prj_zip <- function(platform, version, dont_rm, pkgs, exc_master, dest_dir) {
+.build_prj_zip <- function(platform, version, dont_rm, pkgs, exc_master, dest_dir, sh) {
   if (is.null(version) || is.na(version)) {
     version <- NULL
   }
@@ -41,6 +41,9 @@ source(file.path(base, "docker_utils.R"))
 
   prj_name <- prj$load_params()$get_safe_project_name()
   run_incont_cmd(cont_name, sprintf("unzip %s", basename(pack_fpath))) # from docker_utils.R
+  if (!is.null(sh)) {
+    run_incont_cmd(cont_name, sh)
+  }
   run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj depsinst -v", prj_name)) # ...
   run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj build -v", prj_name)) # ...
   run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj zip -v -p /opt", prj_name)) # ...
@@ -56,14 +59,14 @@ source(file.path(base, "docker_utils.R"))
   return(zip_fpath)
 }
 
-build_dockerfile <-
-
 sub_commands <- list(
   zip = list(
     help = "Build project and generate deployment zip in docker container.",
     options = list(
       make_option(c("-p", "--platform"), dest = "platform", default = "ubuntu",
                   help="Build project for plaform passed. One of ubuntu or centos (default: %default)"),
+      make_option(c("--sh"), dest = "sh",
+                  help="Extra command to execute on container before building project."),
       make_option(c("--dont-rm"), dest = "dont_rm", action="store_true", default=FALSE,
                   help="If passed will not remove build container on error or success."),
       make_option(c("--version"), dest = "version",
@@ -88,7 +91,7 @@ sub_commands <- list(
       }
 
       .build_prj_zip(opts$platform, opts$version, opts$dont_rm, opts$pkgs, opts$exc_master,
-                     opts$dest)
+                     opts$dest, opts$sh)
       invisible()
     }
   ),
@@ -112,8 +115,8 @@ sub_commands <- list(
                              "It should exist.",
                              sep = "\n\t\t")),
       make_option(c("--templ-ctx"), dest = "templ_ctx",
-                  help=paste("Folder containing context for Dockerfile to use for image building.",
-                             "It should exist.",
+                  help=paste("Comma separated folders to copy into context for Dockerfile to use for image building.",
+                             "All should exist.",
                              sep = "\n\t\t")),
       make_option(c("-z", "--zip"), dest = "zip",
                   help=paste("Project zip to deploy.",
@@ -123,6 +126,10 @@ sub_commands <- list(
       make_option(c("-p", "--platform"), dest = "platform", default = "ubuntu",
                   help=paste("Will be used if -z (--zip) is not passed or no -f (--from) passed.",
                              "Build project zip for plaform passed. One of ubuntu or centos (default: %default)",
+                             sep = "\n\t\t")),
+      make_option(c("--sh"), dest = "sh",
+                  help=paste("Will be used if -z (--zip) is not passed",
+                             "Extra command to execute on container before building project zip.",
                              sep = "\n\t\t")),
       make_option(c("--version"), dest = "version",
                   help=paste("Will be used if -z (--zip) is not passed.",
@@ -147,8 +154,15 @@ sub_commands <- list(
       if (!is.null(opts$templ) && !file.exists(opts$templ)) {
         stop(sprintf("Template file does not exist: %s", opts$templ))
       }
-      if (!is.null(opts$templ_ctx) && !dir.exists(opts$templ_ctx)) {
-        stop(sprintf("Template context folder does not exist: %s", opts$templ_ctx))
+      if (!is.null(opts$templ_ctx)) {
+        ctx_dirs <- trimws(unlist(strsplit(opts$templ_ctx, ",")))
+        exists <- dir.exists(ctx_dirs)
+        if (!all(exists)) {
+          stop(sprintf("Template context folder(s) not found: %s",
+                       paste(ctx_dirs[!exists], collapse = ", ")))
+        }
+      } else {
+        ctx_dirs <- NULL
       }
 
 
@@ -168,7 +182,8 @@ sub_commands <- list(
                                    dont_rm = NULL,
                                    pkgs = opts$pkgs,
                                    exc_master = opts$exc_master,
-                                   dest_dir = tmp_dir)
+                                   dest_dir = tmp_dir,
+                                   sh = opts$sh)
       } else {
         if (!file.exists(opts$zip)) {
           stop("Project zip file passed does not exist: %s.", opts$zip)
@@ -180,12 +195,11 @@ sub_commands <- list(
       }
 
       # copy template context
-      if (!is.null(opts$templ_ctx)) {
-        to_copy <- list.files(opts$templ_ctx, include.dirs = T, full.names = T)
-        success <- file.copy(from = to_copy, to = tmp_dir, recursive = T)
+      if (!is.null(ctx_dirs)) {
+        success <- file.copy(from = ctx_dirs, to = tmp_dir, recursive = T)
         if (!all(success)) {
-          stop(sprintf("Failed to copy some files from template context: %s",
-                       paste(to_copy[!success], collapse = ", ")))
+          stop(sprintf("Failed to copy context folder(s) into template context: %s",
+                       paste(ctx_dirs[!success], collapse = ", ")))
         }
       }
 
@@ -195,7 +209,7 @@ sub_commands <- list(
                        tags = list(
                          From = opts$from,
                          DeployProject = c(sprintf("COPY %s /tmp/", basename(opts$zip)),
-                                           sprintf("RUN unzip /tmp/%s && rm -rf /tmp/%s",
+                                           sprintf("RUN unzip /tmp/%s -d /opt && rm -rf /tmp/%s",
                                                    basename(opts$zip), basename(opts$zip)))
                         ))
 

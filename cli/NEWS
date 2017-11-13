@@ -1,6 +1,10 @@
-VERSION 0.17 (2017-11-11)
+VERSION 0.17 (2017-11-13)
   * docker command can deploy project partially. It also can user dockerfile
      template to deploy project among other image setup commands.
+  * 'docker zip/img' can specified sh command to be executed before project
+     building.
+  * Multiple folders can be specified to add to image context while running
+     'docker img'
 
 VERSION 0.16 (2017-11-08)
   * 'proj pack' added which exposes RSuite::prj_path functionality.

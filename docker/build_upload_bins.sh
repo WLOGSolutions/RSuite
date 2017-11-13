@@ -32,5 +32,5 @@ docker cp $HOMEPATH/.aws bin_bld_upl:/root \
     && docker exec -i bin_bld_upl sh -c "pip install awscli" \
     && docker exec -i bin_bld_upl sh -c "rsuite proj start -n Uploader -v" \
     && docker exec -i bin_bld_upl sh -c "cat Uploader/PARAMETERS | grep -v 'Repositories:' > PARAMETERS.fix; echo 'Repositories: Url[http://wlog-cran.s3.amazonaws.com], CRAN' >> PARAMETERS.fix; mv -f PARAMETERS.fix Uploader/PARAMETERS" \
-    && docker exec -i bin_bld_upl sh -c "cd Uploader; rsuite repo addext -b T -s http://wlog-cran.s3.amazonaws.com --with-deps -v -n $pkgs" 
-    #&& docker rm -f bin_bld_upl
+    && docker exec -i bin_bld_upl sh -c "cd Uploader; rsuite repo addext -b T -s http://wlog-cran.s3.amazonaws.com --with-deps -v -n $pkgs" \
+    && docker rm -f bin_bld_upl
