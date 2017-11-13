@@ -9,7 +9,7 @@ LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
 
 COPY centos/jpegsrc.v6b.tar.gz /tmp
 RUN yum install -y \
-        curl wget which python-setuptools unzip git subversion \
+        curl wget which python-setuptools unzip zip git subversion \
         make gcc gcc-c++ gcc-gfortran \
         cairo-devel openssl-devel libtiff-devel libicu-devel bzip2-devel java-1.8.0-openjdk-devel \
         texinfo texlive-latex-bin \

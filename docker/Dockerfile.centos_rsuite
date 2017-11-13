@@ -11,4 +11,5 @@ LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
 RUN wget http://wlog-rsuite.s3.amazonaws.com/cli/redhat/rsuitecli-${rsuite_ver}-1.noarch.rpm \
     && rpm -i rsuitecli-${rsuite_ver}-1.noarch.rpm \
     && rm -rf rsuitecli-${rsuite_ver}-1.noarch.rpm \
-    && rsuite install -v
+    && rsuite install -v \
+    && yum install -y zip
