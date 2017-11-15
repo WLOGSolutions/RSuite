@@ -10,7 +10,7 @@ if [ -z "$plat" -o -z "$rver" -o -z "$pkgs" ]; then
 fi
 
 # detect image
-img_tag=`docker images | grep -e "^wlog/rsuite\\s*${plat}_r${rver}_v" | sort | head -n 1 | sed -e "s/^wlog\/rsuite\\s\+\(${plat}_r${rver}_v[0-9.]\+\).\+$/\\1/"`
+img_tag=`docker images | grep -e "^wlog/rsuite\\s*${plat}_r${rver}_v" | sort -r | head -n 1 | sed -e "s/^wlog\/rsuite\\s\+\(${plat}_r${rver}_v[0-9.]\+\).\+$/\\1/"`
 if [ -z "$img_tag" ]; then 
     echo "Failed to detect image to build under. Was looking for wlog/rsuite:${plat}_r${rver}_vX.X.XXX"
     exit 1

@@ -16,13 +16,16 @@ logging::logReset()
 logging::setLevel(level = "FINEST")
 logging::addHandler(logging::writeToConsole, level = "INFO")
 
-log_file <- gsub("-", "_", sprintf("%s.log", Sys.Date()))
-log_dir <- file.path("..", "logs")
-if (!dir.exists(log_dir)) {
-  dir.create(log_dir, recursive = T)
-}
-log_dir <- normalizePath(log_dir)
-logging::addHandler(logging::writeToFile, level = "FINEST", file = file.path(log_dir, log_file))
+log_fpath <- (function() {
+  log_file <- gsub("-", "_", sprintf("%s.log", Sys.Date()))
+  log_dir <- normalizePath(file.path("..", "logs"))
+  fpath <- file.path(log_dir, log_file)
+  if (file.exists(fpath) && file.access(fpath, 2) == -1) {
+    fpath <- paste0(fpath, ".", Sys.info()[['user']])
+  }
+  return(fpath)
+})()
+logging::addHandler(logging::writeToFile, level = "FINEST", file = log_fpath)
 
 script_path <- getwd()
 

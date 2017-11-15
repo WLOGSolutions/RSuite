@@ -102,8 +102,8 @@ get_package_nspace_imports <- function(pkg_path) {
   stopifnot(file.exists(ns_file))
 
   ns_lines <- readLines(ns_file)
-  ns_imports <- ns_lines[grepl("^\\s*import[(]\\s*[a-zA-Z0-9]+\\s*[)]\\s*$", ns_lines)]
-  ns_imports <- gsub("^\\s*import[()]\\s*([a-zA-Z0-9]+)\\s*[)]\\s*$", "\\1", ns_imports)
+  ns_imports <- ns_lines[grepl("^\\s*import[(]\\s*[a-zA-Z0-9\\.]+\\s*[)]\\s*$", ns_lines)]
+  ns_imports <- gsub("^\\s*import[()]\\s*([a-zA-Z0-9\\.]+)\\s*[)]\\s*$", "\\1", ns_imports)
   return(ns_imports)
 }
 
