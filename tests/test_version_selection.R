@@ -78,3 +78,25 @@ test_that_managed("Test if version dependecies are checked numerically (0.9 < 0.
 
   expect_that_packages_installed(c("TestDependency", "logging"), prj, versions = c("0.12", NA))
 })
+
+test_that_managed("Test if failes if old version only available", {
+  prj <- init_test_project(repo_adapters = c("Dir"))
+  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  create_package_deploy_to_lrepo(name = "TestDependency1", prj = prj, ver = "0.1", type = "source")
+  create_package_deploy_to_lrepo(name = "TestDependency2", prj = prj, ver = "0.1", deps = "TestDependency1", type = "source")
+  create_test_package(name = "TestPackage", prj = prj, deps = "TestDependency1(>= 0.2), TestDependency2")
+
+  expect_error(RSuite::prj_install_deps(prj),
+               "Required dependencies are not available: TestDependency")
+})
+
+test_that_managed("Test if failes if new version only available", {
+  prj <- init_test_project(repo_adapters = c("Dir"))
+  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  create_package_deploy_to_lrepo(name = "TestDependency1", prj = prj, ver = "0.2", type = "source")
+  create_package_deploy_to_lrepo(name = "TestDependency2", prj = prj, ver = "0.1", deps = "TestDependency1", type = "source")
+  create_test_package(name = "TestPackage", prj = prj, deps = "TestDependency1(<= 0.1), TestDependency2")
+
+  expect_error(RSuite::prj_install_deps(prj),
+               "Required dependencies are not available: TestDependency")
+})

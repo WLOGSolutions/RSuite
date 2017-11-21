@@ -76,10 +76,13 @@ check_res.union <- function(cr, oth) {
   stopifnot(is.check_result(cr))
   stopifnot(is.check_result(oth))
 
-  return(check_res.build(
-    found = vers.union(cr$found, oth$found),
-    missing = vers.union(cr$missing, oth$missing)
-  ))
+  vers <- vers.union(vers.drop_avails(cr$found),
+                     vers.drop_avails(oth$found),
+                     cr$missing,
+                     oth$missing)
+  avails <- vers.union(cr$found, oth$found)
+
+  return(vers.check_against(vers, avails))
 }
 
 #'

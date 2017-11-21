@@ -115,8 +115,8 @@ repo_adapter_create_manager.rsuite_repo_adapter_dir <- function(repo_adapter, ..
                   " repo_adapter_create_manager.rsuite_repo_adapter_dir"))
 
     full_path <- dots$path
-    assert(is_nonempty_char1(full_path), "Non empty character(1) expected for path")
-    assert(.is_abs_path(full_path), "Absolute expected for path: %s", full_path)
+    assert(is_nonempty_char1(full_path), "Non empty character(1) expected for 'path'")
+    assert(.is_abs_path(full_path), "Absolute path expected for 'path': %s", full_path)
 
     rver <- dots$rver
 

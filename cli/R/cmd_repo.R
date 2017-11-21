@@ -27,6 +27,13 @@ start_management <- function(opts, rver, types) {
   }
 
   if (!is.null(opts$dir)) {
+    if (!dir.exists(opts$dir)) {
+      logging::logwarn("Repository directory does not exist: %s. Will create it", opts$dir)
+      success <- dir.create(opts$dir, showWarnings = F, recursive = T)
+      if (!success) {
+        stop(sprintf("Failed to create repository directory: %s", opts$dir))
+      }
+    }
     path <- tryCatch(normalizePath(opts$dir, mustWork = T),
                      error = function(e) { NULL })
     if (is.null(path)) {

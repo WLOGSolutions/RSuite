@@ -1,3 +1,6 @@
+VERSION 0.19 (2017-11-21)
+  * repo command fixed to create local repository folder if does not exist.
+
 VERSION 0.18 (2017-11-13)
   * 'docker zip/img' can specified sh command to be executed before project
      building.
