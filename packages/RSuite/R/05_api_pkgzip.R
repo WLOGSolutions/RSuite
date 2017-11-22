@@ -94,18 +94,20 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
   ver_inf <- detect_zip_version(params, zip_ver) # from 15_zip_project.R
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  assert(length(prj_pkgs) > 0, "The project does not have packages to include in PKGZIP")
+
   if (is.null(pkgs)) {
     pkgs <- prj_pkgs
+  } else {
+    assert(all(pkgs %in% prj_pkgs),
+           "Packages requested to include into PKGZIP are not present in project: %s",
+           paste(setdiff(pkgs, prj_pkgs), collapse = ", "))
+    pkgs <- prj_pkgs[prj_pkgs == pkgs]
   }
-  assert(length(prj_pkgs) > 0, "The project does not have packages to include in PKGZIP")
-  assert(all(pkgs %in% prj_pkgs),
-         "Packages requested to include into PKGZIP are not present in project: %s",
-         paste(setdiff(pkgs, prj_pkgs), collapse = ", "))
-
   if (any(with_deps)) {
-    raw_vers <- lapply(X = pkgs,
-                       FUN = function(pkg_name) {
-                         collect_single_pkg_direct_deps(params, pkg_name)
+    raw_vers <- lapply(X = names(pkgs),
+                       FUN = function(pkg_dir) {
+                         collect_single_pkg_direct_deps(params, pkg_dir, pkgs[[pkg_dir]])
                        })
     dep_vers <- do.call("vers.union", raw_vers)
     inproj_deps <- intersect(prj_pkgs, vers.get_names(dep_vers))

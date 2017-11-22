@@ -66,22 +66,40 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   }, error = function(e) { NULL })
   assert(!is.null(bundle), "Failed to download from %s", srcrepo)
   on.exit({ unlink(bundle, recursive = T, force = T) }, add = TRUE)
-  source <- tryCatch({
-    source_pkg <- .get_devtools_intern("source_pkg")
-    source_pkg(bundle, subdir = remote$subdir)
-  }, error = function(e) { NULL })
-  assert(!is.null(source), "Failed to retrieve sources out of package download from %s", srcrepo)
-  on.exit({ unlink(source, recursive = T, force = T) }, add = TRUE)
 
   bld_params <- bld_prj$load_params()
+  if (!file.info(bundle)$isdir) {
+    bundle_path <- tryCatch({
+      decompress <- .get_devtools_intern("decompress")
+      decompress(bundle, bld_params$pkgs_path)
+    }, error = function(e) { NULL })
+    assert(!is.null(bundle_path), "Failed to decompress sources from %s", bundle)
+  } else {
+    success <- file.copy(from = bundle, to = bld_params$pkgs_path, recursive = T)
+    assert(success, "Failed to retrieve downloaded package source")
+    bundle_path <- bundle
+  }
+
+  source <- tryCatch({
+    source_pkg <- .get_devtools_intern("source_pkg")
+    source_pkg(bundle_path, subdir = remote$subdir)
+  }, error = function(e) { NULL })
+  assert(!is.null(source), "Failed to retrieve sources out of package download from %s", srcrepo)
+
+  # alter packages to point to retrieved package
+  prj_path_toks <- unlist(strsplit(bld_params$prj_path, "[\\/]"))
+  pkg_path_toks <- unlist(strsplit(rsuite_fullUnifiedPath(dirname(source)), "[\\/]"))
+  pkgs_path <- paste(pkg_path_toks[-(1:length(prj_path_toks))], collapse = "/") # relative to prj_path
+
+  bld_params_file <- file.path(bld_prj$path, 'PARAMETERS')
+  bld_params_df <- data.frame(read.dcf(bld_params_file), stringsAsFactors = F)
+  if (!('PackagesPath' %in% colnames(bld_params_df))) {
+    bld_params_df <- cbind(bld_params_df, data.frame(PackagesPath = pkgs_path))
+  } else {
+    bld_params_df[, 'PackagesPath'] <- pkgs_path
+  }
+  write.dcf(bld_params_df, file = bld_params_file)
 
   pkg_name <- read.dcf(file.path(source, "DESCRIPTION"))[1, "Package"]
-  success <-
-    file.copy(from = source, to = bld_params$pkgs_path, recursive = T) &&
-    file.rename(from = file.path(bld_params$pkgs_path, basename(source)),
-                to = file.path(bld_params$pkgs_path, pkg_name))
-  assert(success, "Failed to retrieve downloaded package source")
-  unlink(source, force = T, recursive = T)
-
   return(pkg_name)
 }

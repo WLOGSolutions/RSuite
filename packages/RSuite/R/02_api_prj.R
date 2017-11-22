@@ -457,11 +457,12 @@ prj_pack <- function(prj = NULL, path = getwd(),
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   if (is.null(pkgs)) {
     pkgs <- prj_packages
+  } else {
+    assert(all(pkgs %in% prj_packages),
+           sprintf("Some packages requiested to include not found in project: %s",
+                   paste(setdiff(pkgs, prj_packages), collapse = ", ")))
+    pkgs <- prj_packages[prj_packages == pkgs]
   }
-  assert(all(pkgs %in% prj_packages),
-         sprintf("Some packages requiested to include not found in project: %s",
-                 paste(setdiff(pkgs, prj_packages), collapse = ", ")))
-
   ver_inf <- detect_zip_version(params, pack_ver) # from 15_zip_project.R
 
   tmp_dir <- tempfile("pkgpack_")

@@ -64,45 +64,46 @@ build_install_prj_packages <- function(params, build_type,
     rsuite_write_PACKAGES(contrib_url, type = build_type)
   }
 
-  project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  if (length(project_packages) == 0) {
+  prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  if (length(prj_packages) == 0) {
     pkg_loginfo("Nothing to be done.")
     return(invisible())
   }
 
   # Adding packages to repo
-  void <- lapply(X = project_packages,
-                 FUN = function(p) {
-                   pkg_loginfo("Installing %s (for R %s) ...", p, params$r_ver)
-                   pkg_path <- file.path(params$pkgs_path, p)
+  for(pkg_dir in names(prj_packages)) {
+    pkg_name <- prj_packages[[pkg_dir]]
 
-                   pkg_file <- pkg_build(pkg_path, # from 50_pkg_deployment.R
-                                         dest_dir = contrib_url,
-                                         binary = (build_type != "source"),
-                                         rver = params$r_ver,
-                                         libpath = params$lib_path,
-                                         pre_build_steps = pre_build_steps)
-                   if (is.null(pkg_file)) {
-                     return() # Failed to build package
-                   }
-                   rsuite_write_PACKAGES(contrib_url, build_type)
+    pkg_loginfo("Installing %s (for R %s) ...", pkg_name, params$r_ver)
+    pkg_path <- file.path(params$pkgs_path, pkg_dir)
 
-                   # remove package if installed
-                   pkg_remove(p, lib_dir = params$lib_path)
+    pkg_file <- pkg_build(pkg_path, # from 50_pkg_deployment.R
+                          dest_dir = contrib_url,
+                          binary = (build_type != "source"),
+                          rver = params$r_ver,
+                          libpath = params$lib_path,
+                          pre_build_steps = pre_build_steps)
+    if (is.null(pkg_file)) {
+       next # Failed to build package
+    }
+    rsuite_write_PACKAGES(contrib_url, build_type)
 
-                   repo_url <- sprintf("file:///%s", params$get_intern_repo_path())
-                   # this type = "source" does not matter, it is passed just to prevent complaining
-                   #  on windows that "both" type cannot be used with repos = NULL
-                   pkg_install(pkg_file,
-                               lib_dir = params$lib_path,
-                               type = "source",
-                               repos = NULL,
-                               rver = params$r_ver)
-                 })
+    # remove package if installed
+    pkg_remove(pkg_name, lib_dir = params$lib_path)
 
-  failed <- setdiff(project_packages, installed.packages(params$lib_path)[, "Package"])
+    repo_url <- sprintf("file:///%s", params$get_intern_repo_path())
+    # this type = "source" does not matter, it is passed just to prevent complaining
+    #  on windows that "both" type cannot be used with repos = NULL
+    pkg_install(pkg_file,
+                lib_dir = params$lib_path,
+                type = "source",
+                repos = NULL,
+                rver = params$r_ver)
+  }
+
+  failed <- setdiff(prj_packages, installed.packages(params$lib_path)[, "Package"])
   assert(!length(failed),
          "Failed to install project packages: %s", paste(failed, collapse = ", "))
 
-  pkg_loginfo("Successfuly build %s packages", length(project_packages))
+  pkg_loginfo("Successfuly build %s packages", length(prj_packages))
 }

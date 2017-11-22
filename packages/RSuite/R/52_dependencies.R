@@ -54,9 +54,9 @@ collect_prj_direct_deps <- function(params) {
 collect_pkgs_direct_deps <- function(params) {
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   pkgs_vers <- do.call("vers.union",
-                       lapply(X = prj_packages,
-                              FUN = function(name) {
-                                collect_single_pkg_direct_deps(params, name)
+                       lapply(X = names(prj_packages),
+                              FUN = function(pkg_dir) {
+                                collect_single_pkg_direct_deps(params, pkg_dir, prj_packages[[pkg_dir]])
                               }))
 
   unfeasibles <- vers.get_unfeasibles(pkgs_vers)
@@ -82,15 +82,16 @@ collect_pkgs_direct_deps <- function(params) {
 #' Retrieve dependencies with requirements for a single project package
 #'
 #' @param params object of rsuite_project_params class
-#' @param pkg_name package name (type: character)
+#' @param pkg_dir package folder (type: character)
+#' @param pkg_name package name as declared in DESCRIPTION (type: character)
 #'
 #' @return object of versions class containing all direct dependencies of package
 #'   together with their version requirements.
 #'
 #' @keywords internal
 #'
-collect_single_pkg_direct_deps <- function(params, pkg_name) {
-  deps <- desc_retrieve_dependencies(params$pkgs_path, pkg_name) # from 51_pkg_info.R
+collect_single_pkg_direct_deps <- function(params, pkg_dir, pkg_name) {
+  deps <- desc_retrieve_dependencies(params$pkgs_path, pkg_dir) # from 51_pkg_info.R
   vers.from_deps(deps, pkg_name)
 }
 

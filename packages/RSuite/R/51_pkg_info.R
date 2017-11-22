@@ -12,35 +12,46 @@
 #'
 #' @param pkgs_path path to folder containing project packages
 #'
-#' @return vector of project package names (type: character).
+#' @return named vector of project package names. Names are package folders. (type: character).
 #'
 #' @keywords internal
 #'
 build_project_pkgslist <- function(pkgs_path) {
-  project_packages <- Filter(x = list.dirs(pkgs_path,
-                                           full.names = FALSE,
-                                           recursive = FALSE),
-                             f = function(n) { file.exists(file.path(pkgs_path, n, "DESCRIPTION")) })
-  if (!length(project_packages)) {
+  pkg_dirs <- Filter(x = list.dirs(pkgs_path, full.names = FALSE, recursive = FALSE),
+                     f = function(d) { file.exists(file.path(pkgs_path, d, "DESCRIPTION")) })
+  if (!length(pkg_dirs)) {
     return()
   }
 
-  deps <- list()
-  for (pkg in project_packages) {
-    pkg_deps <- unlist(strsplit(desc_retrieve_dependencies(pkgs_path, pkg), split = ", "))
+  dir2deps <- list()
+  pkg_names <- sapply(X = pkg_dirs,
+                      FUN = function(pkg_dir) { desc_retrieve_name(pkgs_path, pkg_dir) })
+
+  for (pkg_dir in pkg_dirs) {
+    pkg_deps <- unlist(strsplit(desc_retrieve_dependencies(pkgs_path, pkg_dir), split = ","))
     pkg_deps <- trimws(gsub(x = pkg_deps, pattern = "(.*)(\\(.*\\))", replacement = "\\1"))
-    pkg_deps <- pkg_deps[pkg_deps %in% project_packages]
-    deps[[pkg]] <- pkg_deps
+    pkg_deps <- pkg_deps[pkg_deps %in% pkg_names]
+    dir2deps[[pkg_dir]] <- pkg_deps
+  }
+  stopifnot(length(pkg_dirs) == length(pkg_names))
+
+  selection <- sapply(pkg_dirs, function(pd) { length(dir2deps[[pd]]) == 0 })
+  ordered_dirs <- pkg_dirs[selection]
+  ordered_names <- pkg_names[selection]
+
+  pkg_dirs <- setdiff(pkg_dirs, ordered_dirs)
+  pkg_names <- setdiff(pkg_names, ordered_names)
+  while(length(pkg_dirs) > 0) {
+    selection <- sapply(pkg_dirs, function(pd) { all(dir2deps[[pd]] %in% ordered_names) })
+    ordered_dirs <- c(ordered_dirs, pkg_dirs[selection])
+    ordered_names <- c(ordered_names, pkg_names[selection])
+
+    pkg_dirs <- pkg_dirs[!selection]
+    pkg_names <- pkg_names[!selection]
   }
 
-  res <- project_packages[sapply(project_packages, function(p) { length(deps[[p]]) == 0 })]
-  project_packages <- setdiff(project_packages, res)
-  while(length(project_packages) > 0) {
-    res <- c(res, project_packages[sapply(project_packages, function(p) { all(deps[[p]] %in% res) })])
-    project_packages <- setdiff(project_packages, res)
-  }
-
-  return(res)
+  names(ordered_names) <- ordered_dirs
+  return(ordered_names)
 }
 
 #'
@@ -99,7 +110,7 @@ update_project_pkgsvers <-function(pkgs_path, pkgsvers) {
 #' Retrieves dependencies from package description file.
 #'
 #' @param pkgs_path path to folder containing project packages.
-#' @param pkg package name to retrieve description from.
+#' @param pkg_dir package folder to retrieve description from.
 #' @param fields fields to search dependencies in.
 #'   (type: character, default: c("Imports", "Depends", "LinkingTo"))
 #'
@@ -107,10 +118,10 @@ update_project_pkgsvers <-function(pkgs_path, pkgsvers) {
 #'
 #' @keywords internal
 #'
-desc_retrieve_dependencies <- function(pkgs_path, pkg, fields = c("Imports", "Depends", "LinkingTo")) {
+desc_retrieve_dependencies <- function(pkgs_path, pkg_dir, fields = c("Imports", "Depends", "LinkingTo")) {
   stopifnot(length(fields) > 0)
 
-  desc_file <- file.path(pkgs_path, pkg, "DESCRIPTION")
+  desc_file <- file.path(pkgs_path, pkg_dir, "DESCRIPTION")
   stopifnot(file.exists(desc_file))
 
   desc <- read.dcf(desc_file, fields = fields)
@@ -119,6 +130,20 @@ desc_retrieve_dependencies <- function(pkgs_path, pkg, fields = c("Imports", "De
   pkgs <- pkgs[!is.na(pkgs) & nchar(pkgs) > 0]
 
   return(paste(pkgs, collapse = ", "))
+}
+
+#'
+#' Retrieves name of package from package description file.
+#'
+#' @param pkgs_path path to folder containing project packages.
+#' @param pkg_dir package folder to retrieve description from.
+#'
+#' @return name of package retrieved. (type: character(1))
+#'
+#' @keywords internal
+#'
+desc_retrieve_name <- function(pkgs_path, pkg_dir) {
+  read.dcf(file.path(pkgs_path, pkg_dir, "DESCRIPTION"))[1, "Package"]
 }
 
 #'
