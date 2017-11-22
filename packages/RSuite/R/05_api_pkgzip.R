@@ -353,15 +353,15 @@ pkgzip_build_github_package <- function(repo, ...,
   prj_config_set_rversion(rver = params$r_ver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
 
-  pkg_name <- get_srcrepo_package(bld_prj, "github", repo, ...)
+  pkg_info <- get_srcrepo_package(bld_prj, "github", repo, ...)
 
   bld_params <- bld_prj$load_params()
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = T),  force = T) # not to include default packages
   prj_install_deps(bld_prj)
 
-  pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_name, "DESCRIPTION"))[1, 'Version']
+  pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_info$dir, "DESCRIPTION"))[1, 'Version']
 
-  pkgzip_build_prj_packages(pkgs = pkg_name, prj = bld_prj,
+  pkgzip_build_prj_packages(pkgs = pkg_info$name, prj = bld_prj,
                             zip_ver = pkg_ver, pkg_type = pkg_type, path = path,
                             with_deps = with_deps, filter_repo = filter_repo)
 }

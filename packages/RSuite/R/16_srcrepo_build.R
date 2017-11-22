@@ -35,7 +35,7 @@
 #' @param ... src repository specific parameters. see apropriate devtools::<type>_install
 #'   documentation.
 #'
-#' @return name of package retrieved.
+#' @return named list with name of package('name') and package forlder ('dir').
 #'
 #' @keywords internal
 #'
@@ -101,5 +101,5 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   write.dcf(bld_params_df, file = bld_params_file)
 
   pkg_name <- read.dcf(file.path(source, "DESCRIPTION"))[1, "Package"]
-  return(pkg_name)
+  return(list(name = pkg_name, dir = basename(source)))
 }

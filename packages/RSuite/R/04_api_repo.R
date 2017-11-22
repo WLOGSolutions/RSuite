@@ -478,14 +478,14 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   prj_config_set_rversion(rver = mgr_info$rver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
 
-  pkg_name <- get_srcrepo_package(bld_prj, "github", repo, ...)
+  pkg_info <- get_srcrepo_package(bld_prj, "github", repo, ...)
 
   unlink(list.files(bld_prj$load_params()$script_path, # not to include default packages
                     pattern = ".+[.]R$", full.names = T),
          force = T)
   prj_install_deps(bld_prj)
 
-  repo_upload_prj_packages(repo_manager, pkgs = pkg_name, prj = bld_prj,
+  repo_upload_prj_packages(repo_manager, pkgs = pkg_info$name, prj = bld_prj,
                            skip_rc = T, pkg_type = pkg_type,
                            with_deps = with_deps)
 }
