@@ -1,10 +1,14 @@
-VERSION 0.19 (2017-11-22)
+VERSION 0.19 (2017-11-23)
   * Detection imports in package NAMESPACE fixed to support comma separated lists.
   * Defaut set_env.R fixed to create user specific log file if has no access to default.
   * Version restriction handling fixed, tests created.
   * GitHub package building fixed to support Git repositories requiring all Git
      repository structure to build properly (e.g. Microsoft/LightGBM).
   * There is not requirement for package to have same name as package folder.
+  * It is possible to skip some preliminary steps while building project packages
+     or packages from github (to put into PIGZIP or to add to repository).
+  * While building package from github it is possible to keep its sources after
+     build finished.
 
 VERSION 0.18 (2017-11-13)
   * #150: checking if R version is available early while installing deps, building,

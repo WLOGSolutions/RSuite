@@ -64,6 +64,16 @@
 #' @param filter_repo repository address to not include dependencies available in.
 #'     In project dependencies will nether be filtered. If NULL will not filter
 #'     dependencies. Will be omited if with_deps is FALSE. (type: character(1), default: NULL)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#' }
+#' (type: character(N), default: NULL).
 #'
 #' @return created pkgzip file path (invisible).
 #'
@@ -75,7 +85,8 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
                                       pkg_type = .Platform$pkgType,
                                       path = getwd(),
                                       with_deps = FALSE,
-                                      filter_repo = NULL) {
+                                      filter_repo = NULL,
+                                      skip_build_steps = NULL) {
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
   assert(is.logical(with_deps), "Logical value expected for with_deps")
@@ -85,6 +96,11 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
   }
   if (!is.null(filter_repo)) {
     assert(is_nonempty_char1(filter_repo), "Non empty character(1) expected for filter_repo")
+  }
+  if (!is.null(skip_build_steps)) {
+    assert(is.character(skip_build_steps)
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
   }
 
   prj <- safe_get_prj(prj)
@@ -127,7 +143,8 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
   pkg_loginfo("Building project packages ...")
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     ver_inf$rev,
-                                    build_type = pkg_type)
+                                    build_type = pkg_type,
+                                    skip_build_steps = skip_build_steps)
 
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
@@ -317,6 +334,18 @@ pkgzip_build_ext_packages <- function(pkgs,
 #' @param filter_repo repository address to not include dependencies available in.
 #'     If NULL will not filter dependencies. Will be omited if with_deps is FALSE.
 #'     (type: character(1), default: NULL)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#' }
+#' (type: character(N), default: NULL).
+#' @param keep_sources if TRUE downloaded package sources will not be removed
+#'   after build. (type: logical, default: FALSE)
 #'
 #' @return created pkgzip file path (invisible).
 #'
@@ -327,7 +356,9 @@ pkgzip_build_github_package <- function(repo, ...,
                                         pkg_type = .Platform$pkgType,
                                         path = getwd(),
                                         with_deps = FALSE,
-                                        filter_repo = NULL) {
+                                        filter_repo = NULL,
+                                        skip_build_steps = NULL,
+                                        keep_sources = FALSE) {
   assert(is_nonempty_char1(repo), "Non empty character(1) expected for repo")
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
@@ -339,6 +370,12 @@ pkgzip_build_github_package <- function(repo, ...,
   if (!is.null(filter_repo)) {
     assert(is_nonempty_char1(filter_repo), "Non empty character(1) expected for filter_repo")
   }
+  if (!is.null(skip_build_steps)) {
+    assert(is.character(skip_build_steps)
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
+  }
+  assert(is.logical(keep_sources), "logical expected for keep_sources")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -348,7 +385,9 @@ pkgzip_build_github_package <- function(repo, ...,
   bld_prj <- prj_start(name = basename(tempfile(pattern = "srcrepo_proj_")),
                        path = tempdir(),
                        skip_rc = T)
-  on.exit({ unlink(bld_prj$path, recursive = T, force = T) }, add = TRUE)
+  if (!any(keep_sources)) {
+    on.exit({ unlink(bld_prj$path, recursive = T, force = T) }, add = TRUE)
+  }
 
   prj_config_set_rversion(rver = params$r_ver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
@@ -363,5 +402,6 @@ pkgzip_build_github_package <- function(repo, ...,
 
   pkgzip_build_prj_packages(pkgs = pkg_info$name, prj = bld_prj,
                             zip_ver = pkg_ver, pkg_type = pkg_type, path = path,
-                            with_deps = with_deps, filter_repo = filter_repo)
+                            with_deps = with_deps, filter_repo = filter_repo,
+                            skip_build_steps = skip_build_steps)
 }

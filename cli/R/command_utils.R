@@ -73,6 +73,8 @@ tryCatch({
 #'   \item{url}{Full url to retrieve installation package.}
 #' }
 #'
+#' @keywords internal
+#'
 get_latest_release <- function(platform_id) {
   # check available versions
   loginfo("Retrieving RSuite CLI exposed on S3 package index ...")
@@ -97,4 +99,19 @@ get_latest_release <- function(platform_id) {
     url = paste0("http://wlog-rsuite.s3.amazonaws.com/cli/", path),
     ver = ver
   ))
+}
+
+#'
+#' Retrieve platform specific package type.
+#'
+#' @param binary If TRUE retrieve binary type (type: logical)
+#'
+#' @return package type retrieved.
+#'
+#' @keywords internal
+#'
+get_pkg_type <- function(binary) {
+  if (!binary) { return("source") }
+  if (.Platform$pkgType != "source") { return(.Platform$pkgType) }
+  return("binary")
 }

@@ -52,9 +52,13 @@ sub_commands <- list(
   ),
   build = list(
     help = "Build the project.",
-    options = list(),
+    options = list(
+      make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
+                  help="Build binary packages (default: %default)")
+    ),
     run = function(opts) {
-      RSuite::prj_build()
+      pkg_type <- get_pkg_type(opts$binary)
+      RSuite::prj_build(type = pkg_type)
     }
   ),
   test = list(

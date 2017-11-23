@@ -16,10 +16,13 @@
 #' @param params project parameters(type: rsuite_project_params)
 #' @param revision revision to tag packages with before building (type: character)
 #' @param build_type type of packages to build. (type: character)
+#' @param skip_build_steps steps to skip while building packages.
+#'   (type: character, default: NULL)
 #'
 #' @keywords internal
 #'
-build_install_tagged_prj_packages <- function(params, revision, build_type) {
+build_install_tagged_prj_packages <- function(params, revision, build_type,
+                                              skip_build_steps = NULL) {
   if (!is.null(revision)) {
     bkp_info <- backup_pkgdesc_files(params$pkgs_path) # from 51_pkg_info.R
 
@@ -40,7 +43,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type) {
                 " Please, install dependencies(Call RSuite::prj_install_deps)"),
          paste(vers.get_names(uninstDeps), collapse = ", "))
 
-  build_install_prj_packages(params, build_type)
+  build_install_prj_packages(params, build_type, skip_build_steps)
 
   out_path <- rsuite_contrib_url(params$irepo_path, build_type, params$r_ver)
   rsuite_write_PACKAGES(out_path, build_type)
@@ -52,8 +55,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type) {
 #'
 #' @keywords internal
 #'
-build_install_prj_packages <- function(params, build_type,
-                                       pre_build_steps = c("specs", "docs", "imps", "tests")) {
+build_install_prj_packages <- function(params, build_type, skip_build_steps = NULL) {
   # Cleaning previous build results
   intern_repo_path <- params$get_intern_repo_path()
   unlink(file.path(intern_repo_path, "*"), recursive = TRUE, force = TRUE)
@@ -82,7 +84,7 @@ build_install_prj_packages <- function(params, build_type,
                           binary = (build_type != "source"),
                           rver = params$r_ver,
                           libpath = params$lib_path,
-                          pre_build_steps = pre_build_steps)
+                          skip_build_steps = skip_build_steps)
     if (is.null(pkg_file)) {
        next # Failed to build package
     }

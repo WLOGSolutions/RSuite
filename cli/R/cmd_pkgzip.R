@@ -17,7 +17,7 @@ source(file.path(base, "command_mgr.R"), chdir = T)
 
 .common_options <- list(
   make_option(c("-p", "--path"), dest = "path", default = getwd(),
-              help="Place created PKGZIP into path provided. (default: %default)")
+              help = "Place created PKGZIP into path provided. (default: %default)")
 )
 
 sub_commands <- list(
@@ -25,20 +25,23 @@ sub_commands <- list(
     help = "Create PKGZIP out of project packages.",
     options = c(
       make_option(c("-n", "--names"), dest = "pkgs",
-                  help = paste0("Comma separated list of project package names to include in PKGZIP.",
-                                " If none passed will include all project packages")),
+                  help = paste("Comma separated list of project package names to include in PKGZIP.",
+                               "If none passed will include all project packages",
+                               sep = "\n\t\t")),
       make_option(c("--version"), dest = "version",
-                  help=paste0("Tag project packages with the version before including in PKGZIP.",
-                              " By default will use ZipVersion from project PARAMETERS and revision control.",
-                              " Version is expected in form NN.NN.")),
+                  help = paste("Tag project packages with the version before including in PKGZIP.",
+                               "By default will use ZipVersion from project PARAMETERS and revision control.",
+                               "Version is expected in form NN.NN.",
+                               sep = "\n\t\t")),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
-                  help="Include binary form of project packages (default: %default)"),
+                  help = "Include binary form of project packages (default: %default)"),
       make_option(c("--with-deps"), dest = "with_deps", action="store_true", default=FALSE,
-                  help="If passed will include dependencies into PKGZIP (default: %default)"),
+                  help = "If passed will include dependencies into PKGZIP (default: %default)"),
       make_option(c("--filter-repo"), dest = "filter_repo",
-                  help=paste0("Url to repository. If passed will not include dependencies into PKGZIP",
-                              " which satisfying versions are present in the repository.",
-                              " The parameter should be used together with --with-deps.")),
+                  help = paste("Url to repository. If passed will not include dependencies into PKGZIP",
+                               "which satisfying versions are present in the repository.",
+                               "The parameter should be used together with --with-deps.",
+                               sep = "\n\t\t")),
       .common_options
     ),
     run = function(opts) {
@@ -79,13 +82,14 @@ sub_commands <- list(
       make_option(c("-n", "--names"), dest = "pkgs", metavar = "PACKAGES",
                   help = "Comma separated list of external packages to include in PKGZIP."),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
-                  help="Include binary form of external packages (default: %default)"),
+                  help = "Include binary form of external packages (default: %default)"),
       make_option(c("--with-deps"), dest = "with_deps", action="store_true", default=FALSE,
-                  help="If passed will include dependencies into PKGZIP (default: %default)"),
+                  help = "If passed will include dependencies into PKGZIP (default: %default)"),
       make_option(c("--filter-repo"), dest = "filter_repo",
-                  help=paste0("Url to repository. If passed will not include dependencies into PKGZIP",
-                              " which satisfying versions are present in the repository.",
-                              " The parameter should be used together with --with-deps.")),
+                  help = paste("Url to repository. If passed will not include dependencies into PKGZIP",
+                               "which satisfying versions are present in the repository.",
+                               "The parameter should be used together with --with-deps.",
+                               sep = "\n\t\t")),
       .common_options
     ),
     run = function(opts) {
@@ -109,16 +113,30 @@ sub_commands <- list(
       make_option(c("-r", "--repo"), dest = "repo",
                   help = "Repository to upload from in form username/repo[/subdir][@ref|#pull]."),
       make_option(c("-H", "--host"), dest = "host", default="https://api.github.com",
-                  help = paste0("GitHub API host to use. Override with your GitHub enterprise hostname,",
-                                " for example, 'github.hostname.com/api/v3'")),
+                  help = paste("GitHub API host to use. Override with your GitHub enterprise hostname,",
+                               "for example, 'github.hostname.com/api/v3'",
+                               sep = "\n\t\t")),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
-                  help="Build and upload binary package (default: %default)"),
+                  help = "Build and upload binary package (default: %default)"),
       make_option(c("--with-deps"), dest = "with_deps", action="store_true", default=FALSE,
-                  help="If passed will include dependencies into PKGZIP (default: %default)"),
+                  help = "If passed will include dependencies into PKGZIP (default: %default)"),
       make_option(c("--filter-repo"), dest = "filter_repo",
-                  help=paste0("Url to repository. If passed will not include dependencies into PKGZIP",
-                              " which satisfying versions are present in the repository.",
-                              " The parameter should be used together with --with-deps.")),
+                  help = paste("Url to repository. If passed will not include dependencies into PKGZIP",
+                              "which satisfying versions are present in the repository.",
+                              "The parameter should be used together with --with-deps.",
+                              sep = "\n\t\t")),
+      make_option(c("--skip-build-steps"), dest = "skip_build_steps", default=as.character(NULL),
+                  help = paste("Comma separated list of steps to skip while building the package.",
+                               "Following values are accepted:",
+                               "\t specs - not process specifics",
+                               "\t docs  - do not build documentation with roxygen",
+                               "\t imps  - do not perform imports validation",
+                               "\t tests - do not run package tests",
+                               "\t rcpp_attribs - do not run Rcpp attributes compilation on the package",
+                               "(default: %default)",
+                               sep = "\n\t\t")),
+      make_option(c("--keep-sources"), dest = "keep_sources", action="store_true", default=FALSE,
+                  help = "If passed will not remove temporary project used to build the package (default: %default)"),
       .common_options
     ),
     run = function(opts) {
@@ -131,7 +149,9 @@ sub_commands <- list(
                                           pkg_type = pkg_type,
                                           path = opts$path,
                                           with_deps = opts$with_deps,
-                                          filter_repo = opts$filter_repo)
+                                          filter_repo = opts$filter_repo,
+                                          skip_build_steps = unlist(strsplit(opts$skip_build_steps, ",")),
+                                          keep_sources = opt$keep_sources)
     }
   )
 )

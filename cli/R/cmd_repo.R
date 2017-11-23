@@ -51,12 +51,6 @@ start_management <- function(opts, rver, types) {
   stop("Neither --dir nor --s3_url specified")
 }
 
-get_pkg_type <- function(binary) {
-  if (!binary) { return("source") }
-  if (.Platform$pkgType != "source") { return(.Platform$pkgType) }
-  return("binary")
-}
-
 sub_commands <- list(
   init = list(
     help = "Initialize repository structure.",
@@ -201,15 +195,29 @@ sub_commands <- list(
       make_option(c("-r", "--repo"), dest = "repo",
                   help = "Repository to upload from in form username/repo[/subdir][@ref|#pull]."),
       make_option(c("-H", "--host"), dest = "host", default="https://api.github.com",
-                  help = paste0("GitHub API host to use. Override with your GitHub enterprise hostname,",
-                                " for example, 'github.hostname.com/api/v3'")),
+                  help = paste("GitHub API host to use. Override with your GitHub enterprise hostname,",
+                               " for example, 'github.hostname.com/api/v3'",
+                               sep = "\n\t\t")),
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
                   help="Build and upload binary package (default: %default)"),
       make_option(c("--rver"), dest = "rver", default=NULL,
-                  help = paste0("R version to build and upload package for. If NULL current R version will",
-                                " be assumed. (default: %default)")),
+                  help = paste("R version to build and upload package for. If NULL current R version will",
+                               " be assumed. (default: %default)",
+                               sep = "\n\t\t")),
       make_option(c("--with-deps"), dest = "with_deps", action="store_true", default=FALSE,
                   help="If passed will upload also dependencies (default: %default)"),
+      make_option(c("--skip-build-steps"), dest = "skip_build_steps", default=as.character(NULL),
+                  help=paste("Comma separated list of steps to skip while building the package.",
+                             "Following values are accepted:",
+                             "\t specs - not process specifics",
+                             "\t docs  - do not build documentation with roxygen",
+                             "\t imps  - do not perform imports validation",
+                             "\t tests - do not run package tests",
+                             "\t rcpp_attribs - do not run Rcpp attributes compilation on the package",
+                             "(default: %default)",
+                             sep = "\n\t\t")),
+      make_option(c("--keep-sources"), dest = "keep_sources", action="store_true", default=FALSE,
+                  help="If passed will not remove temporary project used to build the package (default: %default)"),
       common_options
     ),
     run = function(opts) {
@@ -222,7 +230,9 @@ sub_commands <- list(
 
       RSuite::repo_upload_github_package(ra_mng, repo = opts$repo, host = opts$host,
                                          pkg_type = pkg_type,
-                                         with_deps = opts$with_deps)
+                                         with_deps = opts$with_deps,
+                                         skip_build_steps = unlist(strsplit(opts$skip_build_steps, ",")),
+                                         keep_sources = opt$keep_sources)
       RSuite::repo_mng_stop(ra_mng)
     }
   ),

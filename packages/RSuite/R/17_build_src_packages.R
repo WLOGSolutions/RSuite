@@ -62,7 +62,7 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
   # build packages itself
   build_install_prj_packages(bld_params, # from 12_build_install_prj_pacakges.R
                              pkg_type,
-                             pre_build_steps = c("specs", "tests")) # do not build documentation of check imports
+                             skip_build_steps = c("docs", "imps", "rcpp_attribs"))
 
   res_url <- sprintf("file:///%s",
                      rsuite_contrib_url(bld_params$irepo_path,

@@ -95,21 +95,21 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #' @param binary if TRUE will build binary package. (type: logical)
 #' @param rver R version to build package with. (type: character)
 #' @param libpath library path to use during building. (type: character)
-#' @param pre_build_steps additional steps to perform before building. Should contain only
+#' @param skip_build_steps steps to not perform before building. Can contain only
 #' \describe{
 #'   \item{specs}{Process packages specifics}
 #'   \item{docs}{Try build documentation with roxygen}
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on package}
 #' }
-#' If not passed will perform all pre_build_steps (type: character(N)).
+#' (type: character(N)).
 #'
 #' @return Full path to builded package or NULL if failed to build. (type: character)
 #'
 #' @keywords internal
 #'
-pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath,
-                      pre_build_steps = c("specs", "docs", "imps", "tests", "rcpp_attribs")) {
+pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, skip_build_steps = NULL) {
   stopifnot(length(pkg_path) == 1 && dir.exists(pkg_path))
   stopifnot(length(dest_dir) == 1 && dir.exists(dest_dir))
 
@@ -122,7 +122,9 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath,
     unlink(file.path(libpath, pkg_name), recursive = T, force = T)
   }
 
-  if ("specs" %in% pre_build_steps) {
+  if ("specs" %in% skip_build_steps) {
+    pkg_loginfo("Skipping specifics application")
+  } else {
     makevars <- file.path(pkg_path, "src",
                           ifelse(.Platform$OS.type == "windows", "Makevars.win", "Makevars.in"))
     if (file.exists(makevars)) {
@@ -134,25 +136,29 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath,
     }
   }
 
-  if ("docs" %in% pre_build_steps
-      && !pkg_build_docs(pkg_name, pkg_path, rver, libpath)) { # from 54_pkg_document.R
+  if ("docs" %in% skip_build_steps) {
+    pkg_loginfo("Skipping documentation building")
+  } else if (!pkg_build_docs(pkg_name, pkg_path, rver, libpath)) { # from 54_pkg_document.R
     # package without documentation is unuseable due to NAMESPACE is not generated also
     return(NULL)
   }
 
-  if ("imps" %in% pre_build_steps
-      && !validate_package_imports(pkg_name, pkg_path)) {  # from 54_pkg_document.R
+  if ("imps" %in% skip_build_steps) {
+    pkg_loginfo("Skipping imports validation")
+  } else if (!validate_package_imports(pkg_name, pkg_path)) {  # from 54_pkg_document.R
     return(NULL)
   }
 
-  if (!('rcpp_attribs' %in% pre_build_steps)) {
+  if ('rcpp_attribs' %in% skip_build_steps) {
+    pkg_loginfo("Skipping Rcpp attributes compilation")
     rcpp_attribs_skip_cmd <- c("assignInNamespace('compile_rcpp_attributes', function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )}, 'devtools')")
   } else {
     rcpp_attribs_skip_cmd <- c()
   }
 
-  if ("tests" %in% pre_build_steps
-      && devtools::uses_testthat(pkg = pkg_path)) {
+  if ("tests" %in% skip_build_steps) {
+    pkg_loginfo("Skipping package testing")
+  } else if (devtools::uses_testthat(pkg = pkg_path)) {
     test_res <- run_rscript(c(rcpp_attribs_skip_cmd, # it roughly builds package before testing, so skiping Rcpp here also required
                               "test_results <- devtools::test(%s)",
                               "if (!testthat:::all_passed(test_results)) { stop('Tests failed') }"),

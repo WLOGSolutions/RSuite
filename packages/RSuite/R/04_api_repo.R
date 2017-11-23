@@ -170,6 +170,16 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #' @param with_deps If TRUE will include pkgs dependencies while uploading into
 #'    repository. Packages in repository satisfying pkgs requirements will not be
 #'    included. (type: logical, default: FALSE)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#' }
+#' (type: character(N), default: NULL).
 #'
 #' @export
 #'
@@ -178,10 +188,16 @@ repo_upload_prj_packages <- function(repo_manager,
                                      prj = NULL,
                                      skip_rc = FALSE,
                                      pkg_type = .Platform$pkgType,
-                                     with_deps = FALSE) {
+                                     with_deps = FALSE,
+                                     skip_build_steps = NULL) {
   assert(is_repo_manager(repo_manager), "Repo manager expected for repo_manager")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
   assert(is.logical(with_deps), "Logical value expected for with_deps")
+  if (!is.null(skip_build_steps)) {
+    assert(is.character(skip_build_steps)
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
+  }
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -234,7 +250,8 @@ repo_upload_prj_packages <- function(repo_manager,
   pkg_loginfo("Building project packages ...")
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     revision,
-                                    build_type = pkg_type)
+                                    build_type = pkg_type,
+                                    skip_build_steps = skip_build_steps)
 
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
@@ -451,17 +468,37 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #' @param with_deps If TRUE will include pkgs dependencies while uploading into
 #'    repository. Packages in repository satisfying pkgs requirements will not be
 #'    included. (type: logical, default: FALSE)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#' }
+#' (type: character(N), default: NULL).
+#' @param keep_sources if TRUE downloaded package sources will not be removed
+#'   after build. (type: logical, default: FALSE)
 #'
 #' @export
 #'
 repo_upload_github_package <- function(repo_manager, repo, ...,
                                        prj = NULL,
                                        pkg_type = .Platform$pkgType,
-                                       with_deps = FALSE) {
+                                       with_deps = FALSE,
+                                       skip_build_steps = NULL,
+                                       keep_sources = FALSE) {
   assert(is_repo_manager(repo_manager), "Repo manager expected for repo_manager")
   assert(is_nonempty_char1(repo), "Non empty character(1) expected for repo")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
-  assert(is.logical(with_deps), "Logical value expected for with_deps")
+  assert(is.logical(with_deps), "logical expected for with_deps")
+  if (!is.null(skip_build_steps)) {
+    assert(is.character(skip_build_steps)
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
+  }
+  assert(is.logical(keep_sources), "logical expected for keep_sources")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -473,7 +510,9 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   bld_prj <- prj_start(name = basename(tempfile(pattern = "srcrepo_proj_")),
                        path = tempdir(),
                        skip_rc = T)
-  on.exit({ unlink(bld_prj$path, recursive = T, force = T) }, add = TRUE)
+  if (!any(keep_sources)) {
+    on.exit({ unlink(bld_prj$path, recursive = T, force = T) }, add = TRUE)
+  }
 
   prj_config_set_rversion(rver = mgr_info$rver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
@@ -487,5 +526,6 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
 
   repo_upload_prj_packages(repo_manager, pkgs = pkg_info$name, prj = bld_prj,
                            skip_rc = T, pkg_type = pkg_type,
-                           with_deps = with_deps)
+                           with_deps = with_deps,
+                           skip_build_steps = skip_build_steps)
 }
