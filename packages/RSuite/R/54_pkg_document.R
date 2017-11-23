@@ -99,7 +99,9 @@ get_package_desc_imports <- function(pkg_path) {
 #'
 get_package_nspace_imports <- function(pkg_path) {
   ns_file <- file.path(pkg_path, "NAMESPACE")
-  stopifnot(file.exists(ns_file))
+  if (!file.exists(ns_file)) {
+    return(character(0))
+  }
 
   ns_lines <- readLines(ns_file)
   ns_imports <- ns_lines[grepl("^\\s*import[(]\\s*.+\\s*[)]\\s*$", ns_lines)]
