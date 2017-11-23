@@ -507,12 +507,17 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
 
   mgr_info <- repo_manager_get_info(repo_manager)
 
-  bld_prj <- prj_start(name = basename(tempfile(pattern = "srcrepo_proj_")),
-                       path = tempdir(),
-                       skip_rc = T)
+  bld_prj_path <- tempfile(pattern = "srcrepo_proj_")
   if (!any(keep_sources)) {
-    on.exit({ unlink(bld_prj$path, recursive = T, force = T) }, add = TRUE)
+    on.exit({ unlink(bld_prj_path, recursive = T, force = T) }, add = TRUE)
+  } else {
+    bld_prj_path <- file.path(dirname(dirname(bld_prj_path)), basename(bld_prj_path))
+    pkg_loginfo("Will keep build project sources at %s", bld_prj_path)
   }
+
+  bld_prj <- prj_start(name = basename(bld_prj_path),
+                       path = dirname(bld_prj_path),
+                       skip_rc = T)
 
   prj_config_set_rversion(rver = mgr_info$rver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)

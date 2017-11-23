@@ -9,6 +9,8 @@ VERSION 0.19 (2017-11-23)
      or packages from github (to put into PIGZIP or to add to repository).
   * While building package from github it is possible to keep its sources after
      build finished.
+  * fixing package index in repository for R3.4 fixed for case of removing last
+     package in repository.
 
 VERSION 0.18 (2017-11-13)
   * #150: checking if R version is available early while installing deps, building,

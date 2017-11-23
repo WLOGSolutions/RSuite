@@ -72,18 +72,18 @@ rsuite_write_PACKAGES <- function(url, type) {
   }
 
   if (type %in% c("win.binary", "source", "mac.binary")) {
-    tools::write_PACKAGES(url, type = type, latestOnly = F, addFiles = T)
+    nr <- tools::write_PACKAGES(url, type = type, latestOnly = F, addFiles = T)
   } else {
-    tools::write_PACKAGES(url, latestOnly = F, addFiles = T)
+    nr <- tools::write_PACKAGES(url, latestOnly = F, addFiles = T)
   }
 
-  if (!file.exists(file.path(url, "PACKAGES"))) {
+  if (!file.exists(file.path(url, "PACKAGES")) || nr == 0) {
     con <- file(file.path(url, "PACKAGES"), "wt")
     write.dcf(NULL, con)
     close(con)
   }
 
-  if (!file.exists(file.path(url, "PACKAGES.gz"))) {
+  if (!file.exists(file.path(url, "PACKAGES.gz"))  || nr == 0) {
     con <- gzfile(file.path(url, "PACKAGES.gz"), "wt")
     write.dcf(NULL, con)
     close(con)

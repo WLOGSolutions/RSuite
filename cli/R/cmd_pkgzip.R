@@ -151,7 +151,7 @@ sub_commands <- list(
                                           with_deps = opts$with_deps,
                                           filter_repo = opts$filter_repo,
                                           skip_build_steps = unlist(strsplit(opts$skip_build_steps, ",")),
-                                          keep_sources = opt$keep_sources)
+                                          keep_sources = opts$keep_sources)
     }
   )
 )

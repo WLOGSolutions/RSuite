@@ -232,7 +232,7 @@ sub_commands <- list(
                                          pkg_type = pkg_type,
                                          with_deps = opts$with_deps,
                                          skip_build_steps = unlist(strsplit(opts$skip_build_steps, ",")),
-                                         keep_sources = opt$keep_sources)
+                                         keep_sources = opts$keep_sources)
       RSuite::repo_mng_stop(ra_mng)
     }
   ),
@@ -249,8 +249,12 @@ sub_commands <- list(
       ra_mng <- start_management(opts, rver = NULL, types = pkg_type)
 
       avail_pkgs <- RSuite::repo_mng_list(ra_mng, pkg_type)
-      write(sprintf("%-40s%-40s", "Package", "Version"), stdout())
-      by(avail_pkgs, 1:nrow(avail_pkgs), function(row) write(sprintf("%-40s%-40s", row$Package, row$Version), stdout()))
+      if (nrow(avail_pkgs) > 0) {
+        write(sprintf("%-40s%-40s", "Package", "Version"), stdout())
+        by(avail_pkgs, 1:nrow(avail_pkgs), function(row) write(sprintf("%-40s%-40s", row$Package, row$Version), stdout()))
+      } else {
+        write("No packages available.", stdout())
+      }
 
       RSuite::repo_mng_stop(ra_mng)
     }

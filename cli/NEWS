@@ -4,6 +4,7 @@ VERSION 0.19 (2017-11-23)
   * 'repo addgithub' andd 'pkgzip github' have options to skip some building
      steps (like documentation generation). It makes sens for some faulty packages
      like Microsoft/LightGBM with invalid rogyxen declarations but proper NAMESPACE.
+  * 'repo list' for empty repositories fixed not to raise error.
 
 VERSION 0.18 (2017-11-13)
   * 'docker zip/img' can specified sh command to be executed before project
