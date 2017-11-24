@@ -57,15 +57,39 @@ pkg_download <- function(avail_pkgs, dest_dir) {
   }
 
   remote_pkgs <- avail_pkgs[!grepl("^file:///", avail_pkgs$Repository), ]
+  local_pkgs <- data.frame()
   if (nrow(remote_pkgs)) {
-    remote_paths <- do_dload(remote_pkgs)
-    remote_paths <- as.data.frame(remote_paths, stringsAsFactors = F)
-    colnames(remote_paths) <- c("Package", "Path")
+    # check/build download cache
+    cache_files <- file.path(Sys.getenv("HOME"), ".rsuite", "dload_cache",
+                             URLencode(remote_pkgs$Repository, TRUE),
+                             remote_pkgs$File)
+    cache_exists <- file.exists(cache_files)
+    if (!all(cache_exists)) {
+      remote_paths <- do_dload(remote_pkgs[!cache_exists, ])
+      remote_paths <- as.data.frame(remote_paths, stringsAsFactors = F)
+      colnames(remote_paths) <- c("Package", "Path")
+
+      try({
+        # cache them
+        suppressWarnings({
+          dir.create(unique(dirname(cache_files[!cache_exists])), recursive = T, showWarnings = F)
+          file.copy(from = remote_paths$Path, to = cache_files[!cache_exists], overwrite = T)
+        })
+      }, silent = T)
+    } else {
+      remote_paths <- data.frame()
+    }
+
+    if (any(cache_exists)) {
+      local_pkgs <- remote_pkgs[cache_exists, ]
+      local_pkgs$Repository <- sprintf("file:///%s", dirname(cache_files[cache_exists]))
+      pkg_logdebug(sprintf("Will install '%s' from cached %s", local_pkgs$Package, local_pkgs$File))
+    }
 
     dloaded <- rbind(dloaded, remote_paths)
   }
 
-  local_pkgs <- avail_pkgs[grepl("^file:///", avail_pkgs$Repository), ]
+  local_pkgs <- rbind(local_pkgs, avail_pkgs[grepl("^file:///", avail_pkgs$Repository), ])
   if (nrow(local_pkgs)) {
     # download.packages does not copy local files
     #   here they are copied manually
