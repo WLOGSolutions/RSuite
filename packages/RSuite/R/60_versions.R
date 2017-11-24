@@ -384,20 +384,23 @@ vers.is_empty <- function(ver) {
 #' highes version available for each of them.
 #'
 #' @param pkgs data.frame containing at least columns Package, Version, Repository and File
-#' @param contrib_urls if pkgs is NULL will be used to retrieve available packages from the urls.
+#' @param contrib_url if pkgs is NULL will be used to retrieve available packages from the url.
 #'
 #' @return version object wich contains all packages with vmin and vmax set to
 #'   same version value together with available packages data.frame.
 #'
 #' @keywords internal
 #'
-vers.collect <- function(contrib_urls, pkgs = NULL) {
+vers.collect <- function(contrib_url, pkgs = NULL) {
   if (is.null(pkgs)) {
-    stopifnot(!missing(contrib_urls))
+    stopifnot(!missing(contrib_url))
 
-    # retrieves all duplicates because no filtering applied
-    all_pkgs <- utils::available.packages(contrib_urls, filters = list())
-    pkgs <- as.data.frame(all_pkgs, stringsAsFactors = F)[, .standard_avail_columns()]
+    all_pkgs <- get_curl_available_packages(contrib_url) # from 53_repositories.R
+    if (!is.null(all_pkgs)) {
+      pkgs <- all_pkgs[, .standard_avail_columns()]
+    } else {
+      pkgs <- data.frame()
+    }
   } else {
     stopifnot(is.data.frame(pkgs) && all(.standard_avail_columns() %in% colnames(pkgs)))
   }
@@ -450,15 +453,16 @@ vers.union <- function(...) {
 #' Picks latest available under passed contrib_urls packages from pkg_names.
 #'
 #' @param pkg_names names of packages to pick (type: character(N))
-#' @param contrib_url urls to look for available packages in (type: character(N))
+#' @param contrib_url urls to look for available packages in (type: character(1))
 #'
 #' @return data.frame of same structure available.packages returns which contains
 #'   latest packages among pkg_names found.
 #'
 #' @keywords internal
 #'
-vers.get_available_pkgs <- function(pkg_names, contrib_urls) {
-  vers <- vers.collect(contrib_urls)
+vers.get_available_pkgs <- function(pkg_names, contrib_url) {
+  stopifnot(is.character(contrib_url) && length(contrib_url) == 1)
+  vers <- vers.collect(contrib_url)
   vers <- vers.rm(vers,
                   pkg_names = setdiff(vers.get_names(vers), pkg_names))
   return(vers.pick_available_pkgs(vers))

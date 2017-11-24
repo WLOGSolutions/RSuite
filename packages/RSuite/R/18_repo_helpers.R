@@ -60,8 +60,8 @@ collect_dependencies <- function(vers, pkg_type, params, filter_repo, rver = NUL
                                      repo_infos = repo_infos,
                                      pkg_types = resp_types)
   if (!is.null(filter_repo)) {
-    filter_contrib_urls <- retrieve_contrib_urls(repo_infos[1], pkg_type) # from 53_repositories.R
-    filter_pkgs <- vers.collect(filter_contrib_urls) # from versions.R
+    filter_contrib_url <- repo_infos[[1]]$get_contrib_url(pkg_type) # from 53_repositories.R
+    filter_pkgs <- vers.collect(filter_contrib_url) # from versions.R
     avail_vers <- vers.rm_acceptable(avail_vers, filter_pkgs$avails)
   }
   return(avail_vers)

@@ -1,3 +1,6 @@
+VERSION 0.20 (2017-11-??)
+  * Caching of available packages from each repository to build faster with CLI.
+
 VERSION 0.19 (2017-11-23)
   * Detection imports in package NAMESPACE fixed to support comma separated lists.
   * Defaut set_env.R fixed to create user specific log file if has no access to default.

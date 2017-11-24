@@ -56,18 +56,6 @@ repo_mng_stop <- function(repo_manager) {
 }
 
 #'
-#' Removes cache of available.packages.
-#'
-#' @param contrib_url contrib url with cached results for available.packages.
-#'
-#' @keywords internal
-#'
-.remove_avails_cache <- function(contrib_url) {
-  cache_file <- file.path(tempdir(), paste0("repos_", URLencode(contrib_url, TRUE), ".rds"))
-  unlink(cache_file, force = T)
-}
-
-#'
 #' Retrieve list of packages available in repository.
 #'
 #' @param repo_manager repo manager to retrieve package list from.
@@ -91,14 +79,13 @@ repo_mng_list <- function(repo_manager, pkg_type = .Platform$pkgType, no.cache =
          "Package type %s is not supported by the manager. Types supported: %s",
          pkg_type, paste(repo_info$types, collapse = ", "))
 
-  c_url <- rsuite_contrib_url(repos = repo_info$url, type = pkg_type)
   if (any(no.cache)) {
-    .remove_avails_cache(c_url)
+    clear_available_packages_cache(repo_info$url, # from 53_repositories.R
+                                   type = pkg_type, rver = repo_info$rver)
   }
 
-  avail_pkgs <- available.packages(contriburl = c_url, type = pkg_type, repos = NULL, filters = list())
-  avail_pkgs <- data.frame(avail_pkgs, stringsAsFactors = F, row.names = NULL)
-
+  avail_pkgs <- get_available_packages(repo_info$url,  # from 53_repositories.R
+                                       type = pkg_type, rver = repo_info$rver)
   return(avail_pkgs)
 }
 
@@ -132,8 +119,9 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
   pkg_loginfo("Removing %s packages from repository ...", nrow(toremove))
   res <- repo_manager_remove(repo_manager, toremove, pkg_type)
 
-  c_url <- rsuite_contrib_url(repos = repo_manager_get_info(repo_manager)$url, type = pkg_type)
-  .remove_avails_cache(c_url)
+  mgr_info <- repo_manager_get_info(repo_manager)
+  clear_available_packages_cache(mgr$url, # from 53_repositories.R
+                                 type = pkg_type, rver = mgr$rver)
 
   res$Removed <- T
   res <- merge(x = toremove[, c('Package', 'Version')], y = res[, c('Package', 'Version', 'Removed')],
@@ -263,9 +251,8 @@ repo_upload_prj_packages <- function(repo_manager,
   pkg_loginfo("... done. Uploading to repository ...")
   repo_manager_upload(repo_manager, tmp_path, pkg_type)
 
-  # clear cache
-  c_url <- rsuite_contrib_url(repos = mgr_info$url, type = pkg_type)
-  .remove_avails_cache(c_url)
+  clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
+                                 type = pkg_type, rver = mgr_info$rver)
 }
 
 #'
@@ -330,8 +317,8 @@ repo_upload_package_files <- function(repo_manager, files) {
   # sync the temp repository
   repo_manager_upload(repo_manager, tmp_path, pkg_types)
   for(tp in pkg_types) {
-    c_url <- rsuite_contrib_url(repos = mgr_info$url, type = tp)
-    .remove_avails_cache(c_url)
+    clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
+                                   type = tp, rver = mgr_info$rver)
   }
 }
 
@@ -399,8 +386,8 @@ repo_upload_ext_packages <- function(repo_manager,
   pkg_loginfo("... done. Uploading to repository ...")
 
   repo_manager_upload(repo_manager, tmp_path, pkg_type)
-  c_url <- rsuite_contrib_url(repos = mgr_info$url, type = pkg_type)
-  .remove_avails_cache(c_url)
+  clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
+                                 type = pkg_type, rver = mgr_info$rver)
 }
 
 
@@ -444,8 +431,8 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 
   repo_manager_upload(repo_manager, tmp_path, types)
   for(tp in types) {
-    c_url <- rsuite_contrib_url(repos = mgr_info$url, type = tp)
-    .remove_avails_cache(c_url)
+    clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
+                                   type = tp, rver = mgr_info$rver)
   }
 }
 

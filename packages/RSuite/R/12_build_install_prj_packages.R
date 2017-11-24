@@ -56,10 +56,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type,
 #' @keywords internal
 #'
 build_install_prj_packages <- function(params, build_type, skip_build_steps = NULL) {
-  # Cleaning previous build results
   intern_repo_path <- params$get_intern_repo_path()
-  unlink(file.path(intern_repo_path, "*"), recursive = TRUE, force = TRUE)
-
   contrib_url <- rsuite_contrib_url(intern_repo_path, type = build_type, rver = params$r_ver)
   if (!dir.exists(contrib_url)) {
     dir.create(contrib_url, recursive=TRUE)

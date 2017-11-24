@@ -11,10 +11,12 @@
 #' It contains information on about path, and provided parameters.
 #' It can also retrieve supported contrib urls.
 #'
+#' @param params project parameters. Used to access available packages cache.
+#'   Can be NULL is packages cache will not be considered.
 #' @param path path to repository. url with schema expected (type: character).
 #' @param expected_types project types expected to be found in repository
 #'    (type: character).
-#' @param rver R version to create repositories for
+#' @param rver R version to create repositories info for
 #'
 #' @return object of type rsuite_repo_info.
 #'
@@ -23,21 +25,15 @@
 .create_repo_info <- function(path, expected_types, rver) {
   stopifnot(regexpr("^(https?|ftp|file)(://.*)", path) != -1) # url path expected
 
-  types <- c()
-  for(tp in expected_types) {
-    pkgs_url <- paste0(rsuite_contrib_url(path, tp, rver = rver), "/PACKAGES")
-    try({
-      suppressWarnings({
-        con <- url(pkgs_url, open = "rt")
-      })
-      ln <- readLines(con, n = 1)
-      close(con)
-      if (grepl("^Package:", ln)) {
-        types <- c(types, tp)
-      }
-    }, silent = T)
-  }
-
+  types <- unlist(lapply(X = expected_types,
+                         FUN = function(tp) {
+                            avails <- get_available_packages(path, tp, rver)
+                            if (is.null(avails)) {
+                              NULL
+                            } else {
+                              tp
+                            }
+                          }))
   res <- list(
     path = path,
     types = types,
@@ -49,6 +45,12 @@
     get_contrib_url = function(type) {
       if (type %in% types) {
         return(rsuite_contrib_url(path, type, rver = rver))
+      }
+      NULL
+    },
+    get_avail_pkgs = function(type) {
+      if (type %in% types) {
+        return(get_available_packages(path, type, rver = rver))
       }
       NULL
     }
@@ -179,9 +181,9 @@ get_all_repo_infos <- function(params, rver = NULL) {
 #'
 #' Based on names pathes to repositories build named list of repository infos.
 #'
-#' @param spec names list with pathes to repositories
-#' @param types types to consider for each repository
-#' @param rver R version to build repositories for
+#' @param spec names list with pathes to repositories.
+#' @param types types to consider for each repository.
+#' @param rver R version to build repositories for.
 #'
 #' @return named list with appropriate rsuite_repo_info objects.
 #'
@@ -219,4 +221,129 @@ retrieve_contrib_urls <- function(repo_infos, type) {
   result <- unlist(lapply(X = repo_infos,
                           FUN = function(ri) { ri$get_contrib_url(type) }))
   return(result)
+}
+
+#'
+#' Retrieves repository available packages.
+#'
+#' It's just wrapper over get_curl_available_packages.
+#'
+#' @param path path to repository. url with schema expected (type: character).
+#' @param type to retrieve packages for
+#' @param rver R version to retrieve packages for.
+#'
+#' @return data.frame as available.packages return or NULL if type is not
+#'   supported by the repository.
+#'
+#' @keywords internal
+#'
+get_available_packages <- function(path, type, rver) {
+  stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", path) != -1)) # url path expected
+
+  contrib_url <- rsuite_contrib_url(path, type, rver)
+  return(get_curl_available_packages(contrib_url))
+}
+
+
+#'
+#' Retrieves available packages under contrib url.
+#'
+#' Packages with all versions are retrieved.
+#'
+#' Reads from cache if available. Retrieves available packages if not cached and
+#'   stores result into cache.
+#'
+#' @param contrib_url url to retrive packages available at. (type: character)
+#'
+#' @return data.frame as available.packages return or NULL if type is not
+#'   supported by the repository.
+#'
+#' @keywords internal
+#'
+get_curl_available_packages <- function(contrib_url) {
+  stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", contrib_url) != -1)) # url expected
+
+  cache_dir <- file.path(Sys.getenv("HOME"), ".rsuite", "repos_cache")
+  if (!dir.exists(cache_dir) && !dir.create(cache_dir, recursive = TRUE)) {
+    curl2cfile <- as.list(rep("", length(contrib_url)))
+    names(curl2cfile) <- contrib_url
+  } else { # local repositories are not cached
+    noncache_curl <- contrib_url[grepl("^file://", contrib_url)]
+    curl2cfile <- as.list(rep("", length(noncache_curl)))
+
+    cache_curl <- setdiff(contrib_url, noncache_curl)
+    if (length(cache_curl)) {
+      curl2cfile <- c(curl2cfile,
+                      file.path(cache_dir, paste0(URLencode(cache_curl, TRUE), ".rds")))
+    }
+    names(curl2cfile) <- c(noncache_curl, cache_curl)
+  }
+
+
+  pkgs_raw <- lapply(X = names(curl2cfile),
+                     FUN = function(curl) {
+                       cfile <- curl2cfile[[curl]]
+                       if (file.exists(cfile)) {
+                         # read it from cache
+                         return(readRDS(cfile))
+                       }
+
+                       # really retrieve it
+                       res <- tryCatch({
+                         if (nchar(cfile) > 0) {
+                           pkg_logdebug("Trying to cache availables from %s ...", curl)
+
+                           # remove R cache
+                           r_cache_file <- file.path(tempdir(), paste0("repos_", URLencode(curl, TRUE), ".rds"))
+                           unlink(r_cache_file, force = T)
+                         }
+
+                         pkgs <- suppressWarnings({
+                           utils::available.packages(contriburl = curl, type = type, repos = NULL, filters = list())
+                         })
+                         pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)
+
+                         if (nchar(cfile) > 0) {
+                           # cache it for future
+                           try({
+                             saveRDS(pkgs, file = cfile)
+                             pkg_logdebug("Availables from %s cached.", curl)
+                           }, silent = T)
+                         }
+                         pkgs
+                       }, error = function(e) { NULL })
+
+                       return(res)
+                     })
+  pkgs_raw <- pkgs_raw[!is.null(pkgs_raw)]
+  if (length(pkgs_raw) == 0) {
+    return(NULL)
+  }
+  pkgs <- do.call("rbind", pkgs_raw)
+  return(pkgs)
+}
+
+#'
+#' Removes available packages cache noth RSuite and R.
+#'
+#' @param path path to repository. url with schema expected (type: character).
+#' @param type to retrieve packages for
+#' @param rver R version to retrieve packages for.
+#'
+#' @keywords internal
+#'
+clear_available_packages_cache <- function(path, type, rver) {
+  stopifnot(regexpr("^(https?|ftp|file)(://.*)", path) != -1) # url path expected
+  contrib_url <- rsuite_contrib_url(path, type, rver)
+
+  # remove R cache
+  r_cache_file <- file.path(tempdir(), paste0("repos_", URLencode(contrib_url, TRUE), ".rds"))
+  unlink(r_cache_file, force = T)
+
+  cache_dir <- file.path(Sys.getenv("HOME"), ".rsuite", "repos_cache")
+  if (dir.exists(cache_dir)
+      && !grepl("^file://", path)) { # repository is not local
+    cache_file <- file.path(cache_dir, paste0(URLencode(contrib_url, TRUE), ".rds"))
+    unlink(cache_file, force = T)
+  }
 }

@@ -130,7 +130,7 @@ collect_mscs_direct_deps <- function(params) {
 #'
 #' @param vers version object describing packages to retrieve all subsequent
 #'    dependencies for.
-#' @param repo_infos list of description of repositories  to search for
+#' @param repo_info description of repository to search for
 #'    dependencies in. Unused if avail_pkgs passed. (object of rsuite_repo_info)
 #' @param type type of packages to search. . Unused if avail_pkgs passed.
 #' @param all_pkgs matrix same as available.packages return.
@@ -140,15 +140,15 @@ collect_mscs_direct_deps <- function(params) {
 #'
 #' @keywords internal
 #'
-collect_all_subseq_deps <- function(vers, repo_infos, type, all_pkgs = NULL) {
+collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
   stopifnot(is.versions(vers))
 
   if (is.null(all_pkgs)) {
-    stopifnot(!missing(repo_infos))
+    stopifnot(!missing(repo_info))
     stopifnot(!missing(type))
 
-    contrib_urls <- retrieve_contrib_urls(repo_infos, type)    # from 53_repositories.R
-    avail_vers <- vers.collect(contrib_urls)
+    contrib_url <- repo_info$get_contrib_url(type)    # from 53_repositories.R
+    avail_vers <- vers.collect(contrib_url)
     all_pkgs <- avail_vers$get_avails()
   } else {
     avail_pkgs <- as.data.frame(all_pkgs, stringsAsFactors = F)

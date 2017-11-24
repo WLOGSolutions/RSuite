@@ -134,7 +134,7 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types) {
     for(ri in repo_infos) {
       for(tp in pkg_types) {
         tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
-                                         repo_infos = list(ri),
+                                         repo_info = ri,
                                          type = tp)
         if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
           next
@@ -191,9 +191,9 @@ resolve_packages <- function(vers, repo_infos, pkg_types) {
 
   for(ri in repo_infos) {
     for(tp in pkg_types) {
-      contrib_urls <- retrieve_contrib_urls(list(ri), tp) # from 53_repositories.R
+      contrib_url <- ri$get_contrib_url(tp) # from 53_repositories.R
 
-      tp_avails <- vers.collect(contrib_urls)
+      tp_avails <- vers.collect(contrib_url)
       tp_avails <- vers.rm(tp_avails,
                            pkg_names = setdiff(vers.get_names(tp_avails),
                                                vers.get_names(curr_miss)))

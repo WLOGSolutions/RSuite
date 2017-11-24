@@ -62,7 +62,7 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
 
   bundle <- tryCatch({
     remote_download <- .get_devtools_intern("remote_download")
-    remote_download(remote, quiet = T)
+    remote_download(remote, quiet = F)
   }, error = function(e) { NULL })
   assert(!is.null(bundle), "Failed to download from %s", srcrepo)
   on.exit({ unlink(bundle, recursive = T, force = T) }, add = TRUE)
