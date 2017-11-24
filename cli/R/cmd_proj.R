@@ -54,11 +54,13 @@ sub_commands <- list(
     help = "Build the project.",
     options = list(
       make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
-                  help="Build binary packages (default: %default)")
+                  help="Build binary packages (default: %default)"),
+      make_option(c("-f", "--force"), dest = "rebuild", action="store_true", default=FALSE,
+                  help="If passed all project packages will be rebuilded even if no changes occured (default: %default)")
     ),
     run = function(opts) {
       pkg_type <- get_pkg_type(opts$binary)
-      RSuite::prj_build(type = pkg_type)
+      RSuite::prj_build(type = pkg_type, rebuild = opts$rebuild)
     }
   ),
   test = list(

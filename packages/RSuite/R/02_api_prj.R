@@ -338,10 +338,14 @@ prj_clean_deps <- function(prj = NULL) {
 #'    directory. (type: rsuite_project, default: NULL)
 #' @param type type of packages to build. If NULL will build platform default.
 #'    (type: character)
+#' @param rebuild if TRUE will force rebuild all project packages event if no
+#'    changes detected (type: logical)
 #'
 #' @export
 #'
-prj_build <- function(prj = NULL, type = NULL) {
+prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE) {
+  assert(is.logical(rebuild), "logical expected for rebuild")
+
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
@@ -353,7 +357,8 @@ prj_build <- function(prj = NULL, type = NULL) {
   }
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     revision = NULL,
-                                    build_type = type)
+                                    build_type = type,
+                                    rebuild = rebuild)
 }
 
 #'
@@ -399,7 +404,8 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
   ver_inf <- detect_zip_version(params, zip_ver) # from 15_zip_project.R
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     ver_inf$rev,
-                                    params$pkgs_type)
+                                    params$pkgs_type,
+                                    rebuild = TRUE)
 
   zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
 }

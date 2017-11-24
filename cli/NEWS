@@ -1,3 +1,6 @@
+VERSION 0.20 (2017-11-?)
+  * 'proj build' has option to force rebuild packages.
+
 VERSION 0.19 (2017-11-23)
   * repo command fixed to create local repository folder if does not exist.
   * 'proj build' has option to build binary project packages.

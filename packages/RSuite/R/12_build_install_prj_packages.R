@@ -18,11 +18,14 @@
 #' @param build_type type of packages to build. (type: character)
 #' @param skip_build_steps steps to skip while building packages.
 #'   (type: character, default: NULL)
+#' @param rebuild if TRUE will force rebuild of packages even if no changes found.
+#'   (type: logical, default: FALSE)
 #'
 #' @keywords internal
 #'
 build_install_tagged_prj_packages <- function(params, revision, build_type,
-                                              skip_build_steps = NULL) {
+                                              skip_build_steps = NULL,
+                                              rebuild = FALSE) {
   if (!is.null(revision)) {
     bkp_info <- backup_pkgdesc_files(params$pkgs_path) # from 51_pkg_info.R
 
@@ -43,7 +46,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type,
                 " Please, install dependencies(Call RSuite::prj_install_deps)"),
          paste(vers.get_names(uninstDeps), collapse = ", "))
 
-  build_install_prj_packages(params, build_type, skip_build_steps)
+  build_install_prj_packages(params, build_type, skip_build_steps, rebuild)
 
   out_path <- rsuite_contrib_url(params$irepo_path, build_type, params$r_ver)
   rsuite_write_PACKAGES(out_path, build_type)
@@ -55,7 +58,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type,
 #'
 #' @keywords internal
 #'
-build_install_prj_packages <- function(params, build_type, skip_build_steps = NULL) {
+build_install_prj_packages <- function(params, build_type, skip_build_steps = NULL, rebuild = FALSE) {
   intern_repo_path <- params$get_intern_repo_path()
   contrib_url <- rsuite_contrib_url(intern_repo_path, type = build_type, rver = params$r_ver)
   if (!dir.exists(contrib_url)) {
@@ -74,23 +77,29 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
     pkg_name <- prj_packages[[pkg_dir]]
 
     pkg_loginfo("Installing %s (for R %s) ...", pkg_name, params$r_ver)
+
+    has_changed <- has_package_changed(pkg_dir, params, build_type) # from 55_pkg_source_md5.R
     pkg_path <- file.path(params$pkgs_path, pkg_dir)
 
-    pkg_file <- pkg_build(pkg_path, # from 50_pkg_deployment.R
-                          dest_dir = contrib_url,
-                          binary = (build_type != "source"),
-                          rver = params$r_ver,
-                          libpath = params$lib_path,
-                          skip_build_steps = skip_build_steps)
-    if (is.null(pkg_file)) {
-       next # Failed to build package
+    if (any(rebuild) || has_changed) {
+      pkg_file <- pkg_build(pkg_path, # from 50_pkg_deployment.R
+                            dest_dir = contrib_url,
+                            binary = (build_type != "source"),
+                            rver = params$r_ver,
+                            libpath = params$lib_path,
+                            skip_build_steps = skip_build_steps)
+      if (is.null(pkg_file)) {
+        next # Failed to build package
+      }
+      rsuite_write_PACKAGES(contrib_url, build_type)
+    } else {
+      pkg_file <- file.path(contrib_url, get_package_build_name(pkg_path, build_type))
+      pkg_loginfo("... not changed; installing previously built %s.", pkg_file)
     }
-    rsuite_write_PACKAGES(contrib_url, build_type)
 
     # remove package if installed
     pkg_remove(pkg_name, lib_dir = params$lib_path)
 
-    repo_url <- sprintf("file:///%s", params$get_intern_repo_path())
     # this type = "source" does not matter, it is passed just to prevent complaining
     #  on windows that "both" type cannot be used with repos = NULL
     pkg_install(pkg_file,
@@ -104,5 +113,5 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
   assert(!length(failed),
          "Failed to install project packages: %s", paste(failed, collapse = ", "))
 
-  pkg_loginfo("Successfuly build %s packages", length(prj_packages))
+  pkg_loginfo("Successfuly installed %s packages", length(prj_packages))
 }
