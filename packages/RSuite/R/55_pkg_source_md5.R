@@ -24,7 +24,7 @@ has_package_changed <- function(pkg_dir, params, pkg_type) {
 
   build_name <- get_package_build_name(pkg_path, pkg_type)
 
-  md5_fpath <- file.path(contrib_url, gsub("^(.+)[.](tag[.]gz|tgz|zip)$", ".\\1.md5src.rds", build_name))
+  md5_fpath <- file.path(contrib_url, gsub("^(.+)[.](tar[.]gz|tgz|zip)$", ".\\1.md5src.rds", build_name))
   if (!file.exists(file.path(contrib_url, build_name))) {
     pkg_logfinest("... no built package file found")
     unlink(md5_fpath, force = T)
