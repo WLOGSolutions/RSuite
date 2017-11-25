@@ -92,7 +92,7 @@ pushd cli\zip
 rmdir /s/q zips 2> nul
 call create_zip.cmd
 
-FOR /R %%F IN (zips\rsuitecli_*.%gitver%.zip) DO set zip=%%~nxF
+FOR /R %%F IN (zips\rsuitecli-*.%gitver%.zip) DO set zip=%%~nxF
 IF "%zip%" == "" (
 	echo ERROR: failed to build ZIP package for RSuite CLI tag %gitver%.
 	goto popd_error

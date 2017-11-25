@@ -4,4 +4,4 @@
 .Rbuildignore
 .Ruserdata
 config.txt
-/cli/rpm/*.rpm
+PKG_INDEX
