@@ -1,0 +1,5 @@
+RSuiteVersion: 0.20.226
+RVersion: 3.4
+Project: rsuite_bookdown
+Repositories: MRAN[2017-11-25]
+Artifacts: config_templ.txt

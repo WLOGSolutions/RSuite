@@ -1,0 +1,5 @@
+# Preface {-}
+
+In this book, we describe functionality of [R Suite](rsuite.io). You will find both tutorials and technical references.
+
+[![](imgs/RSuite_Cover.PNG)](http://rsuite.io)

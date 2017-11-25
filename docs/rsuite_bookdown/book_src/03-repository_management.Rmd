@@ -1,0 +1,38 @@
+# CRAN like repository management
+
+Here we present CRAN-alike repository management design patterns with [R Suite's](http://rsuite.io).
+Please check [Reference of instructions on managing the repository with R Suite CLI](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md) for detailed instructions. [R Suite](http://rsuite.io) covers following actions you can do with your repository:
+
+* Add project's packages - add packages that you developed in your project (folder `packages`). It is useful when you develop company/team wide packages.
+* Add project's external packages- add external packages from your project. It is useful if you want to archive particular version of external packages that your project depends on
+* Add packages from project zip file - add selected packages from a deployment package build by R Suite.
+* Add packages from Github -  add a package from GitHub repository.
+* Add file - add packages that you downloaded from internet (either `binary` of `source`). Is is useful if you want to use a package that is shipped outside CRAN.
+
+## Project Local CRAN
+
+This design pattern is when you either work alone or in many teams that do not share repositories. The repository is being stored in a subfolder in you project folder.
+
+## Local CRAN
+
+This design pattern is for either a small teams or larger enterprises that follow *on-premise* policy. The repository is being stored in a folder that can be accessed (at least `read`) by a team.
+
+## CRAN on public cloud 
+
+There are situations that your team is international or you do not have a company intranet. In such situations you could use public cloud services to organize your CRAN-alike repository. Below we enlist different variants.
+
+### CRAN on Google Drive
+
+Variant of Team Local CRAN where a folder is synchronized via [Google Drive](https://www.google.com/drive/).
+
+### CRAN on Microsoft One Drive
+
+Variant of Team Local CRAN where a folder is synchronized via [Microsoft's One Drive](https://onedrive.live.com).
+
+### CRAN on AWS S3 storage
+
+Variant of Team Local CRAN where a repo is stored on [AWS S3](https://aws.amazon.com/s3/details/)
+
+### CRAN on Azure Blob storage
+
+Variant of Team Local CRAN where a folder is stored on [Microsoft Azure Blob](https://azure.microsoft.com/services/storage/blobs/)

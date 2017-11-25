@@ -1,0 +1,235 @@
+# Team Data Science Process (TDSP) with R Suite
+
+> The Team Data Science Process (TDSP) is an agile, iterative data science methodology to deliver predictive analytics solutions and intelligent applications efficiently. TDSP helps improve team collaboration and learning. It contains a distillation of the best practices and structures from Microsoft and others in the industry that facilitate the successful implementation of data science initiatives. The goal is to help companies fully realize the benefits of their analytics program.
+
+Here we show how to adapt [TDSP](https://docs.microsoft.com/en-us/azure/machine-learning/team-data-science-process/overview) to be supported by R Suite's reproducibility features. We will base on TDSP's github repository that is available [here](https://github.com/Azure/Azure-TDSP-Utilities).
+
+## Preliminaries
+
+We are using following tools:
+
+* GNU R 3.42
+* R Suite 0.12.215
+
+## Interactive Data Exploratory Analysis and Reporting (IDEAR) with R Suite
+
+TDSP's github repository contains exemplary scripts for IDEAR. You check it [here](https://github.com/Azure/Azure-TDSP-Utilities/tree/master/DataScienceUtilities/DataReport-Utils/R). This is a great piece of work but we miss there reproducibility features from R Suite. Below we will show you step-by-step how to adapt this code to be in confront with R Suite.
+
+### Create project folder
+
+This is a first step done with a simple command
+```bash
+rsuite proj start -n DataReport
+```
+On our enviroment the output is as follows
+
+```
+> rsuite proj start -n DataReport
+2017-10-14 13:13:52 INFO:rsuite:Will create project DataReport structure for RSuite v0.12.215.
+2017-10-14 13:13:52 INFO:rsuite:Project DataReport started.
+2017-10-14 13:13:52 INFO:rsuite:Puting project DataReport under GIT control ...
+2017-10-14 13:13:53 INFO:rsuite:... done
+```
+### Update MRAN repo to date 2017-08-01
+
+Lets open `PARAMTERS` file that is located in main project folder and edit it to follow original TDSP requirement (check [Run-IDEAR.R](https://github.com/Azure/Azure-TDSP-Utilities/blob/master/DataScienceUtilities/DataReport-Utils/R/Run-IDEAR.R)) and edit line starting with `Repositories` to look like below
+
+```
+Repositories: MRAN[2017-08-01]
+```
+
+Final `PARAMETERS` file should like like the one below
+
+```
+RSuiteVersion: 0.12.215
+RVersion: 3.4
+Project: DataReport
+Repositories: MRAN[2017-01-08]
+Artifacts: config_templ.txt
+```
+
+### Add 3rd party packages dependencies 
+
+We will declare dependencies using special package names `extpackages`. Using package for dependencies gives us a benefit to easily declare version of packages we want to use.
+
+First lets add a new package to the project
+
+```bash
+rsuite proj pkgadd -n extpackages
+```
+The output on our environment is like the one below
+
+```
+2017-10-14 13:29:14 INFO:rsuite:Package extpackages started in project DataReport.
+2017-10-14 13:29:14 INFO:rsuite:Puting package extpackages under GIT control ...
+2017-10-14 13:29:15 INFO:rsuite:... done
+```
+
+Now we have to edit `DESCRIPTION` file that is located in `packages\extpackages` folder. It was not easy to detect all dependencies but we managed with the following file:
+
+```
+Package: extpkgs
+Type: Package
+Title: What the package does (short line)
+Version: 0.1
+Date: 2017-10-14
+Author: Wit Jakuczun
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Depends:
+	knitr (== 1.16),
+	rmarkdown,
+	tcltk,
+	tcltk2,
+	Hmisc,
+	psych,
+	corrgram,
+	yaml,
+	entropy,
+	vcd,
+	shiny,
+	corrplot,
+	scatterplot3d,
+	DescTools,
+	xtable,
+	shinyjs,
+	RODBC,
+	parallel,
+	doSNOW,
+	foreach,
+	dplyr,
+	lubridate,
+	PCAmixdata,
+	caret,
+	Rtsne
+Imports: logging
+```
+
+### Install dependencies
+
+After having declared dependencies we are ready to install them. To do this we run the following command
+
+```bash
+rsuite proj depsinst
+```
+
+After a while (it depends on your internet connection) you should end with the following output
+
+```
+2017-10-14 17:15:08 INFO:rsuite:Detecting repositories (for R 3.4)...
+2017-10-14 17:15:09 INFO:rsuite:Will look for dependencies in ...
+2017-10-14 17:15:09 INFO:rsuite:.          MRAN#1 = http://mran.microsoft.com/snapshot/2017-08-01 (win.binary, source)
+2017-10-14 17:15:09 INFO:rsuite:Collecting project dependencies (for R 3.4)...
+2017-10-14 17:15:10 INFO:rsuite:Resolving dependencies (for R 3.4)...
+2017-10-14 17:15:27 INFO:rsuite:Detected 125 dependencies to install. Installing...
+2017-10-14 17:27:00 INFO:rsuite:All dependencies successfully installed.
+```
+
+As you can see in total `125` external packages were installed into our project. What is important R Suite install all the packages locally in `deployment/libs` folder. **Your global libs is not affected.**
+
+### Building `extpackages` package
+
+Having installed all dependencies we have to build our package to go further. We do this with the following command
+
+```bash
+rsuite proj build
+```
+
+The package builds properly what we can see from the output
+
+```
+2017-10-14 17:29:34 INFO:rsuite:Installing extpackages (for R 3.4) ...
+2017-10-14 17:29:35 WARNING:rsuite:Document building for EXTPAC~1 failed: Error: 'roxygen2' >= 5.0.0 must be installed for this functionality.
+2017-10-14 17:29:55 INFO:rsuite:Successfuly build 1 packages
+```
+
+### Refactoring `Run-IDEAR.R`
+
+`Run-IDEAR.R` is a main script for running IDEAR. To make it compatible with R Suite we have to make some edits.
+
+We start with adding R Suite starting commands to the beginning of the script.
+
+```{r, eval=FALSE}
+# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
+script_path <- (function() {
+	args <- commandArgs(trailingOnly = FALSE)
+	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
+	if (!length(script_path)) { return(".") }
+	return(normalizePath(script_path))
+})()
+
+# Setting .libPaths() to point to libs folder
+source(file.path(script_path, "set_env.R"), chdir = T)
+
+config <- load_config()
+args <- args_parser()
+```
+
+Next, all lines up to the line containing command `script.dir=script.dir <- dirname(sys.frame(1)$ofile)`, we replace with one line
+
+```{r,eval=FALSE}
+library(extpackages)
+```
+
+### Refactoring `IDEAR.Rmd`
+
+Having refactored master script we can switch to report file. 
+
+We start with adding R Suite script init section
+
+```r
+# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
+script_path <- (function() {
+	args <- commandArgs(trailingOnly = FALSE)
+	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
+	if (!length(script_path)) { return(".") }
+	return(normalizePath(script_path))
+})()
+
+# Setting .libPaths() to point to libs folder
+source(file.path(script_path, "set_env.R"), chdir = T)
+
+config <- load_config()
+args <- args_parser()
+
+library(extpackages)
+```
+
+We removed all lines between `options(warn=-1)` and `# set Shiny window size`. They are not necessary anymore as R Suite takes care about installed packages.
+
+Next we replaced lines below
+```r
+OS_type <- .Platform$OS.type
+if (OS_type == 'windows'){
+  winDialog(type = 'ok', 'Please select the .yaml file in the next popup window. Click OK to proceed.')
+} else{
+  print('Please input the path to the .yaml file after the next prompt.')
+}
+
+yaml_file <- tk_choose.files(caption='Select yaml File', multi = FALSE)
+```
+with one line
+
+```r
+yaml_file <- args$get("yaml_file", required=TRUE)
+```
+This allows us to handle `yaml` file from a command line argument like this
+
+```bash
+Rscript Run-IDEAR.R --yaml_file=para-adult.yaml
+```
+
+### Final version and summary
+
+Final version of the scripts is available on our Github repository - just follow this [link](). 
+
+You can run the application with this command (from `R` subfolder)
+
+```bash
+Rscript.exe Run-IDEAR.R --yaml_file=para-adult.yaml --port=5382
+```
+
+After a while you will see that application is running and you can find is under this link [http://127.0.0.1:5382](http://127.0.0.1:5382).
+
+

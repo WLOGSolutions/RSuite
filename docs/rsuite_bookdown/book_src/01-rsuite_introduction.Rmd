@@ -1,0 +1,47 @@
+# Managing large and small R based solutions
+
+Here we describe motivation behind [R Suite](http://rsuite.io).
+
+## Challenges for reproducible R software development
+
+[R Suite](http://rsuite.io) was developed by [WLOG Solutions company](http://wlogsolutions.com) to make their development process reproducible. R Suite gives answers to the following challenges for any R based software solution:
+
+* Isolated and reproducible projects with controlled dependencies and configuration.
+* Separation of business, infrastructural and domain logic.
+* Package based solution development.
+* Management of custom CRAN-alike repositories.
+* Automation of deployment package preparation.
+* Development process integrated with version control system (currently git and svn).
+
+## R Suite as Solution 
+
+We developed [R Suite](http://rsuite.io) to answer the challenges mentioned above. R Suite was developed as an R package. For automation and convenience we added *R Suite CLI* that is a command line tool. CLI is very useful when you want to automate development process using for example *continous integration & deployment* solution.
+
+## Results
+
+[R Suite](http://rsuite.io) according to our knowledge is the first solution that handles R software development in so many variants. Although there are solutions on the market that solve some of the challenges but we could not solve all challenges mentioned above. The table below presents comparison of [R Suite](http://rsuite.io) and other tools.
+
+```{r tools_comparison, echo = FALSE}
+knitr::kable(x  = data.frame(challenge = c("Isolated and reproducible projects",
+                                           "Controlled dependencies",
+                                           "Controlled configuration",
+                                           "Project based R version",
+                                           "Separation of business, infrastructural and domain logic",
+                                           "Management of custom CRAN-alike repositories",
+                                           "Package bases solution development",
+                                           "Automation of deployment package preparation.",
+                                           "Development process integrated with version control system (currently git and svn)",
+                                           "Supports Windows",
+                                           "Supports Linux"),
+                             `R Suite` = rep("Yes", 11),
+                             `packrat` = c("Yes", "Partial", rep("No", 7), rep("Yes", 2)),
+                             `checkpoint` = c("No", "Partial", rep("No", 7), rep("Yes", 2)),
+                             `miniCRAN` = c(rep("No", 4), "Partial", rep("No", 4), rep("Yes", 2)),
+                             `devtools` = c(rep("No", 5), "Yes", rep("No", 3), rep("Yes", 2)),
+                             `docker` = c(rep("Yes", 3), "No", "No", "No", "No", "Yes", "Yes", "No", "Yes")),
+             col.names = c("Challenge", "R Suite", "packrat", "checkpoint", "miniCRAN", "devtools", "docker"))
+```
+
+## What next?
+
+We would be grateful for sending us comments, bugs and pull requests that would help make [R Suite](http://rsuite.io) better. 

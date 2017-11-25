@@ -1,0 +1,50 @@
+# Using R Suite via R Studio's Addins
+
+R Studio has great functionality of Addins that makes it extensible. We used it to make more friendly interface to R Suite for those who are users of this great IDE for R development.
+
+![R Studio Addins](imgs/RStudio_RSuite_Addins.PNG)
+
+## Start a new R Suite Project
+
+### Start R Studio project
+
+First start R Studio project called `myproject`.
+
+![](imgs/RStudio_New_Project.PNG)
+
+### Starting R Suite project
+
+After starting new R Studio project we have to upgrade it to R Suite project. We do this via `Addins > RSUITE > Start project`.
+
+![](imgs/RStudio_Start_Project.PNG)
+
+### Installing extra packages
+
+If you are doing this for the first time you can see the following dialog window
+
+![](imgs/RStudio_extra_pkgs.PNG)
+
+It is safe to say `Yes`. 
+
+### Selecting folder with R Suite project
+
+After a short while you will see another popup
+
+![](imgs/RStudio_Start_Project_2.PNG)
+
+You just click `Select`. After this you are asked if you want to open R Suite project in a new R Studio windows.
+
+### Opening R Suite project in a new R Studio window
+
+![](imgs/RStudio_Start_Project_3.PNG)
+
+If you click `Yes` a new R Studio will open.
+
+![](imgs/RStudio_Start_Project_4.PNG)
+
+
+## Add new package to R Suite Project
+
+You can start a new package via `Addins > RSUITE > Start package in project`. 
+
+![](imgs/RStudio_Start_Package_1.PNG)

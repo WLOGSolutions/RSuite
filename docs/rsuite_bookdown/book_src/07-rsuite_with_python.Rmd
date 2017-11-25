@@ -1,0 +1,54 @@
+# R Suite with Python
+
+Sometimes your R project may need access to a pyton library. In this chapter we will show you how
+to manage *internal* python environment with R substitute
+
+## Preliminaries
+
+We are using:
+
+* [R v. 3.4.2](http://r-project.org)
+* [Anaconda v. 5.0.1](https://www.anaconda.com/).
+* [R Suite v. 0.18-224](http://rsuite.io)
+
+## Step 1 - create your R Suite project
+
+```bash
+rsuite proj start -n rsuite_eats_python
+cd rsuite_eats_python
+```
+
+## Step 2 - create python environment in your R Suite project
+
+```bash
+conda create -p python python=3.6
+```
+
+This command will create folder `python` in your R Suite project.
+
+## Step 3 - make `PyhonLoader` R package
+
+```bash
+rsuite proj pkgadd -n PythonLoader
+```
+
+This package will handle python initialization using [reticulate package](https://github.com/rstudio/reticulate).
+
+### Modify `DESCRIPTION` file
+
+```
+Package: PythonLoader
+Type: Package
+Title: What the package does (short line)
+Version: 0.1
+Date: 2017-11-18
+Author: Wit
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Imports: 
+  logging,
+  reticulate (== 1.3)
+```
+
+###
