@@ -86,11 +86,31 @@ popd
 echo Building/uploading RSuite CLI tag %gitver% DEB package onto S3 repository ... done
 
 
+echo Building/uploading RSuite CLI tag %gitver% ZIP package onto S3 repository ...
+pushd cli\zip
+
+rmdir /s/q zips 2> nul
+call create_zip.cmd
+
+FOR /R %%F IN (zips\rsuitecli_*.%gitver%.zip) DO set zip=%%~nxF
+IF "%zip%" == "" (
+	echo ERROR: failed to build ZIP package for RSuite CLI tag %gitver%.
+	goto popd_error
+)
+aws s3 cp zips\%zip% s3://wlog-rsuite/cli/zip/ --acl public-read
+IF ERRORLEVEL 1 goto popd_error
+echo zip: zip/%zip% >> "%pkg_index%"
+
+popd
+echo Building/uploading RSuite CLI tag %gitver% ZIP package onto S3 repository ... done
+
+
 echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ...
 aws s3 cp "%pkg_index%" s3://wlog-rsuite/cli/ --acl public-read
 IF ERRORLEVEL 1 goto error
 echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ... done
 del "%pkg_index%" 2> nul
+
 
 echo All done.
 exit /B 0
