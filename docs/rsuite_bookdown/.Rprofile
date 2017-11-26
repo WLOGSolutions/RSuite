@@ -1,1 +1,1 @@
-RSuite::prj_load()
+.libPaths(c('deployment/sbox', 'deployment/libs', .libPaths()))

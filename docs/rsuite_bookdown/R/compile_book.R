@@ -9,9 +9,6 @@ script_path <- (function() {
 # Setting .libPaths() to point to libs folder
 source(file.path(script_path, "set_env.R"), chdir = T)
 
-config <- load_config()
-args <- args_parser()
-
 library(bookdown)
 
 loginfo("--> Pandoc version: %s", rmarkdown::pandoc_version())
