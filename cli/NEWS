@@ -1,5 +1,7 @@
-VERSION 0.20 (2017-11-24)
+VERSION 0.20 (2017-12-08)
   * 'proj build' has option to force rebuild packages.
+  * rsuite.cmd references internal scripts by short name. Long names caused
+     issues on some Win10.
 
 VERSION 0.19 (2017-11-23)
   * repo command fixed to create local repository folder if does not exist.

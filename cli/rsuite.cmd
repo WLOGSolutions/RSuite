@@ -22,7 +22,7 @@ if ERRORLEVEL 1 (
 
 :rscript_found
 
-set base_dir=%~dp0
+set base_dir=%~dps0
 set cmd="%1"
 
 if %cmd%=="" goto help

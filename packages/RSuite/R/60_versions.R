@@ -26,6 +26,7 @@ norm_version <- function(ver) {
   ver <- gsub('(?<!\\d)(\\d\\d)(?!\\d)', '0\\1', ver, perl = T)
   ver <- gsub('^(\\d+)$', '\\1.000.000', ver, perl = T)
   ver <- gsub('^(\\d+\\D\\d+)$', '\\1.000', ver, perl = T)
+  ver <- gsub('[-_]', '.', ver, perl = T)
   return(ver)
 }
 

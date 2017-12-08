@@ -1,10 +1,11 @@
-VERSION 0.20 (2017-11-24)
+VERSION 0.20 (2017-12-08)
   * Caching of available packages from each repository to build faster with CLI.
   * While building project packages it detects changes in package sources.
      If no changes detected package will not be rebuilt and package from intrepo
      will be installed.
   * Remote packages downloaded are cached. So next time they are ready which
      reduces dependency collection time.
+  * Fix in package version comparision
 
 VERSION 0.19 (2017-11-23)
   * Detection imports in package NAMESPACE fixed to support comma separated lists.
