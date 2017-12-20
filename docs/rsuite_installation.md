@@ -26,11 +26,14 @@ You can simply install RSuite from WLOG S3 repository executing following comman
 in your R environment:
 
 ```bash
-> install.packages('RSuite', repo = 'http://wlog-rsuite.s3.amazonaws.com')
+> install.packages('RSuite', repo = c(options('repos'), 'http://wlog-rsuite.s3.amazonaws.com'))
 ```
 
 It will install latest released version of RSuite in first folder mentioned in 
 .libPaths().
+
+The complicated parameter repo instructs install.packages to use beside standard repositories
+also RSuite repository located in S3 bundle.
 
 ## Development version installation
 

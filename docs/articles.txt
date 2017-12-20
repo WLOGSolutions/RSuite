@@ -1,3 +1,4 @@
 basic_workflow.md: Basic R Suite usage
 rsuite_installation.md: R Suite installation
 rsuite_cli_reference.md: R Suite CLI reference manual
+troubleshooting.md: If R Suite does not work

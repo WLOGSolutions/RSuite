@@ -98,6 +98,9 @@ exit /B 3
     echo        pkgzip
     echo            Use to create PKGZIP packages to fillup remove repository.
     echo.
+    echo        docker
+    echo            Use to create docker image containing your solution.
+    echo.
     echo        version
     echo            Show RSuite CLI version.
     echo.

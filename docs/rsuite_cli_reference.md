@@ -39,7 +39,7 @@ rsuite install -v
 
 It will log lots of messages on console which can be used to detect reason if any problem with installing RSuite will occur.
 
-If you would like to use some specific repository to look for RSuite package instead of default (http://wlog-rsuite.s3.amazonaws.com) you can call it like this
+If you would like to use some specific repository to look for RSuite package instead of default (`http://wlog-rsuite.s3.amazonaws.com`) you can call it like this
 
 ```bash
 rsuite install -u http://url.to.your.repository
@@ -77,7 +77,7 @@ just after RSuite CLI gets updated.
 After you have installed RSuite you are ready to start developing your projects.
 Command proj gives you access to all related RSuite functionalities.
 
-It accepts -h option which prints all accepted sub-commands with brief description.
+It accepts `-h` option which prints all accepted sub-commands with brief description.
 
 #### Starting project 
 
@@ -88,9 +88,12 @@ just call
 rsuite proj start -n MyProject
 ```
 
-It will create project MyProject in current directory. Default content of PROPERTIES file will created and all other administrative folders to support project development.
+It will create project MyProject in current directory. Default content of PROPERTIES file will created and all other administrative folders 
+to support project development.
 
-It will also add created project under revision control if detects current folder to be under revision control. It will also configure appropriate RC ignores so non required files created during development (like installed packages or auto generated man packages) will be omitted while checking if project needs to be committed before generating deployment package or uploading project packages into repository.
+It will also add created project under revision control if detects current folder to be under revision control. It will also configure appropriate 
+RC ignores so non required files created during development (like installed packages or auto generated man packages) will be omitted while checking 
+if project needs to be committed before generating deployment package or uploading project packages into repository.
 
 If you do not want adding project under revision control call it following way
 
@@ -98,7 +101,8 @@ If you do not want adding project under revision control call it following way
 rsuite proj start -n MyProject --skip_rc
 ```
 
-As all other commands proj accepts -v (short for --verbose) to print lots of messages during project creation and -h (short for --help) to print all accepted options with some short description.
+As all other commands proj accepts `-v` (short for `--verbose`) to print lots of messages during project creation 
+and `-h` (short for `--help`) to print all accepted options with some short description.
 
 #### Creating package
 
@@ -118,7 +122,8 @@ If you do not want adding package under revision control for some reason call it
 rsuite proj pkgadd -n MyPackage --skip_rc
 ```
 
-As all other commands proj accepts -v (short for --verbose) to print lots of messages during project creation and -h (short for --help) to print all accepted options with some short description.
+As all other commands proj accepts `-v` (short for `--verbose`) to print lots of messages during project creation 
+and `-h` (short for `--help`) to print all accepted options with some short description.
 
 #### Building project local enviroment
 
@@ -130,7 +135,8 @@ If you have any other dependencies (required libraries) you have to build intern
 rsuite proj depsinst 
 ```
 
-Beside standard -v and -h options depsinst sub-command accepts also -c (short for --clean) to clean up internal project environment before installing all required packages. You call it like this
+Beside standard `-v` and `-h` options depsinst sub-command accepts also `-c` (short for `--clean`) to clean up internal project environment before
+installing all required packages. You call it like this
 
 ```bash
 rsuite proj depsinst -c
@@ -144,7 +150,7 @@ After building local project environment you can build project packages by calli
 rsuite proj build
 ```
 
-It does not accept any special options except standard -v and -h.
+It does not accept any special options except standard `-v` and `-h`.
 
 #### Cleaning unused project dependencies
 
@@ -154,7 +160,7 @@ If some project dependencies are not required any more you can remove them from 
 rsuite proj depsclean
 ```
 
-It does not accept any special options except standard -v and -h.
+It does not accept any special options except standard `-v` and `-h`.
 
 #### Building deployment package
 
@@ -168,13 +174,14 @@ It checks project consistency if it is under version control to make sure all ch
 
 Local project environment together with rebuilt project packages and master scripts is included in deployment package so in production environment (assuming it is binary compatible with development environment) you can just unzip it to have everything required to run your project functionalities.
 
-zip sub-command accepts also -p (short for --path) which specifies there to put created deployment package:
+zip sub-command accepts also `-p` (short for `--path`) which specifies there to put created deployment package:
 
 ```bash
 rsuite proj zip -p /path/to/put/deployment/package
 ```
 
-If you do not want project consistency check for some reason (or if project is not under version control) you can enforce deployment package version passing --version option following way:
+If you do not want project consistency check for some reason (or if project is not under version control) you can enforce deployment package version 
+passing `--version` option following way:
 
 ```bash
 rsuite proj zip --version=1.0
@@ -182,7 +189,7 @@ rsuite proj zip --version=1.0
 
 Version number should be in form NN.NN.
 
-It also accepts standard options -v and -h.
+It also accepts standard options `-v` and `-h`.
 
 #### Testing project
 
@@ -204,10 +211,10 @@ rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 
 You can also manage content of local (Dir) and S3 repositories with RSuite CLI. For that purpose repo command should be used.
 
-All repo sub-commands accept beside standard -v and -h following options 
+All repo sub-commands accept beside standard `-v` and `-h` following options 
 
-* -d (short for --dir) which takes as parameter path to local (in directory) repository
-* -s (short for --s3_url) which takes as parameter url to S3 repository
+* `-d` (short for `--dir`) which takes as parameter path to local (in directory) repository
+* `-s` (short for `--s3_url`) which takes as parameter url to S3 repository
 
 For local repository it is check if you have permissions to modify it.
 
@@ -257,13 +264,13 @@ If for some reason you do not want check project source consistency while rebuil
 rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path --skip_rc
 ```
 
-You can also decide which kind of packages will be built and added to repository (source or binary) with -b (short for --binary) option:
+You can also decide which kind of packages will be built and added to repository (source or binary) with `-b` (short for `--binary`) option:
 
 ```bash
 rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -b FALSE
 ```
 
-If you want to add also all dependencies which are not currently present in the repository pass --with-deps option:
+If you want to add also all dependencies which are not currently present in the repository pass `--with-deps` option:
 
 ```bash
 rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -b TRUE --with-deps
@@ -287,13 +294,13 @@ rsuite repo addext -d /path/to/your/repository -n package1,package2
 
 Packages are searched in repositories project is configured to use (Repositories entry in project PARAMETERS file) for looking for dependencies.
 
-You can specify that you want to add source (or binary) version of packages to repository with -b (short for --binary) option:
+You can specify that you want to add source (or binary) version of packages to repository with `-b` (short for `--binary`) option:
 
 ```bash
 rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE
 ```
 
-If you want to add also all dependencies which are not currently present in the repository pass --with-deps option:
+If you want to add also all dependencies which are not currently present in the repository pass `--with-deps` option:
 
 ```bash
 rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE --with-deps
@@ -318,16 +325,16 @@ rsuite repo addgithub -d /path/to/your/repository -r github/ProjectName
 
 RSuite CLI will download sources, build package and add it to specified repository.
 
-GitHub repository can be specified in format username/repo[/subdir][@ref|#pull]. 
+GitHub repository can be specified in format `username/repo[/subdir][@ref|#pull]`. 
 
 You can also specify following options to addgithub:
 
-* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, 
+* `-H` (short for `--host`) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, 
   for example, 'github.hostname.com/api/v3'.
-* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what 
+* `-b` (short for `--binary`) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what 
   kind of package will be added to the repository: system specific binary of source.
-* --rver wich takes R version number to target built package for (important for binary packages).
-* --with-deps If passed will upload also dependencies which are not currently present in the repository.
+* `--rver` wich takes R version number to target built package for (important for binary packages).
+* `--with-deps` If passed will upload also dependencies which are not currently present in the repository.
 
 #### List contents of repository
 
@@ -338,7 +345,7 @@ rsuite repo list -s http://your-s3-bucket.s3.amazonaws.com/path
 ```
 
 It will print table with all packages and their versions available in repository. 
-Specifying -b (short for --binary) option to can choose to list binary or source packages.
+Specifying `-b` (short for `--binary`) option to can choose to list binary or source packages.
 
 #### Remove packages from repository
 
@@ -350,7 +357,7 @@ rsuite repo remove -s http://your-s3-bucket.s3.amazonaws.com/path -r Package1==V
 
 ## Building PKGZIP packages
 
-PKGZIPs can be used to create repository in some connection less environment. To create PKGZIPs you can use pkgzip command. All pkgzip sub-commands beside standard -v and -h options accept also -p (short for --path) which takes as parameter folder to put created PKGZIP to.
+PKGZIPs can be used to create repository in some connection less environment. To create PKGZIPs you can use pkgzip command. All pkgzip sub-commands beside standard `-v` and `-h` options accept also `-p` (short for `--path`) which takes as parameter folder to put created PKGZIP to.
 
 ### Building PKGZIP containing project packages
 
@@ -376,13 +383,13 @@ rsuite pkgzip proj --version=1.0
 
 Version number should be in form NN.NN.
 
-You can also decide which kind of packages will be built and included in PKGZIP (source or binary) with -b (short for --binary) option:
+You can also decide which kind of packages will be built and included in PKGZIP (source or binary) with `-b` (short for `--binary`) option:
 
 ```bash
 rsuite pkgzip proj -b TRUE
 ```
 
-If you want to include also all dependencies in PKGZIP pass --with-deps option:
+If you want to include also all dependencies in PKGZIP pass `--with-deps` option:
 
 ```bash
 rsuite pkgzip proj -b FALSE --with-deps
@@ -414,13 +421,13 @@ rsuite pkgzip ext -n package1,package2
 
 Packages are searched in repositories project is configured to use (Repositories entry in project PARAMETERS file) for looking for dependencies.
 
-You can specify that you want to include source (or binary) version of packages in PKGZIP with -b (short for --binary) option:
+You can specify that you want to include source (or binary) version of packages in PKGZIP with `-b` (short for `--binary`) option:
 
 ```bash
 rsuite pkgzip ext -n package1,package2 -b TRUE
 ```
 
-If you want to include also all dependencies in PKGZIP pass --with-deps option:
+If you want to include also all dependencies in PKGZIP pass `--with-deps` option:
 
 ```bash
 rsuite pkgzip ext -n package1,package2 -b FALSE --with-deps
@@ -444,17 +451,100 @@ rsuite pkgzip github -r github/ProjectName
 
 RSuite CLI will download sources, build package and add create PKGZIP out of it.
 
-GitHub repository can be specified in format username/repo[/subdir][@ref|#pull]. 
+GitHub repository can be specified in format `username/repo[/subdir][@ref|#pull]`. 
 
 You can also specify following options to github:
 
-* -H (short for --host) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, 
+* `-H` (short for `--host`) which GitHub API host to use. Use it to override with your GitHub enterprise hostname, 
   for example, 'github.hostname.com/api/v3'.
-* -b (short for --binary) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will 
+* `-b` (short for `--binary`) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will 
   be included in PKGZIP: system specific binary of source.
-* --with-deps If passed will include dependencies into PKGZIP.
-* --filter-repo which takas as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
+* `--with-deps` If passed will include dependencies into PKGZIP.
+* `--filter-repo` which takas as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
   versions are present in the repository. The parameter should be used together with --with-deps.
+
+
+## Docker integration
+
+RSuite CLI can help you with building your solution on some diffrent platform than the one you are working on or build docker images containing solutions
+you developed.
+
+All commands described below assume thar you have docker command useable/available.
+
+#### Building project under different platform in docker container
+
+To build your project in docker container issue following command:
+
+``` bash
+rsuite docker zip -p centos
+```
+
+It will run docker container for centos platform, build project inside it and create zip deployment package. Generated zip is retrieved from the container and
+can be used to deploy solution on your production environment.
+
+RSuite CLI uses standard images for building solution. We support ubuntu and centos platforms for R version 3.2, 3.3 and 3.4. Each image contain installation of
+appropriate R version and R Suite with R Suite CLI installed. Image for with latest version of R Suite is always used.
+
+You can provide following options to rsuite docker zip:
+
+* `-p` (short for `--platform`) takes platform name to build project under. centos and ubuntu platforms are supported (ubuntu is default).
+* `-d` (short for `--dest`) takes location to put generated zip into. Default is current folder.
+* `--sh` accepts additional shell commands to execute inside container before building the project. You can pass commands to install additional system
+  packages to required for project to build properly. For example following command will install libglpk-dev on container before building project:
+  
+``` bash
+rsuite docker zip --sh "apt-get install -y libglpk-dev"
+```
+* `--dont-rm` If passed, container used to build the project will not be removed after command finished. If not passed container used to build project 
+   will be removed even if project building fails. Option is usefull if you want to detect reasons for failure.
+* `--packages` Accepts comma separated list of project packages to include in prject build. If not passed all project packages will be included. Option 
+   is usefull if your solution consists of number of images and only some packages must be present on some of them.
+* `--exc-master` If passed, generated deployment zip will not contain any master scripts. It is usefull if master scripts depend on some glue packages 
+   which you do not want to be present in deployment zip package.
+* `--version` Accepts version number to tag deployment zip package with. Version number should be in form DD.DD. If not passed standard algorithm for 
+   tag selection is applied (ZipVersion from project PARAMETERS + revision from RC). If version is not enforced R Suite will check for source codes 
+   consistency agains RC.
+
+It also accepts standard options `-v` and `-h`.
+
+#### Building docker image for solution
+
+To create docker image for the solution issue following command:
+
+``` bash
+rsuite docker img -t <my/image:tag>
+```
+
+It will build project deployment zip package under appropriate platform (same way as with 'rsuite docker zip' command) and will build docker image containing 
+the deployed version of project inside. Image will be tagged with provided docker tag.
+
+If passed docker tag does not have tag part, project tag detected from project deployment zip package name will be added as tag part. 
+
+You can provide following options to rsuite docker img:
+
+* `--tag-latest` if passed image build will also tagged as latest.
+* `-p` (short for `--platform`) takes platform name to deploy solution under. centos and ubuntu platforms are supported (ubuntu is default).
+* `-f` (short for `--from`) accepts image name to use as base image. If not passed default base images will be used: for appropriate platform and R version.
+* `-z` (short for `--zip`) accepts project deployment zip package file (built probably with 'rsuite docker zip' command). If passed project deployment zip
+   package will not be built. Passed zip package will be used instead.
+* `--templ` accepts Dockerfile template file to use for building image. It is regular Dockerfile which can contain tags to be replaced by RSuite CLI with
+   automatically generated commands.
+   Following tags are accepted:
+    * `<From>` will be replaced with base image name
+    * `<DeployProject>` will be replaced with commands for deploying project out of project deployment zip package.
+  If not passed default Dockerfile template will be generated of following content:
+``` bash
+FROM <From>
+<DeployProject>
+``` 
+* `--templ-ctx` accepts comma separated list of folders to add to image building context. You will be able to copy files from these folders inside your image
+   while building with COPY command in Dockerfile.
+* `--sh` accepts additional shell commands to pass to `rsuite docker zip` command then building project deployment zip package.
+* `--packages` accepts comma separated list of project packages to pass to `rsuite docker zip` command then building project deployment zip package.
+* `--exc-master` option passed to `rsuite docker zip` command then building project deployment zip package.
+* `--version` Accepts version number to pass to `rsuite docker zip` command then building project deployment zip package.
+
+It also accepts standard options `-v` and `-h`.
 
 ## Getting help
 
@@ -464,7 +554,8 @@ You can find your which commands do rsuite accept calling
 rsuite help
 ```
 
-Each command accepts -h (short for --help) option as well as help sub-command which will provide you with brief information of command purpose and sub-commands supported.
+Each command accepts `-h` (short for `--help`) option as well as help sub-command which will provide you with brief information of command purpose and
+sub-commands supported.
 
-Each sub-command accepts -h (short for --help) which will provide you with brief information on sub-command and all the options sub-command accepts with description.
-
+Each sub-command accepts `-h` (short for `--help`) which will provide you with brief information on sub-command and all the options sub-command accepts 
+with description.

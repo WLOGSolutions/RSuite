@@ -26,12 +26,13 @@ if (file.access(.usr_lib_path, 2) == -1) {
   .libPaths(c(.usr_lib_path, .libPaths()))
 }
 
+verbose <- any(c('-v', '--verbose') %in% commandArgs(trailingOnly = T))
 tryCatch({
   suppressWarnings({
     suppressPackageStartupMessages({
       if (!require(optparse)) {
         c_url <- sprintf("file:///%s", contrib.url(file.path(.base_dir, "packages"), type = "source"))
-        install.packages(c("optparse", "getopt"), contriburl = c_url, type = "source", quiet = T)
+        install.packages(c("optparse", "getopt"), contriburl = c_url, type = "source", quiet = !verbose)
       }
       library(optparse)
     })
@@ -46,9 +47,9 @@ tryCatch({
     suppressPackageStartupMessages({
       if (!require(logging)) {
         c_url <- sprintf("file:///%s", contrib.url(file.path(.base_dir, "packages"), type = "source"))
-        install.packages(c("logging"), contriburl = c_url, type = "source", quiet = T)
+        install.packages(c("logging"), contriburl = c_url, type = "source", quiet = !verbose)
       }
-      library(optparse)
+      library(logging)
     })
   })
 }, error = function(e) {
