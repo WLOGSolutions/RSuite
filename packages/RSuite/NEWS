@@ -1,3 +1,6 @@
+VERSION 0.21 (2017-12-26)
+  * Repository cache handling enhanced. It is recached if older than 1 week.
+
 VERSION 0.20 (2017-12-08)
   * Caching of available packages from each repository to build faster with CLI.
   * While building project packages it detects changes in package sources.
@@ -5,7 +8,7 @@ VERSION 0.20 (2017-12-08)
      will be installed.
   * Remote packages downloaded are cached. So next time they are ready which
      reduces dependency collection time.
-  * Fix in package version comparision
+  * Fix in package version comparison
 
 VERSION 0.19 (2017-11-23)
   * Detection imports in package NAMESPACE fixed to support comma separated lists.

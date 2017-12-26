@@ -14,6 +14,8 @@ options <- c(
               help="User provided url to search for RSuite package. (default: %default)"),
   make_option(c("--package"), dest = "package", default=NULL,
               help="Use rsuite package provided to install RSuite. (default: %default)"),
+  make_option(c("-r", "--rstudio-deps"), dest = "rstudio_deps", action="store_true", default=FALSE,
+              help="If passed will install also packages required to run RStudio plugins. (default: %default)"),
   make_option(c("-v", "--verbose"), dest = "verbose", action="store_true", default=FALSE,
               help="If passed lots of messages are written to console during installation.")
 )
@@ -103,8 +105,12 @@ tryCatch({
 
   tools::write_PACKAGES(dir = src_dir, type = "source")
 
-  # install it from local repository, dependencies are from CRAN
-  utils::install.packages("RSuite",
+  pkgs <- c("RSuite")
+  if (opts$rstudio_deps) {
+	pkgs <- c(pkgs, "httpuv", "xtable", "sourcetools", "shiny", "miniUI")
+  }
+  # install RSuite from local repository, dependencies (and other packages) are from CRAN
+  utils::install.packages(pkgs,
                           repos = c(CRAN = cran_path, Local = paste0("file:///", tmp_dir)),
                           quiet = !opts$verbose,
                           verbose = opts$verbose)

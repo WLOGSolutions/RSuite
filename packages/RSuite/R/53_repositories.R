@@ -279,13 +279,26 @@ get_curl_available_packages <- function(contrib_url) {
     names(curl2cfile) <- c(noncache_curl, cache_curl)
   }
 
-
+  to_old <- function(fpath) {
+    if (!file.exists(fpath)) {
+      return(TRUE)
+    }
+    mtime <- file.mtime(fpath)
+    age_days <- as.double(difftime(Sys.time(), mtime, "days"))
+    return(age_days < 0.0 || age_days >= 7.0)
+  }
   pkgs_raw <- lapply(X = names(curl2cfile),
                      FUN = function(curl) {
                        cfile <- curl2cfile[[curl]]
-                       if (file.exists(cfile)) {
-                         # read it from cache
-                         return(readRDS(cfile))
+                       if (file.exists(cfile) && !too_old(cfile)) {
+                         # try to read it from cache
+                         pkgs <- tryCatch({
+                           readRDS(cfile)
+                         }, error = function(e) { data.frame() })
+
+                         if (nrow(pkgs) > 0) {
+                          return(pkgs)
+                         }
                        }
 
                        # really retrieve it
@@ -303,7 +316,7 @@ get_curl_available_packages <- function(contrib_url) {
                          })
                          pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)
 
-                         if (nchar(cfile) > 0) {
+                         if (nrow(pkgs) > 0 && nchar(cfile) > 0) {
                            # cache it for future
                            try({
                              saveRDS(pkgs, file = cfile)

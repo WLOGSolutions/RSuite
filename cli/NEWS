@@ -1,5 +1,7 @@
 VERSION 0.21 (2017-12-??)
   * MSI does not prompt for reboot any more
+  * 'rsuite install' has option to install also packages required 
+    to use RStudio plug-ins
 
 VERSION 0.20 (2017-12-08)
   * 'proj build' has option to force rebuild packages.
