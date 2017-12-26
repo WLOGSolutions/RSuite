@@ -385,16 +385,14 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE) {
 #' @param prj project object to zip. if not passed will zip loaded project or
 #'    default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
-#' @param path folder path to put output zip into. The folder must exist.
-#'    (type: characted: default: getwd())
+#' @param path folder path to put output zip into. If folder does not exist, will
+#'    create it. (type: characted: default: getwd())
 #' @param zip_ver if passed enforce version of zip package to passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
 #'
 #' @export
 #'
 prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
-  assert(dir.exists(path), "Existing folder expected for path")
-
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
@@ -407,6 +405,9 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
                                     params$pkgs_type,
                                     rebuild = TRUE)
 
+  if (!dir.exists(path)) {
+    dir.create(path, recursive = T, showWarnings = F)
+  }
   zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
 }
 

@@ -279,7 +279,7 @@ get_curl_available_packages <- function(contrib_url) {
     names(curl2cfile) <- c(noncache_curl, cache_curl)
   }
 
-  to_old <- function(fpath) {
+  too_old <- function(fpath) {
     if (!file.exists(fpath)) {
       return(TRUE)
     }
