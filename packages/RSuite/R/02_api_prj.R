@@ -459,7 +459,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
   stopifnot(!is.null(prj))
 
   params <- prj$load_params()
-  get_rscript_path(params$r_ver) # from 97_rversion.R; ensure R version is available
+  # no need to check R version here. We will not build anything
 
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   if (is.null(pkgs)) {

@@ -1,5 +1,7 @@
-VERSION 0.21 (2017-12-26)
+VERSION 0.21 (2017-12-27)
   * Repository cache handling enhanced. It is recached if older than 1 week.
+  * Fixed repository caching for R 3.2
+  * Then packing project dest R version is not checked.
 
 VERSION 0.20 (2017-12-08)
   * Caching of available packages from each repository to build faster with CLI.

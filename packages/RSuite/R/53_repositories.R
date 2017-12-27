@@ -312,7 +312,7 @@ get_curl_available_packages <- function(contrib_url) {
                          }
 
                          pkgs <- suppressWarnings({
-                           utils::available.packages(contriburl = curl, type = type, repos = NULL, filters = list())
+                           utils::available.packages(contriburl = curl, type = type, filters = list())
                          })
                          pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)
 
