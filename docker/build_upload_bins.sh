@@ -20,6 +20,7 @@ echo "Will build packages under wlog/rsuite:${img_tag}."
 
 docker rm -f bin_bld_upl 2>&1 > /dev/null
 docker run --name bin_bld_upl -d wlog/rsuite:${img_tag}
+docker exec -i bin_bld_upl apt-get update
 if [ "$plat" = "ubuntu" ]; then
     docker exec -i bin_bld_upl sh -c "apt-get install -y python-pip"
 elif [ "$plat" = "centos" ]; then
@@ -28,7 +29,7 @@ else
     echo "Unexpected platform $plat. Do not know how to install pip."
     exit 2
 fi
-docker cp $HOMEPATH/.aws bin_bld_upl:/root \
+docker cp "$HOMEPATH/.aws" bin_bld_upl:/root \
     && docker exec -i bin_bld_upl sh -c "pip install awscli" \
     && docker exec -i bin_bld_upl sh -c "rsuite proj start -n Uploader -v" \
     && docker exec -i bin_bld_upl sh -c "cat Uploader/PARAMETERS | grep -v 'Repositories:' > PARAMETERS.fix; echo 'Repositories: Url[http://wlog-cran.s3.amazonaws.com], CRAN' >> PARAMETERS.fix; mv -f PARAMETERS.fix Uploader/PARAMETERS" \

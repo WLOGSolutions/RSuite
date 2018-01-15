@@ -54,8 +54,16 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath) {
     }, finally = { close(ns_con) })
   }
 
-  doc_res <- run_rscript("devtools::document(%s)",
+  roclets <- c("collate", "namespace", "rd") # all default roclets
+  dcf <- read.dcf(file.path(pkg_path, "DESCRIPTION"))
+  if ('RoxygenExtraRoclets' %in% colnames(dcf)) {
+    roclets <- c(roclets, trimws(strsplit(dcf[1, 'RoxygenExtraRoclets'], ", ")[1]))
+    pkg_loginfo("Will use following roclets for documentation building: %s", paste(roclets, collapse = ", "))
+  }
+
+  doc_res <- run_rscript("devtools::document(%s, %s)",
                          rscript_arg("pkg", pkg_path),
+                         rscript_arg("roclets", roclets),
                          rver = rver, ex_libpath = libpath)
   if (!is.null(doc_res)) {
     if (doc_res == FALSE) {

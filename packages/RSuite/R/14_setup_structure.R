@@ -220,7 +220,7 @@ create_package_structure <- function(pkg_dir) {
   keywords <- list(
     pkg_name = basename(pkg_dir),
     today = as.character(Sys.Date()),
-    user = Sys.info()[['user']]
+    user = iconv(Sys.info()[['user']], from = "utf-8", to = "latin1")
   )
 
   # now replace markers in files

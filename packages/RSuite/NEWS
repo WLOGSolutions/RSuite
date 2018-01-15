@@ -2,6 +2,10 @@ VERSION 0.21 (2017-12-27)
   * Repository cache handling enhanced. It is recached if older than 1 week.
   * Fixed repository caching for R 3.2
   * Then packing project dest R version is not checked.
+  * Then generating DESCRIPTION for package user name is converted to latin1
+     to get rid of all locale specific characters.
+  * Handling RoxygenExtraRoclets in package DESCRIPTION file.
+  * MRAN repository uses https by default
 
 VERSION 0.20 (2017-12-08)
   * Caching of available packages from each repository to build faster with CLI.

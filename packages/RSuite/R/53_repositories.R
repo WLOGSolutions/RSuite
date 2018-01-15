@@ -294,7 +294,9 @@ get_curl_available_packages <- function(contrib_url) {
                          # try to read it from cache
                          pkgs <- tryCatch({
                            readRDS(cfile)
-                         }, error = function(e) { data.frame() })
+                         }, error = function(e) {
+                           data.frame()
+                         })
 
                          if (nrow(pkgs) > 0) {
                           return(pkgs)
@@ -316,7 +318,10 @@ get_curl_available_packages <- function(contrib_url) {
                          })
                          pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)
 
-                         if (nrow(pkgs) > 0 && nchar(cfile) > 0) {
+                         if (nrow(pkgs) == 0) {
+                           return(NULL)
+                         }
+                         if (nchar(cfile) > 0) {
                            # cache it for future
                            try({
                              saveRDS(pkgs, file = cfile)

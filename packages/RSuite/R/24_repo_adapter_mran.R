@@ -18,7 +18,7 @@ repo_adapter_create_mran <- function(name) {
   result <- repo_adapter_create_base(name)
 
   result$get_repo_path <- function(snapshot_date) {
-    repo_path <- paste0("http://mran.microsoft.com/snapshot/", snapshot_date)
+    repo_path <- paste0("https://mran.microsoft.com/snapshot/", snapshot_date)
     return(repo_path)
   }
   class(result) <- c('rsuite_repo_adapter_mran', class(result))
