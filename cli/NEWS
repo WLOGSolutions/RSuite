@@ -1,7 +1,8 @@
-VERSION 0.21 (2017-12-??)
+VERSION 0.21 (2018-01-17)
   * MSI does not prompt for reboot any more
   * 'rsuite install' has option to install also packages required 
     to use RStudio plug-ins
+  * MSI is properly signed
 
 VERSION 0.20 (2017-12-08)
   * 'proj build' has option to force rebuild packages.
