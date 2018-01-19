@@ -263,7 +263,7 @@ get_available_packages <- function(path, type, rver) {
 get_curl_available_packages <- function(contrib_url) {
   stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", contrib_url) != -1)) # url expected
 
-  home_dir <- shortPathName(Sys.getenv(ifelse(.Platform$OS.type == "windows", "USERPROFILE", "HOME")))
+  home_dir <- ifelse(.Platform$OS.type == "windows", shortPathName(Sys.getenv("USERPROFILE")), Sys.getenv("HOME"))
   cache_dir <- file.path(home_dir, ".rsuite", "repos_cache")
 
   if (!dir.exists(cache_dir) && !dir.create(cache_dir, recursive = TRUE)) {

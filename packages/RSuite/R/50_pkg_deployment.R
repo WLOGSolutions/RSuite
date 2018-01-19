@@ -60,7 +60,8 @@ pkg_download <- function(avail_pkgs, dest_dir) {
   local_pkgs <- data.frame()
   if (nrow(remote_pkgs)) {
     # check/build download cache
-    cache_files <- file.path(Sys.getenv("HOME"), ".rsuite", "dload_cache",
+    home_dir <- ifelse(.Platform$OS.type == "windows", shortPathName(Sys.getenv("USERPROFILE")), Sys.getenv("HOME"))
+    cache_files <- file.path(home_dir, ".rsuite", "dload_cache",
                              URLencode(remote_pkgs$Repository, TRUE),
                              remote_pkgs$File)
     cache_exists <- file.exists(cache_files)
