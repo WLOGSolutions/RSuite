@@ -87,6 +87,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
                             binary = (build_type != "source"),
                             rver = params$r_ver,
                             libpath = params$lib_path,
+                            sboxpath = params$sbox_path,
                             skip_build_steps = skip_build_steps)
       if (is.null(pkg_file)) {
         next # Failed to build package

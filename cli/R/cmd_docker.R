@@ -10,7 +10,7 @@ base <- dirname(gsub("--file=", "", args[grepl("^--file=", args)]))[1]
 source(file.path(base, "command_mgr.R"), chdir = T)
 source(file.path(base, "docker_utils.R"))
 
-.build_prj_zip <- function(platform, version, dont_rm, pkgs, exc_master, dest_dir, sh) {
+.build_prj_zip <- function(platform, version, rver, dont_rm, pkgs, exc_master, dest_dir, sh) {
   if (is.null(version) || is.na(version)) {
     version <- NULL
   }
@@ -20,10 +20,11 @@ source(file.path(base, "docker_utils.R"))
   }
 
   prj <- RSuite::prj_init()
-  docker_image <- get_docker_image(prj, platform) # from docker_utils.R
+  docker_image <- get_docker_image(prj, rver, platform) # from docker_utils.R
 
   pack_fpath <- RSuite::prj_pack(prj = prj, path = tempdir(), pack_ver = version,
-                                 pkgs = pkgs, inc_master = !exc_master)
+                                 pkgs = pkgs, inc_master = !exc_master,
+                                 rver = rver)
 
   cont_name <- run_container(docker_image) # from docker_utils.R
   on.exit({
@@ -69,6 +70,8 @@ sub_commands <- list(
     options = list(
       make_option(c("-p", "--platform"), dest = "platform", default = "ubuntu",
                   help="Build project for plaform passed. One of ubuntu or centos (default: %default)"),
+      make_option(c("--rver"), dest = "rver", default=NULL,
+                  help="If passed will enforce zip building for passed version of R."),
       make_option(c("--sh"), dest = "sh",
                   help="Extra command to execute on container before building project."),
       make_option(c("--dont-rm"), dest = "dont_rm", action="store_true", default=FALSE,
@@ -94,7 +97,8 @@ sub_commands <- list(
         stop(sprintf("Destination folder does not exist: %s", opts$dest))
       }
 
-      .build_prj_zip(opts$platform, opts$version, opts$dont_rm, opts$pkgs, opts$exc_master,
+      .build_prj_zip(opts$platform, opts$version, opts$rver,
+                     opts$dont_rm, opts$pkgs, opts$exc_master,
                      opts$dest, opts$sh)
       invisible()
     }
@@ -131,6 +135,9 @@ sub_commands <- list(
                   help=paste("Will be used if -z (--zip) is not passed or no -f (--from) passed.",
                              "Build project zip for plaform passed. One of ubuntu or centos (default: %default)",
                              sep = "\n\t\t")),
+      make_option(c("--rver"), dest = "rver", default=NULL,
+                  help=paste("Will be used if -z (--zip) is not passed or no -f (--from) passed.",
+                             "If passed will enforce zip building for passed version of R.")),
       make_option(c("--sh"), dest = "sh",
                   help=paste("Will be used if -z (--zip) is not passed",
                              "Extra command to execute on container before building project zip.",
@@ -172,7 +179,7 @@ sub_commands <- list(
 
       if (is.null(opts$from)) {
         prj <- RSuite::prj_init()
-        opts$from <- get_docker_base_image(prj, opts$platform) # from docker_utils.R
+        opts$from <- get_docker_base_image(prj, opts$rver, opts$platform) # from docker_utils.R
         loginfo("Will use %s as base image!", opts$from)
       }
 
@@ -183,6 +190,7 @@ sub_commands <- list(
       if (is.null(opts$zip)) {
         opts$zip <- .build_prj_zip(platform = opts$platform,
                                    version = opts$version,
+                                   rver = opts$rver,
                                    dont_rm = NULL,
                                    pkgs = opts$pkgs,
                                    exc_master = opts$exc_master,

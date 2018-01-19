@@ -39,20 +39,22 @@ get_platform_id <- function(platform) {
 #'
 #' Will raise error if platform is not supported.
 #'
-get_docker_base_image <- function(prj, platform) {
+get_docker_base_image <- function(prj, rver, platform) {
   get_platform_id(platform) # just to check if platform is valid
 
   params <- prj$load_params()
-
-  sprintf("wlog/rsuite:%s_r%s", platform, RSuite:::majmin_rver(params$r_ver))
+  if (is.null(rver)) {
+    rver <- params$r_ver
+  }
+  sprintf("wlog/rsuite:%s_r%s", platform, RSuite:::majmin_rver(rver))
 }
 
 #'
 #' Builds image id with latest RSuite & RSuite CLI to build project for the platform.
 #'
-get_docker_image <- function(prj, platform) {
+get_docker_image <- function(prj, rver, platform) {
   sprintf("%s_v%s",
-          get_docker_base_image(prj, platform),
+          get_docker_base_image(prj, rver, platform),
           get_latest_release(get_platform_id(platform))$ver)
 }
 

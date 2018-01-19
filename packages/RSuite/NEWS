@@ -1,3 +1,12 @@
+VERSION 0.22 (2018-01-19)
+  * RC revision is checked for validity: Git tags containing non digits prevent
+     packages from building when tagged.
+  * Project can be packed with dest R version enforcement to support CLI docker
+     command.
+  * Support packages are detected and installed into sbox while collecting
+     dependencies: as for now only libraries required to run roclets on project
+     packages.
+
 VERSION 0.21 (2018-01-17)
   * Repository cache handling enhanced. It is recached if older than 1 week.
   * Fixed repository caching for R 3.2

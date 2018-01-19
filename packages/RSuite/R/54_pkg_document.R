@@ -12,12 +12,13 @@
 #' @param pkg_path path to the package. (type: character)
 #' @param rver R version to build package with. (type: character)
 #' @param libpath library path to use during building. (type: character)
+#' @param sboxpath library path there support packages can be found. (type: character)
 #'
 #' @return TRUE if documentation build was not required or built it succesfully.
 #'
 #' @keywords internal
 #'
-pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath) {
+pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
   # first remove Rd file built with roxygen
   removed <- lapply(X = list.files(file.path(pkg_path, "man"), ".+[.]Rd$", full.names = T),
                     FUN = function(rd_file) {
@@ -64,7 +65,7 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath) {
   doc_res <- run_rscript("devtools::document(%s, %s)",
                          rscript_arg("pkg", pkg_path),
                          rscript_arg("roclets", roclets),
-                         rver = rver, ex_libpath = libpath)
+                         rver = rver, ex_libpath = c(libpath, sboxpath))
   if (!is.null(doc_res)) {
     if (doc_res == FALSE) {
       pkg_logwarn("Document building aborted for %s", pkg_name)

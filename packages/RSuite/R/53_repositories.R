@@ -263,7 +263,9 @@ get_available_packages <- function(path, type, rver) {
 get_curl_available_packages <- function(contrib_url) {
   stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", contrib_url) != -1)) # url expected
 
-  cache_dir <- file.path(Sys.getenv("HOME"), ".rsuite", "repos_cache")
+  home_dir <- shortPathName(Sys.getenv(ifelse(.Platform$OS.type == "windows", "USERPROFILE", "HOME")))
+  cache_dir <- file.path(home_dir, ".rsuite", "repos_cache")
+
   if (!dir.exists(cache_dir) && !dir.create(cache_dir, recursive = TRUE)) {
     curl2cfile <- as.list(rep("", length(contrib_url)))
     names(curl2cfile) <- contrib_url
@@ -284,7 +286,7 @@ get_curl_available_packages <- function(contrib_url) {
       return(TRUE)
     }
     mtime <- file.mtime(fpath)
-    age_days <- as.double(difftime(Sys.time(), mtime, "days"))
+    age_days <- as.double(difftime(Sys.time(), mtime, units = "days"))
     return(age_days < 0.0 || age_days >= 7.0)
   }
   pkgs_raw <- lapply(X = names(curl2cfile),

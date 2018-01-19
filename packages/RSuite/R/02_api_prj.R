@@ -443,6 +443,8 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #'    (type: logical, default: TRUE)
 #' @param pack_ver if passed enforce version of pack to passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
+#' @param rver if passed enforce destination R version of pack.
+#'    (type: character(1), default: NULL)
 #'
 #' @return invisible file path to pack file created. The file name will be
 #'    in form prjpack_<ProjectName>_<version>.zip
@@ -451,9 +453,12 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #'
 prj_pack <- function(prj = NULL, path = getwd(),
                      pkgs = NULL, inc_master = TRUE,
-                     pack_ver = NULL) {
+                     pack_ver = NULL,
+                     rver = NULL) {
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is.logical(inc_master), "Logical value expected for inc_master")
+  assert(is.null(rver) || (is.character(rver) && length(rver) == 1),
+         "Character(1) expected for rver")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -476,6 +481,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
   on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
 
   exp_params <- export_prj(params, # from 19_pack_helpers.R
+                           rver,
                            pkgs,
                            inc_master,
                            tmp_dir)

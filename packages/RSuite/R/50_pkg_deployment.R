@@ -119,6 +119,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #' @param binary if TRUE will build binary package. (type: logical)
 #' @param rver R version to build package with. (type: character)
 #' @param libpath library path to use during building. (type: character)
+#' @param sboxpath library path there support packages are placed. (type: character)
 #' @param skip_build_steps steps to not perform before building. Can contain only
 #' \describe{
 #'   \item{specs}{Process packages specifics}
@@ -133,7 +134,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #'
 #' @keywords internal
 #'
-pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, skip_build_steps = NULL) {
+pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_build_steps = NULL) {
   stopifnot(length(pkg_path) == 1 && dir.exists(pkg_path))
   stopifnot(length(dest_dir) == 1 && dir.exists(dest_dir))
 
@@ -141,6 +142,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, skip_build_step
   pkg_path <- rsuite_fullUnifiedPath(pkg_path)
   dest_dir <- rsuite_fullUnifiedPath(dest_dir)
   libpath <- rsuite_fullUnifiedPath(libpath)
+  sboxpath <- rsuite_fullUnifiedPath(sboxpath)
 
   if (dir.exists(file.path(libpath, pkg_name))) {
     unlink(file.path(libpath, pkg_name), recursive = T, force = T)
@@ -162,7 +164,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, skip_build_step
 
   if ("docs" %in% skip_build_steps) {
     pkg_loginfo("Skipping documentation building")
-  } else if (!pkg_build_docs(pkg_name, pkg_path, rver, libpath)) { # from 54_pkg_document.R
+  } else if (!pkg_build_docs(pkg_name, pkg_path, rver, libpath, sboxpath)) { # from 54_pkg_document.R
     # package without documentation is unuseable due to NAMESPACE is not generated also
     return(NULL)
   }

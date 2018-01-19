@@ -25,6 +25,60 @@ install_prj_deps <- function(params, ...) {
 
   avail_vers <- resolve_prj_deps(repo_infos, params)
   install_dependencies(avail_vers, lib_dir = params$lib_path, rver = params$r_ver)
+
+  avail_sup_vers <- resolve_prj_sups(repo_infos, params)
+  if (!is.null(avail_sup_vers)) {
+    install_support_pkgs(avail_sup_vers,
+                         sbox_dir = params$sbox_path,
+                         lib_dir = params$lib_path,
+                         rver = params$r_ver)
+  }
+}
+
+#'
+#' Runs overall project support package resolving.
+#' Resolves all the support package dependencies.
+#'
+#' @param repo_infos list of description of repositories (object of rsuite_repo_info)
+#'    to use for dependencies detection.
+#' @param params object of rsuite_project_params
+#' @param only_source detect only source type dependencies
+#'
+#' @return version object describing available project dependencies.
+#'
+#' @keywords internal
+#'
+resolve_prj_sups <- function(repo_infos, params, only_source = F) {
+  if(only_source) {
+    pkg_types <- "source"
+  } else {
+    pkg_types <- c(params$bin_pkgs_type, "source")
+  }
+
+
+  pkg_logdebug("Collecting project support packages (for R %s)...", params$r_ver)
+  prjSupVers <- collect_prj_support_pkgs(params)        # from 52_dependencies.R
+
+  # remove project packages
+  project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  prjSupVers <- vers.rm(prjSupVers, project_packages)
+
+  # remove installed already packages
+  installed <- installed.packages(lib.loc = c(params$sbox_path, params$lib_path, Sys.getenv("R_LIBS_USER"), .Library))
+  installed <- as.data.frame(installed, stringsAsFactors = F)[, c("Package", "Version", "Built")]
+  installed <- installed[majmin_rver(installed$Built) == majmin_rver(params$r_ver), ]
+  prjSupVers <- vers.rm_acceptable(prjSupVers, installed)
+
+  if (!vers.is_empty(prjSupVers)) {
+    pkg_logdebug("Resolving support packages (with deps) (for R %s)...", params$r_ver)
+    avail_vers <- resolve_dependencies(prjSupVers, repo_infos = repo_infos, pkg_types = pkg_types)
+    stopifnot(avail_vers$has_avails())
+    return(avail_vers)
+  }
+
+  pkg_logdebug("No project support packages required.")
+  return()
+
 }
 
 #'
@@ -58,6 +112,46 @@ resolve_prj_deps <- function(repo_infos, params, only_source = F) {
   avail_vers <- resolve_dependencies(prjDepVers, repo_infos = repo_infos, pkg_types = pkg_types)
   stopifnot(avail_vers$has_avails())
   return(avail_vers)
+}
+
+
+install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
+  stopifnot(is.versions(avail_vers))
+  stopifnot(avail_vers$has_avails())
+  stopifnot(is_nonempty_char1(lib_dir))
+
+  remove_installed <- function(vers) {
+    installed <- as.data.frame(installed.packages(lib.loc = c(sbox_dir, lib_dir, Sys.getenv("R_LIBS_USER"), .Library)),
+                               stringsAsFactors = F)[, c("Package", "Version", "Built")]
+    installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
+    return(vers.rm_acceptable(vers, installed))
+  }
+
+  avail_vers <- remove_installed(avail_vers)
+  if (vers.is_empty(avail_vers)) {
+    pkg_logdebug("No support packages to install.")
+    return(invisible())
+  }
+
+  pkg_loginfo("Detected %s support packages to install. Installing...", length(vers.get_names(avail_vers)))
+
+  tmp_dir <- tempfile()
+  dir.create(tmp_dir, recursive = T)
+  on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
+
+  avail_deps <- vers.pick_available_pkgs(avail_vers)
+  dloaded <- pkg_download(avail_deps, dest_dir = tmp_dir)
+  # sort them for installation (in dependency order)
+  dloaded <- dloaded[ pkg_inst_order(dloaded$Package, db = avail_deps), ]
+
+  # this type = "source" does not matter, it is passed just to prevent complaining
+  #  on windows that "both" type cannot be used with repos = NULL
+  pkg_install(dloaded$Path, lib_dir = sbox_dir, type = "source", repos = NULL, rver = rver)
+
+  avail_vers <- remove_installed(avail_vers)
+  assert(vers.is_empty(avail_vers),
+         "Failed to install some support packages: %s", paste(vers.get_names(avail_vers), collapse = ", "))
+  pkg_loginfo("All support packages successfully installed.")
 }
 
 #'

@@ -68,17 +68,21 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
 #' @param prj project object to update configuration for. If not passed will use loaded
 #'    project or default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
+#' @param validate If TRUE will check if R version is valid for the platform.
+#'    (type: logical, default: TRUE)
 #'
 #' @export
 #'
-prj_config_set_rversion <- function(rver, prj = NULL) {
+prj_config_set_rversion <- function(rver, prj = NULL, validate = TRUE) {
   assert(is_nonempty_char1(rver), "Non empty character(1) expected for rver")
 
-  tryCatch({
-    get_rscript_path(rver)
-  }, error = function(e) {
-    assert(FALSE, "Could not find valid R %s in path", rver)
-  })
+  if (any(validate)) {
+    tryCatch({
+      get_rscript_path(rver)
+    }, error = function(e) {
+      assert(FALSE, "Could not find valid R %s in path", rver)
+    })
+  }
 
   prj <- safe_get_prj(prj)
 

@@ -46,6 +46,10 @@ detect_zip_version <- function(params, zip_ver) {
 
   revision <- detect_consistent_revision(params)
   if (!is.null(revision)) {
+    assert(grepl("^\\d+$", revision),
+           paste0("RC revision detected(%s) is invalid:",
+                  " it must contain digits only as it is appended to project packages version numbers."),
+           revision)
     return(list(ver = paste0(zip_ver, "_", revision), rev = revision))
   }
 

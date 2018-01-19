@@ -160,7 +160,7 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   }
   head_tag <- names(repo_tags)[sapply(repo_tags, function(x) tag_target(x) == head_target)]
   assert(length(head_tag), "Failed to find HEAD commit tag. Is it tagged?")
-  assert(length(head_tag) == 1, "More than one HEAD commit tag found.")
+  assert(length(head_tag) == 1, "More than one HEAD commit tag found: %s.", paste(head_tag, collapse = ", "))
 
   # detect if working copy needs update
   diff_working_tree <- git2r::diff(repo, index = FALSE)

@@ -1,6 +1,9 @@
+VERSION 0.22 (2018-01-19)
+  * R version can be enforced then building docker zip/image
+
 VERSION 0.21 (2018-01-17)
   * MSI does not prompt for reboot any more
-  * 'rsuite install' has option to install also packages required 
+  * 'rsuite install' has option to install also packages required
     to use RStudio plug-ins
   * MSI is properly signed
 

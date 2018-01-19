@@ -9,6 +9,8 @@
 #' Exports project sources into folder passed.
 #'
 #' @param params parameters of project to export. (type: rsuite_project_params)
+#' @param rver R version to pack project for. If NULL R version of project will
+#'   not be altered (type: character)
 #' @param pkgs names of project packages to include. (type: character)
 #' @param dest_dir destination folder path to export project to. (type: character)
 #'
@@ -16,7 +18,7 @@
 #'
 #' @keywords internal
 #'
-export_prj <- function(params, pkgs, inc_master, dest_dir) {
+export_prj <- function(params, rver, pkgs, inc_master, dest_dir) {
   stopifnot(is.null(pkgs) || is.character(pkgs))
   stopifnot(is.logical(inc_master))
 
@@ -66,7 +68,11 @@ export_prj <- function(params, pkgs, inc_master, dest_dir) {
   # cleanup: removing excludes
   unlink(file.path(base_dir, excludes), recursive = T, force = T)
 
-  exp_params <- prj_init(base_dir)$load_params()
+  out_prj <- prj_init(base_dir)
+  if (!is.null(rver)) {
+    RSuite::prj_config_set_rversion(rver, out_prj, validate = FALSE)
+  }
+  exp_params <- out_prj$load_params()
 
   # cleanup: clear packages not to be included
   pkgs_toremove <- list.dirs(exp_params$pkgs_path, recursive = F, full.names = F)
