@@ -21,7 +21,7 @@ cp -R ${base_dir}/../R ${orig_dir}
 cp ${base_dir}/../rsuite ${orig_dir}/rsuite.sh
 echo -e "#!/bin/bash\n/usr/share/rsuitecli/rsuite.sh \$*\n" > ${orig_dir}/rsuite
 echo -n $ver > ${orig_dir}/version.txt
-chmod +x ${orig_dir}/{rsuite,rsuite.sh}
+chmod +x ${orig_dir}/{rsuite,rsuite.sh,rsuite-bash-prompt}
 chmod -x ${orig_dir}/R/*.R
 
 pushd ${build_dir} > /dev/null

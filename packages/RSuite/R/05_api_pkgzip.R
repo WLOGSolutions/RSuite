@@ -118,7 +118,7 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
     assert(all(pkgs %in% prj_pkgs),
            "Packages requested to include into PKGZIP are not present in project: %s",
            paste(setdiff(pkgs, prj_pkgs), collapse = ", "))
-    pkgs <- prj_pkgs[prj_pkgs == pkgs]
+    pkgs <- prj_pkgs[prj_pkgs %in% pkgs]
   }
   if (any(with_deps)) {
     raw_vers <- lapply(X = names(pkgs),

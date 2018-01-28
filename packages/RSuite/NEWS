@@ -6,6 +6,7 @@ VERSION 0.22 (2018-01-19)
   * Support packages are detected and installed into sbox while collecting
      dependencies: as for now only libraries required to run roclets on project
      packages.
+  * Imports consistency with declared in package DESCRIPTION fixed.
 
 VERSION 0.21 (2018-01-17)
   * Repository cache handling enhanced. It is recached if older than 1 week.

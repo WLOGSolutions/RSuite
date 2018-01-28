@@ -210,7 +210,7 @@ repo_upload_prj_packages <- function(repo_manager,
     assert(all(pkgs %in% prj_pkgs),
            "Packages requested to upload are not present in project: %s",
            paste(setdiff(pkgs, prj_pkgs), collapse = ", "))
-    pkgs <- prj_pkgs[prj_pkgs == pkgs]
+    pkgs <- prj_pkgs[prj_pkgs %in% pkgs]
   }
 
   revision <- NULL

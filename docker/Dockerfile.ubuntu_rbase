@@ -2,7 +2,7 @@ ARG rver=3.3
 
 FROM rocker/r-ver:${rver}
 
-LABEL name="R${rver} build under base Ubunbtu"
+LABEL name="R${rver} build under base Debian 9.2 (stretch)"
 LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
 
 RUN apt-get update \

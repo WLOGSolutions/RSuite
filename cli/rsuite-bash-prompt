@@ -1,0 +1,437 @@
+#
+# Completions for rsuite:
+# 
+# rsuite updater/install/proj/repo/pkgzip/docker/version/help <options>
+#
+_rsuite() {
+	local cur prev subcmd opts
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	prev="${COMP_WORDS[COMP_CWORD-1]}"
+	cmd="${COMP_WORDS[1]}"
+
+	local common_opts_long="--verbose --help --quite"
+	local common_opts_short="-v -h -q"
+	case "${cmd}" in
+		update)
+			if [[ $cur == --* ]]; then
+				opts="$common_opts_long"
+			else
+				opts="$common_opts_short"
+			fi
+			;;
+		install)
+			if [[ $cur == --* ]]; then
+				opts="--url --package --rstudio-deps $common_opts_long"
+			else
+				case "${prev}" in
+					--package|-p)
+						_filedir
+						return 0
+						;;
+					--url|-u)
+						return 0
+						;;
+					*)
+						opts="-u --package -r $common_opts_short"
+						;;
+				esac
+
+			fi
+			;;
+		proj)
+			if [ $COMP_CWORD == 2 ]; then
+				opts="start pkgadd depsinst build test depsclean zip pack help"
+			else
+				case "${COMP_WORDS[2]}" in
+					build)
+						if [[ $cur == --* ]]; then
+							opts="--binary --force $common_opts_long"
+						else
+							case "${prev}" in
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								*)
+									opts="-b -f $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					start|pkgadd)
+						if [[ $cur == --* ]]; then
+							opts="--name --skip-rc $common_opts_long"
+						else
+							case "${prev}" in
+								--name|-n)
+									return 0
+									;;
+								*)
+									opts="-n --skip-rc $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					depsinst)
+						if [[ $cur == --* ]]; then
+							opts="--clean $common_opts_long"
+						else
+							opts="-c $common_opts_short"
+						fi
+						;;
+					test)
+						if [[ $cur == --* ]]; then
+							opts="--dir $common_opts_long"
+						else
+							case "${prev}" in
+								--dir|-d)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-d $common_opts_short"
+									;;
+							esac
+							
+						fi
+						;;
+					depsclean)
+						if [[ $cur == --* ]]; then
+							opts="$common_opts_long"
+						else
+							opts="$common_opts_short"
+						fi
+						;;
+					zip|pack)
+						if [[ $cur == --* ]]; then
+							opts="--path --version $common_opts_long"
+						else
+							case "${prev}" in
+								--path|-p)
+									_filedir
+									return 0
+									;;
+								--version)
+									return 0
+									;;
+								*)
+									opts="-p --version $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					*)
+						return 0
+						;;
+				esac
+			fi
+			;;
+		repo)
+			if [ $COMP_CWORD == 2 ]; then
+				opts="init addproj addfile addext addpkgzip addgithub list remove help"
+			else
+				case "${COMP_WORDS[2]}" in
+					init|list)
+						if [[ $cur == --* ]]; then
+							opts="--binary --rver --dir --s3_url $common_opts_long"
+						else
+							case "${prev}" in
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								--rver|--s3_url|-s)
+									return 0
+									;;
+								--dir|-d)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-b --rver -d -s $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					addproj)
+						if [[ $cur == --* ]]; then
+							opts="--names --skip_rc --binary --with-deps --dir --s3_url $common_opts_long"
+						else
+							case "${prev}" in
+								--names|-n|--s3_url|-s)
+									return 0
+									;;
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								--dir|-d)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-n --skip_rc -b --with-deps -d -s $common_opts_short"
+							esac
+						fi
+						;;
+					addext)
+						if [[ $cur == --* ]]; then
+							otps="--names --binary --rver --with-deps --dir --s3_url $common_opts_long"
+						else
+							case "${prev}" in
+								--names|-n|--rver|--s3_url|-s)
+									return 0
+									;;
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								--dir|-d)
+									_filedir
+									;;
+								*)
+									opts="-n -b --rver --with-deps -d -s $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					addfile)
+						if [[ $cur == --* ]]; then
+							opts="--files --dir --s3_url $common_opts_long"
+						else
+							case "${prev}" in
+								-f|--files|-d|--dir)
+									_filedir
+									;;
+								--s3_url|-s)
+									return 0
+									;;
+								*)
+									opts="-f -d -s $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					addpkgzip)
+						if [[ $cur == --* ]]; then
+							opts="--pkgzip --dir --s3_url $common_opts_long"
+						else
+							case "${$prev}" in
+								--pkgzip|-z|--dir|-d)
+									_filedir
+									;;
+								--s3_url|-s)
+									return 0
+									;;
+								*)
+									opts="-z -d -s $common_opts_long"
+									;;
+							esac
+						fi
+						;;
+					addgithub)
+						if [[ $cur == --* ]]; then
+							opts="--repo --host --binary --rver --with-deps --skip-build-steps --keep-sources --dir --s3_url $common_opts_long"
+						else
+							case "${prev}" in
+								--repo|-r|--host|-h|--rver|--s3_url|-s)
+									return 0
+									;;
+								--dir|-d)
+									_filedir
+									return 0
+									;;
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								--skip-build-steps)
+									opts="specs docs imps tests rcpp_attribs"
+									;;
+								*)
+									opts="-r -h -b --rver --with-deps --skip-build-steps --keep-sources -d -s $common_opts_short"
+							esac
+						fi
+						;;
+					remove)
+						if [[ $cur == --* ]]; then
+							opts="--toremove --binary --dir --s3_url $common_opts_long"
+						else
+							case "${prev}" in
+								--toremove|-r|--s3_url|-s)
+									return 0
+									;;
+								--dir|-d)
+									_filedir
+									return 0
+									;;
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								*)
+									opts="-r -b -d -s $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					*)
+						retrun 0
+						;;
+
+				esac
+			fi
+			;;
+		pkgzip)
+			if [ $COMP_CWORD == 2 ]; then
+				opts="proj file ext github help"
+			else
+				case "${COMP_WORDS[2]}" in
+					proj)
+						if [[ $cur == --* ]]; then
+							opts="--names --version --binary --with-deps --filter-repo --path $common_opts_long"
+						else
+							case "${prev}" in
+								--names|-n|--version|--filter-repo)
+									return 0
+									;;
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								--path|-p)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-n --version -b --with-deps --filter-repo -p $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					file)
+						if [[ $cur == --* ]]; then
+							opts="--files --path $common_opts_long"
+						else
+							case "${prev}" in
+								--files|-f|--path|-p)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-f -p $common_opts_short"
+									;;
+							esac
+
+						fi
+						;;
+					ext)
+						if [[ $cur == --* ]]; then
+							opts="--names --binary --with-deps --filter-repo --path $common_opts_long"
+						else
+							case "${prev}" in
+								--names|-n|--filter-repo)
+									return 0;
+									;;
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								--path|-p)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-n -b --with-deps --filter-repo -p $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					github)
+						if [[ $cur == --* ]]; then
+							opts="--repo --host --binary --with-deps --filter-repo --skip-build-steps --keep-sources --path $common_opts_long"
+						else
+							case "${prev}" in
+								--repo|-r|--host|-h|--filter-repo)
+									return 0
+									;;
+								--binary|-b)
+									opts="TRUE FALSE"
+									;;
+								--skip-build-steps)
+									opts="specs docs imps tests rcpp_attribs"
+									;;
+								--path|-p)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-r -h -b --with-deps --filter-repo --skip-build-steps --keep-sources -p $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					*)
+						return 0
+						;;
+				esac
+			fi
+			;;
+		docker)
+			if [ $COMP_CWORD == 2 ]; then
+				opts="zip img help"
+			else
+				case "${COMP_WORDS[2]}" in
+					zip)
+						if [[ $cur == --* ]]; then
+							opts="--platform --rver --sh --dont-rm --version --packages --exc-master --dest $common_opts_long"
+						else
+							case "${prev}" in
+								--rver|-sh|--version|--packages)
+									return 0;
+									;;
+								--platform|-p)
+									opts="ubuntu centos"
+									;;
+								--dest|-d)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-p --rver --sh --dont-rm --version --packages --exc-master -d $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					img)
+						if [[ $cur == --* ]]; then
+							opts="--tag --tag-latest --from --templ --templ-ctx --zip --platform --rver --sh --version --packages --exc-master $common_opts_long"
+						else
+							case "${prev}" in
+								--tag|-t|--from|-f|--rver|--sh|--version|--packages)
+									return 0;
+									;;
+								--platform|-p)
+									opts="ubuntu centos"
+									;;
+								--templ|--templ-ctx|--zip|-z)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-t --tag-latest -f --templ --templ-ctx -z -p --rver --sh --version --packages --exc-master $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					*)
+						return 0
+						;;
+				esac
+			fi
+			;;
+		version|help)
+			return 0
+			;;
+		*)
+			opts="update install proj repo pkgzip docker version help" 
+			;;
+
+	esac
+	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+
+}
+complete -F _rsuite rsuite

@@ -86,11 +86,11 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
 #'
 #' @keywords internal
 #'
-get_package_desc_imports <- function(pkg_path) {
+get_package_desc_imports <- function(pkg_path, field = "Imports") {
   desc_file <- file.path(pkg_path, "DESCRIPTION")
   stopifnot(file.exists(desc_file))
 
-  desc_imports <- read.dcf(desc_file, fields = "Imports")[1, "Imports"]
+  desc_imports <- read.dcf(desc_file, fields = field)[1, field]
   desc_imports <- unlist(strsplit(desc_imports, ","))
   desc_imports <- trimws(gsub("\\(.+\\)", "", desc_imports)) # remove ver spec ans ws
   desc_imports <- desc_imports[!is.na(desc_imports)]
@@ -116,6 +116,7 @@ get_package_nspace_imports <- function(pkg_path) {
   ns_imports <- ns_lines[grepl("^\\s*import[(]\\s*.+\\s*[)]\\s*$", ns_lines)]
   ns_imports <- gsub("^\\s*import[()]\\s*(.+)\\s*[)]\\s*$", "\\1", ns_imports)
   ns_imports <- trimws(unlist(strsplit(ns_imports, ",")))
+  ns_imports <- unique(gsub('["\']', "", ns_imports))
   return(ns_imports)
 }
 
@@ -154,11 +155,18 @@ validate_package_imports <- function(pkg_name, pkg_path) {
 
   base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
   ns_not_desc <- setdiff(ns_not_desc, base_pkgs)
-  if (length(ns_not_desc) > 0) {
-    pkg_logwarn("Imports present in NAMESPACE are not declared in DESCRIPTION of %s: %s",
-                pkg_name, paste(ns_not_desc, collapse = ", "))
-    return(FALSE)
+  if (length(ns_not_desc) == 0) {
+    return(TRUE)
   }
 
+  desc_depends <- get_package_desc_imports(pkg_path, field = "Depends")
+  ns_non_desc <- setdiff(ns_not_desc, desc_depends)
+  if (length(ns_non_desc) == 0) {
+    pkg_logwarn("Imports present in NAMESPACE are declared in DESCRIPTION (Depends) of %s", pkg_name)
+    return(TRUE)
+  }
+
+  pkg_logerror("Imports present in NAMESPACE are not declared in DESCRIPTION (neither Imports nor Depends) of %s: %s",
+               pkg_name, paste(ns_not_desc, collapse = ", "))
   return(TRUE)
 }
