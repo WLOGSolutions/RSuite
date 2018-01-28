@@ -30,11 +30,13 @@ package repositories.
 mkdir -p %{buildroot}/usr/share/rsuitecli
 install -m 755 rsuite.sh %{buildroot}/usr/share/rsuitecli/rsuite.sh
 install -m 644 version.txt %{buildroot}/usr/share/rsuitecli/version.txt
-install -m 755 rsuite-bash-prompt %{buildroot}/etc/bash_completion.d/rsuite-bash-prompt
 cp -R R %{buildroot}/usr/share/rsuitecli/
 
 mkdir -p %{buildroot}/usr/bin
 install -m 755 rsuite %{buildroot}/usr/bin/rsuite
+
+mkdir -p %{buildroot}/etc/bash_completion.d/
+install -m 755 rsuite-bash-prompt %{buildroot}/etc/bash_completion.d/rsuite-bash-prompt
 
 %clean
 

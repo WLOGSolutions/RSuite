@@ -16,7 +16,7 @@ rm -rf ${build_dir}
 mkdir -p ${build_dir}
 
 cp -R ${base_dir}/../R ${build_dir}
-cp ${base_dir}/../{rsuite,rsuite.cmd,NEWS} ${build_dir}
+cp ${base_dir}/../{rsuite,rsuite.cmd,rsuite-bash-prompt,NEWS} ${build_dir}
 echo -n $ver > ${build_dir}/version.txt
 chmod +x ${build_dir}/rsuite
 chmod -x ${build_dir}/R/*.R
