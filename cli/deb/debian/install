@@ -1,5 +1,5 @@
 rsuite usr/bin
 {rsuite.sh,version.txt} usr/share/rsuitecli
-rsuite-bash-propmt etc/bash_completion.d/rsuite-bash-propmt
+rsuite-bash-prompt etc/bash_completion.d/rsuite-bash-prompt
 R/*.R usr/share/rsuitecli/R
 R/packages/src/contrib/{PACKAGES,*.gz} usr/share/rsuitecli/R/packages/src/contrib/
