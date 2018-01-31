@@ -1,0 +1,10 @@
+{
+    "gtkplus": {
+	"sysreqs": "/\\bGTK\\+/",
+	"platforms": {
+	    "DEB": "libgtk2.0-dev",
+	    "OSX/brew": "gtk+",
+	    "RPM": "gtk2-devel"
+	}
+    }
+}

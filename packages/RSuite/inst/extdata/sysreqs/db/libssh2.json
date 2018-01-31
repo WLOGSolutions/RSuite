@@ -1,0 +1,10 @@
+{
+  "libssh2": {
+    "sysreqs": "/libssh2/i",
+    "platforms": {
+      "DEB": "libssh2-1-dev",
+      "RPM": "libssh2-devel",
+      "OSX/brew": "libssh2"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "librsvg2": {
+    "sysreqs": "librsvg2",
+    "platforms": {
+      "DEB": "librsvg2-dev",
+      "OSX/brew": "librsvg",
+      "RPM": "librsvg2-devel"
+    }
+  }
+}

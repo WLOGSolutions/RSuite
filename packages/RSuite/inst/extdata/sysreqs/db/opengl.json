@@ -1,0 +1,10 @@
+{
+  "opengl": {
+    "sysreqs": "OpenGL",
+    "platforms": {
+      "DEB": "libgl1-mesa-dev",
+      "OSX/brew": null,
+      "RPM": "mesa-libGL-devel"
+    }
+  }
+}

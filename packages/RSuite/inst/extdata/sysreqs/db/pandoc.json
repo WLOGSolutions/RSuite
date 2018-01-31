@@ -1,0 +1,10 @@
+{
+  "pandoc": {
+    "sysreqs": ["pandoc", "Pandoc"],
+    "platforms": {
+      "DEB": "pandoc pandoc-citeproc",
+      "RPM": "pandoc pandoc-citeproc",
+      "OSX/brew": "pandoc pandoc-citeproc"
+    }
+  }
+}

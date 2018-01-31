@@ -1,0 +1,10 @@
+{
+    "ODBC": {
+      "sysreqs": "/\\bODBC3?\\b/i",
+      "platforms": {
+        "DEB": "unixodbc-dev",
+        "OSX/brew": "unixodbc",
+        "RPM": "unixODBC-devel"
+      }
+    }
+}

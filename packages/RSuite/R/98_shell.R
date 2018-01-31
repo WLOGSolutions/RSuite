@@ -18,10 +18,11 @@
 #'
 #' @keywords internal
 #'
-get_cmd_lines <- function(desc, cmd, ...) {
+get_cmd_lines <- function(desc, cmd, ..., log_debug = FALSE) {
   full_cmd <- paste0(sprintf(cmd, ...), " 2>&1")
 
-  pkg_logfinest("%s cmd: %s", desc, full_cmd)
+  log_fun <- if(log_debug) { pkg_logdebug } else { pkg_logfinest }
+  log_fun("%s cmd: %s", desc, full_cmd)
 
   lines <- character(0)
   con <- pipe(full_cmd, open = "rt")
@@ -31,14 +32,13 @@ get_cmd_lines <- function(desc, cmd, ...) {
       if (!length(ln) || !nchar(ln)) {
         break
       }
-      pkg_logfinest("%s output: %s", desc, ln)
+      log_fun("%s output: %s", desc, ln)
       lines <- c(lines, ln)
     }
   }, finally = close(con))
 
   return(lines)
 }
-
 
 #'
 #' Executes R script code in RScript subprocess collecting it's output

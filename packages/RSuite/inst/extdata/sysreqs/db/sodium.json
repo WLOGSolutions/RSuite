@@ -1,0 +1,10 @@
+{
+  "sodium": {
+    "sysreqs": "/\\blibsodium\\b/",
+    "platforms": {
+      "DEB": "libsodium-dev",
+      "OSX/brew": "libsodium",
+      "RPM": "libsodium-devel"
+    }
+  }
+}

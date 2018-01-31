@@ -1,0 +1,10 @@
+{
+  "glu": {
+    "sysreqs": "/\\bGLU\\b/i",
+    "platforms": {
+      "DEB": "libglu1-mesa-dev",
+      "OSX/brew": null,
+      "RPM": "mesa-libGLU-devel"
+    }
+  }
+}

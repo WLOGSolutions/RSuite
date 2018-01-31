@@ -1,0 +1,10 @@
+{
+  "cmake": {
+    "sysreqs": "cmake",
+    "platforms": {
+      "DEB": "cmake",
+      "RPM": "cmake",
+      "OSX/brew": "cmake"
+    }
+  }
+}

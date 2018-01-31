@@ -1,0 +1,10 @@
+{
+  "libudunits2": {
+    "sysreqs": "/\\budunits-2\\b/",
+    "platforms": {
+      "DEB": "libudunits2-dev",
+      "OSX/brew": "udunits",
+      "RPM": "udunits2-devel"
+    }
+  }
+}

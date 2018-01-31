@@ -1,0 +1,9 @@
+{
+  "bowtie2": {
+    "sysreqs": "bowtie2",
+    "platforms": {
+      "DEB": "bowtie2",
+      "OSX/brew": "homebrew/science/bowtie2"
+    }
+  }
+}

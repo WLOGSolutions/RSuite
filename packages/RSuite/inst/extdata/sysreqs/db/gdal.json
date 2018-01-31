@@ -1,0 +1,10 @@
+{
+  "gdal": {
+    "sysreqs": "/\\bGDAL\\b/",
+    "platforms": {
+      "DEB": "gdal-bin",
+      "OSX/brew": "gdal",
+      "RPM": "gdal"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "python-2.7": {
+    "sysreqs": [ "python (>= 2.7", "python (>= 2.4)", "Python (>=2.76)", "Python 2.7",
+                 "Python (= 2.7)", "Python 2.7.x", "Python (>= 2.7.0)",
+                 "Python (>= 2.4.0)", "Python (>=2.6)", "Python (>= 2.7" ],
+	"handlers": {
+		"check": "[tool]"
+	},
+    "platforms": {
+      "DEB": "python-minimal",
+      "OSX/brew": null,
+      "RPM": "python"
+    }
+  }
+}

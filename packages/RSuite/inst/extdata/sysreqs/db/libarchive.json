@@ -1,0 +1,11 @@
+{
+  "libarchive": {
+    "sysreqs": "libarchive",
+    "platforms": {
+      "DEB": "libarchive-dev",
+      "OSX/brew": "libarchive",
+      "RPM": "libarchive-devel",
+      "CSW": "libarchive_dev"
+    }
+  }
+}

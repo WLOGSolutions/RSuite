@@ -1,0 +1,13 @@
+{
+	"conda": {
+		"sysreqs": "/conda\\s*\\(([^)]+)\\)/i",
+		"satisfies": "python-2.7",
+		"platforms": {
+			"Windows": "conda.exe"
+		},
+		"handlers": {
+			"check": "[tool]",
+			"build": "[shell] :tool create -y -p :path :params"
+		}
+	}
+}

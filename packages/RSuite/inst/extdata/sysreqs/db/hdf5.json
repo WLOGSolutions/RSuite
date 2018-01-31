@@ -1,0 +1,10 @@
+{
+    "hdf5": {
+        "sysreqs": "hdf5",
+        "platforms": {
+            "DEB": "libhdf5-dev",
+            "OSX/brew": "hdf5",
+            "RPM": "hdf5-devel"
+        }
+    }
+}

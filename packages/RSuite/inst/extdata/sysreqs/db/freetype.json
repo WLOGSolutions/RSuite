@@ -1,0 +1,10 @@
+{
+  "freetype": {
+    "sysreqs": "\\bfreetype\\b/i",
+    "platforms": {
+      "DEB": "libfreetype6-dev",
+      "OSX/brew": "freetype",
+      "RPM": "freetype-devel"
+    }
+  }
+}

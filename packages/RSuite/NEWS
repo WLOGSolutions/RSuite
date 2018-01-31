@@ -1,3 +1,7 @@
+VERSION 0.23 (2018-02-??)
+  * SystemRequirements field in package DESCRIPTION interpretation and handling
+     of declared system requirements implemented.
+
 VERSION 0.22 (2018-01-19)
   * RC revision is checked for validity: Git tags containing non digits prevent
      packages from building when tagged.

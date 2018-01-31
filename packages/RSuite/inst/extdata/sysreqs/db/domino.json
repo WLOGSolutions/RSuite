@@ -1,0 +1,6 @@
+{
+  "domino-1.7.1": {
+    "sysreqs": "domino (~>1.7.1)",
+    "platforms": { }
+  }
+}

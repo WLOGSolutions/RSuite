@@ -1,0 +1,10 @@
+{
+  "libpng": {
+    "sysreqs": "/\\blibpng\\b/",
+    "platforms": {
+      "DEB": "libpng-dev",
+      "OSX/brew": "libpng",
+      "RPM": "libpng-devel"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+    "netcdf4": {
+	"sysreqs": "netcdf",
+	"platforms": {
+	    "DEB": "libnetcdf-dev",
+	    "OSX/brew": "netcdf",
+	    "RPM": "netcdf-devel"
+	}
+    }
+}

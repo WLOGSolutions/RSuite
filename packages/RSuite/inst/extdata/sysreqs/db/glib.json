@@ -1,0 +1,10 @@
+{
+    "glib": {
+	"sysreqs": "/\\bGLib\\b/",
+	"platforms": {
+	    "DEB": "libglib2.0-dev",
+	    "OSX/brew": "glib",
+	    "RPM": "glib2-devel"
+	}
+    }
+}

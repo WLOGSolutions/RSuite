@@ -1,0 +1,12 @@
+{
+  "fftw3": {
+    "sysreqs": "fftw3",
+    "platforms": {
+      "DEB": {
+        "runtime": "libfftw3-3",
+        "buildtime": "libfftw3-dev"
+      },
+      "RPM": "fftw-devel"
+    }
+  }
+}

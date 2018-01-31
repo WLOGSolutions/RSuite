@@ -1,0 +1,10 @@
+{
+  "automake": {
+    "sysreqs": "automake",
+    "platforms": {
+      "DEB": "automake",
+      "RPM": "automake",
+      "OSX/brew": "automake"
+    }
+  }
+}

@@ -125,7 +125,22 @@ desc_retrieve_dependencies <- function(pkgs_path, pkg_dir, fields = c("Imports",
   stopifnot(file.exists(desc_file))
 
   desc <- read.dcf(desc_file, fields = fields)
-  pkgs <- unname(unlist(desc[1, fields]))
+  return(dcf_retrieve_dependencies(desc, fields))
+}
+
+#'
+#' Retrieves dependencies from package DCF read from description file.
+#'
+#' @param dcf DCF read from description file.
+#' @param fields fields to search dependencies in.
+#'   (type: character, default: c("Imports", "Depends", "LinkingTo"))
+#'
+#' @return comma separated character will all unparsed dependency declarations.
+#'
+#' @keywords internal
+#'
+dcf_retrieve_dependencies <- function(dcf, fields = c("Imports", "Depends", "LinkingTo")) {
+  pkgs <- unname(unlist(dcf[1, intersect(fields, colnames(dcf))]))
   pkgs <- trimws(gsub(pattern = "\\n", replacement = "", x = pkgs))
   pkgs <- pkgs[!is.na(pkgs) & nchar(pkgs) > 0]
 
@@ -227,21 +242,7 @@ get_package_files_info <- function(files) {
   get_pkg_file_info <- function(file) {
     abs_file <- normalizePath(file)
     pkg_name <- gsub("^([^_]+)_.+$", "\\1", basename(abs_file))
-    if (grepl("[.]zip$", abs_file)) {
-      con <- unz(abs_file, file.path(pkg_name, "DESCRIPTION"))
-      dcf <- tryCatch({
-        data.frame(read.dcf(con), stringsAsFactors = F)[1,]
-      }, error = function(e) { NULL }, finally = { close(con) })
-    } else {
-      tmp_dir <- tempfile(pattern = "pkg_info")
-      dir.create(tmp_dir)
-      dcf <- tryCatch({
-        utils::untar(abs_file, files = file.path(pkg_name, "DESCRIPTION"), exdir = tmp_dir)
-        data.frame(read.dcf(file.path(tmp_dir, pkg_name, "DESCRIPTION")), stringsAsFactors = F)[1,]
-      }, error = function(e) { NULL }, finally = { unlink(tmp_dir, recursive = T, force = T) })
-    }
-
-    assert(!is.null(dcf), "Failed to read DESCRIPTION from package file: %s", file)
+    dcf <- get_pkg_desc(pkg_name, abs_file)
 
     if (!('Built' %in% colnames(dcf))) {
       pkg_type <- 'source'
@@ -260,6 +261,39 @@ get_package_files_info <- function(files) {
 
   db <- do.call("rbind", lapply(X = files, FUN = get_pkg_file_info))
   return(db)
+}
+
+#'
+#' Retrieves packages description.
+#'
+#' @param pkg_name name of the package. (type: character)
+#' @param path package file path or folder of the package. (type: character)
+#'
+#' @return data.frame with single row as read.dcf exposes.
+#'
+#' @keywords internal
+#'
+get_pkg_desc <- function(pkg_name, path) {
+  if (dir.exists(path)) {
+    dcf <- tryCatch({
+      data.frame(read.dcf(file.path(path, "DESCRIPTION")), stringsAsFactors = F)[1,]
+    }, error = function(e) { NULL })
+  } else if (grepl("[.]zip$", path)) {
+    con <- unz(path, file.path(pkg_name, "DESCRIPTION"))
+    dcf <- tryCatch({
+      data.frame(read.dcf(con), stringsAsFactors = F)[1,]
+    }, error = function(e) { NULL }, finally = { close(con) })
+  } else {
+    tmp_dir <- tempfile(pattern = "pkg_info")
+    dir.create(tmp_dir)
+    dcf <- tryCatch({
+      utils::untar(path, files = file.path(pkg_name, "DESCRIPTION"), exdir = tmp_dir)
+      data.frame(read.dcf(file.path(tmp_dir, pkg_name, "DESCRIPTION")), stringsAsFactors = F)[1,]
+    }, error = function(e) { NULL }, finally = { unlink(tmp_dir, recursive = T, force = T) })
+  }
+
+  assert(!is.null(dcf), "Failed to read DESCRIPTION from package: %s", path)
+  return(dcf)
 }
 
 #'

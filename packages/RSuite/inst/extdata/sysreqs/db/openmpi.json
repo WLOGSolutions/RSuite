@@ -1,0 +1,16 @@
+{
+  "openmpi": {
+    "sysreqs": ["OpenMPI or MPICH2", "OpenMPI"],
+    "platforms": {
+      "DEB": {
+        "runtime": "libopenmpi1.6",
+        "buildtime": "libopenmpi-dev"
+      },
+      "OSX/brew": "openmpi",
+      "RPM": {
+        "runtime": "openmpi",
+        "buildtime": "openmpi-devel"
+      }
+    }
+  }
+}

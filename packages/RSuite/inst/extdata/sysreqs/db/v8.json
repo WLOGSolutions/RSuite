@@ -1,0 +1,10 @@
+{
+  "v8": {
+    "sysreqs": "/\\bV8\\b/",
+    "platforms": {
+      "DEB": "libv8-3.14-dev",
+      "OSX/brew": "v8@3.15",
+      "RPM": "v8-314-devel"
+    }
+  }
+}

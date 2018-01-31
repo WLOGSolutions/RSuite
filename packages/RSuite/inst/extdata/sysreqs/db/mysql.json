@@ -1,0 +1,10 @@
+{
+  "mysql": {
+    "sysreqs": "MySQL (>=5.6)",
+    "platforms": {
+      "DEB": ["mysql-server-5.6", "mysql-client-5.6"],
+      "OSX/brew": "mysql",
+      "RPM": ["mysql-server", "mysql"]
+    }
+  }
+}

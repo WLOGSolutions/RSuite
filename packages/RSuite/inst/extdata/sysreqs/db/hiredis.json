@@ -1,0 +1,10 @@
+{
+    "hiredis": {
+        "sysreqs": "hiredis",
+        "platforms": {
+            "DEB": "libhiredis-dev",
+            "OSX/brew": "hiredis",
+            "RPM": "libhiredis-devel"
+        }
+    }
+}

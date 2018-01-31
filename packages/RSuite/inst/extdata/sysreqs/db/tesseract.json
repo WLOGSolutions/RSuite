@@ -1,0 +1,10 @@
+{
+  "tesseract": {
+    "sysreqs": "tesseract",
+    "platforms": {
+      "DEB": "libtesseract-dev libleptonica-dev tesseract-ocr-eng",
+      "OSX/brew": "tesseract",
+      "RPM": "tesseract-devel leptonica-devel"
+    }
+  }
+}

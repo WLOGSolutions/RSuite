@@ -1,0 +1,10 @@
+{
+    "pango": {
+	"sysreqs": "/\\bPango\\b/i",
+	"platforms": {
+	    "DEB": "libpango1.0-dev",
+	    "OSX/brew": "pango",
+	    "RPM": "pango-devel"
+	}
+    }
+}

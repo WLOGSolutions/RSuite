@@ -1,0 +1,10 @@
+{
+  "poppler": {
+    "sysreqs": "poppler",
+    "platforms": {
+      "DEB": "libpoppler-cpp-dev",
+      "OSX/brew": "poppler",
+      "RPM": "poppler-cpp-devel"
+    }
+  }
+}

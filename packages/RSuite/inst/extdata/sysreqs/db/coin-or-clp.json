@@ -1,0 +1,8 @@
+{
+  "coin-or-clp": {
+    "sysreqs": "/COIN-OR Clp/i",
+    "platforms": {
+      "DEB": "coinor-clp"
+    }
+  }
+}

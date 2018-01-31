@@ -1,0 +1,10 @@
+{
+  "webp": {
+    "sysreqs": "webp",
+    "platforms": {
+      "DEB": "libwebp-dev",
+      "OSX/brew": "webp",
+      "RPM": "libwebp-devel"
+    }
+  }
+}

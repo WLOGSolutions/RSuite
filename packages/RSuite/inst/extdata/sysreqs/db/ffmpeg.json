@@ -1,0 +1,9 @@
+{
+  "ffmpeg": {
+    "sysreqs": "/FFmpeg/",
+    "platforms": {
+      "DEB": "ffmpeg",
+      "OSX/brew": "ffmpeg"
+    }
+  }
+}

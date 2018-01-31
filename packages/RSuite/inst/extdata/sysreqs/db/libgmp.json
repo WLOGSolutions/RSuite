@@ -1,0 +1,12 @@
+{
+  "libgmp": {
+    "sysreqs": "/\\bgmp\\b/",
+    "platforms": {
+      "DEB": {
+        "runtime": "libgmp10",
+        "buildtime": "libgmp-dev"
+      },
+      "OSX/brew": "gmp"
+    }
+  }
+}

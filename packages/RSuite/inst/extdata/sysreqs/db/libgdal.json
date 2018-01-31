@@ -1,0 +1,10 @@
+{
+  "libgdal": {
+    "sysreqs": "source: GDAL",
+    "platforms": {
+      "DEB": "libgdal-dev",
+      "OSX/brew": "gdal",
+      "RPM": "gdal-devel"
+    }
+  }
+}

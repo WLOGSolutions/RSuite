@@ -1,0 +1,9 @@
+{
+  "jags": {
+    "sysreqs": "/jags\\b/i",
+    "platforms": {
+      "DEB": "jags",
+      "OSX/brew": "jags"
+    }
+  }
+}

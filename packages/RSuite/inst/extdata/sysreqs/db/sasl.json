@@ -1,0 +1,10 @@
+{
+  "sasl": {
+    "sysreqs": ["Cyrus", "SASL"],
+    "platforms": {
+       "DEB": "libsasl2-dev",
+       "OSX/brew": null,
+       "RPM": "cyrus-sasl-devel"
+    }
+  }
+}

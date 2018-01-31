@@ -1,0 +1,10 @@
+{
+  "zlib": {
+    "sysreqs": "/\\bzlib\\b/i",
+    "platforms": {
+      "DEB": "zlib1g-dev",
+      "OSX/brew": "zlib",
+      "RPM": "zlib-devel"
+    }
+  }
+}

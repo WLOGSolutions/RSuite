@@ -1,0 +1,10 @@
+{
+  "git": {
+    "sysreqs": "git",
+    "platforms": {
+      "DEB": "git-core",
+      "RPM": "git",
+      "OSX/brew": "git"
+    }
+  }
+}

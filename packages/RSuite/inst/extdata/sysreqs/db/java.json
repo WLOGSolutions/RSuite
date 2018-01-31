@@ -1,0 +1,13 @@
+{
+  "java": {
+    "sysreqs": [ "Java", "java" ],
+	"handlers": {
+		"check": "[tool]"
+	},
+    "platforms": {
+      "DEB": "openjdk-7-jre-headless",
+      "OSX/brew": null,
+      "RPM": "java-1.8.0-openjdk"
+    }
+  }
+}

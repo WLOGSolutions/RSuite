@@ -1,0 +1,12 @@
+{
+  "cxx11": {
+    "sysreqs": "C++11",
+    "platforms": {
+      "DEB": null,
+      "OSX/brew": null,
+      "RPM": null,
+      "Windows": null
+    },
+    "comment": "We don't do anything special for C++-11"
+  }
+}

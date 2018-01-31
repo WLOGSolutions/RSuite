@@ -1,0 +1,12 @@
+{
+  "postgresql-client": {
+    "sysreqs": "PostgreSQL client library",
+    "platforms": {
+      "DEB": {
+        "runtime": "libpq5",
+        "buildtime": "libpq-dev"
+      },
+      "OSX/brew": "libpq"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "libpq": {
+    "sysreqs": "libpq",
+    "platforms": {
+      "DEB": "libpq-dev",
+      "OSX/brew": "libpq",
+      "RPM": "postgresql-devel"
+    }
+  }
+}

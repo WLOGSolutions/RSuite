@@ -1,0 +1,8 @@
+{
+  "apparmor": {
+    "sysreqs": "/apparmor/i",
+    "platforms": {
+      "DEB": "libapparmor-dev"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "fftw": {
+    "sysreqs": "fftw",
+    "platforms": {
+      "DEB": "libfftw3-dev",
+      "OSX/brew": "fftw",
+      "RPM": "fftw-devel"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "tcltk": {
+    "sysreqs": "Tcl/Tk (>= 8.5)",
+    "platforms": {
+      "DEB": ["tcl8.5", "tk8.6"],
+      "OSX/brew": "tcl-tk",
+      "RPM": ["tcl", "tk"]
+    }
+  }
+}

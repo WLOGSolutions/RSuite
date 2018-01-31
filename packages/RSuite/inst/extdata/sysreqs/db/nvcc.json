@@ -1,0 +1,8 @@
+{
+  "nvcc": {
+    "sysreqs": "nvcc",
+    "platforms": {
+      "DEB": "nvidia-cuda-toolkit"
+    }
+  }
+}

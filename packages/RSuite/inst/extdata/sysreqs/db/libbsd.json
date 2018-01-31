@@ -1,0 +1,9 @@
+{
+  "libbsd": {
+    "sysreqs": "libbsd",
+    "platforms": {
+      "DEB": "libbsd-dev",
+      "RPM": "libbsd-devel"
+    }
+  }
+}

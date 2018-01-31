@@ -1,0 +1,8 @@
+{
+  "saint-2.3.4": {
+    "sysreqs": "SAINT_v2.3.4",
+    "platforms": {
+      "DEB": "saint"      
+    }
+  }
+}

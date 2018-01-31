@@ -1,0 +1,9 @@
+{
+  "swftools": {
+    "sysreqs": "/SWF Tools/",
+    "platforms": {
+      "DEB": "swftools",
+      "OSX/brew": "swftools"
+    }
+  }
+}
