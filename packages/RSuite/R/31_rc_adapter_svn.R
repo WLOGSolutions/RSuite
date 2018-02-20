@@ -19,6 +19,16 @@
 }
 
 #'
+#' Local version of get_cmd_lines function (used inside) that sets lang variable to en_us.
+#' Change was needed because rsuite depends on svn output that have to be in english.
+#'
+#' @keywords internal
+#'
+.get_cmd_lines_with_eng_lang_environment <- function(desc, cmd, ..., log_debug = FALSE) {
+  return(withr::with_envvar(c(LANG = 'en_us'), get_cmd_lines(desc, cmd, ..., log_debug = log_debug)))
+}
+
+#'
 #' Creates RC adapter to handle SVN repos.
 #'
 #' @param name under which RC adapter will be registered in RSuite.
@@ -63,7 +73,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
   pkg_logdebug("Checking if %s is recognized by SVN ...", dir)
 
-  info_lines <- get_cmd_lines("svn info", "%s info %s", svn_cmd, dir)
+  info_lines <- .get_cmd_lines_with_eng_lang_environment("svn info", "%s info %s", svn_cmd, dir)
   wrk_root_path <- info_lines[grepl("^Working Copy Root Path: ", info_lines)]
   if (!is.null(wrk_root_path) && length(wrk_root_path) > 0) {
     wrk_root_path <- sub("^Working Copy Root Path: ", "", wrk_root_path[1])
@@ -83,7 +93,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
     return(FALSE)
   }
 
-  info_lines <- get_cmd_lines("svn info", "%s info %s", svn_cmd, parent)
+  info_lines <- .get_cmd_lines_with_eng_lang_environment("svn info", "%s info %s", svn_cmd, parent)
   wrk_root_path <- info_lines[grepl("^Working Copy Root Path: ", info_lines)]
   if (!is.null(wrk_root_path) && length(wrk_root_path) > 0) {
     wrk_root_path <- sub("^Working Copy Root Path: ", "", wrk_root_path[1])
@@ -93,7 +103,6 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
   return(FALSE)
 }
-
 
 #'
 #' Object performing operations on SVN working copy
@@ -105,7 +114,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
   result <- list()
   result$is_added <- function(ent) {
-    lns <- get_cmd_lines("svn status", "%s status -v --depth=empty %s", svn_cmd, ent)
+    lns <- .get_cmd_lines_with_eng_lang_environment("svn status", "%s status -v --depth=empty %s", svn_cmd, ent)
     return(!any(grepl("^\\?", lns)))
   }
   result$add_dir <- function(dir) {
@@ -114,18 +123,18 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
       return(invisible())
     }
 
-    lns <- get_cmd_lines("svn add", "%s add --depth=empty %s", svn_cmd, dir)
+    lns <- .get_cmd_lines_with_eng_lang_environment("svn add", "%s add --depth=empty %s", svn_cmd, dir)
     assert(any(grepl("^A", lns)), "Failed to add %s to svn", dir)
     pkg_loginfo("Added to svn: %s", dir)
   }
   result$add_dir_rec <- function(dir) {
-    lns <- get_cmd_lines("svn add", "%s add --depth=infinity --force %s", svn_cmd, dir)
+    lns <- .get_cmd_lines_with_eng_lang_environment("svn add", "%s add --depth=infinity --force %s", svn_cmd, dir)
     if (any(grepl("^A", lns))) {
       pkg_loginfo("Added (recursively) to svn: %s", dir)
     }
   }
   result$add_files <- function(dir, files) {
-    info_lns <- get_cmd_lines("svn status", "%s status -v --depth=files %s", svn_cmd, dir)
+    info_lns <- .get_cmd_lines_with_eng_lang_environment("svn status", "%s status -v --depth=files %s", svn_cmd, dir)
     new_files <- basename(sub("^\\?\\s+", "", info_lns[grepl("^\\?", info_lns)]))
 
     for(f in list.files(dir, pattern = paste(files, collapse = "|"), all.files = T)) {
@@ -135,17 +144,17 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
       }
 
       fpath <- file.path(dir, f)
-      lns <- get_cmd_lines("svn add", "%s add %s", svn_cmd, fpath)
+      lns <- .get_cmd_lines_with_eng_lang_environment("svn add", "%s add %s", svn_cmd, fpath)
       assert(any(grepl("^A", lns)), "Failed to add %s to svn", fpath)
       pkg_loginfo("Added to svn: %s", fpath)
     }
   }
 
   result$prop_rm <- function(dir, prop) {
-    existing_props <- get_cmd_lines("svn add", "%s proplist %s", svn_cmd, dir)
+    existing_props <- .get_cmd_lines_with_eng_lang_environment("svn add", "%s proplist %s", svn_cmd, dir)
     props_to_rm <- prop[prop %in% trimws(existing_props)]
     for(p in props_to_rm) {
-      lns <- get_cmd_lines("svn propdel", "%s propdel %s %s", svn_cmd, p, dir)
+      lns <- .get_cmd_lines_with_eng_lang_environment("svn propdel", "%s propdel %s %s", svn_cmd, p, dir)
       assert(any(grepl(sprintf("^property '%s' deleted", p), lns)), "Failed to remove property '%s' from %s", p, dir)
 
       pkg_loginfo("Property '%s' removed from %s", p, dir)
@@ -154,7 +163,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   result$prop_set <- function(dir, prop, val) {
     val_file <- tempfile("svn_props")
     writeLines(val, con = val_file)
-    lns <- get_cmd_lines("svn propset", "%s propset %s -F %s %s", svn_cmd, prop, val_file, dir)
+    lns <- .get_cmd_lines_with_eng_lang_environment("svn propset", "%s propset %s -F %s %s", svn_cmd, prop, val_file, dir)
     unlink(val_file)
 
     assert(any(grepl(sprintf("^property '%s' set on", prop), lns)), "Failed to set property '%s' on %s", prop, dir)
@@ -163,7 +172,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   }
 
   result$get_root_path <- function(dir) {
-    info_lines <- get_cmd_lines("svn info", "%s info %s", svn_cmd, dir)
+    info_lines <- .get_cmd_lines_with_eng_lang_environment("svn info", "%s info %s", svn_cmd, dir)
     wrk_root_path <- sub("^Repository Root: ", "", info_lines[grepl("^Repository Root: ", info_lines)])
     if (length(wrk_root_path) > 0){
       return(wrk_root_path[1])
@@ -265,18 +274,18 @@ rc_adapter_get_version.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   svn_cmd <- .get_svn_cmd()
 
   # detect local revision
-  info_lns <- get_cmd_lines("svn info", "%s info %s", svn_cmd, dir)
+  info_lns <- .get_cmd_lines_with_eng_lang_environment("svn info", "%s info %s", svn_cmd, dir)
   rev_ln <- info_lns[grepl("^Revision: ", info_lns)]
   assert(!is.null(rev_ln) && length(rev_ln) > 0,
          "Failed to detect SVN revision at %s. Is directory under SVN control?", dir)
   revision <- trimws(sub("^Revision: ", "", rev_ln[[1]]))
 
   # detect if has changes
-  stat_lns <- get_cmd_lines("svn status", "%s status %s", svn_cmd, dir)
+  stat_lns <- .get_cmd_lines_with_eng_lang_environment("svn status", "%s status %s", svn_cmd, dir)
   has_changes <- any(grepl("^[?!MA]", stat_lns))
 
   # detect if working copy needs update
-  diff_lns <- get_cmd_lines("svn diff", "%s diff -r %s %s", svn_cmd, revision, dir)
+  diff_lns <- .get_cmd_lines_with_eng_lang_environment("svn diff", "%s diff -r %s %s", svn_cmd, revision, dir)
   needs_update <- length(diff_lns) > 0
 
   return(list(

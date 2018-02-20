@@ -19,5 +19,6 @@ Imports: logging,
   testthat,
   rstudioapi (>= 0.7),
   utils,
-  jsonlite
+  jsonlite,
+  withr
 RoxygenNote: 6.0.1

@@ -14,5 +14,6 @@
 #' @import testthat
 #' @import rstudioapi
 #' @import utils
+#' @import withr
 #' @importFrom stats aggregate
 NULL
