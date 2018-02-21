@@ -70,5 +70,3 @@ import(roxygen2)
 import(rstudioapi)
 import(testthat)
 importFrom(stats,aggregate)
-
-import(jsonlite)
