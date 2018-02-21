@@ -46,6 +46,12 @@ if %cmd%=="proj" (
     exit /b 0
 )
 
+if %cmd%=="sysreqs" (
+    Rscript.exe --no-init-file "%base_dir%/R/cmd_sysreqs.R" %*
+    if ERRORLEVEL 1 exit /B 2
+    exit /b 0
+)
+
 if %cmd%=="repo" (
     Rscript --no-init-file "%base_dir%/R/cmd_repo.R" %*
     if ERRORLEVEL 1 exit /B 2
@@ -91,6 +97,10 @@ exit /B 3
     echo        proj
     echo            Use it to manage project, its dependencies, and build
     echo            project packages.
+    echo.
+    echo        sysreqs
+    echo            The command helps you manage R projects system requirements
+    echo            like libraries and tools.
     echo.
     echo        repo
     echo            Use to manage repositories. e.g. upload packages.

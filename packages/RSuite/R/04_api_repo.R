@@ -120,8 +120,8 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
   res <- repo_manager_remove(repo_manager, toremove, pkg_type)
 
   mgr_info <- repo_manager_get_info(repo_manager)
-  clear_available_packages_cache(mgr$url, # from 53_repositories.R
-                                 type = pkg_type, rver = mgr$rver)
+  clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
+                                 type = pkg_type, rver = mgr_info$rver)
 
   res$Removed <- T
   res <- merge(x = toremove[, c('Package', 'Version')], y = res[, c('Package', 'Version', 'Removed')],

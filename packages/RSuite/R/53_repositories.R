@@ -263,7 +263,9 @@ get_available_packages <- function(path, type, rver) {
 get_curl_available_packages <- function(contrib_url) {
   stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", contrib_url) != -1)) # url expected
 
-  home_dir <- ifelse(.Platform$OS.type == "windows", shortPathName(Sys.getenv("USERPROFILE")), Sys.getenv("HOME"))
+  home_dir <- ifelse(.Platform$OS.type == "windows",
+                     utils::shortPathName(Sys.getenv("USERPROFILE")),
+                     Sys.getenv("HOME"))
   cache_dir <- file.path(home_dir, ".rsuite", "repos_cache")
 
   if (!dir.exists(cache_dir) && !dir.create(cache_dir, recursive = TRUE)) {
@@ -276,7 +278,7 @@ get_curl_available_packages <- function(contrib_url) {
     cache_curl <- setdiff(contrib_url, noncache_curl)
     if (length(cache_curl)) {
       curl2cfile <- c(curl2cfile,
-                      file.path(cache_dir, paste0(URLencode(cache_curl, TRUE), ".rds")))
+                      file.path(cache_dir, paste0(utils::URLencode(cache_curl, TRUE), ".rds")))
     }
     names(curl2cfile) <- c(noncache_curl, cache_curl)
   }
@@ -311,12 +313,12 @@ get_curl_available_packages <- function(contrib_url) {
                            pkg_logdebug("Trying to cache availables from %s ...", curl)
 
                            # remove R cache
-                           r_cache_file <- file.path(tempdir(), paste0("repos_", URLencode(curl, TRUE), ".rds"))
+                           r_cache_file <- file.path(tempdir(), paste0("repos_", utils::URLencode(curl, TRUE), ".rds"))
                            unlink(r_cache_file, force = T)
                          }
 
                          pkgs <- suppressWarnings({
-                           utils::available.packages(contriburl = curl, type = type, filters = list())
+                           utils::available.packages(contriburl = curl, filters = list())
                          })
                          pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)
 
@@ -357,13 +359,13 @@ clear_available_packages_cache <- function(path, type, rver) {
   contrib_url <- rsuite_contrib_url(path, type, rver)
 
   # remove R cache
-  r_cache_file <- file.path(tempdir(), paste0("repos_", URLencode(contrib_url, TRUE), ".rds"))
+  r_cache_file <- file.path(tempdir(), paste0("repos_", utils::URLencode(contrib_url, TRUE), ".rds"))
   unlink(r_cache_file, force = T)
 
   cache_dir <- file.path(Sys.getenv("HOME"), ".rsuite", "repos_cache")
   if (dir.exists(cache_dir)
       && !grepl("^file://", path)) { # repository is not local
-    cache_file <- file.path(cache_dir, paste0(URLencode(contrib_url, TRUE), ".rds"))
+    cache_file <- file.path(cache_dir, paste0(utils::URLencode(contrib_url, TRUE), ".rds"))
     unlink(cache_file, force = T)
   }
 }

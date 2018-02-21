@@ -13,7 +13,7 @@
 rstudio_01_prj_start <- function() {
   assert(isAvailable(), "No RStudio available")
   rstudio_ver <- as.character(getVersion())
-  assert(compareVersion(rstudio_ver, "1.1.287") >= 0,
+  assert(utils::compareVersion(rstudio_ver, "1.1.287") >= 0,
          "RStudio version(%s) is too old. RStudio v1.1.287 at least is required.",
          rstudio_ver)
 
@@ -65,7 +65,7 @@ rstudio_01_prj_start <- function() {
 rstudio_02_prj_start_package <- function() {
   assert(isAvailable(), "No RStudio available")
   rstudio_ver <- as.character(getVersion())
-  assert(compareVersion(rstudio_ver, "1.1.287") >= 0,
+  assert(utils::compareVersion(rstudio_ver, "1.1.287") >= 0,
          "RStudio version(%s) is too old. RStudio v1.1.287 at least is required.",
          rstudio_ver)
 
@@ -97,7 +97,7 @@ rstudio_02_prj_start_package <- function() {
 rstudio_03_prj_install_deps <- function() {
   assert(isAvailable(), "No RStudio available")
   rstudio_ver <- as.character(getVersion())
-  assert(compareVersion(rstudio_ver, "1.1.287") >= 0,
+  assert(utils::compareVersion(rstudio_ver, "1.1.287") >= 0,
          "RStudio version(%s) is too old. RStudio v1.1.287 at least is required.",
          rstudio_ver)
 
@@ -117,7 +117,7 @@ rstudio_03_prj_install_deps <- function() {
 rstudio_04_prj_build <- function() {
   assert(isAvailable(), "No RStudio available")
   rstudio_ver <- as.character(getVersion())
-  assert(compareVersion(rstudio_ver, "1.1.287") >= 0,
+  assert(utils::compareVersion(rstudio_ver, "1.1.287") >= 0,
          "RStudio version(%s) is too old. RStudio v1.1.287 at least is required.",
          rstudio_ver)
 
@@ -137,7 +137,7 @@ rstudio_04_prj_build <- function() {
 rstudio_05_prj_clean_deps <- function() {
   assert(isAvailable(), "No RStudio available")
   rstudio_ver <- as.character(getVersion())
-  assert(compareVersion(rstudio_ver, "1.1.287") >= 0,
+  assert(utils::compareVersion(rstudio_ver, "1.1.287") >= 0,
          "RStudio version(%s) is too old. RStudio v1.1.287 at least is required.",
          rstudio_ver)
 
@@ -158,7 +158,7 @@ rstudio_05_prj_clean_deps <- function() {
 rstudio_06_prj_zip <- function() {
   assert(isAvailable(), "No RStudio available")
   rstudio_ver <- as.character(getVersion())
-  assert(compareVersion(rstudio_ver, "1.1.287") >= 0,
+  assert(utils::compareVersion(rstudio_ver, "1.1.287") >= 0,
          "RStudio version(%s) is too old. RStudio v1.1.287 at least is required.",
          rstudio_ver)
 

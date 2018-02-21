@@ -183,7 +183,8 @@ zip_folder <- function(wspace, zip_file_path) {
   tryCatch({
     zip_res <- run_rscript(c("retcode <- utils::zip(%s, file = '.', zip = 'zip')",
                              "stopifnot(retcode == 0)"),
-                           rscript_arg("zipfile", zip_file_path))
+                           rscript_arg("zipfile", zip_file_path),
+                           log_debug = FALSE)
   }, finally = {
     setwd(wd)
   })
@@ -214,7 +215,8 @@ zip_folder <- function(wspace, zip_file_path) {
 unzip_folder <- function(dest_dir, zip_file_path) {
   zip_res <- run_rscript("utils::unzip(%s, %s)",
                          rscript_arg("zipfile", zip_file_path),
-                         rscript_arg("exdir", dest_dir))
+                         rscript_arg("exdir", dest_dir),
+                         log_debug = FALSE)
   if (is.null(zip_res)) {
     return(TRUE)
   }

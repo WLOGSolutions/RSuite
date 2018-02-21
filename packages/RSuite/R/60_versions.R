@@ -309,7 +309,7 @@ vers.rm_acceptable <- function(ver, pkgs) {
 vers.rm_base <- function(ver) {
   stopifnot(is.versions(ver))
 
-  base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
+  base_pkgs <- utils::installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
   vers.rm(ver, c(base_pkgs, "R"))
 }
 

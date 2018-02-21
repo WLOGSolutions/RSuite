@@ -316,7 +316,7 @@ get_pkgzip_info <- function(pkgzip) {
   assert(is_nonempty_char1(pkgzip), "Non empty character(1) expected for pkgzip")
   assert(file.exists(pkgzip), "File %s does not exist", pkgzip)
 
-  files <- unzip(pkgzip, list = T)$Name
+  files <- utils::unzip(pkgzip, list = T)$Name
   files <- files[grepl("^.+/[^_]+_[^/]+[.](zip|t(ar[.])?gz)$", files)]
   dummy_urls <- sprintf("http://repo/%s", files)
 

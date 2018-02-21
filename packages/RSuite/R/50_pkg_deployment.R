@@ -60,9 +60,11 @@ pkg_download <- function(avail_pkgs, dest_dir) {
   local_pkgs <- data.frame()
   if (nrow(remote_pkgs)) {
     # check/build download cache
-    home_dir <- ifelse(.Platform$OS.type == "windows", shortPathName(Sys.getenv("USERPROFILE")), Sys.getenv("HOME"))
+    home_dir <- ifelse(.Platform$OS.type == "windows",
+                       utils::shortPathName(Sys.getenv("USERPROFILE")),
+                       Sys.getenv("HOME"))
     cache_files <- file.path(home_dir, ".rsuite", "dload_cache",
-                             URLencode(remote_pkgs$Repository, TRUE),
+                             utils::URLencode(remote_pkgs$Repository, TRUE),
                              remote_pkgs$File)
     cache_exists <- file.exists(cache_files)
     if (!all(cache_exists)) {
@@ -255,9 +257,9 @@ pkg_remove <- function(pkgs, lib_dir) {
                      detach(search_item, unload = TRUE, character.only = TRUE)
                    }
                  })
-  installed <- installed.packages(lib_dir)[, "Package"]
+  installed <- utils::installed.packages(lib_dir)[, "Package"]
   to_remove <- intersect(pkgs, installed)
-  try (expr = suppressMessages(remove.packages(to_remove, lib = lib_dir)))
+  try (expr = suppressMessages(utils::remove.packages(to_remove, lib = lib_dir)))
 }
 
 
@@ -453,7 +455,7 @@ get_specific_args <- function(pkg_file, spec_desc) {
 #' @keywords internal
 #'
 get_package_build_rver <- function(lib_dir, pkg_name) {
-  installed <- data.frame(installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Built")]
+  installed <- data.frame(utils::installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Built")]
   if (!(pkg_name %in% installed$Package)) {
     return(NA)
   }

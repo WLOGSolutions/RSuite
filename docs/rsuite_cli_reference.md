@@ -207,6 +207,56 @@ following way:
 rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 ```
 
+## System requirements management
+
+Project environment can contain packages which have system requirements declared (in SystemRequirements field in their 
+DESCRIPTION file). RSuite tries to interpret them and can help you to update your system for packages to build/work properly.
+For example xml package on linuxes requires libxml2 system library on Lunuxes. Depending on platform (RedHat like or Debian like)
+appropriate package should be installed using appropriate package management utility. RSuite can check your system against these 
+system requirements, try to install them (if running as privileged user) and generate script to to check/install them.
+
+#### Collecting system requirements
+
+To find out which system requirements are needed for your solution to run properly use following command:
+
+```bash
+rsuite sysreqs collect
+```
+
+It collects and presents all SystemRequiremets fields declared for all project packages and packages the project depends on. 
+
+#### Checking system against requirements
+
+To check if your system conforms to requirements declared for project dependencies use following command:
+
+```bash
+rsuite sysreqs check
+```
+
+It will collect all SystemRequirements fields from project dependencies and will try to match them with internal utilities
+database. Matched requirements will enforce platform dependent checks of the system. 
+
+#### Installing system requirements
+
+RSuite not only checks system against dependency requirements but also can update your system. Pay attention that to install 
+system libraries priviledge access is usually required. To update your system use following command:
+
+```bash
+rsuite sysreqs install
+```
+
+#### Create system update script
+
+You can also create script to upgrade your system to meet requirements for your project. Call following command:
+
+```bash
+rsuite sysreqs script
+```
+
+It will create bash script sysreqs_install.sh (for Linux) or batch script sysreqs_install.cmd (for Windows) which
+will check for proper system elements and install them if not found using platform specific package management 
+utility.
+
 ## Repository management
 
 You can also manage content of local (Dir) and S3 repositories with RSuite CLI. For that purpose repo command should be used.

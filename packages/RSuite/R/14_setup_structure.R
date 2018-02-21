@@ -40,7 +40,7 @@ get_earliest_strver_comliant <- function(ver) {
 check_project_structure <- function(prj_dir) {
   stopifnot(dir.exists(prj_dir))
 
-  rsuite_ver <- as.character(packageVersion('RSuite'))
+  rsuite_ver <- as.character(utils::packageVersion('RSuite'))
   prj_name <- basename(prj_dir)
 
   # Verify versions and parameters
@@ -213,8 +213,8 @@ create_package_structure <- function(pkg_dir) {
   stopifnot(!dir.exists(pkg_dir))
 
   files <- suppressWarnings(
-    unzip(system.file(file.path("extdata", "PackageTemplate.zip"), package = "RSuite"),
-          exdir = pkg_dir))
+    utils::unzip(system.file(file.path("extdata", "PackageTemplate.zip"), package = "RSuite"),
+                 exdir = pkg_dir))
   assert(length(files) > 0, "Failed to create package structure at %s", pkg_dir)
 
   keywords <- list(

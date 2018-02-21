@@ -64,7 +64,7 @@ resolve_prj_sups <- function(repo_infos, params, only_source = F) {
   prjSupVers <- vers.rm(prjSupVers, project_packages)
 
   # remove installed already packages
-  installed <- installed.packages(lib.loc = c(params$sbox_path, params$lib_path, Sys.getenv("R_LIBS_USER"), .Library))
+  installed <- utils::installed.packages(lib.loc = c(params$sbox_path, params$lib_path, Sys.getenv("R_LIBS_USER"), .Library))
   installed <- as.data.frame(installed, stringsAsFactors = F)[, c("Package", "Version", "Built")]
   installed <- installed[majmin_rver(installed$Built) == majmin_rver(params$r_ver), ]
   prjSupVers <- vers.rm_acceptable(prjSupVers, installed)
@@ -121,7 +121,7 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
   stopifnot(is_nonempty_char1(lib_dir))
 
   remove_installed <- function(vers) {
-    installed <- as.data.frame(installed.packages(lib.loc = c(sbox_dir, lib_dir, Sys.getenv("R_LIBS_USER"), .Library)),
+    installed <- as.data.frame(utils::installed.packages(lib.loc = c(sbox_dir, lib_dir, Sys.getenv("R_LIBS_USER"), .Library)),
                                stringsAsFactors = F)[, c("Package", "Version", "Built")]
     installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
     return(vers.rm_acceptable(vers, installed))
@@ -171,7 +171,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
   stopifnot(is_nonempty_char1(lib_dir))
 
   remove_installed <- function(vers) {
-    installed <- as.data.frame(installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Version", "Built")]
+    installed <- as.data.frame(utils::installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Version", "Built")]
     installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
     return(vers.rm_acceptable(vers, installed))
   }

@@ -15,7 +15,7 @@
 #' @keywords internal
 #'
 .get_devtools_intern <- function(name) {
-  search_res <- getAnywhere(name)
+  search_res <- utils::getAnywhere(name)
   ixs <- which(search_res$where == "namespace:devtools")
   if (!length(ixs)) {
     return()

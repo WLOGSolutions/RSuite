@@ -22,10 +22,11 @@
 #' Local version of get_cmd_lines function (used inside) that sets lang variable to en_us.
 #' Change was needed because rsuite depends on svn output that have to be in english.
 #'
+#'
 #' @keywords internal
 #'
 .get_cmd_lines_with_eng_lang_environment <- function(desc, cmd, ..., log_debug = FALSE) {
-  return(withr::with_envvar(c(LANG = 'en_us'), get_cmd_lines(desc, cmd, ..., log_debug = log_debug)))
+  return(devtools::with_envvar(c(LANG = 'en_us'), get_cmd_lines(desc, cmd, ..., log_debug = log_debug)))
 }
 
 #'

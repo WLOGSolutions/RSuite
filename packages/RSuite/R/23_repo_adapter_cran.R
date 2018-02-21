@@ -28,7 +28,7 @@ repo_adapter_create_cran <- function(name) {
     if ('@CRAN@' %in% path) {
       # it sometimes contains just placeholder for URL '@CRAN@'
       #   replace it with first mirror URL in the case
-      path <- getCRANmirrors()$URL[[1]]
+      path <- utils::getCRANmirrors()$URL[[1]]
     }
     stopifnot(!is.null(path))
     assign('path', path, envir = local_env)

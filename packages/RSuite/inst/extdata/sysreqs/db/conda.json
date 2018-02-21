@@ -6,6 +6,7 @@
 			"Windows": "conda.exe"
 		},
 		"handlers": {
+		  "install": "[skip]",
 			"check": "[tool]",
 			"build": "[shell] :tool create -y -p :path :params"
 		}

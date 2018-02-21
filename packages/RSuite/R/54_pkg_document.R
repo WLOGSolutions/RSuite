@@ -153,7 +153,7 @@ validate_package_imports <- function(pkg_name, pkg_path) {
 
   ns_not_desc <- setdiff(ns_imports, desc_imports)
 
-  base_pkgs <- installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
+  base_pkgs <- utils::installed.packages(lib.loc = .Library, priority = "base")[, "Package"]
   ns_not_desc <- setdiff(ns_not_desc, base_pkgs)
   if (length(ns_not_desc) == 0) {
     return(TRUE)

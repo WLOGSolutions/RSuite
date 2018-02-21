@@ -110,7 +110,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
                 rver = params$r_ver)
   }
 
-  failed <- setdiff(prj_packages, installed.packages(params$lib_path)[, "Package"])
+  failed <- setdiff(prj_packages, utils::installed.packages(params$lib_path)[, "Package"])
   assert(!length(failed),
          "Failed to install project packages: %s", paste(failed, collapse = ", "))
 

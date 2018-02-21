@@ -97,7 +97,7 @@ get_rscript_search_paths <- function(rscript_cmd) {
   paths <- unlist(strsplit(Sys.getenv("PATH"), split = .Platform$path.sep, fixed = T))
 
   if (.Platform$OS.type == "windows") {
-    reg_ents <- unlist(readRegistry("SOFTWARE\\R-core\\R", hive = "HLM", maxdepth = 2))
+    reg_ents <- unlist(utils::readRegistry("SOFTWARE\\R-core\\R", hive = "HLM", maxdepth = 2))
     regs <- unique(file.path(reg_ents[grepl("InstallPath$", names(reg_ents))], "bin"))
 
     paths <- c(regs, paths)

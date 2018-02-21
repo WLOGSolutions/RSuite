@@ -63,7 +63,7 @@ add_recipe.sysreqs_check_recipe <- function(recipe, req_name, sysreq, pkg_name) 
   }
 
   for(req_satisfied in sysreq[[req_name]]$satisfies) {
-    recipe$satisfied[[req_satisfied]] <- c(satisfied[[req_satisfied]], req_name)
+    recipe$satisfied[[req_satisfied]] <- c(recipe$satisfied[[req_satisfied]], req_name)
   }
   return(recipe)
 }
@@ -243,7 +243,7 @@ build_win_script <- function(recipe, plat_desc) {
 
   required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) { sl$syslibs }))
   if (!is.null(required_syslibs)) {
-    check_tool <- plat_desclib_tools$check
+    check_tool <- plat_desc$lib_tools$check
     if (!is.null(check_tool)) {
       if (!is.null(check_tool)) {
         assert(grepl("^\\[shell\\] ", check_tool),
@@ -285,17 +285,17 @@ build_win_script <- function(recipe, plat_desc) {
     build_spec <- recipe$build_specs[[req_name]]
 
     cmd <- gsub(":params", build_spec$params, build_spec$cmd, fixed = TRUE)
-    tool_wspace <- gsub("\\", "/", file.path("${basedir}", req_name), fixed = TRUE)
+    tool_wspace <- gsub("\\", "/", paste0("%basedir%", req_name), fixed = TRUE)
     cmd <- gsub(":path", tool_wspace, cmd, fixed = TRUE)
     cmd <- gsub(":tool", build_spec$tool, cmd, fixed = TRUE)
 
     script_lines <- c(script_lines,
                       "",
-                      sprintf('for %%i in (%s) do if "%%~$PATH:i" == "" (', build_spec$tool),
+                      sprintf('for %%%%i in (%s) do if "%%%%~$PATH:i" == "" (', build_spec$tool),
                       sprintf('   echo Tool %s is not available: environment cannot be built', build_spec$tool),
                       sprintf('   goto %s_failed', build_spec$tool),
                       sprintf(')'),
-                      sprintf('if exists "%s" rmdir /S/Q "%s"', tool_wspace, tool_wspace),
+                      sprintf('if exist "%s" rmdir /S/Q "%s"', tool_wspace, tool_wspace),
                       sprintf('echo Building %s for %s ...', req_name, paste(build_spec$packages, collapse = ", ")),
                       sprintf('%s', cmd),
                       sprintf('if NOT ERRORLEVEL 0 ('),

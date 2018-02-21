@@ -18,7 +18,7 @@
 #'
 collect_uninstalled_direct_deps <- function(params) {
   depVers <- collect_prj_direct_deps(params)
-  installed <- as.data.frame(installed.packages(params$lib_path), stringsAsFactors = F)[, c("Package", "Version")]
+  installed <- as.data.frame(utils::installed.packages(params$lib_path), stringsAsFactors = F)[, c("Package", "Version")]
   depVers <- vers.rm_acceptable(depVers, installed)
 }
 

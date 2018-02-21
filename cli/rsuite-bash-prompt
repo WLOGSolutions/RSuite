@@ -1,7 +1,7 @@
 #
 # Completions for rsuite:
-# 
-# rsuite updater/install/proj/repo/pkgzip/docker/version/help <options>
+#
+# rsuite updater/install/proj/sysreqs/repo/pkgzip/docker/version/help <options>
 #
 _rsuite() {
 	local cur prev subcmd opts
@@ -92,7 +92,7 @@ _rsuite() {
 									opts="-d $common_opts_short"
 									;;
 							esac
-							
+
 						fi
 						;;
 					depsclean)
@@ -118,6 +118,24 @@ _rsuite() {
 									opts="-p --version $common_opts_short"
 									;;
 							esac
+						fi
+						;;
+					*)
+						return 0
+						;;
+				esac
+			fi
+			;;
+		sysreqs)
+			if [ $COMP_CWORD == 2 ]; then
+				opts="collect check install script"
+			else
+				case "${COMP_WORDS[2]}" in
+					collect|check|install|script)
+						if [[ $cur == --* ]]; then
+							opts="$common_opts_long"
+						else
+							opts="$common_opts_short"
 						fi
 						;;
 					*)
@@ -427,7 +445,7 @@ _rsuite() {
 			return 0
 			;;
 		*)
-			opts="update install proj repo pkgzip docker version help" 
+			opts="update install proj sysreqs repo pkgzip docker version help"
 			;;
 
 	esac

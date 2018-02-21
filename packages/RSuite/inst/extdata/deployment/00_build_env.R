@@ -40,7 +40,7 @@ for(n in names(all_repos)) {
 
 required_pkgs <- c("RSuite")
 if (!any(grepl("--force", args))) {
-  installed_pkgs <- installed.packages(.Library)[, "Package"]
+  installed_pkgs <- utils::installed.packages(.Library)[, "Package"]
   required_pkgs <- setdiff(required_pkgs, installed_pkgs)
 }
 
@@ -54,7 +54,7 @@ if (length(required_pkgs)) {
   # TODO: pkgSpecificInstall("stringi", .Library, repos = all_repos, quiet = !verbose)
   utils::install.packages(required_pkgs, repos = all_repos, quiet = !verbose)
 
-  installed_pkgs <- installed.packages()[, "Package"]
+  installed_pkgs <- utils::installed.packages()[, "Package"]
   uninstalled <- setdiff(required_pkgs, installed_pkgs)
   if (length(uninstalled)) {
     stop(sprintf("Failed to install %s", paste(uninstalled, collapse = ", ")))
