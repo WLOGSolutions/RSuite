@@ -53,6 +53,7 @@ install -m 755 rsuite-bash-prompt %{buildroot}/etc/bash_completion.d/rsuite-bash
 /usr/share/rsuitecli/R/cmd_install.R
 /usr/share/rsuitecli/R/cmd_update.R
 /usr/share/rsuitecli/R/cmd_docker.R
+/usr/share/rsuitecli/R/cmd_sysreqs.R
 /usr/share/rsuitecli/R/packages/src/contrib/getopt_1.20.0.tar.gz
 /usr/share/rsuitecli/R/packages/src/contrib/logging_0.7-103.tar.gz
 /usr/share/rsuitecli/R/packages/src/contrib/optparse_1.4.4.tar.gz

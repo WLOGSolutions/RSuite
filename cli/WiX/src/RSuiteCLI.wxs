@@ -52,6 +52,7 @@
                     <File Id='cmd_repo.R' Name='cmd_repo.R' DiskId='1' Source='../R/cmd_repo.R' />
                     <File Id='cmd_pkgzip.R' Name='cmd_pkgzip.R' DiskId='1' Source='../R/cmd_pkgzip.R' />
                     <File Id='cmd_docker.R' Name='cmd_docker.R' DiskId='1' Source='../R/cmd_docker.R' />
+                    <File Id='cmd_sysreqs.R' Name='cmd_sysreqs.R' DiskId='1' Source='../R/cmd_sysreqs.R' />
                 </Component>
                 <Directory Id='packages' Name='packages'>
                     <Directory Id='packages_src' Name='src'>
