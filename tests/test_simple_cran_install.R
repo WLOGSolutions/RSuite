@@ -39,12 +39,12 @@ test_that_managed("Installing sub dependencies of from CRAN", {
 
 test_that_managed("Installing sub sub dependencies of from CRAN", {
   prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))
-  create_test_package("TestPackage1", prj, imps = "logging, lubridate (>= 1.7)")
+  create_test_package("TestPackage1", prj, imps = "logging, lubridate (>= 1.7), stringr (>= 1.3)")
   create_test_master_script("library(lubridate)", prj)
 
   RSuite::prj_install_deps(prj)
 
   expect_that_packages_installed(
-    c("lubridate", "stringr", "stringi", "magrittr", "logging", "Rcpp"),
+    c("lubridate", "stringr", "stringi", "magrittr", "logging", "Rcpp", "glue"),
     prj)
 })
