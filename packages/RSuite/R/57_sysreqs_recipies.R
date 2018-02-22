@@ -102,7 +102,7 @@ perform.sysreqs_check_recipe <- function(recipe) {
   check_tool <- gsub("^\\[shell\\] ", "", check_tool)
 
   cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), check_tool))
-  # TODO get retcode
+  # TODO handle this situation (now temporarly using cmd_lines, but not sure if this is a good idea.)
   result$nolibs <-
     get_cmd_lines(sprintf("checking for system libraries: %s", paste(required_syslibs, collapse = ", ")),
                   cmd = cmd,
@@ -190,10 +190,10 @@ perform.sysreqs_install_recipe <- function(recipe) {
       cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), install_tool))
 
       pkg_loginfo("Installing system libraries(%s) ...", paste(required_syslibs, collapse = ", "))
-      # TODO get retcode
-      get_cmd_lines(sprintf("installing system libraries: %s", paste(required_syslibs, collapse = ", ")),
+      cmd_output <- get_cmd_output(sprintf("installing system libraries: %s", paste(required_syslibs, collapse = ", ")),
                     cmd = cmd,
                     log_debug = TRUE)
+
       pkg_loginfo("... done")
     }
   }
@@ -208,12 +208,14 @@ perform.sysreqs_install_recipe <- function(recipe) {
     cmd <- gsub(":path", tool_wspace, cmd, fixed = TRUE)
     cmd <- gsub(":tool", build_spec$tool, cmd, fixed = TRUE)
 
-    # TODO get retcode
-    get_cmd_lines(sprintf("building %s for %s", req_name, paste(build_spec$packages, collapse = ", ")),
+    cmd_ret_code <- get_cmd_output(sprintf("building %s for %s", req_name, paste(build_spec$packages, collapse = ", ")),
                   cmd = cmd,
                   log_debug = TRUE)
-
-    pkg_loginfo("... done")
+    if(is.null(cmd_ret_code) || cmd_ret_code > 0) {
+      pkg_logwarn("Something went wrong while installing requirement: %s. Please rerun task with -v flag to see more details.", req_name)
+    } else{
+      pkg_loginfo("Installing %s done.", req_name)
+    }
   }
 }
 
