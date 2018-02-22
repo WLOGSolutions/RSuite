@@ -4,11 +4,11 @@ Priority: optional
 Maintainer: WLOG Solution <info@wlogsolutions.com>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.8
-Homepage: http://www.rsuite.com
+Homepage: http://rsuite.io
 
 Package: rsuitecli
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, libssl-dev, libxml2-dev, libcurl4-openssl-dev, zlib1g-dev
 Description: RSuite CLI is command line API to RSuite
  RSuite CLI wraps functionalities of RSuite so you can create
  and manage your R projects, build them or manage your own

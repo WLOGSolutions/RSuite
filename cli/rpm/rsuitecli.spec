@@ -12,6 +12,7 @@ Group:          Development/Tools
 Source:		%{name}-%{version}.tar.gz
 BuildArch: 	noarch
 
+Requires: openssl-devel libxml2-devel libcurl-devel zlib-devel
 Requires(post): info
 Requires(preun): info
 
