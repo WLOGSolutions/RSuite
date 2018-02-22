@@ -1,15 +1,15 @@
 # How to install RSuite CLI
 
-RSuite CLI is command line api to functionalities RSuite package provides. It also provides some intergration features (with docker e.g.)
+RSuite CLI is command line api to functionalities RSuite package provides. It also provides some integration features (with docker e.g.)
 based on RSuite functionalities.
 
-RSuite CLI is just simple command line shell with enchanged arguments parsing and help system (and bash completion configuration for bash).
-It internally performes some environment checks (like detection there R is installed on Windows) and calls R to get access to RSuite.
+RSuite CLI is just simple command line shell with enhanced arguments parsing and help system (and bash completion configuration for bash).
+It internally performs some environment checks (like detection there R is installed on Windows) and calls R to get access to RSuite.
 
 RSuite and RSuite calling code are platform independent but RSuite CLI depends on platform: on Windows it is cmd script on Linuxes it is
 bash script.
 
-To make start of joney with RSuite CLI as easier as possible we prepared installation packages for you. Herein we discuss how they can be
+To make start of journey with RSuite CLI as easier as possible we prepared installation packages for you. Herein we discuss how they can be
 installed on each supported platform. You can download them from [R Suite Download](http://rsuite.io/RSuite_Download.php).
 
 ## Windows installation
@@ -76,10 +76,10 @@ $ rsuite version
 
 ## After you installed RSuite CLI
 
-After RSuite CLI is installed you probably will need to install RSuite package into you R enviroment:
+After RSuite CLI is installed you probably will need to install RSuite package into you R environment:
 
 ``` bash
 rsuite install
 ```
 
-For full description of how to use RSuite CLI please refere to [RSuite CLI reference manual](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md).
+For full description of how to use RSuite CLI please refer to [RSuite CLI reference manual](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md).
