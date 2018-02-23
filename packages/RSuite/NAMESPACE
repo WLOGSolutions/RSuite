@@ -68,5 +68,8 @@ import(logging)
 import(rmarkdown)
 import(roxygen2)
 import(rstudioapi)
+import(subprocess)
 import(testthat)
 importFrom(stats,aggregate)
+
+import(jsonlite)

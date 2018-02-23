@@ -176,6 +176,15 @@ rm_satisfied.sysreqs_install_recipe <- function(recipe) {
 }
 
 perform.sysreqs_install_recipe <- function(recipe) {
+  .is_ret_code_a_failure <- function(cmd_ret_code, req_name) {
+    if(is.null(cmd_ret_code) || cmd_ret_code > 0) {
+      pkg_logwarn("Something went wrong while installing requirement: %s. Process terminated with code: %s. Rerun task with -v flag to see more details.", req_name, cmd_ret_code)
+      return(TRUE)
+    } else{
+      pkg_loginfo("Installing %s done.", req_name)
+      return(FALSE)
+    }
+  }
   plat_desc <- get_platform_desc()
 
   required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) { sl$syslibs }))
@@ -198,6 +207,7 @@ perform.sysreqs_install_recipe <- function(recipe) {
     }
   }
 
+  failed_req <- list()
   for(req_name in names(recipe$build_specs)) {
     build_spec <- recipe$build_specs[[req_name]]
     pkg_loginfo("Building %s for %s ...", req_name, paste(build_spec$packages, collapse = ", "))
@@ -207,15 +217,19 @@ perform.sysreqs_install_recipe <- function(recipe) {
     tool_wspace <- gsub("\\", "/", file.path(recipe$prj_path, req_name), fixed = TRUE)
     cmd <- gsub(":path", tool_wspace, cmd, fixed = TRUE)
     cmd <- gsub(":tool", build_spec$tool, cmd, fixed = TRUE)
+    cmd <- paste(cmd, '-v')
 
     cmd_ret_code <- get_cmd_output(sprintf("building %s for %s", req_name, paste(build_spec$packages, collapse = ", ")),
                   cmd = cmd,
                   log_debug = TRUE)
-    if(is.null(cmd_ret_code) || cmd_ret_code > 0) {
-      pkg_logwarn("Something went wrong while installing requirement: %s. Please rerun task with -v flag to see more details.", req_name)
-    } else{
-      pkg_loginfo("Installing %s done.", req_name)
+    if(.is_ret_code_a_failure(cmd_ret_code, req_name)){
+      failed_req[[length(failed_req) + 1]] <- req_name
     }
+  }
+  if(length(failed_req) > 0){
+    pkg_logwarn('There was an error with installing following system requirements: %s', failed_req)
+  }else{
+    pkg_loginfo("All system requirements installed.")
   }
 }
 

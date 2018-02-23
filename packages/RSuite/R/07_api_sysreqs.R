@@ -118,8 +118,6 @@ sysreqs_install <- function(prj = NULL) {
   recipe <- rm_satisfied(recipe) # from 57_sysreqs_recipies.R
   perform(recipe)
 
-  # TODO get return codes and check if those requirements are really installed.
-  pkg_loginfo("All system requirements installed.")
 }
 
 #'
