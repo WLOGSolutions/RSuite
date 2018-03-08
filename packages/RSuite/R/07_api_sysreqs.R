@@ -118,7 +118,6 @@ sysreqs_install <- function(prj = NULL) {
   recipe <- rm_satisfied(recipe) # from 57_sysreqs_recipies.R
   perform(recipe)
 
-  pkg_loginfo("All system requirements installed.")
 }
 
 #'

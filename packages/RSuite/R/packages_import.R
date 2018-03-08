@@ -14,5 +14,6 @@
 #' @import git2r
 #' @import rstudioapi
 #' @import jsonlite
+#' @import subprocess
 #' @importFrom stats aggregate
 NULL
