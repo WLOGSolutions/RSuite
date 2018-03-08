@@ -7,34 +7,41 @@ if [ -z "$rscript_path" ]; then
 	exit 1
 fi
 
-basedir=$(dirname $0)
-basedir=$(readlink -f $basedir)
+basedir=$(dirname "$0")
+basedir=$(readlink -f "$basedir")
+
 cmd="$1"
 if [ -z "$cmd" ]; then
 	cmd="help";
 fi
 
+if [ "$OS" == "Windows_NT" ]; then
+	# This is required as MinGW bash uses different HOME than system
+	#  as a result R is not able to find user packages installed
+	export HOME=$HOME/Documents
+fi
+
 case "$cmd" in
 	update)
-                $rscript_path --no-init-file $basedir/R/cmd_update.R $* || exit 2
+                "$rscript_path" --no-init-file "$basedir/R/cmd_update.R" $* || exit 2
 		;;
 	install)
-                $rscript_path --no-init-file $basedir/R/cmd_install.R $* || exit 2
+                "$rscript_path" --no-init-file "$basedir/R/cmd_install.R" $* || exit 2
 		;;
 	proj)
-                $rscript_path --no-init-file $basedir/R/cmd_proj.R $* || exit 2
+                "$rscript_path" --no-init-file "$basedir/R/cmd_proj.R" $* || exit 2
 		;;
 	sysreqs)
-                $rscript_path --no-init-file $basedir/R/cmd_sysreqs.R $* || exit 2
+                "$rscript_path" --no-init-file "$basedir/R/cmd_sysreqs.R" $* || exit 2
 		;;
 	repo)
-                $rscript_path --no-init-file $basedir/R/cmd_repo.R $* || exit 2
+                "$rscript_path" --no-init-file "$basedir/R/cmd_repo.R" $* || exit 2
 		;;
 	pkgzip)
-                $rscript_path --no-init-file $basedir/R/cmd_pkgzip.R $* || exit 2
+                "$rscript_path" --no-init-file "$basedir/R/cmd_pkgzip.R" $* || exit 2
 		;;
 	docker)
-                $rscript_path --no-init-file $basedir/R/cmd_docker.R $* || exit 2
+                "$rscript_path" --no-init-file "$basedir/R/cmd_docker.R" $* || exit 2
 		;;
 	version)
                 ver=`cat ${basedir}/version.txt`
@@ -47,11 +54,11 @@ case "$cmd" in
 		echo ""
 		echo ""
 		echo "Commands:"
-    echo "       update"
-    echo "          Checks if newest version of RSuite CLI is installed. If not"
-    echo "          installer for newest version is downloaded and installation"
-    echo "          is initiated."
-    echo ""
+		echo "       update"
+		echo "          Checks if newest version of RSuite CLI is installed. If not"
+		echo "          installer for newest version is downloaded and installation"
+		echo "          is initiated."
+		echo ""
 		echo "       install"
 		echo "           Install RSuite with all the dependencies."
 		echo ""
@@ -59,10 +66,10 @@ case "$cmd" in
 		echo "           Use it to manage project, its dependencies, and build"
 		echo "           project packages."
 		echo ""
-    echo "       sysreqs"
-    echo "          The command helps you manage R projects system requirements"
-    echo "          like libraries and tools."
-    echo ""
+		echo "       sysreqs"
+		echo "          The command helps you manage R projects system requirements"
+		echo "          like libraries and tools."
+		echo ""
 		echo "       repo"
 		echo "           Use to manage repositories. e.g. upload packages."
 		echo ""

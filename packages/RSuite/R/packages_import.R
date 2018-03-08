@@ -13,5 +13,6 @@
 #' @import rmarkdown
 #' @import git2r
 #' @import rstudioapi
+#' @import jsonlite
 #' @importFrom stats aggregate
 NULL

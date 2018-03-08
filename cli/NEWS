@@ -1,6 +1,7 @@
 VERSION 0.23 (2018-02-??)
   * sysreqs subcommand added for management of system requirements.
-  
+  * WiX installer contains also bash script for MinGW bash terminals.
+
 VERSION 0.22 (2018-01-19)
   * R version can be enforced then building docker zip/image
   * For linux bash_completions added.
