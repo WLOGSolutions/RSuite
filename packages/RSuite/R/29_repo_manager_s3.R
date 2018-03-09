@@ -51,9 +51,9 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
   tryCatch({
     pkg_logdebug("Uploading file onto %s to test RW permissions ...", bucket_url)
 
-    upl_lines <- get_cmd_lines("aws cp",
-                               "%s s3 --profile=%s cp %s %s",
-                               aws_cmd, s3_profile, tmp_file, bucket_url)
+    upl_lines <- get_cmd_outlines("aws cp",
+                                  "%s s3 --profile=%s cp %s %s",
+                                  aws_cmd, s3_profile, tmp_file, bucket_url)
     upl_success <- any(grepl("^upload: ", upl_lines))
   }, finally = {
     unlink(tmp_file, force = T)
@@ -66,7 +66,7 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
   file_url <- sprintf("%s/%s", bucket_url, basename(tmp_file))
   pkg_logdebug("Cleanup: removing %s ...", file_url)
 
-  cln_lines <- get_cmd_lines("aws rm", "%s s3 --profile=%s rm %s", aws_cmd, s3_profile, file_url)
+  cln_lines <- get_cmd_outlines("aws rm", "%s s3 --profile=%s rm %s", aws_cmd, s3_profile, file_url)
   if (!any(grepl("^delete: ", cln_lines))) {
     pkg_logdebug("Cleanup: removing %s ... failed", file_url)
   }
@@ -117,12 +117,12 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
       s3_pkgs_url <- paste0(
         rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver),
         "/PACKAGES")
-      dld_lines <- get_cmd_lines("aws cp",
-                                 "%s s3 --profile=%s cp %s %s",
-                                 repo_manager$aws_cmd,
-                                 repo_manager$s3_profile,
-                                 s3_pkgs_url,
-                                 tmp_file)
+      dld_lines <- get_cmd_outlines("aws cp",
+                                    "%s s3 --profile=%s cp %s %s",
+                                    repo_manager$aws_cmd,
+                                    repo_manager$s3_profile,
+                                    s3_pkgs_url,
+                                    tmp_file)
       dld_success <- any(grepl("^download: ", dld_lines))
       if (dld_success) {
         types <- setdiff(types, tp)
@@ -147,12 +147,12 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
     pkg_loginfo("Initializing %s for %s types ...",
                 repo_manager$bucket_url, paste(types, collapse = ", "))
 
-    sync_lines <- get_cmd_lines("aws sync",
-                                "%s s3 --profile=%s sync %s %s --acl public-read",
-                                repo_manager$aws_cmd,
-                                repo_manager$s3_profile,
-                                tmp_dir,
-                                repo_manager$bucket_url)
+    sync_lines <- get_cmd_outlines("aws sync",
+                                   "%s s3 --profile=%s sync %s %s --acl public-read",
+                                   repo_manager$aws_cmd,
+                                   repo_manager$s3_profile,
+                                   tmp_dir,
+                                   repo_manager$bucket_url)
     assert(any(grepl("^upload: ", sync_lines)),
            "Failed to initialize repository at %s for %s",
            repo_manager$bucket_url, tp)
@@ -192,12 +192,12 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
       "/PACKAGES")
     loc_pkgs_path <- file.path(src_path, "PACKAGES")
 
-    dld_lines <- get_cmd_lines("aws cp",
-                               "%s s3 --profile=%s cp %s %s",
-                               repo_manager$aws_cmd,
-                               repo_manager$s3_profile,
-                               s3_pkgs_url,
-                               loc_pkgs_path)
+    dld_lines <- get_cmd_outlines("aws cp",
+                                  "%s s3 --profile=%s cp %s %s",
+                                  repo_manager$aws_cmd,
+                                  repo_manager$s3_profile,
+                                  s3_pkgs_url,
+                                  loc_pkgs_path)
     dld_success <- any(grepl("^download: ", dld_lines))
     if (!dld_success) {
       pkg_loginfo(paste0("Failed to retrieve PACKAGES for %s from %s.",
@@ -227,21 +227,21 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
     dst_url <- rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver)
     pkg_loginfo("... done; synchronizing to %s ...", dst_url)
 
-    sync_lines <- get_cmd_lines("aws sync",
-                                "%s s3 --profile=%s sync %s %s --acl public-read",
-                                repo_manager$aws_cmd,
-                                repo_manager$s3_profile,
-                                src_path,
-                                dst_url)
+    sync_lines <- get_cmd_outlines("aws sync",
+                                   "%s s3 --profile=%s sync %s %s --acl public-read",
+                                   repo_manager$aws_cmd,
+                                   repo_manager$s3_profile,
+                                   src_path,
+                                   dst_url)
     assert(any(grepl("^upload: ", sync_lines)),
            "Failed to syncronize repository at %s for %s",
            repo_manager$bucket_url, tp)
 
     # remove PACKAGES.rds as it does not support package history
-    get_cmd_lines("aws rm", "%s s3 --profile=%s rm %s",
-                  repo_manager$aws_cmd,
-                  repo_manager$s3_profile,
-                  paste0(dst_url, "/PACKAGES.rds"))
+    get_cmd_outlines("aws rm", "%s s3 --profile=%s rm %s",
+                     repo_manager$aws_cmd,
+                     repo_manager$s3_profile,
+                     paste0(dst_url, "/PACKAGES.rds"))
 
     pkg_loginfo("... done")
   }
@@ -292,12 +292,12 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
   dir.create(path = tmp_dir, recursive = T)
   on.exit(unlink(tmp_dir, force = T, recursive = T))
 
-  dld_lines <- get_cmd_lines("aws cp",
-                             "%s s3 --profile=%s cp %s %s",
-                             repo_manager$aws_cmd,
-                             repo_manager$s3_profile,
-                             paste0(dst_url, "/PACKAGES"),
-                             file.path(tmp_dir, "PACKAGES"))
+  dld_lines <- get_cmd_outlines("aws cp",
+                                "%s s3 --profile=%s cp %s %s",
+                                repo_manager$aws_cmd,
+                                repo_manager$s3_profile,
+                                paste0(dst_url, "/PACKAGES"),
+                                file.path(tmp_dir, "PACKAGES"))
   dld_success <- any(grepl("^download: ", dld_lines))
   if (!dld_success) {
     pkg_loginfo(paste0("Failed to retrieve PACKAGES for %s from %s.",
@@ -327,12 +327,12 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
 
   pkg_loginfo("... done; synchronizing PACKAGES to %s ...", dst_url)
 
-  sync_lines <- get_cmd_lines("aws sync",
-                              "%s s3 --profile=%s sync %s %s --acl public-read",
-                              repo_manager$aws_cmd,
-                              repo_manager$s3_profile,
-                              tmp_dir,
-                              dst_url)
+  sync_lines <- get_cmd_outlines("aws sync",
+                                 "%s s3 --profile=%s sync %s %s --acl public-read",
+                                 repo_manager$aws_cmd,
+                                 repo_manager$s3_profile,
+                                 tmp_dir,
+                                 dst_url)
   assert(any(grepl("^upload: ", sync_lines)),
          "Failed to syncronize repository at %s for %s",
          repo_manager$bucket_url, type)
@@ -340,12 +340,12 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
   pkg_loginfo("... done; removing package files ...")
 
   to_remove <- pkgs_dcf[to_remove_mask, ]
-  rm_lines <- get_cmd_lines("aws rm", '%s s3 --profile=%s rm %s --recursive --exclude "*" %s',
-                            repo_manager$aws_cmd,
-                            repo_manager$s3_profile,
-                            dst_url,
-                            paste(sprintf('--include "%s_%s.*"', to_remove$Package, to_remove$Version),
-                                  collapse = " "))
+  rm_lines <- get_cmd_outlines("aws rm", '%s s3 --profile=%s rm %s --recursive --exclude "*" %s',
+                               repo_manager$aws_cmd,
+                               repo_manager$s3_profile,
+                               dst_url,
+                               paste(sprintf('--include "%s_%s.*"', to_remove$Package, to_remove$Version),
+                                     collapse = " "))
   if (length(rm_lines[grepl("^delete: ", rm_lines)]) < nrow(to_remove)) {
     pkg_logwarn("Failed to remove some package files from %s", dst_url)
   }

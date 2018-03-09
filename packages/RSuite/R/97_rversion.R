@@ -59,7 +59,7 @@ get_rscript_path <- function(rver) {
 
 
     b_ver <- tryCatch({
-      output <- get_cmd_lines("Rscript detection", "%s --version", rscript_path) # from 98_shell.R
+      output <- get_cmd_outlines("Rscript detection", "%s --version", rscript_path) # from 98_shell.R
       gsub("^.+ (\\d+\\.\\d+\\.\\d+) .+$", "\\1", output)
     }, error = function(e) { NA })
 

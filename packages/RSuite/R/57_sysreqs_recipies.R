@@ -104,9 +104,9 @@ perform.sysreqs_check_recipe <- function(recipe) {
   cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), check_tool))
   # TODO handle this situation (now temporarly using cmd_lines, but not sure if this is a good idea.)
   result$nolibs <-
-    get_cmd_lines(sprintf("checking for system libraries: %s", paste(required_syslibs, collapse = ", ")),
-                  cmd = cmd,
-                  log_debug = TRUE)
+    get_cmd_outlines(sprintf("checking for system libraries: %s", paste(required_syslibs, collapse = ", ")),
+                     cmd = cmd,
+                     log_debug = TRUE)
 
   if (length(result$nolibs) > 0) {
     pkg_loginfo("Lack of required system libraries detected in environment: %s",
@@ -176,16 +176,12 @@ rm_satisfied.sysreqs_install_recipe <- function(recipe) {
 }
 
 perform.sysreqs_install_recipe <- function(recipe) {
-  .is_ret_code_a_failure <- function(cmd_ret_code, req_name) {
-    if(is.null(cmd_ret_code) || cmd_ret_code > 0) {
-      pkg_logwarn("Something went wrong while installing requirement: %s. Process terminated with code: %s. Rerun task with -v flag to see more details.", req_name, cmd_ret_code)
-      return(TRUE)
-    } else{
-      pkg_loginfo("Installing %s done.", req_name)
-      return(FALSE)
-    }
+  .is_retcode_failure <- function(cmd_ret_code, req_name) {
+    return(is.null(cmd_ret_code) || cmd_ret_code > 0)
   }
   plat_desc <- get_platform_desc()
+
+  failed_reqs <- c()
 
   required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) { sl$syslibs }))
   if (!is.null(required_syslibs)) {
@@ -199,17 +195,27 @@ perform.sysreqs_install_recipe <- function(recipe) {
       cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), install_tool))
 
       pkg_loginfo("Installing system libraries(%s) ...", paste(required_syslibs, collapse = ", "))
-      cmd_output <- get_cmd_output(sprintf("installing system libraries: %s", paste(required_syslibs, collapse = ", ")),
-                    cmd = cmd,
-                    log_debug = TRUE)
-
-      pkg_loginfo("... done")
+      cmd_retcode <- get_cmd_retcode(sprintf("installing system libraries: %s", paste(required_syslibs, collapse = ", ")),
+                                     cmd = cmd,
+                                     log_debug = TRUE)
+      if (.is_retcode_failure(cmd_retcode, "sys libs")) {
+        failed_reqs <- c(failed_reqs, "sys libs")
+        pkg_logwarn("Something went wrong while installing system libraries. Installation process terminated with code: %s.", cmd_retcode)
+      } else {
+        pkg_loginfo("... done")
+      }
     }
   }
 
-  failed_req <- list()
   for(req_name in names(recipe$build_specs)) {
     build_spec <- recipe$build_specs[[req_name]]
+
+    if (!file.exists(Sys.which(build_spec$tool))) {
+      pkg_logwarn("Tool %s for building %s is not available.", build_spec$tool, req_name)
+      failed_reqs <- c(failed_reqs, req_name)
+      next
+    }
+
     pkg_loginfo("Building %s for %s ...", req_name, paste(build_spec$packages, collapse = ", "))
 
     cmd <- gsub(":params", build_spec$params, build_spec$cmd, fixed = TRUE)
@@ -219,15 +225,19 @@ perform.sysreqs_install_recipe <- function(recipe) {
     cmd <- gsub(":tool", build_spec$tool, cmd, fixed = TRUE)
     cmd <- paste(cmd, '-v')
 
-    cmd_ret_code <- get_cmd_output(sprintf("building %s for %s", req_name, paste(build_spec$packages, collapse = ", ")),
-                  cmd = cmd,
-                  log_debug = TRUE)
-    if(.is_ret_code_a_failure(cmd_ret_code, req_name)){
-      failed_req[[length(failed_req) + 1]] <- req_name
+    cmd_retcode <- get_cmd_retcode(sprintf("building %s for %s", req_name, paste(build_spec$packages, collapse = ", ")),
+                                   cmd = cmd,
+                                   log_debug = TRUE)
+    if(.is_retcode_failure(cmd_retcode)) {
+      failed_reqs <- c(failed_reqs, req_name)
+      pkg_logwarn("Something went wrong while building %s. Building process terminated with code: %s.", req_name, cmd_retcode)
+    } else {
+      pkg_loginfo("... done")
     }
   }
-  if(length(failed_req) > 0){
-    pkg_logwarn('There was an error with installing following system requirements: %s', failed_req)
+
+  if(length(failed_reqs) > 0){
+    pkg_logwarn('Error(s) occurred while installing following system requirements: %s', paste(failed_reqs, collapse = ", "))
   }else{
     pkg_loginfo("All system requirements installed.")
   }

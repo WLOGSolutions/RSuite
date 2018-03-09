@@ -10,47 +10,68 @@
 #'
 #' Logs command to run and all output to finest level.
 #'
-#' @param desc description of command to prefix logged messages. (type: character)
+#' @param desc description of command to prefix logged messages. (type: character(1))
 #' @param cmd command to run. Can contain formating expessions. (type: character)
 #' @param ... parameters to build cmd using sprintf.
+#' @param log_debug if TRUE will log onto DEBUG level else FINEST log level
+#'   will be used. (type: logical(1), default: FALSE)
 #'
-#' @return character(N) containing command output lines.
+#' @return integer(1) containing retcode of the process.
 #'
 #' @keywords internal
 #'
-get_cmd_output <- function(desc, cmd, ..., log_debug = FALSE) {
-  .log_output <- function(desc, out_arr, log_fun) {
-    .log_single_out <- function(desc, out_arr, log_fun) {
-      for (single_out in out_arr) {
-        for (line in single_out) {
-          if (nchar(line) > 0) {
-            log_fun("%s output: %s", desc, line)
-          }
+get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
+  .log_single_out <- function(desc, out_arr, log_fun) {
+    for (single_out in out_arr) {
+      for (line in single_out) {
+        if (nchar(line) > 0) {
+          log_fun("%s output: %s", desc, line)
         }
       }
     }
-
-    .log_single_out(desc, out_arr$stdout, log_fun)
-    .log_single_out(desc, out_arr$stderr, log_fun)
   }
-
-  full_cmd <- sprintf(cmd, ...)
-  cmd_split <- strsplit(full_cmd, split = ' ')[[1]]
+  .split_cmd <- function(cmd) {
+    args <- c()
+    quote_arg <- NULL
+    for(t in unlist(strsplit(cmd, '\\s+'))) {
+      if (!is.null(quote_arg)) {
+        if (grepl("[\"']$", t)) {
+          args <- c(args, paste(quote_arg, substring(t, 1, nchar(t) -1)))
+          quote_arg <- NULL
+        } else {
+          quote_arg <- paste(quote_arg, t)
+        }
+      } else {
+        if (grepl("^[\"']", t)) {
+          quote_arg <- substring(t, 2)
+        } else {
+          args <- c(args, t)
+        }
+      }
+    }
+    if (!is.null(quote_arg)) {
+      args <- c(args, quote_arg)
+    }
+    return(args)
+  }
 
   log_fun <- if (log_debug) {
     pkg_logdebug
   } else {
     pkg_logfinest
   }
-  log_fun("%s cmd: %s", desc, full_cmd)
+  full_cmd <- sprintf(cmd, ...)
+  log_fun("%s cmd: %s", desc, cmd)
 
-  con <- spawn_process(command = Sys.which(cmd_split[1]),
-                       arguments = cmd_split[2:length(cmd_split)])
+  args <- .split_cmd(full_cmd)
+  cmd_path <- Sys.which(args[1])
+  assert(file.exists(cmd_path), "Command %s is not available", cmd)
+  con <- spawn_process(command = cmd_path, arguments = args[2:length(args)])
   tryCatch({
     while (process_state(con) == 'running') {
-      .log_output(desc,
-                  process_read(con, PIPE_BOTH, timeout = 3000),
-                  log_fun)
+      out_arr <- process_read(con, PIPE_BOTH, timeout = 3000)
+      .log_single_out(desc, out_arr$stdout, log_fun)
+      .log_single_out(desc, out_arr$stderr, log_fun)
     }
   }, finally = {
     ret_code <- process_return_code(con)
@@ -72,7 +93,7 @@ get_cmd_output <- function(desc, cmd, ..., log_debug = FALSE) {
 #'
 #' @keywords internal
 #'
-get_cmd_lines <- function(desc, cmd, ..., log_debug = FALSE) {
+get_cmd_outlines <- function(desc, cmd, ..., log_debug = FALSE) {
   full_cmd <- paste0(sprintf(cmd, ...), " 2>&1")
 
   log_fun <- if(log_debug) { pkg_logdebug } else { pkg_logfinest }
