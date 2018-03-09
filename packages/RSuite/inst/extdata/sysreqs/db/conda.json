@@ -3,7 +3,9 @@
 		"sysreqs": "/conda\\s*\\(([^)]+)\\)/i",
 		"satisfies": "python-2.7",
 		"platforms": {
-			"Windows": "conda.exe"
+			"Windows": "conda.exe",
+			"DEB": "conda",
+			"RPM": "conda"
 		},
 		"handlers": {
 		  "install": "[skip]",
