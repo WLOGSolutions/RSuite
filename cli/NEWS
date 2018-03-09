@@ -1,4 +1,4 @@
-VERSION 0.23 (2018-02-??)
+VERSION 0.23 (2018-03-09)
   * sysreqs subcommand added for management of system requirements.
   * WiX installer contains also bash script for MinGW bash terminals.
 
