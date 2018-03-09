@@ -1,4 +1,4 @@
-# Hits and solutions
+# Hints and solutions
 
 If R Suite does not work as expected first of all try to increase verbosity of logs. In most cases 
 it will give you some hints how to resolve the issue.
