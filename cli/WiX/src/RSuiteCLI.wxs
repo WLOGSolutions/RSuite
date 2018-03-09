@@ -39,7 +39,7 @@
                 <File Id='RSuiteBash' Name='rsuite' DiskId='1' Source='../rsuite' />
                 <File Id='zip.exe' Name='zip.exe' DiskId='1' Source='zip.exe' />
                 <File Id='version.txt' Name='version.txt' DiskId='1' Source='build/version.txt' />
-                <Environment Id="PATH" Name="PATH" Value="[APPLICATIONFOLDER]" Permanent="no" Part="last" Action="set" System="yes" />
+                <Environment Id="PATH" Name="PATH" Value="[APPLICATIONFOLDER]" Permanent="no" Part="first" Action="set" System="yes" />
             </Component>
 
             <Directory Id='RSources' Name='R'>
