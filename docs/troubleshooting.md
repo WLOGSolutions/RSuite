@@ -1,4 +1,4 @@
-# Hits and solutions
+# Hints and solutions
 
 If R Suite does not work as expected first of all try to increase verbosity of logs. In most cases 
 it will give you some hints how to resolve the issue.
@@ -169,8 +169,7 @@ If you are using R Suite from R console, R session has to be restarted first: te
 R Suite CLI uses optparse and logging packages to interact with user (optparse is used for parsing command line arguments). Just after installation on fresh
 environment R Suite CLI checks if the packages are available. If not it tries to install them from shipped together with R Suite CLI sources. 
 
-Complaining about lack of optparse means that it was not available and R Suite CLI failed to install it from source package. To detect reason it may be useful 
-to run rsuite command with -v (short for --verbose) option. For example:
+Complaining about lack of optparse means that it was not available and R Suite CLI failed to install it from source package. To detect reason it may be useful to run rsuite command with -v (short for --verbose) option. For example:
 
 ``` bash
 ...>rsuite proj install -v
@@ -190,8 +189,7 @@ ERROR: there is no package called 'optparse'
 ERROR: optparse is required for RSuite CLI to work. Tried to install it but failed.
 ```
 
-As you can see installing of optparse failed due to user library folder contains locale specific symbols. In the case you can try to install binary optparse and
-logging packages:
+As you can see installing of optparse failed due to user library folder contains locale specific symbols. In the case you can try to install binary optparse and logging packages:
 
 ``` bash
 RScript -e "install.packages(c('optparse', 'logging'), repos = 'http://cran.r-project.org/')"
