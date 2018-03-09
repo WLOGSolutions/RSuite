@@ -3,7 +3,7 @@
 base_dir=$(dirname $0)
 base_dir=`realpath ${base_dir}`
 
-basever=`cat ${base_dir}/../version.txt`
+basever=`cat ${base_dir}/../version.txt | sed -e "s/[\r\n]//"`
 gittag=`git tag | tail -n 1`
 if [ -z "$gittag" ]; then
 	echo "ERROR: Failed to detect git tag"
