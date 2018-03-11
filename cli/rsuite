@@ -44,11 +44,11 @@ case "$cmd" in
                 "$rscript_path" --no-init-file "$basedir/R/cmd_docker.R" $* || exit 2
 		;;
 	version)
-                ver=`cat ${basedir}/version.txt`
+                ver=`cat "${basedir}/version.txt"`
                 echo $ver
 		;;
 	help)
-		ver=`cat ${basedir}/version.txt`
+		ver=`cat "${basedir}/version.txt"`
 		echo "Command line utility for R project management with RSuite (v$ver)"
 		echo "Usage: rsuite [command] [args]"
 		echo ""
