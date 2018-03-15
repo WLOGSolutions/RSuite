@@ -1,3 +1,7 @@
+VERSION 0.24 (2018-03-??)
+  * docker command has new parameter -i (--image) which makes it possible
+     to build solution on specific(non default) image.
+
 VERSION 0.23 (2018-03-09)
   * sysreqs subcommand added for management of system requirements.
   * WiX installer contains also bash script for MinGW bash terminals.
