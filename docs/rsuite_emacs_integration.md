@@ -1,7 +1,7 @@
 # Introduction
 
 ![Emacs integration with R Suite exemplary
-screencast](docs/media/rsuite_emacs_scrncast.png "Emacs integration
+screencast](media/rsuite_emacs_scrncast.png "Emacs integration
 with R Suite")
 
 # Instalation

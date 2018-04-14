@@ -20,6 +20,7 @@
   "Docker platforms supported by R Suite.")
 (defconst rsuite/buffer "rsuite" "Buffer for rsuite output.")
 (defconst rsuite/err_buffer "rsuite:error" "Buffer for rsuite error output.")
+(defconst rsuite/cli "rsuite" "Path to RSuite CLI.")
 
 (defun rsuite-toggle-verbose ()
   "Toggle R Suite verbosity."
@@ -31,7 +32,7 @@
 (defun run-rsuite (args)
   "Utility for running rsuite cli.
 ARGS is a string of arguments forwarded to rsuite cli."
-  (async-shell-command (concat "rsuite " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
+  (async-shell-command (concat rsuite/cli " " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
 
 (defun rsuite-detect-prj-path ()
   "Return R Suite's project path or throws error if none found."
@@ -95,8 +96,29 @@ ARGS is a string of arguments forwarded to rsuite cli."
 	(run-rsuite (concat "proj zip --version=" version " --path=" path))
       (run-rsuite (concat "proj zip --path=" path)))))
 
-(defun rsuite-docker-zip ()
-  "Make deployment zip using docker."
+(defun rsuite-docker-zip-image ()
+  "Make deployment zip using docker and custom base image."
+  (interactive)
+  (let ((rver nil)
+	(image nil)
+	(version nil)
+	(path nil)
+	(rcmd "docker zip"))
+    (setq version (read-string "Version: "))
+    (setq path (read-directory-name "Path: "))
+    (setq image (read-string "Image: "))
+    (setq rver (read-string "RVer: "))
+    (setq rcmd (concat rcmd
+		       " --dest=" path
+		       " --rver=" rver
+		       " --image=" image))
+    (if (> (length version) 0)
+	(run-rsuite (concat rcmd
+			    " --version=" version))
+      (run-rsuite rcmd))))
+
+(defun rsuite-docker-zip-platform ()
+  "Make deployment zip using docker and image of one of the supported OSs."
   (interactive)
   (let ((platform nil)
 	(version nil)
@@ -113,8 +135,8 @@ ARGS is a string of arguments forwarded to rsuite cli."
 			    " --version=" version))
       (run-rsuite rcmd))))
 
-(defun rsuite-docker-img ()
-  "Make deployment docker image."
+(defun rsuite-docker-image-platform ()
+  "Make deployment docker image for supported OSs."
   (interactive)
   (let ((platform nil)
 	(version nil)
@@ -127,6 +149,25 @@ ARGS is a string of arguments forwarded to rsuite cli."
     (setq rcmd (concat rcmd
 		       " --tag=" tag
 		       " --platform=" platform))
+    (if (> (length version) 0)
+	(run-rsuite (concat rcmd
+			    " --version=" version))
+      (run-rsuite rcmd))))
+
+(defun rsuite-docker-image-image ()
+  "Make deployment docker image using custom base image."
+  (interactive)
+  (let ((image nil)
+	(version nil)
+	(tag nil)
+	(rcmd "docker img"))
+    
+    (setq version (read-string "Version: "))
+    (setq tag (read-string "Tag: "))
+    (setq image (read-string "Image: "))
+    (setq rcmd (concat rcmd
+		       " --tag=" tag
+		       " --image=" image))
     (if (> (length version) 0)
 	(run-rsuite (concat rcmd
 			    " --version=" version))
