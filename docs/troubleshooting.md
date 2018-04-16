@@ -13,13 +13,10 @@ issues.
 If you are stuck fill free to contact us:
 
 * through RSuite website (http://rsuite.io#contact) or 
-* directly by sending email with your problem description to 
-
-<!--html_preserve-->
-<a href="mailto:rsuite@wlogsolutions.com">rsuite@wlogsolutions.com</a>
-<!--/html_preserve-->
-* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite "RSuite room")
-
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
+  "Gitter RSuite room")
+* directly by sending email with your problem description to
+  [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
 ## Verbosity of logs
 

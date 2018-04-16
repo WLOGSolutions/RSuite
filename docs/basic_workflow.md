@@ -8,6 +8,20 @@ In this document we present a basic R Suite usage. It covers:
 * developing custom package with `devtools`
 * understanding loggers
 
+## **Got stuck?**
+
+If you are stuck fill free to contact us:
+
+* through RSuite website (http://rsuite.io#contact) or 
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
+  "Gitter RSuite room")
+* directly by sending email with your problem description to
+  [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
+  
+## Table of contents
+
+  * [Step 1 - start a new project](step-1---start-a-new-project "Step 1 - start a new project")
+
 # Step 1 - start a new project
 
 To create a new project (called `my_project`) we have to issue the following command

@@ -4,6 +4,16 @@
 screencast](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuite_emacs_scrncast.png
 "Emacs integration with R Suite")
 
+## **Got stuck?**
+
+If you are stuck fill free to contact us:
+
+* through RSuite website (http://rsuite.io#contact) or 
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
+  "Gitter RSuite room")
+* directly by sending email with your problem description to
+  [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
+
 # Instalation
 
 Currently installation is supported only via manual. It is planned to
