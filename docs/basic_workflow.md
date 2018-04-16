@@ -20,7 +20,7 @@ If you are stuck fill free to contact us:
   
 ## Table of contents
 
-  * [Step 1 - start a new project](step-1---start-a-new-project "Step 1 - start a new project")
+  * [Step 1 - start a new project](#step-1---start-a-new-project "Step 1 - start a new project")
 
 # Step 1 - start a new project
 
