@@ -8,6 +8,19 @@ If it does not help do not hesitate to contact us through email (rsuite@wlogsolu
 R Suite generated when the problem occurred. It would be ideal if you could send us zipped project which causes
 issues.
 
+## **Got stuck?**
+
+If you are stuck fill free to contact us:
+
+* through RSuite website (http://rsuite.io#contact) or 
+* directly by sending email with your problem description to 
+
+<!--html_preserve-->
+<a href="mailto:rsuite@wlogsolutions.com">rsuite@wlogsolutions.com</a>
+<!--/html_preserve-->
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite "RSuite room")
+
+
 ## Verbosity of logs
 
 ### RSuite logging

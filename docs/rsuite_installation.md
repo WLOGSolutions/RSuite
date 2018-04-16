@@ -1,6 +1,39 @@
 # How to install RSuite
 
-RSuite is R package so it is platform independent. 
+RSuite is an R package so it is platform independent. We **strongly
+recommend** using R Suite CLI to install R Suite package. But there
+are other options that could fit better your needs.
+
+## **Got stuck?**
+
+If you are stuck fill free to contact us:
+
+* through RSuite website (http://rsuite.io#contact) or 
+* directly by sending email with your problem description to 
+
+<!--html_preserve-->
+<a href="mailto:rsuite@wlogsolutions.com">rsuite@wlogsolutions.com</a>
+<!--/html_preserve-->
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite "RSuite room")
+
+## (Recommended) Installation with help of RSuite CLI
+
+If you have RSuite CLI installed (check ![R Suite CLI installation
+reference](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
+"RSuite CLI installation reference.") already you can use it to
+install latest compatible version of RSuite. Just execute following
+command in you shell:
+
+```bash
+$ rsuite install
+```
+
+If any problems occur try to run this command in verbose mode. It will probably
+give you hint on why the problem occurred:
+
+```bash
+$ rsuite install -v
+```
 
 ## Requirements
 
@@ -59,7 +92,7 @@ You can check which version of RSuite is latest released with following code:
 > RSuite::rsuite_check_version()
 ```
 
-You can upgrate RSuite any time executing following code:
+You can upgrade RSuite any time executing following code:
 
 ```bash
 > RSuite::rsuite_update()
@@ -73,26 +106,4 @@ Version of RSuite and RSuite CLI has form <Maj>.<Min>-<Rel>. Compatibility is
 detected comparing if <Maj>.<Min> match for RSuite and RSuite CLI. Then upgrading
 to latest released version of RSuite compatibility with RSuite CLI can be broken.
 In that case you will need to upgrade RSuite CLI also.
-
-## Installation with help of RSuite CLI
-
-If you have RSuite CLI installed already you can use it to install latest 
-compatible version of RSuite. Just execute following command in you shell:
-
-```bash
-$ rsuite install
-```
-
-If any problems occure try to run this command in verbose mode. It will probably
-give you hint on why the problem occured:
-
-```bash
-$ rsuite install -v
-```
-
-If you are stuck fill free to contact us through RSuite website (http://rsuite.io#contact) 
-or directly by sending email with your problem description to 
-<!--html_preserve-->
-<a href="mailto:rsuite@wlogsolutions.com">rsuite@wlogsolutions.com</a>
-<!--/html_preserve-->.
 
