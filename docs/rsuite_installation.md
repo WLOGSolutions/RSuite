@@ -9,16 +9,17 @@ are other options that could fit better your needs.
 If you are stuck fill free to contact us:
 
 * through RSuite website (http://rsuite.io#contact) or 
-* directly by sending email with your problem description to 
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite "RSuite room")
+* directly by sending email with your problem description to [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
 <!--html_preserve-->
 <a href="mailto:rsuite@wlogsolutions.com">rsuite@wlogsolutions.com</a>
 <!--/html_preserve-->
-* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite "RSuite room")
+
 
 ## (Recommended) Installation with help of RSuite CLI
 
-If you have RSuite CLI installed (check ![R Suite CLI installation
+If you have RSuite CLI installed (check [RSuite CLI installation
 reference](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
 "RSuite CLI installation reference.") already you can use it to
 install latest compatible version of RSuite. Just execute following

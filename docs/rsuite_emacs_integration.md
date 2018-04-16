@@ -1,8 +1,8 @@
 # Introduction
 
 ![Emacs integration with R Suite exemplary
-screencast](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuite_emacs_scrncast.png "Emacs integration
-with R Suite")
+screencast](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuite_emacs_scrncast.png
+"Emacs integration with R Suite")
 
 # Instalation
 
@@ -13,13 +13,13 @@ repository](https://melpa.org/#/getting-started "MELPA repository").
 ## Download package
 
 You have to download `rsuite.el` using this
-[https://github.com/WLOGSolutions/RSuite](link "rsuite.el") into your
+[link](https://github.com/WLOGSolutions/RSuite "rsuite.el") into your
 `~\.emacs.d\myscripts\` folder. You can use any other folder but
 remember to adapt next steps to your folder.
 
 ## Make package available to Emacs
 
-We use [https://github.com/jwiegley/use-package](use-package
+We use [use-package](https://github.com/jwiegley/use-package
 "use-package") for managing our Emacs' packages. So first you have to
 install `use-package` package. We recommend using [MELPA
 repository](https://melpa.org/#/getting-started "MELPA repository"). 
@@ -32,18 +32,18 @@ to your needs.
 (use-package rsuite
   :load-path "~/.emacs.d/myscripts/"
   :bind (
-	 ("C-x r p s" . rsuite-proj-start)
-	 ("C-x r p p" . rsuite-proj-pkg-start)
-	 ("C-x r p b" . rsuite-proj-build)
-	 ("C-x r p d" . rsuite-proj-depsinst)
-	 ("C-x r p z" . rsuite-proj-zip)
-	 ("C-x r d z i" . rsuite-docker-zip-image)
-	 ("C-x r d z p" . rsuite-docker-zip-platform)
-	 ("C-x r d i p" . rsuite-docker-image-platform)
-	 ("C-x r d i i" . rsuite-docker-image-image)))
+	 ("C-x M-r p s" . rsuite-proj-start)
+	 ("C-x M-r p p" . rsuite-proj-pkg-start)
+	 ("C-x M-r p b" . rsuite-proj-build)
+	 ("C-x M-r p d" . rsuite-proj-depsinst)
+	 ("C-x M-r p z" . rsuite-proj-zip)
+	 ("C-x M-r d z i" . rsuite-docker-zip-image)
+	 ("C-x M-r d z p" . rsuite-docker-zip-platform)
+	 ("C-x M-r d i p" . rsuite-docker-image-platform)
+	 ("C-x M-r d i i" . rsuite-docker-image-image)))
 ```
 
-# Instruction
+# Reference
 
 ## Variables
 Currently the `rsuite.el` package provides following variables:
