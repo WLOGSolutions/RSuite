@@ -8,6 +8,34 @@ In this document we present a basic R Suite usage. It covers:
 * developing custom package with `devtools`
 * understanding loggers
 
+## **Got stuck?**
+
+If you are stuck fill free to contact us:
+
+* through RSuite website (http://rsuite.io#contact) or 
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
+  "Gitter RSuite room")
+* directly by sending email with your problem description to
+  [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
+  
+## Table of contents
+
+  * [Step 1 - start a new project](#step-1---start-a-new-project "Step
+    1 - start a new project")  
+  * [Step 1 - start a new project](#step-1---start-a-new-project "Step 1 - start a new project")
+  * [Step 2 - add first package](#step-2---add-first-package "Step 2 - add first package")
+  * [Step 3 - add custom package to master script](#step-3---add-custom-package-to-master-script "Step 3 - add custom package to master script")
+  * [Step 4 - building custom packages](#step-4---building-custom-packages "Step 4 - building custom packages")
+  * [Step 5 - adding function to a package](#step-5---adding-function-to-a-package "Step 5 - adding function to a package")
+  * [Step 6 - rebuild packages](#step-6---rebuild-packages "Step 6 - rebuild packages")
+  * [Step 7 - adding dependencies ](#step-7---adding-dependencies- "Step 7 - adding dependencies ")
+  * [Step 8 - install dependencies](#step-8---install-dependencies "Step 8 - install dependencies")
+  * [Step 9 - developing custom package using `devtools`](#step-9---developing-custom-package-using-devtools "Step 9 - developing custom package using `devtools`")
+  * [Step 11 - loggers in packages](#step-11---loggers-in-packages "Step 11 - loggers in packages")
+  * [Step 12 - prepare deployment package](#step-12---prepare-deployment-package "Step 12 - prepare deployment package")
+  * [Step 13 - running deployment package](#step-13---running-deployment-package "Step 13 - running deployment package")
+
+
 # Step 1 - start a new project
 
 To create a new project (called `my_project`) we have to issue the following command

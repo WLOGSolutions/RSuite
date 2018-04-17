@@ -10,8 +10,19 @@ RSuite and RSuite calling code are platform independent but RSuite CLI depends o
 bash script.
 
 To make start of journey with RSuite CLI as easier as possible we prepared installation packages for you. Herein we discuss how they can be
-installed on each supported platform. You can download them from [R Suite Download](http://rsuite.io/RSuite_Download.php).
+installed on each supported platform. You can download them from [R
+Suite Download](http://rsuite.io/RSuite_Download.php).
 
+## **Got stuck?**
+
+If you are stuck fill free to contact us:
+
+* through RSuite website (http://rsuite.io#contact) or 
+* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
+  "RSuite room")
+* directly by sending email with your problem description to
+  [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
+  
 ## Windows installation
 
 For Windows RSuite CLI is provided as MSI packages for both x86 and x64 platforms. You can just download appropriate MSI and run it.
