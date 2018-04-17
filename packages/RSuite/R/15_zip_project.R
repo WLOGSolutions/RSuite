@@ -125,6 +125,8 @@ zip_project <- function(params, version, odir) {
     assert(success,
            "Failed to copy project libraries to temporary folder")
 
+    success <- file.copy(file.path(params$prj_path, ".Rprofile"), root_dir)
+
     if (dir.exists(params$script_path)) {
       success <- file.copy(params$script_path, root_dir, recursive = T)
       assert(success,

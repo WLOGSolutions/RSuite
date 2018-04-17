@@ -19,6 +19,13 @@ if [ "$OS" == "Windows_NT" ]; then
 	# This is required as MinGW bash uses different HOME than system
 	#  as a result R is not able to find user packages installed
 	export HOME=$HOME/Documents
+
+	# Under Windows tar in path breaks built of any R package. So get rid of it.
+	tardir=$(dirname `which tar 2> /dev/null` 2> /dev/null)
+	if [ -n "$tardir" ]; then
+	  PATH=$(echo $PATH | sed -e "s|:$tardir:|:|g")
+	  echo $PATH
+	fi
 fi
 
 case "$cmd" in

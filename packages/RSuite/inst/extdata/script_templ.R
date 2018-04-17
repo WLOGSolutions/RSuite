@@ -2,7 +2,7 @@
 script_path <- (function() {
 	args <- commandArgs(trailingOnly = FALSE)
 	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return(".") }
+	if (!length(script_path)) { return("R") }
 	return(normalizePath(script_path))
 })()
 

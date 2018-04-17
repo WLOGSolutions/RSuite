@@ -63,7 +63,7 @@ check_project_structure <- function(prj_dir) {
   }
 
   create_rproj(prj_dir, prj_name)
-  create_rprofile(prj_dir)
+  create_rprofile(prj_dir, text = "source(file.path('R', 'set_env.R'), chdir = T)")
 
   # Scripts folder
   if (length(list.files(path = params$script_path, pattern = "*.R", recursive = F)) == 0) {
@@ -76,7 +76,6 @@ check_project_structure <- function(prj_dir) {
     }
   }
 
-  create_rproj(params$script_path, paste0(prj_name, "_MasterScripts"))
   create_rprofile(params$script_path, text = "source('set_env.R', chdir = T)")
 
   set_env_r <- file.path(params$script_path, "set_env.R")
@@ -92,7 +91,8 @@ check_project_structure <- function(prj_dir) {
 
   # initialize tests folder
   create_rproj(file.path(prj_dir, 'tests'), paste0(prj_name, "_Tests"))
-  create_rprofile(file.path(prj_dir, 'tests'))
+  create_rprofile(file.path(prj_dir, 'tests'),
+                  text = "source(file.path('..', 'R', 'set_env.R'), chdir = T)")
 
   if (params$r_ver == current_rver()) {
     # add logger to libraries folder as it will be required for sure
@@ -233,7 +233,7 @@ create_package_structure <- function(pkg_dir) {
   }
 
   create_rproj(pkg_dir, keywords$pkg_name)
-  create_rprofile(pkg_dir)
+  create_rprofile(pkg_dir, text = "source(file.path('..', '..', 'R', 'set_env.R'), chdir = T)")
 }
 
 

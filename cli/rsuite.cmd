@@ -1,5 +1,8 @@
 @echo off
 
+rem
+rem Retecting if Rscript is available. If not it will be searched in registry
+rem
 
 Rscript.exe --version 1> nul 2>&1
 if ERRORLEVEL 1 (
@@ -22,6 +25,15 @@ if ERRORLEVEL 1 (
 
 :rscript_found
 
+rem
+rem Following is required to get rid of tar.exe from path as it breaks building of any package under R
+rem
+
+setlocal
+for /f "tokens=1 delims=" %%P in ('Rscript.exe -e "cat(gsub(gsub('\\tar.exe', '', Sys.which('tar'), fixed = TRUE), '', Sys.getenv('PATH'), fixed = TRUE))"') do (
+  set "PATH=%%P"
+)
+
 set base_dir=%~dps0
 set cmd="%1"
 
@@ -29,13 +41,13 @@ if %cmd%=="" goto help
 if %cmd%=="help" goto help
 
 if %cmd%=="update" (
-    Rscript --no-init-file "%base_dir%/R/cmd_update.R" %*
+    Rscript.exe --no-init-file "%base_dir%/R/cmd_update.R" %*
     if ERRORLEVEL 1 exit /B 2
     exit /b 0
 )
 
 if %cmd%=="install" (
-    Rscript --no-init-file "%base_dir%/R/cmd_install.R" %*
+    Rscript.exe --no-init-file "%base_dir%/R/cmd_install.R" %*
     if ERRORLEVEL 1 exit /B 2
     exit /b 0
 )
