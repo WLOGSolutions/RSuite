@@ -130,7 +130,7 @@ source(file.path(script_path, "set_env.R"), chdir = T)
 config <- load_config()
 args <- args_parser()
 
-library(my_package)
+library(mypackage)
 ```
 
 You can check if your package is visible to your master script by using the following commands
@@ -196,7 +196,7 @@ source(file.path(script_path, "set_env.R"), chdir = T)
 config <- load_config()
 args <- args_parser()
 
-library(my_package)
+library(mypackage)
 
 hello_world("John")
 ```
