@@ -1,4 +1,4 @@
-VERSION 0.24 (2018-04-??)
+VERSION 0.24 (2018-04-18)
   * .Rprofile loads environment throu set_env.R not to load RSuite before
      environment is configured properly.
   * set_env.R default script_path set to R (relative to base project dir).
