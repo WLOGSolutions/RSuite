@@ -14,6 +14,14 @@
 .base_dir <- normalizePath(".")
 if (.Platform$OS.type == "windows") {
   .base_dir <- shortPathName(.base_dir)
+
+  # get rid of tar from PATH as it breaks package building
+  tar_path <- Sys.which('tar')
+  if (file.exists(tar_path)) {
+    path <- unlist(strsplit(Sys.getenv('PATH'), .Platform$path.sep))
+    path <- path[gsub("\\\\$", "", path) != gsub('\\\\tar.exe$', '', tar_path)]
+    Sys.setenv(PATH = paste(path, collapse = .Platform$path.sep))
+  }
 }
 
 .usr_lib_path <- .libPaths()[1]

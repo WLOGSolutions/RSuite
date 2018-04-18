@@ -25,15 +25,6 @@ if ERRORLEVEL 1 (
 
 :rscript_found
 
-rem
-rem Following is required to get rid of tar.exe from path as it breaks building of any package under R
-rem
-
-setlocal
-for /f "tokens=1 delims=" %%P in ('Rscript.exe -e "cat(gsub(gsub('\\tar.exe', '', Sys.which('tar'), fixed = TRUE), '', Sys.getenv('PATH'), fixed = TRUE))"') do (
-  set "PATH=%%P"
-)
-
 set base_dir=%~dps0
 set cmd="%1"
 
