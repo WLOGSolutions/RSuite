@@ -26,7 +26,7 @@ get_docker_cmd <- function() {
 #' Raises error if platform is not supported.
 #'
 get_platform_id <- function(platform) {
-  platform_id_dict <- list(ubuntu = "deb", centos = "rpm")
+  platform_id_dict <- list(ubuntu = "deb", debian = "deb", centos = "rpm")
   if (!(platform %in% names(platform_id_dict))) {
     stop(sprintf("Platform %s is not currently supported. Supported platforms are %s.",
                  platform, paste(names(platform_id_dict), collapse = " ")))

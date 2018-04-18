@@ -10,7 +10,7 @@ rsuite_ver=${ver_base}.${git_tag}
 
 plat=$1
 if [ -z "$plat" ]; then
-    plat="ubuntu"
+    plat="debian"
 fi
 
 if [ ! -f "Dockerfile.${plat}_rsuite" ]; then

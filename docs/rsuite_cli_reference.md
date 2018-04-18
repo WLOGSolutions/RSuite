@@ -150,7 +150,14 @@ After building local project environment you can build project packages by calli
 rsuite proj build
 ```
 
-It does not accept any special options except standard `-v` and `-h`.
+RSuite detects if project package have been changed and not rebuilds it in the case. If you would like to enforce rebuilding your project packages
+use following command:
+
+```bash
+rsuite proj build -f
+```
+
+It also accept standard `-v` and `-h` options.
 
 #### Cleaning unused project dependencies
 
@@ -537,7 +544,7 @@ appropriate R version and R Suite with R Suite CLI installed. Image for with lat
 
 You can provide following options to rsuite docker zip:
 
-* `-p` (short for `--platform`) takes platform name to build project under. centos and ubuntu platforms are supported (ubuntu is default).
+* `-p` (short for `--platform`) takes platform name to build project under. centos, ubuntu and debian platforms are supported (ubuntu is default).
 * `-d` (short for `--dest`) takes location to put generated zip into. Default is current folder.
 * `--sh` accepts additional shell commands to execute inside container before building the project. You can pass commands to install additional system
   packages to required for project to build properly. For example following command will install libglpk-dev on container before building project:
@@ -554,6 +561,7 @@ rsuite docker zip --sh "apt-get install -y libglpk-dev"
 * `--version` Accepts version number to tag deployment zip package with. Version number should be in form DD.DD. If not passed standard algorithm for 
    tag selection is applied (ZipVersion from project PARAMETERS + revision from RC). If version is not enforced R Suite will check for source codes 
    consistency agains RC.
+* `-i` (short for `--image`) takes name of docker image to use for building zip instead of default rsuite image.
 
 It also accepts standard options `-v` and `-h`.
 
@@ -593,6 +601,7 @@ FROM <From>
 * `--packages` accepts comma separated list of project packages to pass to `rsuite docker zip` command then building project deployment zip package.
 * `--exc-master` option passed to `rsuite docker zip` command then building project deployment zip package.
 * `--version` Accepts version number to pass to `rsuite docker zip` command then building project deployment zip package.
+* `-i` (short for `--image`) takes name of docker image to use for building zip (if not passed) instead of default rsuite image.
 
 It also accepts standard options `-v` and `-h`.
 

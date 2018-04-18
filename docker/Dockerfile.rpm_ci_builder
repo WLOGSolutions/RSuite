@@ -1,4 +1,4 @@
-FROM wlog/rsuite:centos_r3.4_v0.17.223
+FROM wlog/rsuite:centos_r3.4_v0.23.232
 
 LABEL name="Jenkins slave under CentOS with R3.3 and RSuite"
 LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"

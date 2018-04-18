@@ -1,6 +1,6 @@
 ARG rver=3.3
 
-FROM wlog/rsuite:ubuntu_r${rver}
+FROM wlog/rsuite:debian_r${rver}
 
 ARG rsuite_ver
 ENV rsuite_ver ${rsuite_ver:-0.23.232}

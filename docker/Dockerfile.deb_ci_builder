@@ -1,6 +1,6 @@
-FROM wlog/rsuite:ubuntu_r3.3_v0.17.223
+FROM wlog/rsuite:ubuntu_r3.3_v0.23.232
 
-LABEL name="Jenkins slave under Ubuntu with R3.3 and RSuite"
+LABEL name="Jenkins slave under Debian with R3.3 and RSuite"
 LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
 
 RUN apt-get update \
