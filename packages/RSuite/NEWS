@@ -2,6 +2,10 @@ VERSION 0.24 (2018-04-??)
   * .Rprofile loads environment throu set_env.R not to load RSuite before
      environment is configured properly.
   * set_env.R default script_path set to R (relative to base project dir).
+  * Removing previously build version from intrepo before rebuilding package.
+     On windows non removing caused updating package instead of overwritting
+     due to that if something was removed it not got removed from build packaged.
+  * Fixed zipping of project not to remove data files.
 
 VERSION 0.23 (2018-03-09)
   * SystemRequirements field in package DESCRIPTION interpretation and handling

@@ -147,9 +147,14 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   libpath <- rsuite_fullUnifiedPath(libpath)
   sboxpath <- rsuite_fullUnifiedPath(sboxpath)
 
+  # remove oprevious installed version if exists
   if (dir.exists(file.path(libpath, pkg_name))) {
     unlink(file.path(libpath, pkg_name), recursive = T, force = T)
   }
+
+  # remove previous build package version if exists
+  unlink(list.files(dest_dir, pattern = paste0(pkg_name, "_.*"), full.names = TRUE),
+         force = TRUE)
 
   if ("specs" %in% skip_build_steps) {
     pkg_loginfo("Skipping specifics application")

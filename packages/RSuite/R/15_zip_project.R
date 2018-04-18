@@ -142,10 +142,10 @@ zip_project <- function(params, version, odir) {
 
     # remove any .Rproj.user, .Rhistory, .RData, if exists in root_dir
     to_rem <- c(
-      list.files(root_dir, pattern = ".Rproj.user", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
-      list.files(root_dir, pattern = ".RData", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
-      list.files(root_dir, pattern = ".Rhistory", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
-      list.files(root_dir, pattern = ".svn", recursive = TRUE, include.dirs = TRUE, all.files = TRUE)
+      list.files(root_dir, pattern = "^[.]Rproj.user", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
+      list.files(root_dir, pattern = "^[.]RData", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
+      list.files(root_dir, pattern = "^[.]Rhistory", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
+      list.files(root_dir, pattern = "^[.]svn", recursive = TRUE, include.dirs = TRUE, all.files = TRUE)
     )
     unlink(file.path(root_dir, to_rem), recursive = T, force = T)
 
