@@ -23,7 +23,7 @@ If you are stuck fill free to contact us:
 * directly by sending email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
   
-## Windows installation
+# Windows installation
 
 For Windows RSuite CLI is provided as MSI packages for both x86 and x64 platforms. You can just download appropriate MSI and run it.
 It will install RSuite CLI and will add reference to it to you PATH so then you open console rsuite command will be available. 
@@ -37,7 +37,7 @@ You can check that everything installed properly with following command:
 RSuite CLI on first run will try to detect if R is available. It not available in PATH it will search for R installation in windows
 registry. 
 
-## Debian (Ubuntu) installation
+# Debian (Ubuntu) installation
 
 For Debian-like systems RSuite CLI is provided as DEB package. It is architecture independent. It has some dependencies which will be
 required to install RSuite package (libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev).
@@ -64,7 +64,7 @@ You can check that everything installed properly with following command:
 $ rsuite version
 ```
 
-## RedHat (CentOS, Fedora) installation
+# RedHat (CentOS, Fedora) installation
 
 For RedHat-like systems RSuite CLI is provided as RPM package. It is architecture independent. It has some dependencies which will be
 required to install RSuite package (openssl-devel libxml2-devel libcurl-devel zlib-devel).
@@ -85,7 +85,7 @@ You can check that everything installed properly with following command:
 $ rsuite version
 ```
 
-## After you installed RSuite CLI
+# After you installed RSuite CLI
 
 After RSuite CLI is installed you probably will need to install RSuite package into you R environment:
 
