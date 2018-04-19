@@ -18,9 +18,9 @@ If you are stuck fill free to contact us:
 * directly by sending email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
-## Verbosity of logs
+# Verbosity of logs
 
-### RSuite logging
+## RSuite logging
 
 To make R Suite log more information set logging level with following command:
 
@@ -30,7 +30,7 @@ logging::setLevel('DEBUG')
 
 Each R Suite command logs quite a log messages and output of sub-commands it runs while performing tasks. It will probably give you some hints on what is wrong.
 
-### RSuite CLI logging
+## RSuite CLI logging
 
 Near all commands of R Suite CLI accept -v (short for --verbose) option. It works the same way as setting DEBUG level while using R Suite in R console. For example following command for project environment building
 
@@ -43,13 +43,13 @@ commands it uses to build them together with their output. It is specially usefu
 failed to be installed in project environment.
 
 
-## Known issues
+# Known issues
 
 We are using R Suite heavily during our daily work. Below you can find couple of issues we stumbled upon. R Suite to work
 properly is dependent on environment it works on. Most of cases are resolved by R Suite itself but some environment
 specific cases are hard to resolve in generic way.
 
-### Windows: user profile folder with local specific characters
+## Windows: user profile folder with local specific characters
 If you (as me one day) selected your full name to use as username you will probably have trouble with building source
 packages. 
 
@@ -116,7 +116,7 @@ So why don't we handle such a case in R Suite? In general case it is not possibl
 The only sure place to look for such a folder is user private space which is somewhere under his profile folder. And profile folder is not a good choice as it
 contains locale specific symbols. Otherwise problem would not occur.
 
-### Linux: /tmp is mounted with noexec option
+## Linux: /tmp is mounted with noexec option
 On some security conscious systems /tmp is separate volume mounted with noexec option. That option prevents running any files located on the volume even if
 execution permission is set for the file.
 
@@ -174,7 +174,7 @@ Add this lines to your .profile, .bash_profile and .bashrc (or .rc) to have them
 
 If you are using R Suite from R console, R session has to be restarted first: tempdir() is detected on R session start.
 
-### R Suite CLI complains about lack of optparse
+## R Suite CLI complains about lack of optparse
 
 R Suite CLI uses optparse and logging packages to interact with user (optparse is used for parsing command line arguments). Just after installation on fresh
 environment R Suite CLI checks if the packages are available. If not it tries to install them from shipped together with R Suite CLI sources. 
