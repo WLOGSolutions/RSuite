@@ -12,7 +12,7 @@ It helps you with number of tasks like
 
 RSuite supports you in developing you R projects in standardized way and help with dependencies control and project consistency management while preparing to deploy on production.
 
-## Requirements
+# Requirements
 
 RSuite CLI requires R being available on your machine. Any version will do, but we tested it mostly on v3.2+.
 While running RSuite CLI checks if R is available in PATH environment variable. If it's not it will try 
@@ -23,7 +23,7 @@ For working with Subversion and/or Git revision control command line clients res
 
 To manage S3 repositories you will need aws command line client and aws credentials (.aws folder in you home directory).
 
-## Installing RSuite
+# Installing RSuite
 
 To install RSuite just open you command line (terminal) and run 
 
@@ -51,7 +51,7 @@ You can also see all supported options 'rsuite install' supports please call
 rsuite install -h
 ```
 
-#### Updating RSuite CLI
+## Updating RSuite CLI
 
 RSuite CLI works with compatible version of RSuite. Compatibility is determined by
 two higher numbers in versions of both: they should match. While installing RSuite
@@ -72,14 +72,14 @@ Pay attention that new version of RSuite CLI will need newer version of RSuite
 to work. You will need to issue RSuite insllation (update to compatible version)
 just after RSuite CLI gets updated.
 
-## Project management
+# Project management
 
 After you have installed RSuite you are ready to start developing your projects.
 Command proj gives you access to all related RSuite functionalities.
 
 It accepts `-h` option which prints all accepted sub-commands with brief description.
 
-#### Starting project 
+## Starting project 
 
 To start project, create it's structure and properly put created files under revision control (Git or Subversion)
 just call 
@@ -104,7 +104,7 @@ rsuite proj start -n MyProject --skip_rc
 As all other commands proj accepts `-v` (short for `--verbose`) to print lots of messages during project creation 
 and `-h` (short for `--help`) to print all accepted options with some short description.
 
-#### Creating package
+## Creating package
 
 After you have created project you can add packages to it. Just call (project folder should be your current directory)
 
@@ -125,7 +125,7 @@ rsuite proj pkgadd -n MyPackage --skip_rc
 As all other commands proj accepts `-v` (short for `--verbose`) to print lots of messages during project creation 
 and `-h` (short for `--help`) to print all accepted options with some short description.
 
-#### Building project local enviroment
+## Building project local enviroment
 
 Then project is created it already has logging installed as master scripts and all packages are supposed to use logging.
 
@@ -142,7 +142,7 @@ installing all required packages. You call it like this
 rsuite proj depsinst -c
 ```
 
-#### Building project packages
+## Building project packages
 
 After building local project environment you can build project packages by calling
 
@@ -159,7 +159,7 @@ rsuite proj build -f
 
 It also accept standard `-v` and `-h` options.
 
-#### Cleaning unused project dependencies
+## Cleaning unused project dependencies
 
 If some project dependencies are not required any more you can remove them from local project environment by calling
 
@@ -169,7 +169,7 @@ rsuite proj depsclean
 
 It does not accept any special options except standard `-v` and `-h`.
 
-#### Building deployment package
+## Building deployment package
 
 To build deployment packages simply call
 
@@ -198,7 +198,7 @@ Version number should be in form NN.NN.
 
 It also accepts standard options `-v` and `-h`.
 
-#### Testing project
+## Testing project
 
 RSuite CLI can run testthat tests for you. Just execute following command:
 
@@ -214,7 +214,7 @@ following way:
 rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 ```
 
-## System requirements management
+# System requirements management
 
 Project environment can contain packages which have system requirements declared (in SystemRequirements field in their 
 DESCRIPTION file). RSuite tries to interpret them and can help you to update your system for packages to build/work properly.
@@ -222,7 +222,7 @@ For example xml package on linuxes requires libxml2 system library on Lunuxes. D
 appropriate package should be installed using appropriate package management utility. RSuite can check your system against these 
 system requirements, try to install them (if running as privileged user) and generate script to to check/install them.
 
-#### Collecting system requirements
+## Collecting system requirements
 
 To find out which system requirements are needed for your solution to run properly use following command:
 
@@ -232,7 +232,7 @@ rsuite sysreqs collect
 
 It collects and presents all SystemRequiremets fields declared for all project packages and packages the project depends on. 
 
-#### Checking system against requirements
+## Checking system against requirements
 
 To check if your system conforms to requirements declared for project dependencies use following command:
 
@@ -243,7 +243,7 @@ rsuite sysreqs check
 It will collect all SystemRequirements fields from project dependencies and will try to match them with internal utilities
 database. Matched requirements will enforce platform dependent checks of the system. 
 
-#### Installing system requirements
+## Installing system requirements
 
 RSuite not only checks system against dependency requirements but also can update your system. Pay attention that to install 
 system libraries priviledge access is usually required. To update your system use following command:
@@ -252,7 +252,7 @@ system libraries priviledge access is usually required. To update your system us
 rsuite sysreqs install
 ```
 
-#### Create system update script
+## Create system update script
 
 You can also create script to upgrade your system to meet requirements for your project. Call following command:
 
@@ -264,7 +264,7 @@ It will create bash script sysreqs_install.sh (for Linux) or batch script sysreq
 will check for proper system elements and install them if not found using platform specific package management 
 utility.
 
-## Repository management
+# Repository management
 
 You can also manage content of local (Dir) and S3 repositories with RSuite CLI. For that purpose repo command should be used.
 
@@ -277,7 +277,7 @@ For local repository it is check if you have permissions to modify it.
 
 For S3 repository it is required to have repository credentials in your user home directory and S3 command line client available in your run environment (PATH environment variable should point to folder containing aws utility).
 
-#### Initializing repository
+## Initializing repository
 
 To create repository structure execute following
 
@@ -299,7 +299,7 @@ with following command
 rsuite repo init -d /path/to/your/repository --rver 3.4
 ```
 
-#### Adding project packages to repository
+## Adding project packages to repository
 
 During adding project packages to repository project consistency is checked the same way it is done during building deployment package: it is checked if uncommitted changes exists and if project source revision is consistent with repository. Project packages are rebuilt with revision number appended to project version number.
 
@@ -333,7 +333,7 @@ If you want to add also all dependencies which are not currently present in the 
 rsuite repo addproj -s http://your-s3-bucket.s3.amazonaws.com/path -b TRUE --with-deps
 ```
 
-#### Adding in file packages to repository
+## Adding in file packages to repository
 
 If you have some specific packages downloaded as files (source or binary) you can upload then following way:
 
@@ -341,7 +341,7 @@ If you have some specific packages downloaded as files (source or binary) you ca
 rsuite repo addfile -d /path/to/your/repository -f /path/to/file1.tar.gz,/path/to/file2.tar.gz
 ```
 
-#### Adding external packages to repository
+## Adding external packages to repository
 
 If you need for some reason add external packages (from CRAN, MRAN or any other repository) you can do it with following command
 
@@ -364,7 +364,7 @@ rsuite repo addext -d /path/to/your/repository -n package1,package2 -b TRUE --wi
 ```
 
 
-#### Adding content of PKGZIP to repository
+## Adding content of PKGZIP to repository
 
 If you managed to build PKGZIP containing some packages (see pkgzip command) you can add its content to repository:
 
@@ -372,7 +372,7 @@ If you managed to build PKGZIP containing some packages (see pkgzip command) you
 rsuite repo addpkgzip -s http://your-s3-bucket.s3.amazonaws.com/path -z /path/to/pkgzip.zip
 ```
 
-#### Adding package from GitHub to repository
+## Adding package from GitHub to repository
 
 If you want to add package available on GitHub repository you can achieve it calling following command:
 
@@ -393,7 +393,7 @@ You can also specify following options to addgithub:
 * `--rver` wich takes R version number to target built package for (important for binary packages).
 * `--with-deps` If passed will upload also dependencies which are not currently present in the repository.
 
-#### List contents of repository
+## List contents of repository
 
 You can list packages available on the repository with following command:
 
@@ -404,7 +404,7 @@ rsuite repo list -s http://your-s3-bucket.s3.amazonaws.com/path
 It will print table with all packages and their versions available in repository. 
 Specifying `-b` (short for `--binary`) option to can choose to list binary or source packages.
 
-#### Remove packages from repository
+## Remove packages from repository
 
 You can also remove packages from repository with following command:
 
@@ -412,11 +412,11 @@ You can also remove packages from repository with following command:
 rsuite repo remove -s http://your-s3-bucket.s3.amazonaws.com/path -r Package1==Version1,Package2==Version2
 ```
 
-## Building PKGZIP packages
+# Building PKGZIP packages
 
 PKGZIPs can be used to create repository in some connection less environment. To create PKGZIPs you can use pkgzip command. All pkgzip sub-commands beside standard `-v` and `-h` options accept also `-p` (short for `--path`) which takes as parameter folder to put created PKGZIP to.
 
-### Building PKGZIP containing project packages
+## Building PKGZIP containing project packages
 
 During creating PKGZIP with project packages included project consistency is checked the same way it is done during building deployment package: it is checked if uncommitted changes exists and if project source revision is consistent with repository. Project packages are rebuilt with revision number appended to project version number and rebuilt versions are included into PKGZIP.
 
@@ -460,7 +460,7 @@ you can filter dependencies against contents of the repository:
 rsuite pkgzip proj -b FALSE --with-deps --filter-repo http://url.to.your.repository
 ```
 
-#### Building PKGZIP containing in file packages
+## Building PKGZIP containing in file packages
 
 If you have some specific packages downloaded as files (source or binary) you can create PKGZIP containing them following way:
 
@@ -468,7 +468,7 @@ If you have some specific packages downloaded as files (source or binary) you ca
 rsuite pkgzip proj -f /path/to/file1.tar.gz,/path/to/file2.tar.gz
 ```
 
-#### Building PKGZIP containing external packages
+## Building PKGZIP containing external packages
 
 If you need to create PKGZIP containing external packages (from CRAN, MRAN or any other repository) you can do it with following command
 
@@ -498,7 +498,7 @@ you can filter dependencies against contents of the repository:
 rsuite pkgzip ext -n package1,package2 --with-deps --filter-repo http://url.to.your.repository
 ```
 
-#### Building PKGZIP containing package from GitHub
+## Building PKGZIP containing package from GitHub
 
 If you want to create PKGZIP out of available on GitHub repository call following command:
 
@@ -521,14 +521,14 @@ You can also specify following options to github:
   versions are present in the repository. The parameter should be used together with --with-deps.
 
 
-## Docker integration
+# Docker integration
 
 RSuite CLI can help you with building your solution on some diffrent platform than the one you are working on or build docker images containing solutions
 you developed.
 
 All commands described below assume thar you have docker command useable/available.
 
-#### Building project under different platform in docker container
+## Building project under different platform in docker container
 
 To build your project in docker container issue following command:
 
@@ -565,7 +565,7 @@ rsuite docker zip --sh "apt-get install -y libglpk-dev"
 
 It also accepts standard options `-v` and `-h`.
 
-#### Building docker image for solution
+## Building docker image for solution
 
 To create docker image for the solution issue following command:
 
@@ -605,7 +605,7 @@ FROM <From>
 
 It also accepts standard options `-v` and `-h`.
 
-## Getting help
+# Getting help
 
 You can find your which commands do rsuite accept calling 
 
