@@ -435,7 +435,7 @@ Loading required package: data.table
 
 As you can see there are logging messages. You can see that debug message is missing. 
 
-# Step 10.1 - controlling loggers level
+## Step 10.1 - controlling loggers level
 
 To see debug logging message you have to edit file `config.txt` in project root folder to 
 look like this
@@ -464,7 +464,7 @@ Loading required package: data.table
 
 As you can see now debug logging message is printed.
 
-# Step 10.2 - `logs` folder
+## Step 10.2 - `logs` folder
 
 Logging messages are stored in `logs` folder in files named with current date.
 You can check this by issuing a command
