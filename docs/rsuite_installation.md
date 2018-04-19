@@ -12,7 +12,7 @@ If you are stuck fill free to contact us:
 * using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite "RSuite room")
 * directly by sending email with your problem description to [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
-## Requirements
+# Requirements
 
 RSuite depends on number of other R packages. On Linux systems they require
 libxml2-devel, libssl-devel, libcurl-devel and zlib-devel system packages.
@@ -30,7 +30,7 @@ On Debian like systems (Debian/Ubuntu) you can install them executing:
 $ sudo apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev
 ```
 
-## (Recommended) Installation with help of RSuite CLI
+# Installation with help of RSuite CLI [Recommended]
 
 If you have RSuite CLI installed (check [RSuite CLI installation
 reference](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
@@ -49,7 +49,7 @@ give you hint on why the problem occurred:
 $ rsuite install -v
 ```
 
-## Basic installation
+# Basic installation
 
 You can simply install RSuite from WLOG S3 repository executing following command
 in your R environment:
@@ -64,7 +64,7 @@ It will install latest released version of RSuite in first folder mentioned in
 The complicated parameter repo instructs install.packages to use beside standard repositories
 also RSuite repository located in S3 bundle.
 
-## Development version installation
+# Development version installation
 
 RSuite sources are publicly available. You can install development version of 
 RSuite from GitHub execute following code in your R environment:
@@ -73,7 +73,7 @@ RSuite from GitHub execute following code in your R environment:
 > devtools::install_github('WLOGSolutions/RSuite/packages/RSuite')
 ```
 
-## Updating RSuite
+# Updating RSuite
 
 You can check which version of RSuite is currently installed in your R environment
 with following code:
