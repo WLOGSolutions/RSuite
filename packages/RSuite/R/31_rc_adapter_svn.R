@@ -9,6 +9,7 @@
 #' Detects svn command line client path
 #'
 #' @keywords internal
+#' @noRd
 #'
 .get_svn_cmd <- function() {
   svn_cmd <- Sys.which("svn")
@@ -23,6 +24,7 @@
 #' Change was needed because rsuite depends on svn output that have to be in english.
 #'
 #' @keywords internal
+#' @noRd
 #'
 .get_cmd_outlines_with_eng_lang <- function(desc, cmd, ..., log_debug = FALSE) {
   old_lang <- Sys.getenv("LANG")
@@ -39,6 +41,7 @@
 #' @return object of type rsuite_rc_adapter
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_create_svn <- function(name) {
   result <- rc_adapter_create_base(name)
@@ -59,6 +62,7 @@ rc_adapter_create_svn <- function(name) {
 #' if it is just created inside working copy. If so warning is commited.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   # check if there is administrative .svn somethere up folder structure
@@ -112,6 +116,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 #' Object performing operations on SVN working copy
 #'
 #' @keywords internal
+#' @noRd
 #'
 .svn_manager <- function() {
   svn_cmd <- .get_svn_cmd()
@@ -192,6 +197,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 #' Implementation of rc_adapter_prj_struct_add for SVN rc adapted.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) {
   svn <- .svn_manager()
@@ -243,6 +249,7 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) 
 #' Implementation of rc_adapter_pkg_struct_add for SVN rc adapted.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_pkg_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params, name) {
   pkg_dir <- file.path(params$pkgs_path, name)
@@ -273,6 +280,7 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params, 
 #' Implementation of rc_adapter_get_version for SVN rc adapted.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_get_version.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   svn_cmd <- .get_svn_cmd()
@@ -304,6 +312,7 @@ rc_adapter_get_version.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 #' Implementation of rc_adapter_remove_admins for SVN rc adapted.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_remove_admins.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   admins <- list.files(dir, pattern = ".svn", recursive = TRUE, include.dirs = TRUE, all.files = TRUE)

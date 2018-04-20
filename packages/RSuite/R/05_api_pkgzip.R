@@ -15,6 +15,7 @@
 #' @return name of PKGZIP file.
 #'
 #' @keywords internal
+#' @noRd
 #'
 .pkgzip_file_name <- function(pkg_names, pref = "", suff = "") {
   pkg_names <- unique(pkg_names)

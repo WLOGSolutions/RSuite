@@ -17,6 +17,7 @@
 #' @return parameters object of exported project or NULL if failed to export.
 #'
 #' @keywords internal
+#' @noRd
 #'
 export_prj <- function(params, rver, pkgs, inc_master, dest_dir) {
   stopifnot(is.null(pkgs) || is.character(pkgs))
@@ -114,6 +115,7 @@ export_prj <- function(params, rver, pkgs, inc_master, dest_dir) {
 #' @param params parameters of project to create .prjinfo for. (type: rsuite_project_params)
 #'
 #' @keywords internal
+#' @noRd
 #'
 create_prjinfo <- function(params, revision) {
   prjinfo_fpath <- file.path(params$prj_path, ".prjinfo")
@@ -141,6 +143,7 @@ create_prjinfo <- function(params, revision) {
 #'   not specified in the .prjinfo file. (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 retrieve_consistent_prjinfo_rev <- function(params) {
   prjinfo_fpath <- file.path(params$prj_path, ".prjinfo")

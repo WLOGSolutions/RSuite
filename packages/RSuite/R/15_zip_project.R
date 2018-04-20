@@ -22,6 +22,7 @@
 #' }
 #'
 #' @keywords internal
+#' @noRd
 #'
 detect_zip_version <- function(params, zip_ver) {
   if (!is.null(zip_ver)) {
@@ -70,6 +71,7 @@ detect_zip_version <- function(params, zip_ver) {
 #' @return revision number detected (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 detect_consistent_revision <- function(params) {
   rc_adapter <- detect_rc_adapter(params$prj_path)
@@ -98,6 +100,7 @@ detect_consistent_revision <- function(params) {
 #' @param odir otput dir path.
 #'
 #' @keywords internal
+#' @noRd
 #'
 zip_project <- function(params, version, odir) {
   wdir <- tempfile()
@@ -179,6 +182,7 @@ zip_project <- function(params, version, odir) {
 #' @return TRUE if all ziped successfuly.
 #'
 #' @keywords internal
+#' @noRd
 #'
 zip_folder <- function(wspace, zip_file_path) {
   wd <- setwd(wspace)
@@ -213,6 +217,7 @@ zip_folder <- function(wspace, zip_file_path) {
 #' @return TRUE if all unziped successfuly.
 #'
 #' @keywords internal
+#' @noRd
 #'
 unzip_folder <- function(dest_dir, zip_file_path) {
   zip_res <- run_rscript("utils::unzip(%s, %s)",

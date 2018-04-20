@@ -11,6 +11,7 @@
 #' @return version number detected (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 current_rver <- function() {
   paste(c(R.version$major, unlist(strsplit(R.version$minor, ".", fixed = T))[1]), collapse = ".")
@@ -24,6 +25,7 @@ current_rver <- function() {
 #' @return version number in form X.X (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 majmin_rver <- function(rver) {
   gsub("(\\d+\\.\\d+)\\.\\d+", "\\1", rver)
@@ -40,6 +42,7 @@ majmin_rver <- function(rver) {
 #' @return full path to Rscript command with appropriate version.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_rscript_path <- function(rver) {
   stopifnot(is_nonempty_char1(rver))
@@ -92,6 +95,7 @@ get_rscript_path <- function(rver) {
 #' @return vertor of paths containing command. (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_rscript_search_paths <- function(rscript_cmd) {
   paths <- unlist(strsplit(Sys.getenv("PATH"), split = .Platform$path.sep, fixed = T))

@@ -13,6 +13,7 @@
 #' @return object of type rsuite_repo_adapter_cran
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_cran <- function(name) {
   result <- repo_adapter_create_base(name)
@@ -43,6 +44,7 @@ repo_adapter_create_cran <- function(name) {
 #'   adapter working on CRAN).
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_info.rsuite_repo_adapter_cran <- function(repo_adapter, params) {
   return(list(
@@ -56,6 +58,7 @@ repo_adapter_get_info.rsuite_repo_adapter_cran <- function(repo_adapter, params)
 #'   adapter working on CRAN).
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_path.rsuite_repo_adapter_cran <- function(repo_adapter, params, ix = NA) {
   return(repo_adapter$get_repo_path())
@@ -68,6 +71,7 @@ repo_adapter_get_path.rsuite_repo_adapter_cran <- function(repo_adapter, params,
 #' Just informs that CRAN is not manageable
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_manager.rsuite_repo_adapter_cran <- function(repo_adapter, ...) {
   assert(FALSE, "CRAN is readonly and cannot be managed")

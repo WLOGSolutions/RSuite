@@ -16,6 +16,7 @@
 #' @return object of type rsuite_repo_manager
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_dir_create <- function(path, types, rver) {
   assert((is.na(rver) && all(types == "source")) || is_nonempty_char1(rver),
@@ -41,6 +42,7 @@ repo_manager_dir_create <- function(path, types, rver) {
 #' Implementation of repo_manager_get_info for rsuite_repo_manager_dir.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_get_info.rsuite_repo_manager_dir <- function(repo_manager) {
   return(list(
@@ -54,6 +56,7 @@ repo_manager_get_info.rsuite_repo_manager_dir <- function(repo_manager) {
 #' Implementation of repo_manager_init for rsuite_repo_manager_dir.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_init.rsuite_repo_manager_dir <- function(repo_manager, types) {
   if (missing(types)) {
@@ -82,6 +85,7 @@ repo_manager_init.rsuite_repo_manager_dir <- function(repo_manager, types) {
 #' Implementation of repo_manager_upload for rsuite_repo_manager_dir..
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_upload.rsuite_repo_manager_dir <- function(repo_manager, src_dir, types) {
   if (missing(types)) {
@@ -121,6 +125,7 @@ repo_manager_upload.rsuite_repo_manager_dir <- function(repo_manager, src_dir, t
 #' Implementation of repo_adapter_stop_management for rsuite_repo_manager_dir.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, type) {
   path <- rsuite_contrib_url(repo_manager$path, type = type, rver = repo_manager$rver)
@@ -150,6 +155,7 @@ repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, 
 #' Implementation of repo_manager_destroy for rsuite_repo_manager_dir.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_destroy.rsuite_repo_manager_dir <- function(repo_manager) {
   # noop

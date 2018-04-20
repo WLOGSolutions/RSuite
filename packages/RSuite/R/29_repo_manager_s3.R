@@ -17,6 +17,7 @@
 #' @return object of type rsuite_repo_manager
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_s3_create <- function(url, types, rver, s3_profile) {
   assert(is_nonempty_char1(url), "Non empty character(1) expected for url")
@@ -87,6 +88,7 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
 #' Implementation of repo_manager_get_info for rsuite_repo_manager_s3.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_get_info.rsuite_repo_manager_s3 <- function(repo_manager) {
   return(list(
@@ -101,6 +103,7 @@ repo_manager_get_info.rsuite_repo_manager_s3 <- function(repo_manager) {
 #' Implementation of repo_manager_init for rsuite_repo_manager_s3.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
   if (missing(types)) {
@@ -171,6 +174,7 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
 #' Implementation of repo_manager_upload for rsuite_repo_manager_s3.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, types) {
   if (missing(types)) {
@@ -255,6 +259,7 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
 #' Result is data.frame.
 #'
 #' @keywords internal
+#' @noRd
 #'
 .merge_dcfs <- function(dcf1, dcf2) {
   dcf1 <- as.data.frame(dcf1, stringsAsFactors = F)
@@ -282,6 +287,7 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
 #' Implementation of repo_adapter_stop_management for rsuite_repo_manager_s3.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, type) {
   dst_url <- rsuite_contrib_url(repo_manager$bucket_url, type = type, rver = repo_manager$rver)
@@ -359,6 +365,7 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
 #' Implementation of repo_manager_destroy for rsuite_repo_manager_s3.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_destroy.rsuite_repo_manager_s3 <- function(repo_manager) {
   # noop

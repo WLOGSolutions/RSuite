@@ -31,6 +31,7 @@
 #'   dependencies (except filtered).
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_dependencies <- function(vers, pkg_type, params, filter_repo, rver = NULL) {
   stopifnot(is.versions(vers))
@@ -82,6 +83,7 @@ collect_dependencies <- function(vers, pkg_type, params, filter_repo, rver = NUL
 #' @param return versions object with avail describing packages found.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_packages <- function(vers, pkg_type, params, rver = NULL) {
   stopifnot(is.versions(vers))
@@ -117,6 +119,7 @@ collect_packages <- function(vers, pkg_type, params, rver = NULL) {
 #'   specified in params. (type: character(1), default: NULL)
 #'
 #' @keywords internal
+#' @noRd
 #'
 temp_repo_prepare <- function(vers, tmp_path, pkg_type, params, rver = NULL) {
   stopifnot(is.versions(vers))
@@ -161,6 +164,7 @@ temp_repo_prepare <- function(vers, tmp_path, pkg_type, params, rver = NULL) {
 #' @param params project parameters object. (type: rsuite_project_params)
 #'
 #' @keywords internal
+#' @noRd
 #'
 temp_repo_copy_proj_pkgs <- function(pkgs, tmp_path, pkg_type, params) {
   stopifnot(is.character(pkgs))
@@ -191,6 +195,7 @@ temp_repo_copy_proj_pkgs <- function(pkgs, tmp_path, pkg_type, params) {
 #'   R version. (type: character(1), default: NULL)
 #'
 #' @keywords internal
+#' @noRd
 #'
 temp_repo_write_PACKAGES <- function(tmp_path, pkg_type, rver = NULL) {
   dest_curl <- rsuite_contrib_url(tmp_path, pkg_type, rver = rver)

@@ -30,6 +30,7 @@
 #' @return object of type rsuite_repo_adapter_dir
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_dir <- function(name) {
   result <- repo_adapter_create_base(name)
@@ -53,6 +54,7 @@ repo_adapter_create_dir <- function(name) {
 #'   adapter working on directory).
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_info.rsuite_repo_adapter_dir <- function(repo_adapter, params) {
   full_path <- repo_adapter$get_full_path(params)
@@ -70,6 +72,7 @@ repo_adapter_get_info.rsuite_repo_adapter_dir <- function(repo_adapter, params) 
 #'   adapter working on directory).
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_path.rsuite_repo_adapter_dir <- function(repo_adapter, params, ix = NA) {
   full_path <- repo_adapter$get_full_path(params, ix)
@@ -86,6 +89,7 @@ repo_adapter_get_path.rsuite_repo_adapter_dir <- function(repo_adapter, params, 
 #'   (default: .Platform$pkgType)
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_manager.rsuite_repo_adapter_dir <- function(repo_adapter, ...) {
   dots <- list(...)

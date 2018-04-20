@@ -19,6 +19,7 @@
 #' @return check_result object
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.build <- function(found, missing) {
   if (missing(found)) {
@@ -53,6 +54,7 @@ check_res.build <- function(found, missing) {
 #' @param cr check_result object to print.
 #'
 #' @keywords internal
+#' @noRd
 #'
 print.check_result <- function(cr) {
   cat("found:\n")
@@ -71,6 +73,7 @@ print.check_result <- function(cr) {
 #' @return check_result object which is result of merging inputs.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.union <- function(cr, oth) {
   stopifnot(is.check_result(cr))
@@ -96,6 +99,7 @@ check_res.union <- function(cr, oth) {
 #' @return check_result object representing join of inputs.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.join <- function(cr, oth) {
   stopifnot(is.check_result(cr))
@@ -124,6 +128,7 @@ check_res.join <- function(cr, oth) {
 #' @return check_result object with packages excluded.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.exclude <- function(cr, pkg_names) {
   stopifnot(is.check_result(cr))
@@ -143,6 +148,7 @@ check_res.exclude <- function(cr, pkg_names) {
 #' @return TRUE if found packages in check_result is not empty.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.has_found <- function(cr) {
   stopifnot(is.check_result(cr))
@@ -159,6 +165,7 @@ check_res.has_found <- function(cr) {
 #' @return versions object with packages found. It has availables.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.get_found <- function(cr) {
   stopifnot(is.check_result(cr))
@@ -175,6 +182,7 @@ check_res.get_found <- function(cr) {
 #' @return TRUE if missing packages in check_result is not empty.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.has_missing <- function(cr) {
   stopifnot(is.check_result(cr))
@@ -190,13 +198,13 @@ check_res.has_missing <- function(cr) {
 #' @return versions object with packages missing. It has no availables.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_res.get_missing <- function(cr) {
   stopifnot(is.check_result(cr))
 
   cr$missing
 }
-
 
 
 #'
@@ -206,6 +214,7 @@ check_res.get_missing <- function(cr) {
 #' @return TRUE if version object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 is.check_result <- function(cr) {
   return(class(cr) == "check_result")

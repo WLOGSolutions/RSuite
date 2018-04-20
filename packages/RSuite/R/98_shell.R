@@ -19,6 +19,7 @@
 #' @return integer(1) containing retcode of the process.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
   .log_single_out <- function(desc, out_arr, log_fun) {
@@ -92,6 +93,7 @@ get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
 #' @return character(N) containing command output lines.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_cmd_outlines <- function(desc, cmd, ..., log_debug = FALSE) {
   full_cmd <- paste0(sprintf(cmd, ...), " 2>&1")
@@ -131,6 +133,7 @@ get_cmd_outlines <- function(desc, cmd, ..., log_debug = FALSE) {
 #' @return NULL if succeded, if failed returns FALSE or error string.
 #'
 #' @keywords internal
+#' @noRd
 #'
 run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debug = TRUE) {
   full_code <- sprintf(paste0(script_code, collapse = ";"), ...)
@@ -184,6 +187,7 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
 #' Creates string which can be passed as parameter to script code.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rscript_arg <- function(name, val) {
   if (is.null(val)) {

@@ -20,6 +20,7 @@
 #' @param rver version of R to build packages for. (type: characted, default: params$r_ver)
 #'
 #' @keywords internal
+#' @noRd
 #'
 build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver = params$r_ver) {
   stopifnot(is.data.frame(avail_pkgs) && "Package" %in% colnames(avail_pkgs))

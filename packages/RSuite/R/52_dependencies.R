@@ -15,6 +15,7 @@
 #'   which are not installed in prject local environment.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_uninstalled_direct_deps <- function(params) {
   depVers <- collect_prj_direct_deps(params)
@@ -31,6 +32,7 @@ collect_uninstalled_direct_deps <- function(params) {
 #'   together with their version requirements.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_prj_direct_deps <- function(params) {
   pkgVers <- collect_pkgs_direct_deps(params)
@@ -48,6 +50,7 @@ collect_prj_direct_deps <- function(params) {
 #'   Version requirements for support packages included should be empty.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_prj_support_pkgs <- function(params) {
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
@@ -109,6 +112,7 @@ collect_prj_support_pkgs <- function(params) {
 #'   packages together with their version requirements.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_pkgs_direct_deps <- function(params) {
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
@@ -148,6 +152,7 @@ collect_pkgs_direct_deps <- function(params) {
 #'   together with their version requirements.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_single_pkg_direct_deps <- function(params, pkg_dir, pkg_name) {
   deps <- desc_retrieve_dependencies(params$pkgs_path, pkg_dir) # from 51_pkg_info.R
@@ -165,6 +170,7 @@ collect_single_pkg_direct_deps <- function(params, pkg_dir, pkg_name) {
 #'   versions object does not contain requirements on package versions.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_mscs_direct_deps <- function(params) {
   script_files <- list.files(path = params$script_path, pattern = "*.(r|R|Rmd)$",
@@ -198,6 +204,7 @@ collect_mscs_direct_deps <- function(params) {
 #'    subsequent dependencies.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
   stopifnot(is.versions(vers))

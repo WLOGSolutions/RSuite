@@ -16,6 +16,7 @@
 #' scripts.
 #'
 #' @keywords internal
+#' @noRd
 #'
 install_prj_deps <- function(params, ...) {
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
@@ -47,6 +48,7 @@ install_prj_deps <- function(params, ...) {
 #' @return version object describing available project dependencies.
 #'
 #' @keywords internal
+#' @noRd
 #'
 resolve_prj_sups <- function(repo_infos, params, only_source = F) {
   if(only_source) {
@@ -93,6 +95,7 @@ resolve_prj_sups <- function(repo_infos, params, only_source = F) {
 #' @return version object describing available project dependencies.
 #'
 #' @keywords internal
+#' @noRd
 #'
 resolve_prj_deps <- function(repo_infos, params, only_source = F) {
   if(only_source) {
@@ -164,6 +167,7 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
 #' @param rver R version to install dependencies for. (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 install_dependencies <- function(avail_vers, lib_dir, rver) {
   stopifnot(is.versions(avail_vers))
@@ -216,6 +220,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
 #' @return versions object describing all resolved dependencies.
 #'
 #' @keywords internal
+#' @noRd
 #'
 resolve_dependencies <- function(vers, repo_infos, pkg_types) {
   stopifnot(is.versions(vers))
@@ -275,6 +280,7 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types) {
 #' @return versions object describing all resolved packages.
 #'
 #' @keywords internal
+#' @noRd
 #'
 resolve_packages <- function(vers, repo_infos, pkg_types) {
   stopifnot(is.versions(vers))

@@ -9,6 +9,7 @@
 #' Structure compliance table
 #'
 #' @keywords internal
+#' @noRd
 #'
 rsuite_strver_compliance <- list(
   "0.1" = c("0.1", "0.2"),
@@ -21,6 +22,7 @@ rsuite_strver_compliance <- list(
 #' The result is normalized version.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_earliest_strver_comliant <- function(ver) {
   for(v in names(rsuite_strver_compliance)) {
@@ -36,6 +38,7 @@ get_earliest_strver_comliant <- function(ver) {
 #' requirements.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_project_structure <- function(prj_dir) {
   stopifnot(dir.exists(prj_dir))
@@ -119,6 +122,7 @@ check_project_structure <- function(prj_dir) {
 #' @return project parameters (rsuite_project_params object)
 #'
 #' @keywords internal
+#' @noRd
 #'
 force_load_PARAMETERS <- function(params_file, prj_name, rsuite_ver) {
   prj_dir <- dirname(params_file)
@@ -167,6 +171,7 @@ force_load_PARAMETERS <- function(params_file, prj_name, rsuite_ver) {
 #' @param  rsuite_ver version of RSuite.
 #'
 #' @keywords internal
+#' @noRd
 #'
 update_PARAMETERS <- function(params_file, rsuite_ver) {
   params_dt <- data.frame(read.dcf(params_file), stringsAsFactors = F)
@@ -208,6 +213,7 @@ update_PARAMETERS <- function(params_file, rsuite_ver) {
 #' Creates project structure out of project template.
 #'
 #' @keywords internal
+#' @noRd
 #'
 create_package_structure <- function(pkg_dir) {
   stopifnot(!dir.exists(pkg_dir))
@@ -242,6 +248,7 @@ create_package_structure <- function(pkg_dir) {
 #' Asserts that folder is created.
 #'
 #' @keywords internal
+#' @noRd
 #'
 create_struct_dir <- function(dir, desc) {
   if (!dir.exists(dir)) {
@@ -256,6 +263,7 @@ create_struct_dir <- function(dir, desc) {
 #' Logs warning if failed to copy.
 #'
 #' @keywords internal
+#' @noRd
 #'
 create_rproj <- function(dir, name) {
   if (length(list.files(path = dir, pattern = "*.Rproj", recursive = F)) > 0) {
@@ -282,6 +290,7 @@ create_rproj <- function(dir, name) {
 #' Creates .Rprofile at specified location with specified contents if not exists.
 #'
 #' @keywords internal
+#' @noRd
 #'
 create_rprofile <- function(dir, text = "RSuite::prj_load()") {
   rprof_file <- file.path(dir, ".Rprofile")
@@ -294,6 +303,7 @@ create_rprofile <- function(dir, text = "RSuite::prj_load()") {
 #' Copies folder from onto folder to if to not exists.
 #'
 #' @keywords internal
+#' @noRd
 #'
 copy_folder <- function(from, to) {
   if (dir.exists(to)) {
@@ -320,6 +330,7 @@ copy_folder <- function(from, to) {
 #' @return rc_adapter or NULL
 #'
 #' @keywords internal
+#' @noRd
 #'
 detect_rc_adapter <- function(prj_dir) {
   for(rc_name in reg_rc_adapter_names()) {

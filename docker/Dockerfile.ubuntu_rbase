@@ -12,7 +12,7 @@ RUN apt-get update \
 		make gcc g++ gfortran \
 		libcairo2-dev libcurl4-openssl-dev libtiff5-dev libicu-dev libzip2 openjdk-7-jdk \
 		texinfo texlive-latex-base \
-        libxml2-dev zlib1g-dev \
+        libxml2-dev zlib1g-dev libbz2-dev \
 		supervisor \
 	&& export CPPFLAGS="$CPPFLAGS -fPIC" \
 	&& cd /tmp \

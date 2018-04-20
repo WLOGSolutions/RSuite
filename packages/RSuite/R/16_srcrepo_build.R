@@ -13,6 +13,7 @@
 #' @return object found in devtools namespace.
 #'
 #' @keywords internal
+#' @noRd
 #'
 .get_devtools_intern <- function(name) {
   search_res <- utils::getAnywhere(name)
@@ -38,6 +39,7 @@
 #' @return named list with name of package('name') and package forlder ('dir').
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   stopifnot(is_nonempty_char1(srcrepo_type))

@@ -13,6 +13,7 @@
 #' @return object of type rsuite_repo_adapter_mran
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_mran <- function(name) {
   result <- repo_adapter_create_base(name)
@@ -30,6 +31,7 @@ repo_adapter_create_mran <- function(name) {
 #'   adapter working on Microsoft MRAN).
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_info.rsuite_repo_adapter_mran <- function(repo_adapter, params) {
   return(list(
@@ -43,6 +45,7 @@ repo_adapter_get_info.rsuite_repo_adapter_mran <- function(repo_adapter, params)
 #'   adapter working on Microsoft MRAN).
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_path.rsuite_repo_adapter_mran <- function(repo_adapter, params, ix = NA) {
   snapshot_date <- params$get_repo_adapter_arg(repo_adapter$name, default = NA, ix = ix)
@@ -60,6 +63,7 @@ repo_adapter_get_path.rsuite_repo_adapter_mran <- function(repo_adapter, params,
 #' Just informs that MRAN is not manageable
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_manager.rsuite_repo_adapter_mran <- function(repo_adapter, ...) {
   assert(FALSE, "MRAN is readonly and cannot be managed")

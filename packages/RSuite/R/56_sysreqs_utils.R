@@ -11,6 +11,7 @@
 #' @return path to sysreqs database.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_sysreqsdb_path <- function() {
   dbpath <- system.file(file.path("extdata", "sysreqs", "db"), package = "RSuite")
@@ -31,6 +32,7 @@ get_sysreqsdb_path <- function() {
 #' } one of
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_platform_desc <- function() {
   platform <- .get_platform()
@@ -64,6 +66,7 @@ get_platform_desc <- function() {
 #'   (type: character(1))
 #'
 #' @keywords internal
+#' @noRd
 #'
 .get_platform <- function() {
   if (.Platform$OS.type == "windows") {
@@ -88,6 +91,7 @@ get_platform_desc <- function() {
 #' @return platform distribution name or NA if failed to detect. (type: character(1))
 #'
 #' @keywords internal
+#' @noRd
 #'
 .get_distrib <- function(platform) {
   if (platform == "DEB") {
@@ -128,6 +132,7 @@ get_platform_desc <- function() {
 #' @return release identifier retrieved or NA if failed to detected. (type: character(1))
 #'
 #' @keywords internal
+#' @noRd
 #'
 .get_release <- function(distrib) {
   if (is.na(distrib)) {
@@ -197,6 +202,7 @@ get_platform_desc <- function() {
 #' }
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_sysreqs_for <- function(pkg_name, field) {
   stopifnot(is.character(field) && length(field) == 1)
@@ -239,6 +245,7 @@ get_sysreqs_for <- function(pkg_name, field) {
 #'   by db entry. Otherwise returns sysreq entry.
 #'
 #' @keywords internal
+#' @noRd
 #'
 try_build_sysreq <- function(pkg_name, field, db_ent_name, db_ent_val, plat_desc) {
   match_pars <- character(0)
@@ -303,6 +310,7 @@ try_build_sysreq <- function(pkg_name, field, db_ent_name, db_ent_val, plat_desc
 #'   (type: character(1))
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
   if (!(plat_desc$name %in% names(dbent_platforms))) {
@@ -342,5 +350,3 @@ get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
   pkg_logdebug("... unknown platform format for %s in %s", plat_desc$name, dbent_name)
   return()
 }
-
-

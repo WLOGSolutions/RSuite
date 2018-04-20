@@ -15,6 +15,7 @@
 #' @return data frame with columns Package and Path.
 #'
 #' @keywords internal
+#' @noRd
 #'
 pkg_download <- function(avail_pkgs, dest_dir) {
   stopifnot(is.data.frame(avail_pkgs) && "Package" %in% colnames(avail_pkgs))
@@ -136,6 +137,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #' @return Full path to builded package or NULL if failed to build. (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_build_steps = NULL) {
   stopifnot(length(pkg_path) == 1 && dir.exists(pkg_path))
@@ -246,6 +248,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
 #' @param lib_dir directory to reinstall packages in (type: character).
 #'
 #' @keywords internal
+#' @noRd
 #'
 pkg_remove <- function(pkgs, lib_dir) {
   void <- lapply(X = pkgs,
@@ -273,6 +276,7 @@ pkg_remove <- function(pkgs, lib_dir) {
 #' of specific package pecularities.
 #'
 #' @keywords internal
+#' @noRd
 #'
 pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
   common_args <- c(rscript_arg("lib", lib_dir), 'quiet = F')
@@ -336,6 +340,7 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
 #' @return data.frame describing all specificts
 #'
 #' @keywords internal
+#' @noRd
 #'
 load_specifics <- function() {
   spec_files <- c(
@@ -380,6 +385,7 @@ load_specifics <- function() {
 #' @return data.frame describing specifics for concrete package.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_pkg_specifics <- function(pkg_name, for_source, spec_desc) {
   spec_desc <- spec_desc[spec_desc$Package == pkg_name, ]
@@ -398,6 +404,7 @@ get_pkg_specifics <- function(pkg_name, for_source, spec_desc) {
 #' @return character vector to add to install.packages script args.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_specific_args <- function(pkg_file, spec_desc) {
   pkg_file <- basename(pkg_file)
@@ -458,6 +465,7 @@ get_specific_args <- function(pkg_file, spec_desc) {
 #' @return R version number the packages is built for.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_package_build_rver <- function(lib_dir, pkg_name) {
   installed <- data.frame(utils::installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Built")]

@@ -1,3 +1,9 @@
+VERSION 0.25 (2018-04-??)
+  * Functionality related to integration with RStutio moved to separate AddIn
+     package. Got rid of dependency to rstudioapi.
+  * Removed dependency to knitr and rmarkdown. They should be installed as
+     supportive packages.
+
 VERSION 0.24 (2018-04-18)
   * .Rprofile loads environment throu set_env.R not to load RSuite before
      environment is configured properly.

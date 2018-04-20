@@ -15,6 +15,7 @@
 #' @return named vector of project package names. Names are package folders. (type: character).
 #'
 #' @keywords internal
+#' @noRd
 #'
 build_project_pkgslist <- function(pkgs_path) {
   pkg_dirs <- Filter(x = list.dirs(pkgs_path, full.names = FALSE, recursive = FALSE),
@@ -63,6 +64,7 @@ build_project_pkgslist <- function(pkgs_path) {
 #' @return named list with package names and package versions (type: list).
 #'
 #' @keywords internal
+#' @noRd
 #'
 retrieve_project_pkgsvers <- function(pkgs_path) {
   project_packages <- Filter(x = list.dirs(pkgs_path,
@@ -88,6 +90,7 @@ retrieve_project_pkgsvers <- function(pkgs_path) {
 #' @return named list with package names and package versions (type: list).
 #'
 #' @keywords internal
+#' @noRd
 #'
 update_project_pkgsvers <-function(pkgs_path, pkgsvers) {
   project_packages <- Filter(x = list.dirs(pkgs_path,
@@ -117,6 +120,7 @@ update_project_pkgsvers <-function(pkgs_path, pkgsvers) {
 #' @return comma separated character will all unparsed dependency declarations.
 #'
 #' @keywords internal
+#' @noRd
 #'
 desc_retrieve_dependencies <- function(pkgs_path, pkg_dir, fields = c("Imports", "Depends", "LinkingTo")) {
   stopifnot(length(fields) > 0)
@@ -138,6 +142,7 @@ desc_retrieve_dependencies <- function(pkgs_path, pkg_dir, fields = c("Imports",
 #' @return comma separated character will all unparsed dependency declarations.
 #'
 #' @keywords internal
+#' @noRd
 #'
 dcf_retrieve_dependencies <- function(dcf, fields = c("Imports", "Depends", "LinkingTo")) {
   pkgs <- unname(unlist(dcf[1, intersect(fields, colnames(dcf))]))
@@ -156,6 +161,7 @@ dcf_retrieve_dependencies <- function(dcf, fields = c("Imports", "Depends", "Lin
 #' @return name of package retrieved. (type: character(1))
 #'
 #' @keywords internal
+#' @noRd
 #'
 desc_retrieve_name <- function(pkgs_path, pkg_dir) {
   read.dcf(file.path(pkgs_path, pkg_dir, "DESCRIPTION"))[1, "Package"]
@@ -169,6 +175,7 @@ desc_retrieve_name <- function(pkgs_path, pkg_dir) {
 #' @return object sutable to restore DESCRIPTION files.
 #'
 #' @keywords internal
+#' @noRd
 #'
 backup_pkgdesc_files <- function(pkgs_path) {
   bkp_dir <- tempfile(pattern = "pkgdescs_")
@@ -197,6 +204,7 @@ backup_pkgdesc_files <- function(pkgs_path) {
 #' @param bkp object returned by backup_pkgdesc_files
 #'
 #' @keywords internal
+#' @noRd
 #'
 restore_pkgdesc_files <- function(bkp) {
   stopifnot(class(bkp) == "pkgdesc_backup")
@@ -232,6 +240,7 @@ restore_pkgdesc_files <- function(bkp) {
 #' }
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_package_files_info <- function(files) {
   assert(!missing(files) && is.character(files) && length(files) > 0,
@@ -272,6 +281,7 @@ get_package_files_info <- function(files) {
 #' @return data.frame with single row as read.dcf exposes.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_pkg_desc <- function(pkg_name, path) {
   if (dir.exists(path)) {
@@ -311,6 +321,7 @@ get_pkg_desc <- function(pkg_name, path) {
 #' }
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_pkgzip_info <- function(pkgzip) {
   assert(is_nonempty_char1(pkgzip), "Non empty character(1) expected for pkgzip")
@@ -337,6 +348,7 @@ get_pkgzip_info <- function(pkgzip) {
 #' @return data.frame with File column fullfilled.
 #'
 #' @keywords internal
+#' @noRd
 #'
 deduce_package_files <- function(avail_pkgs) {
   stopifnot(is.data.frame(avail_pkgs) &&
@@ -368,6 +380,7 @@ deduce_package_files <- function(avail_pkgs) {
 #' }
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_package_url_infos <- function(urls) {
   stopifnot(is.character(urls) && length(urls) > 0)
@@ -398,6 +411,7 @@ get_package_url_infos <- function(urls) {
 #' @return character vector with respected dependency types for req_type.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_respected_types <- function(req_type, bin_type) {
   if (req_type == "source") {

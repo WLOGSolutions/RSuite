@@ -21,6 +21,7 @@
 #' @return object of type rsuite_repo_info.
 #'
 #' @keywords internal
+#' @noRd
 #'
 .create_repo_info <- function(path, expected_types, rver) {
   stopifnot(regexpr("^(https?|ftp|file)(://.*)", path) != -1) # url path expected
@@ -69,6 +70,7 @@
 #'   repository names.
 #'
 #' @keywords internal
+#' @noRd
 #'
 parse_repo_adapters_spec <- function(specs) {
   specs <- trimws(specs)
@@ -87,6 +89,7 @@ parse_repo_adapters_spec <- function(specs) {
 #'   in params.
 #'
 #' @keywords internal
+#' @noRd
 #'
 make_detached_repos <- function(params) {
   urls <- c()
@@ -116,6 +119,7 @@ make_detached_repos <- function(params) {
 #' @return non empty named list of repository descriptions as rsuite_repo_info object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_all_repo_infos <- function(params, rver = NULL) {
   if (is.null(rver)) {
@@ -188,6 +192,7 @@ get_all_repo_infos <- function(params, rver = NULL) {
 #' @return named list with appropriate rsuite_repo_info objects.
 #'
 #' @keywords internal
+#' @noRd
 #'
 build_repo_infos <- function(spec, types, rver) {
   result <- lapply(X = spec, FUN = function(path) { .create_repo_info(path, types, rver) })
@@ -199,6 +204,7 @@ build_repo_infos <- function(spec, types, rver) {
 #' Logs information on repository infos,
 #'
 #' @keywords internal
+#' @noRd
 #'
 log_repo_infos <- function(repo_infos) {
   pkg_loginfo("Will look for dependencies in ...")
@@ -216,6 +222,7 @@ log_repo_infos <- function(repo_infos) {
 #' @return character(N) containing retrieved contrib_urls
 #'
 #' @keywords internal
+#' @noRd
 #'
 retrieve_contrib_urls <- function(repo_infos, type) {
   result <- unlist(lapply(X = repo_infos,
@@ -236,6 +243,7 @@ retrieve_contrib_urls <- function(repo_infos, type) {
 #'   supported by the repository.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_available_packages <- function(path, type, rver) {
   stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", path) != -1)) # url path expected
@@ -259,6 +267,7 @@ get_available_packages <- function(path, type, rver) {
 #'   supported by the repository.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_curl_available_packages <- function(contrib_url) {
   stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", contrib_url) != -1)) # url expected
@@ -353,6 +362,7 @@ get_curl_available_packages <- function(contrib_url) {
 #' @param rver R version to retrieve packages for.
 #'
 #' @keywords internal
+#' @noRd
 #'
 clear_available_packages_cache <- function(path, type, rver) {
   stopifnot(regexpr("^(https?|ftp|file)(://.*)", path) != -1) # url path expected

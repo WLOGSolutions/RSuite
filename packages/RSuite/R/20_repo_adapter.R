@@ -53,6 +53,7 @@ repo_adapter_get_info <- function(repo_adapter, params) {
 #' Default implementation of repo_adapter_get_info
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_info.default <- function(repo_adapter, params) {
   assert(FALSE,
@@ -84,6 +85,7 @@ repo_adapter_get_path <- function(repo_adapter, params, ix = NA) {
 #' Default implementation of repo_adapter_get_path.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_path.default <- function(repo_adapter, params) {
   assert(FALSE,
@@ -120,6 +122,7 @@ repo_adapter_create_manager <- function(repo_adapter, ...) {
 #' Default implementation of repo_manager_create
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_manager.default <- function(repo_adapter, ...) {
   assert(FALSE,

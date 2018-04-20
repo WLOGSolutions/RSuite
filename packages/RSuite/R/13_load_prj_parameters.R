@@ -13,6 +13,7 @@
 #' @return object of rsuite_project_parameters
 #'
 #' @keywords internal
+#' @noRd
 #'
 load_prj_parameters <- function(prj_path) {
   assert(is.character(prj_path) && length(prj_path) == 1,

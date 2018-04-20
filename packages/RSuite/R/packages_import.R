@@ -9,10 +9,7 @@
 #' @import testthat
 #' @import devtools
 #' @import roxygen2
-#' @import knitr
-#' @import rmarkdown
 #' @import git2r
-#' @import rstudioapi
 #' @import jsonlite
 #' @import subprocess
 #' @importFrom stats aggregate

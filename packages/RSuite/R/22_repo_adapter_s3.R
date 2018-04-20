@@ -14,6 +14,7 @@
 #' @return object of type rsuite_repo_adapter_s3
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_s3 <- function(name) {
   result <- repo_adapter_create_url(name)
@@ -31,6 +32,7 @@ repo_adapter_create_s3 <- function(name) {
 #'   the repository inside bucket. (type: character).
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_get_path.rsuite_repo_adapter_s3 <- function(repo_adapter, params, ix = NA) {
   url <- repo_adapter_get_path.rsuite_repo_adapter_url(repo_adapter, params, ix)
@@ -62,6 +64,7 @@ repo_adapter_get_path.rsuite_repo_adapter_s3 <- function(repo_adapter, params, i
 #' @return manageable repo adapter object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_adapter_create_manager.rsuite_repo_adapter_s3 <- function(repo_adapter, ...) {
   dots <- list(...)

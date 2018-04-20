@@ -31,6 +31,7 @@ repo_manager_get_info <- function(repo_manager) {
 #' Default implementation of repo_manager_get_info.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_get_info.default <- function(repo_manager) {
   assert(FALSE,
@@ -65,6 +66,7 @@ repo_manager_init <- function(repo_manager, types) {
 #' Default implementation of repo_manager_init
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_init.default <- function(repo_manager, types) {
   assert(FALSE,
@@ -101,6 +103,7 @@ repo_manager_upload <- function(repo_manager, src_dir, types) {
 #' Default implementation of repo_manager_upload
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_upload.default <- function(repo_manager, src_dir, types) {
   assert(FALSE,
@@ -138,6 +141,7 @@ repo_manager_remove <- function(repo_manager, toremove, type) {
 #' Default implementation of repo_manager_remove.
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_remove.default <- function(repo_manager, toremove, type) {
   assert(FALSE,
@@ -163,6 +167,7 @@ repo_manager_destroy <- function(repo_manager) {
 #' Default implementation of repo_manager_destroy
 #'
 #' @keywords internal
+#' @noRd
 #'
 repo_manager_destroy.default <- function(repo_manager) {
   assert(FALSE,

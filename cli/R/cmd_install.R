@@ -14,8 +14,8 @@ options <- c(
               help="User provided url to search for RSuite package. (default: %default)"),
   make_option(c("--package"), dest = "package", default=NULL,
               help="Use rsuite package provided to install RSuite. (default: %default)"),
-  make_option(c("-r", "--rstudio-deps"), dest = "rstudio_deps", action="store_true", default=FALSE,
-              help="If passed will install also packages required to run RStudio plugins. (default: %default)"),
+  make_option(c("-r", "--rstudio-addin"), dest = "rstudio_addin", action="store_true", default=FALSE,
+              help="If passed will install also RSuiteRStudio add in. (default: %default)"),
   make_option(c("-v", "--verbose"), dest = "verbose", action="store_true", default=FALSE,
               help="If passed lots of messages are written to console during installation.")
 )
@@ -93,7 +93,7 @@ tryCatch({
     dloaded <- utils::download.packages(rsuite_pkg, destdir = src_dir, available = rsuite_avails, repos = NULL,
                                         quiet = !opts$verbose)
     if (nrow(dloaded) != 1) {
-      pkg_url <- sprintf("%s/%s", avails$Repository, paste(avails$File, collapse = " "))
+      pkg_url <- sprintf("%s/%s", rsuite_avails$Repository, paste(rsuite_avails$File, collapse = " "))
       .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
     }
   } else {
@@ -103,12 +103,32 @@ tryCatch({
     }
   }
 
+  pkgs <- c("RSuite")
+
+  if (opts$rstudio_addin) {
+    rstudio_pkg <- "RSuiteRStudio"
+
+    rstudio_avails <- data.frame(utils::available.packages(contriburl = rsuite_curl),
+                                 row.names = NULL, stringsAsFactors = F)
+    rstudio_avails <- rstudio_avails[rstudio_avails$Package == rstudio_pkg, ]
+    if (nrow(rstudio_avails) < 1) {
+      .fatal_error(sprintf("Failed to detect RStudio AddIn package at %s", opts$url))
+    }
+    rstudio_avails <- rstudio_avails[1, ]
+    message(sprintf("... installing also %s(v%s) package ...", rstudio_pkg, rstudio_avails$Version))
+
+    dloaded <- utils::download.packages(rstudio_pkg, destdir = src_dir, available = rstudio_avails, repos = NULL,
+                                        quiet = !opts$verbose)
+    if (nrow(dloaded) != 1) {
+      pkg_url <- sprintf("%s/%s", rstudio_avails$Repository, paste(rstudio_avails$File, collapse = " "))
+      .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
+    }
+
+    pkgs <- c(pkgs, rstudio_pkg)
+  }
+
   tools::write_PACKAGES(dir = src_dir, type = "source")
 
-  pkgs <- c("RSuite")
-  if (opts$rstudio_deps) {
-	pkgs <- c(pkgs, "httpuv", "xtable", "sourcetools", "shiny", "miniUI")
-  }
   # install RSuite from local repository, dependencies (and other packages) are from CRAN
   utils::install.packages(pkgs,
                           repos = c(CRAN = cran_path, Local = paste0("file:///", tmp_dir)),

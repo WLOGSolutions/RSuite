@@ -17,6 +17,7 @@
 #' @return TRUE if documentation build was not required or built it succesfully.
 #'
 #' @keywords internal
+#' @noRd
 #'
 pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
   # first remove Rd file built with roxygen
@@ -85,6 +86,7 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
 #' @return character vector with all the package declared imports.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_package_desc_imports <- function(pkg_path, field = "Imports") {
   desc_file <- file.path(pkg_path, "DESCRIPTION")
@@ -105,6 +107,7 @@ get_package_desc_imports <- function(pkg_path, field = "Imports") {
 #' @return character vector with all the package declared imports.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_package_nspace_imports <- function(pkg_path) {
   ns_file <- file.path(pkg_path, "NAMESPACE")
@@ -135,6 +138,7 @@ get_package_nspace_imports <- function(pkg_path) {
 #' @return TRUE if declarations are consitent, FALSE overvise.
 #'
 #' @keywords internal
+#' @noRd
 #'
 validate_package_imports <- function(pkg_name, pkg_path) {
   desc_imports <- get_package_desc_imports(pkg_path)

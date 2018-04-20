@@ -9,6 +9,7 @@
 #' Detect project base dir in parents of path.
 #'
 #' @keywords internal
+#' @noRd
 #'
 detect_prj_path <- function(path) {
   stopifnot(is.character(path) && length(path) == 1)
@@ -31,6 +32,7 @@ detect_prj_path <- function(path) {
 #' If no loaded project asserts that could not detect project out of context.
 #'
 #' @keywords internal
+#' @noRd
 #'
 safe_get_prj <- function(prj, prj_param_name = "prj") {
   assert(is.null(prj) || is_prj(prj),

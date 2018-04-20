@@ -9,6 +9,7 @@
 #' This provides support for binary package installation from local CRAN on Linux.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rsuite_contrib_url <- function(repos, type, rver = NA) {
   rver <- ifelse(is.na(rver), current_rver(), majmin_rver(rver))
@@ -61,6 +62,7 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
 #' wraps write_PACKAGES and ensures index files exist.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rsuite_write_PACKAGES <- function(url, type) {
   if (!dir.exists(url)) {
@@ -99,6 +101,7 @@ rsuite_write_PACKAGES <- function(url, type) {
 #' Converts passed path to full path and replaces it to short names on Windows.
 #'
 #' @keywords internal
+#' @noRd
 #'
 rsuite_fullUnifiedPath <- function(path) {
   path <- suppressWarnings(normalizePath(path))

@@ -18,6 +18,7 @@
 #' @return vector of normalized versions. (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 norm_version <- function(ver) {
   ver <- as.character(ver)
@@ -41,6 +42,7 @@ norm_version <- function(ver) {
 #' @return vector of denormalized versions. (type: character)
 #'
 #' @keywords internal
+#' @noRd
 #'
 denorm_version <- function(ver) {
   ver <- as.character(ver)
@@ -57,6 +59,7 @@ denorm_version <- function(ver) {
 #' @return vector of character.
 #'
 #' @keywords internal
+#' @noRd
 #'
 .standard_avail_columns <- function() {
   return(c("Package", "Version", "Depends", "Imports", "LinkingTo", "Repository", "File"))
@@ -73,6 +76,7 @@ denorm_version <- function(ver) {
 #' @return created versions object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 .df2ver <- function(df, avails = NULL) {
   stopifnot(is.data.frame(df) && all(c('pkg', 'vmin', 'vmax') %in% colnames(df)))
@@ -110,6 +114,7 @@ denorm_version <- function(ver) {
 #' @param ver version object to print.
 #'
 #' @keywords internal
+#' @noRd
 #'
 print.versions <- function(ver) {
   cat("--- reqs --\n")
@@ -133,6 +138,7 @@ print.versions <- function(ver) {
 #' @return version object which contains passed packages with requirements
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.build <- function(pkg_names = c(), vmin = NA, vmax = NA, avails = NULL) {
   if (!is.null(avails)) {
@@ -173,6 +179,7 @@ vers.build <- function(pkg_names = c(), vmin = NA, vmax = NA, avails = NULL) {
 #' @return check_res object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.check_against <- function(ver, oth) {
   stopifnot(is.versions(ver))
@@ -214,6 +221,7 @@ vers.check_against <- function(ver, oth) {
 #' @return data.frame with columns pkg, vmin, vmax
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.get <- function(ver, pkg_names) {
   stopifnot(is.versions(ver))
@@ -232,6 +240,7 @@ vers.get <- function(ver, pkg_names) {
 #' @return data.frame with columns pkg, vmin and vmax.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.get_unfeasibles <- function(ver) {
   stopifnot(is.versions(ver))
@@ -256,6 +265,7 @@ vers.get_unfeasibles <- function(ver) {
 #' @return modified version object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.rm <- function(ver, pkg_names) {
   stopifnot(is.versions(ver))
@@ -279,6 +289,7 @@ vers.rm <- function(ver, pkg_names) {
 #'   removed.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.rm_acceptable <- function(ver, pkgs) {
   stopifnot(is.versions(ver))
@@ -305,6 +316,7 @@ vers.rm_acceptable <- function(ver, pkgs) {
 #' @return versions objects with base (and R) packages removed.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.rm_base <- function(ver) {
   stopifnot(is.versions(ver))
@@ -321,6 +333,7 @@ vers.rm_base <- function(ver) {
 #' @return same version object with avails removed.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.drop_avails <- function(ver) {
   stopifnot(is.versions(ver))
@@ -337,6 +350,7 @@ vers.drop_avails <- function(ver) {
 #' @return data.frame of structure same as available.packages returns.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.pick_available_pkgs <- function(ver) {
   stopifnot(is.versions(ver))
@@ -358,6 +372,7 @@ vers.pick_available_pkgs <- function(ver) {
 #' @return character vector with package names retrieved.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.get_names <- function(ver) {
   stopifnot(is.versions(ver))
@@ -372,6 +387,7 @@ vers.get_names <- function(ver) {
 #' @return TRUE if no package specified in version object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.is_empty <- function(ver) {
   stopifnot(is.versions(ver))
@@ -391,6 +407,7 @@ vers.is_empty <- function(ver) {
 #'   same version value together with available packages data.frame.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.collect <- function(contrib_url, pkgs = NULL) {
   if (is.null(pkgs)) {
@@ -426,6 +443,7 @@ vers.collect <- function(contrib_url, pkgs = NULL) {
 #'   and minimal vmax if they occure multiple times.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.union <- function(...) {
   vers <- list(...)
@@ -460,6 +478,7 @@ vers.union <- function(...) {
 #'   latest packages among pkg_names found.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.get_available_pkgs <- function(pkg_names, contrib_url) {
   stopifnot(is.character(contrib_url) && length(contrib_url) == 1)
@@ -479,6 +498,7 @@ vers.get_available_pkgs <- function(pkg_names, contrib_url) {
 #'    specified.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.from_deps <- function(deps, pkg_name = NA) {
   stopifnot(is.character(deps) && length(deps) == 1)
@@ -528,6 +548,7 @@ vers.from_deps <- function(deps, pkg_name = NA) {
 #'    with requirements specified.
 #'
 #' @keywords internal
+#' @noRd
 #'
 vers.from_deps_in_avails <- function(avails) {
   stopifnot(is.data.frame(avails)
@@ -551,6 +572,7 @@ vers.from_deps_in_avails <- function(avails) {
 #' @return TRUE if version object.
 #'
 #' @keywords internal
+#' @noRd
 #'
 is.versions <- function(ver) {
   return(class(ver) == "versions")

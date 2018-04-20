@@ -47,6 +47,7 @@ rc_adapter_is_under_control <- function(rc_adapter, dir) {
 #' Default implemenation of rc_adapter_is_under_control
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_is_under_control.default <- function(rc_adapter, dir) {
   assert(FALSE,
@@ -73,6 +74,7 @@ rc_adapter_prj_struct_add <- function(rc_adapter, params) {
 #' Default implemenation of rc_adapter_prj_struct_add
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_prj_struct_add.default <- function(rc_adapter, params) {
   assert(FALSE,
@@ -105,6 +107,7 @@ rc_adapter_pkg_struct_add <- function(rc_adapter, params, name) {
 #' Default implemenation of rc_adapter_pkg_struct_add
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_pkg_struct_add.default <- function(rc_adapter, params, name) {
   assert(FALSE,
@@ -139,6 +142,7 @@ rc_adapter_get_version <- function(rc_adapter, dir) {
 #' Default implemenation of rc_adapter_get_version
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_get_version.default <- function(rc_adapter, dir) {
   assert(FALSE,
@@ -172,6 +176,7 @@ rc_adapter_remove_admins <- function(rc_adapter, dir) {
 #' Default implemenation of rc_adapter_remove_admins
 #'
 #' @keywords internal
+#' @noRd
 #'
 rc_adapter_remove_admins.default <- function(rc_adapter, dir) {
   assert(FALSE,

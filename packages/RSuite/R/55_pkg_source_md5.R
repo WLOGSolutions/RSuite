@@ -17,6 +17,7 @@
 #' @return TRUE if some changes detected.
 #'
 #' @keywords internal
+#' @noRd
 #'
 has_package_changed <- function(pkg_dir, params, pkg_type) {
   contrib_url <- rsuite_contrib_url(params$get_intern_repo_path(), pkg_type, params$r_ver)
@@ -62,6 +63,7 @@ has_package_changed <- function(pkg_dir, params, pkg_type) {
 #' @return name of output package file to be generated.
 #'
 #' @keywords internal
+#' @noRd
 #'
 get_package_build_name <- function(pkg_path, pkg_type) {
   desc <- read.dcf(file.path(pkg_path, "DESCRIPTION"))
@@ -88,6 +90,7 @@ get_package_build_name <- function(pkg_path, pkg_type) {
 #' @return data.frame with columns file and md5.
 #'
 #' @keywords internal
+#' @noRd
 #'
 collect_pkg_source_md5 <- function(pkg_path) {
   files <- c(file.path(pkg_path, c("DESCRIPTION", "NAMESPACE")),

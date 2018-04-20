@@ -22,6 +22,7 @@
 #'   (type: logical, default: FALSE)
 #'
 #' @keywords internal
+#' @noRd
 #'
 build_install_tagged_prj_packages <- function(params, revision, build_type,
                                               skip_build_steps = NULL,
@@ -57,6 +58,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type,
 #' into environment. Raises exception if failed to build anything.
 #'
 #' @keywords internal
+#' @noRd
 #'
 build_install_prj_packages <- function(params, build_type, skip_build_steps = NULL, rebuild = FALSE) {
   intern_repo_path <- params$get_intern_repo_path()
