@@ -47,7 +47,7 @@ Todo:
         <CustomAction Id="WixSetDefaultPerMachineFolderFx" Property="WixPerMachineFolder" Value="$(var.PlatformProgramFilesFolder)R\[ApplicationFolderName]" Execute="immediate" />
         <CustomAction Id="WixSetPerUserFolderFx" Property="APPLICATIONFOLDER" Value="[WixPerUserFolder]" Execute="immediate" />
         <CustomAction Id="WixSetPerMachineFolderFx" Property="APPLICATIONFOLDER" Value="[WixPerMachineFolder]" Execute="immediate" />
-
+		
         <InstallExecuteSequence>
             <Custom Action="WixSetDefaultPerUserFolderFx" Before="CostFinalize" />
             <Custom Action="WixSetDefaultPerMachineFolderFx" After="WixSetDefaultPerUserFolderFx" />
