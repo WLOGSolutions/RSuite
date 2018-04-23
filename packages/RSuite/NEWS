@@ -5,6 +5,7 @@ VERSION 0.25 (2018-04-??)
      supportive packages.
   * On Linux properly detecting if supportive packages are available. They can
      be present under .Library.site but not under .Library.
+  * Default MRAN date is Today - 7days.
 
 VERSION 0.24 (2018-04-18)
   * .Rprofile loads environment throu set_env.R not to load RSuite before
