@@ -35,9 +35,11 @@ required dependencies are installed automatically.
 
 # Installation with help of RSuite CLI [Recommended]
 
+![Installing R Suite with R Suite CLI](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuite_install_with_cli.png "Installing R Suite with R Suite CLI")
+
 If you have RSuite CLI installed (check [RSuite CLI installation
 reference](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
-"RSuite CLI installation reference.") already you can use it to
+"RSuite CLI installation reference.")) already you can use it to
 install latest compatible version of RSuite. Just execute following
 command in you shell:
 
