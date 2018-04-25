@@ -38,7 +38,7 @@ If you are stuck fill free to contact us:
 
 # Step 1 - start a new project
 
-![Start a new project](media/basic_workflow_step_1.png "Start a new R Suite project")
+![Start a new project](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_1.png "Start a new R Suite project")
 
 To create a new project (called `my_project`) we have to issue the following command
 ```bash
@@ -56,7 +56,7 @@ To avoid warning message you can add `--skip-rc` when calling `rsuite`.
 
 ## Step 1.1 - run master file
 
-![Run master file](media/basic_workflow_step_1_1.png "Run master file")
+![Run master file](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_1_1.png "Run master file")
 
 Every project has a special structure. Lets change path to the project
 we just created to check it.
@@ -114,7 +114,7 @@ You should not see any error messages.
 
 # Step 2 - add first package
 
-![Add first package to R Suite project](media/basic_workflow_step_1_1.png
+![Add first package to R Suite project](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_1_1.png
 "Add first package to R Suite project")
 
 R Suite forces users to keep logic in packages. To create a package issue the following command
@@ -150,7 +150,7 @@ You should see the following output
 
 # Step 3 - add custom package to master script
 
-![Editing master.r in R Studio](media/basic_workflow_step_3a.png "Editing master.R in R Studio")
+![Editing master.r in R Studio](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_3a.png "Editing master.R in R Studio")
 
 Open in any editor `R\master.R` and change it to look like this:
 
@@ -175,7 +175,7 @@ library(mypackage)
 You can check if your package is visible to your master script by
 using the following commands
 
-![Running master.R](media/basic_workflow_step_3b.png "Running master.R")
+![Running master.R](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_3b.png "Running master.R")
 
 ```bash
 Rscript R\master.R
@@ -193,7 +193,7 @@ Execution halted
 
 # Step 4 - building custom packages
 
-![Building custom packages](media/basic_workflow_step_4.png "Buidling custom packages")
+![Building custom packages](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_4.png "Buidling custom packages")
 
 Adding a package to the project is not enough to use it. You have to build it. You can do this using this command
 
@@ -218,7 +218,7 @@ If everything worked properly you should not see any error messages.
 
 # Step 5 - adding function to a custom package
 
-![Adding function to a custom package](media/basic_workflow_step_4.png "Adding function to a custom package")
+![Adding function to a custom package](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_4.png "Adding function to a custom package")
 
 Lets add a function `hello_world` to our pacakge `mypackage`. To do
 this you have to create a new file in folder
@@ -255,7 +255,7 @@ library(mypackage)
 hello_world("John")
 ```
 
-![Running master.R](media/basic_workflow_step_5b.png "Running master.R")
+![Running master.R](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_5b.png "Running master.R")
 
 Lets check if everything works
 
@@ -274,7 +274,7 @@ Execution halted
 
 # Step 6 - rebuild custom packages
 
-![Rebuilding custom packages](media/basic_workflow_step_6.png "Rebuilding custom packages")
+![Rebuilding custom packages](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_6.png "Rebuilding custom packages")
 
 You have to rebuild packages to have all the functionality available
 to master scripts. You do it with a following command.
@@ -302,7 +302,7 @@ You can add dependencies to external packages in two ways:
 1. **Recommended** - using *imports* in `DESCRIPTION` file in each package
 2. **Not recommended** - using `library` or `require` in master scripts.
 
-![Editing DESCRIPTION file](media/basic_workflow_step_7a.png "Editing DESCRIPTION file")
+![Editing DESCRIPTION file](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_7a.png "Editing DESCRIPTION file")
 
 To add dependency to external package we will edit file
 `packages\mypackage\DESCRIPTION` like below:
@@ -328,7 +328,7 @@ I have added line `data.table (>= 1.10.1)` to Depends section. This
 means I declared that `mypackage` depends on `data.table` package in
 version `1.10.1` or newer.
 
-![Rebuilding packages](media/basic_workflow_step_7b.png "Rebuilding packages")
+![Rebuilding packages](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_7b.png "Rebuilding packages")
 
 Lets rebuild package to have master scripts see the changes
 
@@ -348,7 +348,7 @@ You can conclude that you have to install dependencies to build your package.
 # Step 8 - install dependencies
 
 ![Installing R Suite project
-dependencies](media/basic_workflow_step_8.png "Installing R Suite
+dependencies](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_8.png "Installing R Suite
 project dependencies")
 
 To install dependecies you have to issue the following command:
