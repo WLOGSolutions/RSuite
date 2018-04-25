@@ -1,5 +1,8 @@
-VERSION 0.25 (2018-04-??)
-  * install command apdated to install RSuiteRStudio add-in.
+VERSION 0.25 (2018-04-23)
+  * install command adapted to install RSuiteRStudio add-in.
+  * main windows script adapted to detect non global R installation.
+  * docker command has new sub-commands to support development process:
+     run, list, stop, exec, build
 
 VERSION 0.24 (2018-04-18)
   * docker command has new parameter -i (--image) which makes it possible

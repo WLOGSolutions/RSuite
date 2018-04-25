@@ -6,14 +6,26 @@ rem
 
 Rscript.exe --version 1> nul 2>&1
 if ERRORLEVEL 1 (
-    for /f "skip=1 tokens=2* " %%a in ('reg query HKLM\SOFTWARE\R-core\R /v InstallPath') do (
+	echo Rscript is not available at path. Trying to detect in registry ...
+
+	echo ... detecting per-user R installation ...
+	for /f "skip=1 tokens=2* " %%a in ('reg query HKCU\SOFTWARE\R-core\R /v InstallPath') do (
+		echo ... found at %%~sb\bin
 		set "PATH=%%~sb\bin;%PATH%"
 	)
 	Rscript.exe --version 1> nul 2>&1
-    if ERRORLEVEL 1 (
-        echo ERROR: Failed to detect R path in registry. R is required to use RSuite CLI.
-        exit /B 1
-    )
+	if ERRORLEVEL 1 (echo ... not found) else goto rscript_found
+
+	echo ... detecting global R installation ...
+	for /f "skip=1 tokens=2* " %%a in ('reg query HKLM\SOFTWARE\R-core\R /v InstallPath') do (
+		echo ... found at %%~sb\bin
+		set "PATH=%%~sb\bin;%PATH%"
+	)
+	Rscript.exe --version 1> nul 2>&1
+	if ERRORLEVEL 1 (echo ... not found) else goto rscript_found
+
+	echo ERROR: Failed to detect R path in registry. R is required to use RSuite CLI.
+	exit /B 1
 )
 
 Rscript.exe --version 1> nul 2>&1

@@ -66,7 +66,9 @@ resolve_prj_sups <- function(repo_infos, params, only_source = F) {
   prjSupVers <- vers.rm(prjSupVers, project_packages)
 
   # remove installed already packages
-  installed <- utils::installed.packages(lib.loc = c(params$sbox_path, params$lib_path, Sys.getenv("R_LIBS_USER"), .Library))
+  installed <- utils::installed.packages(lib.loc = c(params$sbox_path, params$lib_path,
+                                                     Sys.getenv("R_LIBS_USER"),
+                                                     .Library.site, .Library))
   installed <- as.data.frame(installed, stringsAsFactors = F)[, c("Package", "Version", "Built")]
   installed <- installed[majmin_rver(installed$Built) == majmin_rver(params$r_ver), ]
   prjSupVers <- vers.rm_acceptable(prjSupVers, installed)

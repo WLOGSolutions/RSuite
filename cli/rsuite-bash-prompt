@@ -390,47 +390,116 @@ _rsuite() {
 			;;
 		docker)
 			if [ $COMP_CWORD == 2 ]; then
-				opts="zip img help"
+				opts="zip img run list stop build exec help"
 			else
 				case "${COMP_WORDS[2]}" in
 					zip)
 						if [[ $cur == --* ]]; then
-							opts="--platform --rver --sh --dont-rm --version --packages --exc-master --dest $common_opts_long"
+							opts="--platform --rver --sh --dont-rm --version --packages --exc-master --dest --image $common_opts_long"
 						else
 							case "${prev}" in
 								--rver|-sh|--version|--packages)
 									return 0;
 									;;
 								--platform|-p)
-									opts="ubuntu centos"
+									opts="ubuntu centos debian"
 									;;
 								--dest|-d)
 									_filedir
 									return 0
 									;;
 								*)
-									opts="-p --rver --sh --dont-rm --version --packages --exc-master -d $common_opts_short"
+									opts="-p --rver --sh --dont-rm --version --packages --exc-master -d -i $common_opts_short"
 									;;
 							esac
 						fi
 						;;
 					img)
 						if [[ $cur == --* ]]; then
-							opts="--tag --tag-latest --from --templ --templ-ctx --zip --platform --rver --sh --version --packages --exc-master $common_opts_long"
+							opts="--tag --tag-latest --from --templ --templ-ctx --zip --platform --rver --sh --version --packages --exc-master --image $common_opts_long"
 						else
 							case "${prev}" in
-								--tag|-t|--from|-f|--rver|--sh|--version|--packages)
+								--tag|-t|--from|-f|--rver|--sh|--version|--packages|-i|--image)
 									return 0;
 									;;
 								--platform|-p)
-									opts="ubuntu centos"
+									opts="ubuntu centos debian"
 									;;
 								--templ|--templ-ctx|--zip|-z)
 									_filedir
 									return 0
 									;;
 								*)
-									opts="-t --tag-latest -f --templ --templ-ctx -z -p --rver --sh --version --packages --exc-master $common_opts_short"
+									opts="-t --tag-latest -f --templ --templ-ctx -z -p --rver --sh --version --packages --exc-master -i $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					run)
+						if [[ $cur == --* ]]; then
+							opts="--image --platform --rver --name --sh $common_opts_long"
+						else
+							case "${prev}" in
+								--image|-i|--name|-n|--sh)
+									return 0;
+									;;
+								--platform|-p)
+									opts="ubuntu centos debian"
+									;;
+								--rver|-r)
+									opts="3.2 3.3 3.4"									
+									;;
+								*)
+									opts="-i -p -r -n --sh $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					list)
+						return 0
+						;;
+					stop)
+						if [[ $cur == --* ]]; then
+							opts="--name --all $common_opts_long"
+						else
+							case "${prev}" in
+								--name|-n|--all|-a)
+									return 0;
+									;;
+								*)
+									opts="-n -a $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					build)
+						if [[ $cur == --* ]]; then
+							opts="--name --version --packages --exc-master --zip $common_opts_long"
+						else
+							case "${prev}" in
+								--name|-n|--version|--packages|--exc-master)
+									return 0;
+									;;
+								--zip|-z)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-n --version --package --exc-master -z $common_opts_short"
+									;;
+							esac
+						fi
+						;;
+					exec)
+						if [[ $cur == --* ]]; then
+							opts="--name --cmd $common_opts_long"
+						else
+							case "${prev}" in
+								--name|-n|--cmd|-c)
+									return 0;
+									;;
+								*)
+									opts="-n -c $common_opts_short"
 									;;
 							esac
 						fi

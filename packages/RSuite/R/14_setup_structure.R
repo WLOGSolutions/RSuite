@@ -131,7 +131,7 @@ force_load_PARAMETERS <- function(params_file, prj_name, rsuite_ver) {
     params_dt <- data.frame(RSuiteVersion = rsuite_ver,
                             RVersion = current_rver(), # from 97_rversion.R
                             Project = prj_name,
-                            Repositories = sprintf("MRAN[%s]", Sys.Date()),
+                            Repositories = sprintf("MRAN[%s]", Sys.Date() - 7),
                             Artifacts = "config_templ.txt")
     write.dcf(params_dt, file = params_file)
     params <- load_prj_parameters(prj_dir)

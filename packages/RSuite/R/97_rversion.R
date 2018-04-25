@@ -101,10 +101,17 @@ get_rscript_search_paths <- function(rscript_cmd) {
   paths <- unlist(strsplit(Sys.getenv("PATH"), split = .Platform$path.sep, fixed = T))
 
   if (.Platform$OS.type == "windows") {
-    reg_ents <- unlist(utils::readRegistry("SOFTWARE\\R-core\\R", hive = "HLM", maxdepth = 2))
-    regs <- unique(file.path(reg_ents[grepl("InstallPath$", names(reg_ents))], "bin"))
+    machine_regs <- tryCatch({
+      reg_ents <- unlist(utils::readRegistry("SOFTWARE\\R-core\\R", hive = "HLM", maxdepth = 2))
+      unique(file.path(reg_ents[grepl("InstallPath$", names(reg_ents))], "bin"))
+    }, error = function(e) { NULL })
 
-    paths <- c(regs, paths)
+    user_regs <- tryCatch({
+      reg_ents <- unlist(utils::readRegistry("SOFTWARE\\R-core\\R", hive = "HCU", maxdepth = 2))
+      unique(file.path(reg_ents[grepl("InstallPath$", names(reg_ents))], "bin"))
+    }, error = function(e) { NULL })
+
+    paths <- c(machine_regs, user_regs, paths)
   }
 
   found <- paths[file.exists(file.path(paths, rscript_cmd))]
