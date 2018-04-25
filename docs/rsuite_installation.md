@@ -30,6 +30,9 @@ On Debian like systems (Debian/Ubuntu) you can install them executing:
 $ sudo apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev
 ```
 
+**Important:** If you are installing using RSuite CLI (see below) the
+required dependencies are installed automatically.
+
 # Installation with help of RSuite CLI [Recommended]
 
 If you have RSuite CLI installed (check [RSuite CLI installation
