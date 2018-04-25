@@ -8,6 +8,8 @@ In this document we present a basic R Suite usage. It covers:
 * developing custom package with `devtools`
 * understanding loggers
 
+**Important** This tutorial was tested with R Suite version 0.25-234.
+
 ## **Got stuck?**
 
 If you are stuck fill free to contact us:
@@ -36,6 +38,8 @@ If you are stuck fill free to contact us:
 
 # Step 1 - start a new project
 
+![Start a new project](media/basic_workflow_step_1.png "Start a new R Suite project")
+
 To create a new project (called `my_project`) we have to issue the following command
 ```bash
 rsuite proj start -n my_project
@@ -52,7 +56,10 @@ To avoid warning message you can add `--skip-rc` when calling `rsuite`.
 
 ## Step 1.1 - run master file
 
-Every project has a special structure. Lets change path to this project
+![Run master file](media/basic_workflow_step_1_1.png "Run master file")
+
+Every project has a special structure. Lets change path to the project
+we just created to check it.
 
 ```bash
 cd my_project
@@ -60,6 +67,7 @@ dir
 ```
 
 You should see the following output
+
 ```
  Directory of C:\Workplace\Projects\my_project        
                                                       
@@ -106,6 +114,9 @@ You should not see any error messages.
 
 # Step 2 - add first package
 
+![Add first package to R Suite project](media/basic_workflow_step_1_1.png
+"Add first package to R Suite project")
+
 R Suite forces users to keep logic in packages. To create a package issue the following command
 
 ```bash
@@ -139,6 +150,8 @@ You should see the following output
 
 # Step 3 - add custom package to master script
 
+![Editing master.r in R Studio](media/basic_workflow_step_3a.png "Editing master.R in R Studio")
+
 Open in any editor `R\master.R` and change it to look like this:
 
 ```R
@@ -146,7 +159,7 @@ Open in any editor `R\master.R` and change it to look like this:
 script_path <- (function() {
 	args <- commandArgs(trailingOnly = FALSE)
 	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return(".") }
+	if (!length(script_path)) { return("R") }
 	return(normalizePath(script_path))
 })()
 
@@ -159,16 +172,28 @@ args <- args_parser()
 library(mypackage)
 ```
 
-You can check if your package is visible to your master script by using the following commands
+You can check if your package is visible to your master script by
+using the following commands
+
+![Running master.R](media/basic_workflow_step_3b.png "Running master.R")
 
 ```bash
 Rscript R\master.R
 ```
 
-You will notice an error saying there is no such package as `mypackage`. This is fine because in R you
-have to install package to have access to it.
+You will notice an error saying there is no such package as
+`mypackage`. This is fine because in R you have to install package to
+have access to it.
+
+```
+Loading required package: methods
+Error in library(mypackage) : there is no package called 'mypackage'
+Execution halted
+```
 
 # Step 4 - building custom packages
+
+![Building custom packages](media/basic_workflow_step_4.png "Buidling custom packages")
 
 Adding a package to the project is not enough to use it. You have to build it. You can do this using this command
 
@@ -179,7 +204,7 @@ rsuite proj build
 On my computer this command gave the following output
 
 ```
-2017-09-23 16:55:55 INFO:rsuite:Installing mypackage (for R 3.3) ...
+2017-09-23 16:55:55 INFO:rsuite:Installing mypackage (for R 3.4) ...
 2017-09-23 16:56:00 INFO:rsuite:Successfuly build 1 packages
 ```
 
@@ -191,15 +216,18 @@ Rscript R\master.R
 
 If everything worked properly you should not see any error messages.
 
-# Step 5 - adding function to a package
+# Step 5 - adding function to a custom package
 
-Lets add a function `hello_world` to our pacakge `mypackage`. To do this you have to create a new file in folder `packages/mypackage/R/hello_world.R`.
-The easiest way to do this is to open `packages/mypackage/mypackage.Rproj` in R Studio. Edit `hello_world.R` to have the following content
+![Adding function to a custom package](media/basic_workflow_step_4.png "Adding function to a custom package")
+
+Lets add a function `hello_world` to our pacakge `mypackage`. To do
+this you have to create a new file in folder
+`packages/mypackage/R/hello_world.R`. Edit `hello_world.R` to have the following content
 
 ```R
 #'@export
 hello_world <- function(name) {
-    print(sprintf("Hello %s!", name))
+    sprintf("Hello %s!", name)
 }
 ```
 
@@ -212,7 +240,7 @@ Now you can change master script by adding one line to it
 script_path <- (function() {
 	args <- commandArgs(trailingOnly = FALSE)
 	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return(".") }
+	if (!length(script_path)) { return("R") }
 	return(normalizePath(script_path))
 })()
 
@@ -227,18 +255,29 @@ library(mypackage)
 hello_world("John")
 ```
 
+![Running master.R](media/basic_workflow_step_5b.png "Running master.R")
+
 Lets check if everything works
 
 ```bash
 Rscript R\master.R
 ```
 
-As you can see you got an error message that there is no such function as `hello_world`.
+As you can see you got an error message that there is no such function
+as `hello_world`.
 
-# Step 6 - rebuild packages
+```
+Loading required package: methods
+Error in hello_world("John") : could not find function "hello_world"
+Execution halted
+```
 
-You have to rebuild packages to have all the functionality available to master scripts.
-Run a command
+# Step 6 - rebuild custom packages
+
+![Rebuilding custom packages](media/basic_workflow_step_6.png "Rebuilding custom packages")
+
+You have to rebuild packages to have all the functionality available
+to master scripts. You do it with a following command.
 
 ```bash
 rsuite proj build
@@ -260,34 +299,36 @@ You should see output with the following line
 
 You can add dependencies to external packages in two ways:
 
-1. In  `DESCRIPTION` file in each package
-2. Using `library` or `require` in master scripts.
+1. **Recommended** - using *imports* in `DESCRIPTION` file in each package
+2. **Not recommended** - using `library` or `require` in master scripts.
 
-We **strongly advise** not to use `library` or `require` in master scripts with
-external packages. It is possible but does not give user a full control over 
-version of external package.
+![Editing DESCRIPTION file](media/basic_workflow_step_7a.png "Editing DESCRIPTION file")
 
-To add dependency to external package we will edit file `packages\mypackage\DESCRIPTION` like this
+To add dependency to external package we will edit file
+`packages\mypackage\DESCRIPTION` like below:
 
 ```
 Package: mypackage
 Type: Package
 Title: What the package does (short line)
 Version: 0.1
-Date: 2017-09-23
-Author: Wit Jakuczun
+Date: 2018-04-25
+Author: WitJakuczun
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
-Depends:
-    logging,
-    data.table (>= 1.10.1)
-RoxygenNote: 5.0.1
+Imports: 
+	logging,
+	data.table (>= 1.10.1)
+RoxygenNote: 6.0.1
 ```
 
 
-I have added line `data.table (>= 1.10.1)` to Depends section. This means I declared that `mypackage`
-depends on `data.table` package in version `1.10.1` or newer. 
+I have added line `data.table (>= 1.10.1)` to Depends section. This
+means I declared that `mypackage` depends on `data.table` package in
+version `1.10.1` or newer.
+
+![Rebuilding packages](media/basic_workflow_step_7b.png "Rebuilding packages")
 
 Lets rebuild package to have master scripts see the changes
 
@@ -304,8 +345,11 @@ ERROR: Some dependencies are not installed in project env: data.table. Please, i
 
 You can conclude that you have to install dependencies to build your package.
 
-
 # Step 8 - install dependencies
+
+![Installing R Suite project
+dependencies](media/basic_workflow_step_8.png "Installing R Suite
+project dependencies")
 
 To install dependecies you have to issue the following command:
 
@@ -316,16 +360,17 @@ rsuite proj depsinst
 You should see the following output
 
 ```
-2017-09-23 17:12:38 INFO:rsuite:Detecting repositories (for R 3.3)...
+2017-09-23 17:12:38 INFO:rsuite:Detecting repositories (for R 3.4)...
 2017-09-23 17:12:39 INFO:rsuite:Will look for dependencies in ...
-2017-09-23 17:12:39 INFO:rsuite:.          MRAN#1 = http://mran.microsoft.com/snapshot/2017-09-23 (win.binary, source)
-2017-09-23 17:12:39 INFO:rsuite:Collecting project dependencies (for R 3.3)...
-2017-09-23 17:12:39 INFO:rsuite:Resolving dependencies (for R 3.3)...
+2017-09-23 17:12:39 INFO:rsuite:.          MRAN#1 = http://mran.microsoft.com/snapshot/2018-04-18 (win.binary, source)
+2017-09-23 17:12:39 INFO:rsuite:Collecting project dependencies (for R 3.4)...
+2017-09-23 17:12:39 INFO:rsuite:Resolving dependencies (for R 3.4)...
 2017-09-23 17:12:46 INFO:rsuite:Detected 1 dependencies to install. Installing...
 2017-09-23 17:12:51 INFO:rsuite:All dependencies successfully installed.
 ```
 
-From this output you can see that we use `MRAN` as package repository. Moreover R Suite detected 1 dependency to be installed.
+From this output you can see that we use `MRAN` as package
+repository. Moreover R Suite detected 1 dependency to be installed. 
 
 You can check if installation succedded by issuing the following command
 
@@ -336,7 +381,7 @@ rsuite proj build
 The output you should see if everything worked
 
 ```
-2017-09-23 17:18:23 INFO:rsuite:Installing mypackage (for R 3.3) ...
+2017-09-23 17:18:23 INFO:rsuite:Installing mypackage (for R 3.4) ...
 2017-09-23 17:18:28 INFO:rsuite:Successfuly build 1 packages
 ```
 
@@ -589,7 +634,7 @@ rsuite proj build
 You should see the following output
 
 ```
-2017-09-23 17:44:20 INFO:rsuite:Installing mypackage (for R 3.3) ...
+2017-09-23 17:44:20 INFO:rsuite:Installing mypackage (for R 3.4) ...
 2017-09-23 17:44:25 INFO:rsuite:Successfuly build 1 packages
 ```
 
@@ -608,7 +653,7 @@ rsuite proj zip --version=1.0
 The output should be like this
 
 ```
-2017-09-23 17:49:01 INFO:rsuite:Installing mypackage (for R 3.3) ...
+2017-09-23 17:49:01 INFO:rsuite:Installing mypackage (for R 3.4) ...
 2017-09-23 17:49:06 INFO:rsuite:Successfuly build 1 packages
 2017-09-23 17:49:06 INFO:rsuite:Preparing files for zipping...
 2017-09-23 17:49:07 INFO:rsuite:... done. Creating zip file my_project_1.0x.zip ...
