@@ -1,2 +1,2 @@
-packages/RSuite/inst/extdata/sysreqs/* linguist-vendored
-docs/* linguist-documentation
+* linguist-vendored
+*.R linguist-vendored=false
