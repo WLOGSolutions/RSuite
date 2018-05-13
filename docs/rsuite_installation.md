@@ -30,11 +30,16 @@ On Debian like systems (Debian/Ubuntu) you can install them executing:
 $ sudo apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev
 ```
 
+**Important:** If you are installing using RSuite CLI (see below) the
+required dependencies are installed automatically.
+
 # Installation with help of RSuite CLI [Recommended]
+
+![Installing R Suite with R Suite CLI](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuite_install_with_cli.png "Installing R Suite with R Suite CLI")
 
 If you have RSuite CLI installed (check [RSuite CLI installation
 reference](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
-"RSuite CLI installation reference.") already you can use it to
+"RSuite CLI installation reference.")) already you can use it to
 install latest compatible version of RSuite. Just execute following
 command in you shell:
 
