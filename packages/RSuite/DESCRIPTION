@@ -1,12 +1,12 @@
 Package: RSuite
 Type: Package
-Title: Supports developing, building and deploying R solution
+Title: Supports Developing, Building and Deploying R Solution
 Version: 0.25
 Date: 2018-04-23
 Author: WLOG Solutions
-Maintainer: WLOG Solutions <info@wlogsolutions.com>
+Maintainer: Walerian Sokolowski <info@wlogsolutions.com>
 Description: The main package purpose is to support safe and supportable 
-  solutions development in R. It will help you with enviroment separation per
+  solutions development in R. It will help you with environment separation per
   project, dependency management, local packages creation and preparing 
   deployment packs for you solutions.
 License: MIT + file LICENSE
