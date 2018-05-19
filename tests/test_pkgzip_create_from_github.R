@@ -16,7 +16,7 @@ test_that_managed("Create PKGZIP out of sources on GitHub (basic)", {
   prj <- init_test_project(repo_adapters = c("CRAN"))
   pkgzip <- init_test_pkgzip()
 
-  RSuite::pkgzip_build_github_package("Azure/rAzureBatch",
+  RSuite::pkgzip_build_github_package("Azure/rAzureBatch@v0.5.7",
                                       prj = prj, pkg_type = "source", path = pkgzip$path)
 
   expect_that_pkgzip_contains("rAzureBatch", type = "source", pkgzip = pkgzip)
@@ -26,7 +26,7 @@ test_that_managed("Create PKGZIP out of sources on GitHub (with deps)", {
   prj <- init_test_project(repo_adapters = c("CRAN"))
   pkgzip <- init_test_pkgzip()
 
-  RSuite::pkgzip_build_github_package("Azure/rAzureBatch",
+  RSuite::pkgzip_build_github_package("Azure/rAzureBatch@v0.5.7",
                                       prj = prj, pkg_type = "source", path = pkgzip$path,
                                       with_deps = T)
 

@@ -11,6 +11,7 @@ R Suite was developed by [WLOG Solutions](http://wlogsolutions.com) company to m
 
 # How to use it
 To create project use
+
 ``` bash
 RSuite::prj_start(name = "myproject")
 ```
@@ -32,6 +33,7 @@ Project folder structure is following:
 Then you have project created setwd to anywhere inside it.
 
 To create package inside your project simply run:
+
 ``` bash
 RSuite::prj_start_package(name = "mypackage")
 ```
@@ -70,6 +72,7 @@ Master scripts are required for "glue logic" like read configuration parameters,
 solution functionality stack.
 
 After all you can prepare your solution for deployment:
+
 ``` bash
 RSuite::prj_zip()
 ```
@@ -82,6 +85,7 @@ For more information check R Suite's [official webpage](http://rsuite.io)!
 
 # How to install it
 Just run 
+
 ``` bash
 install.packages('RSuite')
 ```
