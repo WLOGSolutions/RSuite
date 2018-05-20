@@ -226,7 +226,8 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
                          rscript_arg("dir", libpath),
                          paste(bld_args, collapse = ", "),
                          rscript_arg("file", ou_file),
-                         rver = rver)
+                         rver = rver,
+                         ex_libpath = sboxpath)
   if (!is.null(bld_res)) {
     if (bld_res == FALSE) {
       pkg_logwarn("Building of %s aborted", pkg_name)

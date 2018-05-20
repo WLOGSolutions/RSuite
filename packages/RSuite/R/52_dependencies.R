@@ -75,7 +75,7 @@ collect_prj_support_pkgs <- function(params) {
                             FUN = function(pkg_dir) {
                               pkg_path <- file.path(params$pkgs_path, pkg_dir)
                               if (!requires_roxygen(pkg_path)) {
-                                return()
+                                return("devtools") # still requires devtools
                               }
 
                               desc_file <- file.path(pkg_path, "DESCRIPTION")
@@ -83,7 +83,7 @@ collect_prj_support_pkgs <- function(params) {
 
                               desc <- read.dcf(desc_file)
                               if (!('RoxygenExtraRoclets' %in% colnames(desc))) {
-                                return("roxygen2")
+                                return(c("devtools", "roxygen2"))
                               }
 
                               roclets <- trimws(strsplit(desc[1, 'RoxygenExtraRoclets'], ", ")[1])
@@ -94,7 +94,7 @@ collect_prj_support_pkgs <- function(params) {
                                       pkg_dir, paste(unspec_roclets, collapse = ", "))
 
                               roc_pkgs <- gsub("^([a-zA-Z]+)::.+$", "\\1", roclets)
-                              return(c("roxygen2", roc_pkgs))
+                              return(c("devtools", "roxygen2", roc_pkgs))
                             }))
   sup_vers <- vers.build(unique(sup_pkgs))
   return(sup_vers)

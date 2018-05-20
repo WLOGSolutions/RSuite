@@ -140,18 +140,21 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
 
   cmd0 <- get_rscript_path(rver = ifelse(is.na(rver), current_rver(), rver)) # from 97_rversion.R
 
-  libs <- c(ex_libpath, .libPaths())
-  libs <- libs[-length(libs)] # last is always .Library
+  old_libs_user <- Sys.getenv('R_LIBS_USER')
+  Sys.unsetenv('R_LIBS_USER') # required to prevent Rscript detecting own user libraries
+  on.exit({ Sys.setenv(R_LIBS_USER = old_libs_user) }, add = TRUE)
 
   script <- sprintf(paste0(".Library <- NULL;",
-                           ".libPaths(%s);",
+                           ".libPaths(c(%s, Sys.getenv('R_LIBS_USER'), .Library.site));",
+                           "cat('Lib paths:\\n');",
+                           "void <- lapply(.libPaths(), function(lp) { cat(paste0('\\t', lp, '\\n')) });",
                            "tryCatch({",
                            "  suppressWarnings({ %s });",
                            "  cat(sprintf('~ done\\n'))",
                            "}, error = function(e) {",
                            "  cat(sprintf('~ error:%%s\\n', e))",
                            "})"),
-                    rscript_arg("new", rsuite_fullUnifiedPath(libs)), full_code)
+                    rscript_arg("new", rsuite_fullUnifiedPath(ex_libpath)), full_code)
 
   rscript_cmd <- paste(cmd0, "--no-init-file", "--no-site-file", "-e", shQuote(script), "2>&1")
   log_fun <- if(log_debug) { pkg_logdebug } else { pkg_logfinest }

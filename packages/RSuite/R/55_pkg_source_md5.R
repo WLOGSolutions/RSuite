@@ -8,8 +8,6 @@
 #'
 #' Checks if packages sources have been changed since last check.
 #'
-#' It caches check results for subsequent builds.
-#'
 #' @param pkg_dir name of package folder. (type: character)
 #' @param params project parameters package belongs to.
 #' @param pkg_type check for the package type.
@@ -35,7 +33,6 @@ has_package_changed <- function(pkg_dir, params, pkg_type) {
   curr_md5 <- collect_pkg_source_md5(pkg_path)
   if (!file.exists(md5_fpath)) {
     pkg_logfinest("... no cached package md5 sums detected")
-    saveRDS(curr_md5, file = md5_fpath)
     return(TRUE)
   }
 
@@ -50,8 +47,29 @@ has_package_changed <- function(pkg_dir, params, pkg_type) {
   }
 
   pkg_logfinest(sprintf("... changes detected in %s", changes$file))
-  saveRDS(curr_md5, file = md5_fpath)
   return(TRUE)
+}
+
+#'
+#' Saves package it's md5 sums for later checks if it has changed.
+#'
+#' @param pkg_dir name of package folder. (type: character)
+#' @param params project parameters package belongs to.
+#' @param pkg_type check for the package type.
+#'
+#' @keywords  internal
+#' @noRd
+#'
+save_package_m5sums <- function(pkg_dir, params, pkg_type) {
+  contrib_url <- rsuite_contrib_url(params$get_intern_repo_path(), pkg_type, params$r_ver)
+  pkg_path <- file.path(params$pkgs_path, pkg_dir)
+
+  build_name <- get_package_build_name(pkg_path, pkg_type)
+  stopifnot(file.exists(file.path(contrib_url, build_name))) # package file should exist
+
+  md5_fpath <- file.path(contrib_url, gsub("^(.+)[.](tar[.]gz|tgz|zip)$", ".\\1.md5src.rds", build_name))
+  curr_md5 <- collect_pkg_source_md5(pkg_path)
+  saveRDS(curr_md5, file = md5_fpath)
 }
 
 #'

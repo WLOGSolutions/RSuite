@@ -95,6 +95,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
         next # Failed to build package
       }
       rsuite_write_PACKAGES(contrib_url, build_type)
+      save_package_m5sums(pkg_dir, params, build_type) # from 55_pkg_source_md5.R - for later checks
     } else {
       pkg_file <- file.path(contrib_url, get_package_build_name(pkg_path, build_type))
       pkg_loginfo("... not changed; installing previously built %s.", pkg_file)

@@ -104,6 +104,9 @@ rsuite_write_PACKAGES <- function(url, type) {
 #' @noRd
 #'
 rsuite_fullUnifiedPath <- function(path) {
+  if (is.null(path) || length(path) == 0) {
+    return(c())
+  }
   path <- suppressWarnings(normalizePath(path))
   if (.Platform$OS.type == "windows") {
     path <- suppressWarnings(utils::shortPathName(path))
