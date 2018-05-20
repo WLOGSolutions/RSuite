@@ -140,7 +140,7 @@ get_installed_packages <- function(ex_liblocs, rver) {
     if (get_result == FALSE) {
       pkg_logwarn("Get installed aborted")
     } else {
-      pkg_logwarn("Get installed failed: %s", build_result)
+      pkg_logwarn("Get installed failed: %s", get_result)
     }
 
     installed <- as.data.frame(utils::installed.packages(lib.loc = ex_liblocs), stringsAsFactors = F)[, c("Package", "Version", "Built")]
