@@ -554,7 +554,7 @@ rsuite docker zip --sh "apt-get install -y libglpk-dev"
 ```
 * `--dont-rm` If passed, container used to build the project will not be removed after command finished. If not passed container used to build project 
    will be removed even if project building fails. Option is usefull if you want to detect reasons for failure.
-* `--packages` Accepts comma separated list of project packages to include in prject build. If not passed all project packages will be included. Option 
+* `--packages` Accepts comma separated list of project packages to include in project build. If not passed all project packages will be included. Option 
    is usefull if your solution consists of number of images and only some packages must be present on some of them.
 * `--exc-master` If passed, generated deployment zip will not contain any master scripts. It is usefull if master scripts depend on some glue packages 
    which you do not want to be present in deployment zip package.
