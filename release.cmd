@@ -21,10 +21,10 @@ echo Building/uploading RSuite tag %gitver% onto S3 repository ... done
 
 
 echo Building/uploading RSuite CLI tag %gitver% MSI onto S3 repository ...
-pushd cli\WiX 
+pushd cli\WiX
 
-del *.msi 2> nul 
-call build.cmd 
+del *.msi 2> nul
+call build.cmd
 
 FOR /R %%F IN (RSuiteCLI_v*.%gitver%_x64.msi) DO set msi_x64=%%~nxF
 IF "%msi_x64%" == "" (
@@ -111,7 +111,7 @@ IF ERRORLEVEL 1 goto error
 echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ... done
 del "%pkg_index%" 2> nul
 
-
+set zip=
 echo All done.
 exit /B 0
 
@@ -119,5 +119,6 @@ exit /B 0
 popd
 
 :error
+set zip=
 echo Failed.
 exit /B 1
