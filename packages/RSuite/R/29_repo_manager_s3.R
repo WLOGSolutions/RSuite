@@ -25,7 +25,7 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
          paste0("Invalid url specified.",
                 " Amazon S3 url should have <schema>://<bucket>.s3.amazonaws.com/<path> form;",
                 " Url does not have required form: %s"), url)
-  assert((is.na(rver) && all(types == "source")) || is_nonempty_char1(rver),
+  assert( (is.na(rver) && all(types == "source")) || is_nonempty_char1(rver),
          "Non empty character(1) expected for rver")
 
   if (is.null(s3_profile)) {
@@ -56,7 +56,8 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
                                   "%s s3 --profile=%s cp %s %s",
                                   aws_cmd, s3_profile, tmp_file, bucket_url)
     upl_success <- any(grepl("^upload: ", upl_lines))
-  }, finally = {
+  },
+  finally = {
     unlink(tmp_file, force = T)
   })
 
@@ -116,7 +117,7 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
 
   # detect which types must be initialized
   tryCatch({
-    for(tp in types) {
+    for (tp in types) {
       s3_pkgs_url <- paste0(
         rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver),
         "/PACKAGES")
@@ -132,7 +133,8 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
         inited_types <- c(inited_types, tp)
       }
     }
-  }, finally = {
+  },
+  finally = {
     unlink(tmp_file, force = T)
   })
 
@@ -162,7 +164,8 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
 
     pkg_loginfo("Initializing %s for %s types ... done",
                 repo_manager$bucket_url, paste(types, collapse = ", "))
-  }, finally = {
+  },
+  finally = {
     unlink(tmp_dir, recursive = T, force = T)
   })
 
@@ -182,7 +185,7 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
   }
   rver <- repo_manager$rver
 
-  for(tp in types) {
+  for (tp in types) {
     src_path <- rsuite_contrib_url(src_dir, type = tp, rver = rver)
     if (!dir.exists(src_path)) {
       pkg_logdebug("No package files found in %s.", src_path)
@@ -226,7 +229,8 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
     pkgsgz_con <- gzfile(file.path(src_path, "PACKAGES.gz"), "wt")
     tryCatch({
       write.dcf(pkgs_dcf, file = pkgsgz_con)
-    }, finally = close(pkgsgz_con))
+    },
+    finally = close(pkgsgz_con))
 
     dst_url <- rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver)
     pkg_loginfo("... done; synchronizing to %s ...", dst_url)
@@ -265,8 +269,12 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
   dcf1 <- as.data.frame(dcf1, stringsAsFactors = F)
   dcf2 <- as.data.frame(dcf2, stringsAsFactors = F)
 
-  if (!nrow(dcf1)) { return(dcf2) }
-  if (!nrow(dcf2)) { return(dcf1) }
+  if (!nrow(dcf1)) {
+    return(dcf2)
+  }
+  if (!nrow(dcf2)) {
+    return(dcf1)
+  }
 
   cols <- union(colnames(dcf1), colnames(dcf2))
   if (length(setdiff(cols, colnames(dcf1))) > 0) {
@@ -329,7 +337,8 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
   pkgsgz_con <- gzfile(file.path(tmp_dir, "PACKAGES.gz"), "wt")
   tryCatch({
     write.dcf(left_pkgs_dcf, file = pkgsgz_con)
-  }, finally = close(pkgsgz_con))
+  },
+  finally = close(pkgsgz_con))
 
   pkg_loginfo("... done; synchronizing PACKAGES to %s ...", dst_url)
 
@@ -370,5 +379,3 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
 repo_manager_destroy.rsuite_repo_manager_s3 <- function(repo_manager) {
   # noop
 }
-
-

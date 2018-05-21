@@ -16,7 +16,7 @@ detect_prj_path <- function(path) {
   stopifnot(dir.exists(path))
 
   prj_path <- normalizePath(path)
-  while(!file.exists(file.path(prj_path, "PARAMETERS"))) {
+  while (!file.exists(file.path(prj_path, "PARAMETERS"))) {
     parent_path <- dirname(prj_path)
     assert(parent_path != prj_path, "Failed to detect project base folder from %s", path)
     prj_path <- parent_path
@@ -43,7 +43,8 @@ safe_get_prj <- function(prj, prj_param_name = "prj") {
   }
   prj <- tryCatch({
     prj_init()
-  }, error = function(e) {
+  },
+  error = function(e) {
     NULL
   })
 
@@ -101,7 +102,7 @@ prj_init <- function(path = getwd()) {
     },
     path = prj_path
   )
-  class(prj) <- 'rsuite_project'
+  class(prj) <- "rsuite_project"
 
   prj <- register_prj(prj)
   invisible(prj)
@@ -116,7 +117,7 @@ prj_init <- function(path = getwd()) {
 #' @export
 #'
 is_prj <- function(prj) {
-  class(prj) == 'rsuite_project'
+  class(prj) == "rsuite_project"
 }
 
 #'
@@ -480,7 +481,10 @@ prj_pack <- function(prj = NULL, path = getwd(),
   ver_inf <- detect_zip_version(params, pack_ver) # from 15_zip_project.R
 
   tmp_dir <- tempfile("pkgpack_")
-  on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
+  on.exit({
+      unlink(tmp_dir, recursive = T, force = T)
+  },
+  add = T)
 
   exp_params <- export_prj(params, # from 19_pack_helpers.R
                            rver,

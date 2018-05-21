@@ -44,7 +44,7 @@ home_bkp <- Sys.getenv("HOME")
 curr_dir <- shortPathName(normalizePath("."))
 if (dir.exists(file.path(curr_dir, ".aws"))) {
   logging::loginfo("Setting HOME to %s", curr_dir)
-  Sys.setenv(HOME=curr_dir)
+  Sys.setenv(HOME = curr_dir)
 } else if (!is.null(home_bkp) && !dir.exists(file.path(home_bkp, ".aws"))) {
   logging::loginfo("Unsetting HOME as it does not contain .aws credentials")
   Sys.unsetenv("HOME")
@@ -56,9 +56,11 @@ tryCatch({
     RSuite::repo_upload_prj_package("S3",
                                     pkg = NULL, # all project packages
                                     binary = binary)
-  }, finally = {
+  },
+  finally = {
     RSuite::repo_mng_stop(mgr)
   })
-}, finally = {
+},
+finally = {
   Sys.setenv(HOME = home_bkp)
 })

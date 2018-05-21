@@ -32,16 +32,22 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
 
   tmp_path <- tempfile("src_build_temp")
   cont_dir <- rsuite_contrib_url(tmp_path, pkg_type, rver)
-  dir.create(cont_dir, recursive = T, showWarnings = F)
-  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+  dir.create(cont_dir, recursive = TRUE, showWarnings = FALSE)
+  on.exit({
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   dloaded <- pkg_download(avail_pkgs, dest_dir = cont_dir)
 
   # prepare project to build packages
   bld_prj <- prj_start(name = basename(tempfile(pattern = "srcrepo_proj_")),
                        path = tempdir(),
-                       skip_rc = T)
-  on.exit({ unlink(bld_prj$path, recursive = T, force = T) }, add = TRUE)
+                       skip_rc = TRUE)
+  on.exit({
+    unlink(bld_prj$path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   prj_config_set_rversion(rver = rver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
@@ -51,13 +57,14 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
   lapply(X = dloaded$Path,
          FUN = function(src_archive) {
            if (grepl("[.]zip$", src_archive)) {
-             utils::unzip(src_archive, exdir=bld_params$pkgs_path)
+             utils::unzip(src_archive, exdir = bld_params$pkgs_path)
            } else {
-             utils::untar(src_archive, exdir=bld_params$pkgs_path)
+             utils::untar(src_archive, exdir = bld_params$pkgs_path)
            }
          })
 
-  unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = T),  force = T) # not to include default packages
+  # not to include default packages
+  unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = TRUE),  force = TRUE)
   prj_install_deps(bld_prj) # build environment
 
   # build packages itself
@@ -81,4 +88,3 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
   pkg_loginfo("===> Building %s source packages into %s type: %s ... done",
               nrow(avail_pkgs$Package), pkg_type, paste(avail_pkgs$Package, collapse = ", "))
 }
-

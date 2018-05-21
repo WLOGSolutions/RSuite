@@ -102,7 +102,8 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
            && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
+           paste("character(N) expected for skip_build_steps containing entities",
+                 "spec, docs, imps, tests, rcpp_attribs or vignettes"))
   }
 
   prj <- safe_get_prj(prj)
@@ -149,7 +150,10 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
                                     skip_build_steps = skip_build_steps)
 
   tmp_path <- tempfile("pkgzip_temp_repo")
-  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+  on.exit({
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   temp_repo_prepare(avail_vers, tmp_path, pkg_type, params) # from 18_repo_helpers.R
   temp_repo_copy_proj_pkgs(pkgs, tmp_path, pkg_type, params) # from 18_repo_helpers.R
@@ -200,7 +204,7 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
   tmp_path <- tempfile("pkgzip_temp_repo")
   tryCatch({
     rvers <- unique(pkg_infos$RVersion)
-    for(rver in rvers) {
+    for (rver in rvers) {
       rver_infos <- pkg_infos[pkg_infos$RVersion == rver, ]
       rver_types <- unique(rver_infos$Type)
 
@@ -209,7 +213,7 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
       tmp_mgr <- repo_manager_dir_create(tmp_path, rver_types, rver)
       repo_manager_init(tmp_mgr)
 
-      for(tp in rver_types) {
+      for (tp in rver_types) {
         dest_path <- rsuite_contrib_url(tmp_path, tp, rver)
 
         rver_tp_files <- pkg_infos[pkg_infos$Type == tp & pkg_infos$RVersion == rver, ]$File
@@ -229,7 +233,8 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 
     pkg_loginfo("Zip file created: %s", zip_file_path)
     return(invisible(zip_file_path))
-  }, finally = {
+  },
+  finally = {
     unlink(tmp_path, recursive = T, force = T)
   })
 }
@@ -299,7 +304,10 @@ pkgzip_build_ext_packages <- function(pkgs,
   }
 
   tmp_path <- tempfile("pkgzip_temp_repo")
-  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+  on.exit({
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   temp_repo_prepare(avail_vers, tmp_path, pkg_type, params) # from 18_repo_helpers.R
   temp_repo_write_PACKAGES(tmp_path, pkg_type, rver = params$r_ver) # from 18_repo_helpers.R
@@ -376,7 +384,8 @@ pkgzip_build_github_package <- function(repo, ...,
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
            && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
+           paste("character(N) expected for skip_build_steps containing entities",
+                 "spec, docs, imps, tests, rcpp_attribs or vignettes"))
   }
   assert(is.logical(keep_sources), "logical expected for keep_sources")
 
@@ -387,7 +396,10 @@ pkgzip_build_github_package <- function(repo, ...,
 
   bld_prj_path <- tempfile(pattern = "srcrepo_proj_")
   if (!any(keep_sources)) {
-    on.exit({ unlink(bld_prj_path, recursive = T, force = T) }, add = TRUE)
+    on.exit({
+      unlink(bld_prj_path, recursive = T, force = T)
+    },
+    add = TRUE)
   } else {
     bld_prj_path <- file.path(dirname(dirname(bld_prj_path)), basename(bld_prj_path))
     pkg_loginfo("Will keep build project sources at %s", bld_prj_path)
@@ -403,10 +415,12 @@ pkgzip_build_github_package <- function(repo, ...,
   pkg_info <- get_srcrepo_package(bld_prj, "github", repo, ...)
 
   bld_params <- bld_prj$load_params()
-  unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = T),  force = T) # not to include default packages
+
+  # not to include default packages
+  unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = T), force = TRUE)
   prj_install_deps(bld_prj)
 
-  pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_info$dir, "DESCRIPTION"))[1, 'Version']
+  pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_info$dir, "DESCRIPTION"))[1, "Version"]
 
   pkgzip_build_prj_packages(pkgs = pkg_info$name, prj = bld_prj,
                             zip_ver = pkg_ver, pkg_type = pkg_type, path = path,

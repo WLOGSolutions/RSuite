@@ -99,7 +99,7 @@ make_detached_repos <- function(params) {
     return(urls)
   }
 
-  for(ix in 1:length(ra_names)) {
+  for (ix in 1:length(ra_names)) {
     ra_name <- ra_names[[ix]]
     repo_adapter <- find_repo_adapter(ra_name)
     if (is.null(repo_adapter)) {
@@ -134,7 +134,7 @@ get_all_repo_infos <- function(params, rver = NULL) {
 
   non_reliable <- c()
   seen_adapters <- list()
-  for(ix in 1:length(ra_names)) {
+  for (ix in 1:length(ra_names)) {
     ra_name <- ra_names[ix]
     if (!(ra_name %in% names(seen_adapters))) {
       repo_adapter <- find_repo_adapter(ra_name)
@@ -161,8 +161,11 @@ get_all_repo_infos <- function(params, rver = NULL) {
 
     repo_path <- repo_adapter_get_path(repo_adapter, params, ix)
     if (is.null(names(repo_path))) {
-      if (length(repo_path) == 1) { names(repo_path) <- sprintf("%s#%s", ra_name, ix) }
-      else { names(repo_path) <- sprintf("%s#%s", paste0(ra_name, 1:length(repo_path)), ix) }
+      if (length(repo_path) == 1) {
+        names(repo_path) <- sprintf("%s#%s", ra_name, ix)
+      } else {
+        names(repo_path) <- sprintf("%s#%s", paste0(ra_name, 1:length(repo_path)), ix)
+      }
     }
 
     repos <- c(repos,
@@ -195,7 +198,7 @@ get_all_repo_infos <- function(params, rver = NULL) {
 #' @noRd
 #'
 build_repo_infos <- function(spec, types, rver) {
-  result <- lapply(X = spec, FUN = function(path) { .create_repo_info(path, types, rver) })
+  result <- lapply(X = spec, FUN = function(path) .create_repo_info(path, types, rver))
   names(result) <- names(spec)
   return(result)
 }
@@ -208,7 +211,7 @@ build_repo_infos <- function(spec, types, rver) {
 #'
 log_repo_infos <- function(repo_infos) {
   pkg_loginfo("Will look for dependencies in ...")
-  for(n in names(repo_infos)) {
+  for (n in names(repo_infos)) {
     pkg_loginfo(".      %10s = %s", n, repo_infos[[n]]$to_str())
   }
 }
@@ -226,7 +229,7 @@ log_repo_infos <- function(repo_infos) {
 #'
 retrieve_contrib_urls <- function(repo_infos, type) {
   result <- unlist(lapply(X = repo_infos,
-                          FUN = function(ri) { ri$get_contrib_url(type) }))
+                          FUN = function(ri) ri$get_contrib_url(type)))
   return(result)
 }
 
@@ -280,7 +283,8 @@ get_curl_available_packages <- function(contrib_url) {
   if (!dir.exists(cache_dir) && !dir.create(cache_dir, recursive = TRUE)) {
     curl2cfile <- as.list(rep("", length(contrib_url)))
     names(curl2cfile) <- contrib_url
-  } else { # local repositories are not cached
+  } else {
+    # local repositories are not cached
     noncache_curl <- contrib_url[grepl("^file://", contrib_url)]
     curl2cfile <- as.list(rep("", length(noncache_curl)))
 
@@ -307,12 +311,11 @@ get_curl_available_packages <- function(contrib_url) {
                          # try to read it from cache
                          pkgs <- tryCatch({
                            readRDS(cfile)
-                         }, error = function(e) {
-                           data.frame()
-                         })
+                         },
+                         error = function(e) data.frame())
 
                          if (nrow(pkgs) > 0) {
-                          return(pkgs)
+                           return(pkgs)
                          }
                        }
 
@@ -339,10 +342,12 @@ get_curl_available_packages <- function(contrib_url) {
                            try({
                              saveRDS(pkgs, file = cfile)
                              pkg_logdebug("Availables from %s cached.", curl)
-                           }, silent = T)
+                           },
+                           silent = T)
                          }
                          pkgs
-                       }, error = function(e) { NULL })
+                       },
+                       error = function(e) NULL)
 
                        return(res)
                      })
@@ -370,12 +375,13 @@ clear_available_packages_cache <- function(path, type, rver) {
 
   # remove R cache
   r_cache_file <- file.path(tempdir(), paste0("repos_", utils::URLencode(contrib_url, TRUE), ".rds"))
-  unlink(r_cache_file, force = T)
+  unlink(r_cache_file, force = TRUE)
 
   cache_dir <- file.path(Sys.getenv("HOME"), ".rsuite", "repos_cache")
   if (dir.exists(cache_dir)
-      && !grepl("^file://", path)) { # repository is not local
+      && !grepl("^file://", # repository is not local
+                path)) {
     cache_file <- file.path(cache_dir, paste0(utils::URLencode(contrib_url, TRUE), ".rds"))
-    unlink(cache_file, force = T)
+    unlink(cache_file, force = TRUE)
   }
 }

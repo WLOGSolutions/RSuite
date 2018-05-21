@@ -26,9 +26,9 @@ if (any(grepl("--verbose", args))) {
 }
 
 # Getting version
-verArgs <- grepl("^-v([0-9]+)([\\._-][0-9]+)*$", args)
-if (any(verArgs)) {
-  zip_ver <- sub("^-v", "", args[verArgs][[1]])
+ver_args <- grepl("^-v([0-9]+)([\\._-][0-9]+)*$", args)
+if (any(ver_args)) {
+  zip_ver <- sub("^-v", "", args[ver_args][[1]])
 } else {
   zip_ver <- NULL
 }

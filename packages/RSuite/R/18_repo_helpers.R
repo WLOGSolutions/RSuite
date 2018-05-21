@@ -201,4 +201,3 @@ temp_repo_write_PACKAGES <- function(tmp_path, pkg_type, rver = NULL) {
   dest_curl <- rsuite_contrib_url(tmp_path, pkg_type, rver = rver)
   rsuite_write_PACKAGES(dest_curl, type = pkg_type)
 }
-

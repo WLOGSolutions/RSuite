@@ -19,23 +19,23 @@ repo_adapter_create_cran <- function(name) {
   result <- repo_adapter_create_base(name)
 
   local_env <- new.env()
-  assign('path', NULL, envir = local_env)
+  assign("path", NULL, envir = local_env)
   result$get_repo_path <- function() {
-    path <- get('path', envir = local_env)
+    path <- get("path", envir = local_env)
     if (!is.null(path)) {
       return(path)
     }
-    path <- getOption('repos') # This can point to CRAN mirror
-    if ('@CRAN@' %in% path) {
+    path <- getOption("repos") # This can point to CRAN mirror
+    if ("@CRAN@" %in% path) {
       # it sometimes contains just placeholder for URL '@CRAN@'
       #   replace it with first mirror URL in the case
       path <- utils::getCRANmirrors()$URL[[1]]
     }
     stopifnot(!is.null(path))
-    assign('path', path, envir = local_env)
+    assign("path", path, envir = local_env)
     return(path)
   }
-  class(result) <- c('rsuite_repo_adapter_cran', class(result))
+  class(result) <- c("rsuite_repo_adapter_cran", class(result))
   return(result)
 }
 
@@ -76,4 +76,3 @@ repo_adapter_get_path.rsuite_repo_adapter_cran <- function(repo_adapter, params,
 repo_adapter_create_manager.rsuite_repo_adapter_cran <- function(repo_adapter, ...) {
   assert(FALSE, "CRAN is readonly and cannot be managed")
 }
-

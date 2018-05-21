@@ -49,7 +49,9 @@ export_prj <- function(params, rver, pkgs, inc_master, dest_dir) {
   }
 
   success <- unlist(lapply(file.path(base_dir, "deployment", c("libs", "sbox")),
-                           function(d) { dir.create(d, recursive = T, showWarnings = F) }))
+                           function(d) {
+                             dir.create(d, recursive = TRUE, showWarnings = FALSE)
+                           }))
   if (!all(success)) {
     pkg_logwarn("Failed to create deployment folder structure in export folder")
     return()

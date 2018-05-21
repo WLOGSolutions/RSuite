@@ -21,7 +21,7 @@ rc_adapter_create_base <- function(name) {
          "Adapter name cannot contain whitespaces or comma.")
 
   result <- list(name = name)
-  class(result) <- 'rsuite_rc_adapter'
+  class(result) <- "rsuite_rc_adapter"
   return(result)
 }
 

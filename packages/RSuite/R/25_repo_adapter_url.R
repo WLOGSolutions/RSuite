@@ -17,7 +17,7 @@
 #'
 repo_adapter_create_url <- function(name) {
   result <- repo_adapter_create_base(name)
-  class(result) <- c('rsuite_repo_adapter_url', class(result))
+  class(result) <- c("rsuite_repo_adapter_url", class(result))
   return(result)
 }
 
@@ -53,4 +53,3 @@ repo_adapter_get_path.rsuite_repo_adapter_url <- function(repo_adapter, params, 
          repo_adapter$name, repo_adapter$name)
   return(url)
 }
-

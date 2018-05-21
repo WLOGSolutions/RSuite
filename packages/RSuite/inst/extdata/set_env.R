@@ -21,7 +21,7 @@ log_fpath <- (function() {
   log_dir <- normalizePath(file.path("..", "logs"))
   fpath <- file.path(log_dir, log_file)
   if (file.exists(fpath) && file.access(fpath, 2) == -1) {
-    fpath <- paste0(fpath, ".", Sys.info()[['user']])
+    fpath <- paste0(fpath, ".", Sys.info()[["user"]])
   }
   return(fpath)
 })()
@@ -59,8 +59,8 @@ load_config <- function() {
   }
 
   config <- read.dcf(config_file)
-  if("LogLevel" %in% colnames(config)) {
-    for (hname in names(getLogger()[['handlers']])) {
+  if ("LogLevel" %in% colnames(config)) {
+    for (hname in names(logging::getLogger()[["handlers"]])) {
       logging::setLevel(config[, "LogLevel"], logging::getHandler(hname))
     }
   }
@@ -70,4 +70,3 @@ load_config <- function() {
 
   return(config_lst)
 }
-

@@ -18,14 +18,14 @@ if (any(grepl("--usage", args))) {
 
 message("Detecting repository ...")
 cran_path <- (function() {
-  official_repo_path <- getOption('repos') # This can point to CRAN mirror
-  if ('@CRAN@' %in% official_repo_path) {
+  official_repo_path <- getOption("repos") # This can point to CRAN mirror
+  if ("@CRAN@" %in% official_repo_path) {
     official_repo_path <- getCRANmirrors()$URL[[1]]
   }
   return(official_repo_path)
 })()
 s3_path <- (function() {
-  'http://wlog-rsuite.s3.amazonaws.com'
+  "http://wlog-rsuite.s3.amazonaws.com"
 })()
 
 all_repos <- c(CRAN = cran_path,
@@ -34,7 +34,7 @@ if (is.null(all_repos)) {
   stop("No repositories to look for dependencies in!")
 }
 message("Will use repo(s):")
-for(n in names(all_repos)) {
+for (n in names(all_repos)) {
   message(sprintf("\t%10s = %s", n, all_repos[[n]]))
 }
 
@@ -50,8 +50,8 @@ if (length(required_pkgs)) {
   message(sprintf("Installing %s packages...", length(required_pkgs)))
 
   # Installing stringi is specific if you are building in connectionless environment.
-  #  During instalation it downloads ICUD library which in the case has to be predownloaded and pointed with ICUDR_DIR variable
-  # TODO: pkgSpecificInstall("stringi", .Library, repos = all_repos, quiet = !verbose)
+  #  During instalation it downloads ICUD library which in the case has to be predownloaded
+  #  and pointed with ICUDR_DIR variable
   utils::install.packages(required_pkgs, repos = all_repos, quiet = !verbose)
 
   installed_pkgs <- utils::installed.packages()[, "Package"]

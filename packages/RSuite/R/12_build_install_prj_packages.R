@@ -31,21 +31,21 @@ build_install_tagged_prj_packages <- function(params, revision, build_type,
     bkp_info <- backup_pkgdesc_files(params$pkgs_path) # from 51_pkg_info.R
 
     pkg_revs <- lapply(X = retrieve_project_pkgsvers(params$pkgs_path), # from 51_pkg_info.R
-                       FUN = function(ver) { paste0(ver, "-", revision) })
+                       FUN = function(ver) paste0(ver, "-", revision))
     update_project_pkgsvers(params$pkgs_path, pkg_revs) # from 51_pkg_info.R
 
-    on.exit({ restore_pkgdesc_files(bkp_info) }, add = T)
+    on.exit(restore_pkgdesc_files(bkp_info), add = TRUE)
   }
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path)
 
   # check if environment has to be rebuilt
-  uninstDeps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
-  uninstDeps <- vers.rm(uninstDeps, prj_pkgs)
-  assert(vers.is_empty(uninstDeps),
+  uninst_deps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
+  uninst_deps <- vers.rm(uninst_deps, prj_pkgs)
+  assert(vers.is_empty(uninst_deps),
          paste0("Some dependencies are not installed in project env: %s.",
                 " Please, install dependencies(Call RSuite::prj_install_deps)"),
-         paste(vers.get_names(uninstDeps), collapse = ", "))
+         paste(vers.get_names(uninst_deps), collapse = ", "))
 
   build_install_prj_packages(params, build_type, skip_build_steps, rebuild)
 
@@ -64,7 +64,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
   intern_repo_path <- params$get_intern_repo_path()
   contrib_url <- rsuite_contrib_url(intern_repo_path, type = build_type, rver = params$r_ver)
   if (!dir.exists(contrib_url)) {
-    dir.create(contrib_url, recursive=TRUE)
+    dir.create(contrib_url, recursive = TRUE)
     rsuite_write_PACKAGES(contrib_url, type = build_type)
   }
 
@@ -75,7 +75,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
   }
 
   # Adding packages to repo
-  for(pkg_dir in names(prj_packages)) {
+  for (pkg_dir in names(prj_packages)) {
     pkg_name <- prj_packages[[pkg_dir]]
 
     pkg_loginfo("Installing %s (for R %s) ...", pkg_name, params$r_ver)

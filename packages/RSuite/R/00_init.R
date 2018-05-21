@@ -6,7 +6,7 @@
 #----------------------------------------------------------------------------
 
 .onLoad <- function(libpath, pkgname) {
-  if (length(logging::getLogger()[['handlers']]) == 0) {
+  if (length(logging::getLogger()[["handlers"]]) == 0) {
     logging::addHandler(logging::writeToConsole, level = "FINEST")
   }
 

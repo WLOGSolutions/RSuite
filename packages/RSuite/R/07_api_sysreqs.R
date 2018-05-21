@@ -33,13 +33,16 @@ sysreqs_collect <- function(prj = NULL) {
   pkg_loginfo("Detected %s dependencies. Processing...", length(vers.get_names(avail_vers)))
 
   tmp_dir <- tempfile()
-  dir.create(tmp_dir, recursive = T)
-  on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
+  dir.create(tmp_dir, recursive = TRUE)
+  on.exit({
+    unlink(tmp_dir, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   result <- list()
 
   dloaded <- pkg_download(avail_vers$avails, dest_dir = tmp_dir)
-  for(r in 1:nrow(dloaded)) {
+  for (r in 1:nrow(dloaded)) {
     dl <- dloaded[r, ]
     dcf <- get_pkg_desc(dl$Package, dl$Path) # from 51_pkg_info.R
 
@@ -51,7 +54,7 @@ sysreqs_collect <- function(prj = NULL) {
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   if (length(prj_packages) > 0) {
     pkg_loginfo("Processing project packages...")
-    for(pkg in names(prj_packages)) {
+    for (pkg in names(prj_packages)) {
       dcf <- get_pkg_desc(pkg, file.path(params$pkgs_path, prj_packages[[pkg]])) # from 51_pkg_info.R
 
       if (!is.null(dcf$SystemRequirements)) {

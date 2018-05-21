@@ -37,7 +37,10 @@ pkg_download <- function(avail_pkgs, dest_dir) {
     save(pkgs, file = in_file)
 
     ou_file <- tempfile(fileext = ".RData")
-    on.exit({ unlink(c(in_file, ou_file), force = T) }, add = T)
+    on.exit({
+      unlink(c(in_file, ou_file), force = TRUE)
+    },
+    add = TRUE)
 
     build_result <- run_rscript(c("load(%s)",
                                   "remote_paths <- download.packages(pkgs$Package, available = pkgs, %s)",
@@ -70,16 +73,17 @@ pkg_download <- function(avail_pkgs, dest_dir) {
     cache_exists <- file.exists(cache_files)
     if (!all(cache_exists)) {
       remote_paths <- do_dload(remote_pkgs[!cache_exists, ])
-      remote_paths <- as.data.frame(remote_paths, stringsAsFactors = F)
+      remote_paths <- as.data.frame(remote_paths, stringsAsFactors = FALSE)
       colnames(remote_paths) <- c("Package", "Path")
 
       try({
         # cache them
         suppressWarnings({
-          dir.create(unique(dirname(cache_files[!cache_exists])), recursive = T, showWarnings = F)
-          file.copy(from = remote_paths$Path, to = cache_files[!cache_exists], overwrite = T)
+          dir.create(unique(dirname(cache_files[!cache_exists])), recursive = TRUE, showWarnings = FALSE)
+          file.copy(from = remote_paths$Path, to = cache_files[!cache_exists], overwrite = TRUE)
         })
-      }, silent = T)
+      },
+      silent = TRUE)
     } else {
       remote_paths <- data.frame()
     }
@@ -175,41 +179,49 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
 
   if ("docs" %in% skip_build_steps) {
     pkg_loginfo("Skipping documentation building")
-  } else if (!pkg_build_docs(pkg_name, pkg_path, rver, libpath, sboxpath)) { # from 54_pkg_document.R
+  } else if (!pkg_build_docs(pkg_name, pkg_path, # from 54_pkg_document.R
+                             rver, libpath, sboxpath)) {
     # package without documentation is unuseable due to NAMESPACE is not generated also
     return(NULL)
   }
 
   if ("imps" %in% skip_build_steps) {
     pkg_loginfo("Skipping imports validation")
-  } else if (!validate_package_imports(pkg_name, pkg_path)) {  # from 54_pkg_document.R
+  } else if (!validate_package_imports(pkg_name, # from 54_pkg_document.R
+                                       pkg_path)) {
     return(NULL)
   }
 
-  if ('rcpp_attribs' %in% skip_build_steps) {
+  if ("rcpp_attribs" %in% skip_build_steps) {
     pkg_loginfo("Skipping Rcpp attributes compilation")
-    rcpp_attribs_skip_cmd <- c("assignInNamespace('compile_rcpp_attributes', function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )}, 'devtools')")
+    rcpp_attribs_skip_cmd <- paste("assignInNamespace('compile_rcpp_attributes',",
+                                   " function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )},",
+                                   "'devtools')")
   } else {
     rcpp_attribs_skip_cmd <- c()
   }
 
   vign_cleanup <- NULL
-  if ('vignettes' %in% skip_build_steps) {
+  if ("vignettes" %in% skip_build_steps) {
     pkg_loginfo("Skipping vignettes building")
   } else {
-    vign_cleanup <- pkg_build_vignettes(pkg_path, # from 54_pkg_document.R
+    vign_cleanup <- pkg_build_vignettes(pkg_name, pkg_path, # from 54_pkg_document.R
                                         rver, ex_libpath = c(libpath, sboxpath))
   }
-  on.exit({ if (!is.null(vign_cleanup)) { vign_cleanup() } }, add = TRUE)
+  on.exit({
+    if (!is.null(vign_cleanup)) vign_cleanup()
+  },
+  add = TRUE)
 
   if ("tests" %in% skip_build_steps) {
     pkg_loginfo("Skipping package testing")
   } else if (devtools::uses_testthat(pkg = pkg_path)) {
-    test_res <- run_rscript(c(rcpp_attribs_skip_cmd, # it roughly builds package before testing, so skiping Rcpp here also required
+    # it roughly builds package before testing, so skiping Rcpp here also required
+    test_res <- run_rscript(c(rcpp_attribs_skip_cmd,
                               "test_results <- devtools::test(%s)",
                               "if (!testthat:::all_passed(test_results)) { stop('Tests failed') }"),
                             rscript_arg("pkg", pkg_path),
-                            rver = rver, ex_libpath = libpath)
+                            rver = rver, ex_libpath = c(sboxpath, libpath))
     if (!is.null(test_res)) {
       if (test_res == FALSE) {
         pkg_logwarn("Testing aborted for %s", pkg_name)
@@ -290,7 +302,7 @@ pkg_remove <- function(pkgs, lib_dir) {
 #' @noRd
 #'
 pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
-  common_args <- c(rscript_arg("lib", lib_dir), 'quiet = F')
+  common_args <- c(rscript_arg("lib", lib_dir), "quiet = FALSE")
   if (!missing(type)) {
     common_args <- c(common_args, rscript_arg("type", type))
   }
@@ -334,9 +346,11 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
              # verify if package is built for proper R version
              pkg_rver <- get_package_build_rver(lib_dir, pkg_name)
              if (is.na(pkg_rver) || majmin_rver(pkg_rver) != majmin_rver(rver)) {
-               pkg_logwarn("Package %s is succesfully installed but R version it is build for(%s) is not the one requested(%s).",
+               pkg_logwarn(paste("Package %s is succesfully installed but R version it is build for(%s)",
+                                 "is not the one requested(%s)."),
                            pkg_name, pkg_rver, rver)
-               pkg_logwarn("It is propably cause of inconsistent repository state. Package %s will be deleted as it is unusable.",
+               pkg_logwarn(paste("It is propably cause of inconsistent repository state.",
+                                 "Package %s will be deleted as it is unusable."),
                            pkg_name)
                unlink(pkg_path, recursive = T, force = T)
              }
@@ -366,14 +380,15 @@ load_specifics <- function() {
   lines <- c()
 
   spec_files <- spec_files[file.exists(spec_files)]
-  for(sf in spec_files) {
+  for (sf in spec_files) {
     sf_lines <- readLines(sf)
     sf_lines <- sf_lines[!grepl("^#", sf_lines)]
 
     tryCatch({
       read.dcf(textConnection(sf_lines))
       lines <- c(lines, sf_lines, "")
-    }, error = function(e) {
+    },
+    error = function(e) {
       pkg_logwarn("Failed to read %s: %s", sf, e)
     })
   }
@@ -426,7 +441,7 @@ get_specific_args <- function(pkg_file, spec_desc) {
                                  spec_desc = spec_desc)
 
   collapse_non_na <- function(vals, sep) {
-    vals <- Filter(x = vals, f = function(v) {!is.na(v) })
+    vals <- Filter(x = vals, f = function(v) !is.na(v))
     if (!length(vals)) {
       return(NULL)
     }
@@ -438,7 +453,7 @@ get_specific_args <- function(pkg_file, spec_desc) {
   if (!is.null(env_var_pats)) {
     env_var_pats <- trimws(unlist(strsplit(env_var_pats, split = ",")))
   }
-  for(evp in env_var_pats) {
+  for (evp in env_var_pats) {
     if (!grepl("^[^[]+\\[.+\\]$", evp)) {
       pkg_logwarn("Invalid variable requirement for %s detected: %s", pkg_name, evp)
       next
@@ -448,7 +463,8 @@ get_specific_args <- function(pkg_file, spec_desc) {
 
     match_res <- tryCatch({
       grepl(var_pat, Sys.getenv(var_name))
-    }, error = function(e) {
+    },
+    error = function(e) {
       pkg_logwarn("Invalid variable requirement for %s(var: %s): %s", pkg_name, var_name, e)
       NULL
     })

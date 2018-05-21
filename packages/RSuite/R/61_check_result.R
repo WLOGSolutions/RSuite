@@ -27,7 +27,8 @@ check_res.build <- function(found, missing) {
   }
   stopifnot(is.versions(found))
   if (!vers.is_empty(found)) {
-    stopifnot(found$has_avails() && all(c("Package", "Version", "Repository", "File") %in% colnames(found$get_avails())))
+    stopifnot(found$has_avails()
+              && all(c("Package", "Version", "Repository", "File") %in% colnames(found$get_avails())))
   }
 
   if (base::missing(missing)) {
@@ -39,8 +40,8 @@ check_res.build <- function(found, missing) {
     found = found,
     missing = missing,
 
-    get_found_names = function() { vers.get_names(found) },
-    get_missing_names = function() { vers.get_names(missing) }
+    get_found_names = function() vers.get_names(found),
+    get_missing_names = function() vers.get_names(missing)
   )
   class(res) <- "check_result"
 

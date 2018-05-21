@@ -1,9 +1,14 @@
-# RSuite 0.26 (2018-04-??)
+# RSuite 0.26 (2018-05-??)
   * Saving MD5 sums for package also if it gets build for the first time.
   * #138: Fixes related to project R-cross building. Proper detection of 
      installed packages for Rver. devtools is installed into sbox if not 
      found for Rver required by the project.
   * Handling vignettes building while building package.
+  * testthat moved to Suggested. While building package it is detected that 
+    package requires testthat for testing and it gets installed into sbox.
+    Also other packages required to run tets are detected and installed into
+    sbox. All packages from Suggests field are also installed into sbox as 
+    they are requied to propely check package.
   
 # RSuite 0.25 (2018-04-23)
   * Functionality related to integration with RStutio moved to separate AddIn

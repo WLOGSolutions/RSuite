@@ -6,7 +6,6 @@
 #----------------------------------------------------------------------------
 
 #' @import logging
-#' @import testthat
 #' @import devtools
 #' @import roxygen2
 #' @import git2r

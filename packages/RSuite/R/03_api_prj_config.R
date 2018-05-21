@@ -35,18 +35,18 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
 
   prj <- safe_get_prj(prj)
 
-  params_file <- file.path(prj$path, 'PARAMETERS')
+  params_file <- file.path(prj$path, "PARAMETERS")
   params_dt <- read.dcf(params_file)
   repos_val <- paste(repos, collapse = ", ")
-  if (!('Repositories' %in% colnames(params_dt))) {
+  if (!("Repositories" %in% colnames(params_dt))) {
     params_dt <- cbind(params_dt, data.frame(Repositories = repos_val))
   } else {
-    params_dt[, 'Repositories'] <- repos_val
+    params_dt[, "Repositories"] <- repos_val
   }
   write.dcf(params_dt, file = params_file)
 
   params <- prj$load_params()
-  for(ra_ix in 1:length(ra_specs)) {
+  for (ra_ix in 1:length(ra_specs)) {
     ra_name <- names(ra_specs)[[ra_ix]]
     repo_adapter <- find_repo_adapter(ra_name)
     stopifnot(!is.null(repo_adapter))
@@ -79,21 +79,22 @@ prj_config_set_rversion <- function(rver, prj = NULL, validate = TRUE) {
   if (any(validate)) {
     tryCatch({
       get_rscript_path(rver)
-    }, error = function(e) {
+    },
+    error = function(e) {
       assert(FALSE, "Could not find valid R %s in path", rver)
     })
   }
 
   prj <- safe_get_prj(prj)
 
-  params_file <- file.path(prj$path, 'PARAMETERS')
+  params_file <- file.path(prj$path, "PARAMETERS")
   params_dt <- read.dcf(params_file)
-  if (!('RVersion' %in% colnames(params_dt))) {
+  if (!("RVersion" %in% colnames(params_dt))) {
     params_dt <- cbind(params_dt, data.frame(RVersion = majmin_rver(rver)))
   } else {
-    params_dt[, 'RVersion'] <- majmin_rver(rver)
+    params_dt[, "RVersion"] <- majmin_rver(rver)
   }
   write.dcf(params_dt, file = params_file)
 
-  pkg_loginfo("Package R version set to %s", params_dt[1, 'RVersion'])
+  pkg_loginfo("Package R version set to %s", params_dt[1, "RVersion"])
 }

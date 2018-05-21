@@ -56,7 +56,7 @@ get_rscript_path <- function(rver) {
   candidate_ver <- NA
 
   bin_paths <- get_rscript_search_paths(rscript_cmd)
-  for(b in bin_paths) {
+  for (b in bin_paths) {
     rscript_path <- file.path(b, rscript_cmd)
     stopifnot(file.exists(rscript_path))
 
@@ -64,7 +64,8 @@ get_rscript_path <- function(rver) {
     b_ver <- tryCatch({
       output <- get_cmd_outlines("Rscript detection", "%s --version", rscript_path) # from 98_shell.R
       gsub("^.+ (\\d+\\.\\d+\\.\\d+) .+$", "\\1", output)
-    }, error = function(e) { NA })
+    },
+    error = function(e) NA)
 
     if (is.na(b_ver)) {
       next
@@ -104,12 +105,14 @@ get_rscript_search_paths <- function(rscript_cmd) {
     machine_regs <- tryCatch({
       reg_ents <- unlist(utils::readRegistry("SOFTWARE\\R-core\\R", hive = "HLM", maxdepth = 2))
       unique(file.path(reg_ents[grepl("InstallPath$", names(reg_ents))], "bin"))
-    }, error = function(e) { NULL })
+    },
+    error = function(e) NULL)
 
     user_regs <- tryCatch({
       reg_ents <- unlist(utils::readRegistry("SOFTWARE\\R-core\\R", hive = "HCU", maxdepth = 2))
       unique(file.path(reg_ents[grepl("InstallPath$", names(reg_ents))], "bin"))
-    }, error = function(e) { NULL })
+    },
+    error = function(e) NULL)
 
     paths <- c(machine_regs, user_regs, paths)
   }

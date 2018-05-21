@@ -33,7 +33,7 @@ home_bkp <- Sys.getenv("HOME")
 curr_dir <- shortPathName(normalizePath("."))
 if (dir.exists(file.path(curr_dir, ".aws"))) {
   logging::loginfo("Setting HOME to %s", curr_dir)
-  Sys.setenv(HOME=curr_dir)
+  Sys.setenv(HOME = curr_dir)
 } else if (!is.null(home_bkp) && !dir.exists(file.path(home_bkp, ".aws"))) {
   logging::loginfo("Unsetting HOME as it does not contain .aws credentials")
   Sys.unsetenv("HOME")
@@ -43,9 +43,11 @@ tryCatch({
   mgr <- RSuite::repo_mng_start("S3", url = ra_url)
   tryCatch({
     RSuite::repo_manager_init(mgr)
-  }, finally = {
+  },
+  finally = {
     RSuite::repo_mng_stop(mgr)
   })
-}, finally = {
+},
+finally = {
   Sys.setenv(HOME = home_bkp)
 })

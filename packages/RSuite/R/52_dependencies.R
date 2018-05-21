@@ -18,9 +18,10 @@
 #' @noRd
 #'
 collect_uninstalled_direct_deps <- function(params) {
-  depVers <- collect_prj_direct_deps(params)
-  installed <- as.data.frame(utils::installed.packages(params$lib_path), stringsAsFactors = F)[, c("Package", "Version")]
-  depVers <- vers.rm_acceptable(depVers, installed)
+  dep_vers <- collect_prj_direct_deps(params)
+  installed <- as.data.frame(utils::installed.packages(params$lib_path),
+                             stringsAsFactors = F)[, c("Package", "Version")]
+  dep_vers <- vers.rm_acceptable(dep_vers, installed)
 }
 
 #'
@@ -35,10 +36,10 @@ collect_uninstalled_direct_deps <- function(params) {
 #' @noRd
 #'
 collect_prj_direct_deps <- function(params) {
-  pkgVers <- collect_pkgs_direct_deps(params)
-  mscVers <- collect_mscs_direct_deps(params)
-  prjVers <- vers.union(pkgVers, mscVers)
-  return(prjVers)
+  pkg_vers <- collect_pkgs_direct_deps(params)
+  msc_vers <- collect_mscs_direct_deps(params)
+  prj_vers <- vers.union(pkg_vers, msc_vers)
+  return(prj_vers)
 }
 
 #'
@@ -73,31 +74,65 @@ collect_prj_support_pkgs <- function(params) {
 
   sup_pkgs <- unlist(lapply(X = names(prj_packages),
                             FUN = function(pkg_dir) {
-                              pkg_path <- file.path(params$pkgs_path, pkg_dir)
-                              if (!requires_roxygen(pkg_path)) {
-                                return("devtools") # still requires devtools
-                              }
+                              sup_pkgs <- "devtools"
 
+                              pkg_path <- file.path(params$pkgs_path, pkg_dir)
                               desc_file <- file.path(pkg_path, "DESCRIPTION")
                               stopifnot(file.exists(desc_file))
 
                               desc <- read.dcf(desc_file)
-                              if (!('RoxygenExtraRoclets' %in% colnames(desc))) {
-                                return(c("devtools", "roxygen2"))
+
+                              if (requires_roxygen(pkg_path)) {
+                                sup_pkgs <- c(sup_pkgs, "roxygen2")
+
+                                if ("RoxygenExtraRoclets" %in% colnames(desc)) {
+                                  roclets <- trimws(strsplit(desc[1, "RoxygenExtraRoclets"], ", ")[1])
+
+                                  unspec_roclets <- roclets[!grepl("^[a-zA-Z]+::", roclets)]
+                                  assert(length(unspec_roclets) == 0,
+                                         "Some extra roclets in %s are underspecified: %s",
+                                          pkg_dir, paste(unspec_roclets, collapse = ", "))
+
+                                  roc_pkgs <- gsub("^([a-zA-Z]+)::.+$", "\\1", roclets)
+                                  sup_pkgs <- c(sup_pkgs, roc_pkgs)
+                                }
                               }
 
-                              roclets <- trimws(strsplit(desc[1, 'RoxygenExtraRoclets'], ", ")[1])
+                              if ("VignetteBuilder" %in% colnames(desc)) {
+                                sup_pkgs <- c(sup_pkgs, desc[1, "VignetteBuilder"])
+                              }
 
-                              unspec_roclets <- roclets[!grepl("^[a-zA-Z]+::", roclets)]
-                              assert(length(unspec_roclets) == 0,
-                                     "Some extra roclets in %s are underspecified: %s",
-                                      pkg_dir, paste(unspec_roclets, collapse = ", "))
+                              if (devtools::uses_testthat(pkg = pkg_path)) {
+                                sup_pkgs <- c(sup_pkgs, "testthat")
+                              }
 
-                              roc_pkgs <- gsub("^([a-zA-Z]+)::.+$", "\\1", roclets)
-                              return(c("devtools", "roxygen2", roc_pkgs))
+                              tests_path <- file.path(pkg_path, "tests")
+                              if (dir.exists(tests_path)) {
+                                sup_pkgs <- c(sup_pkgs,
+                                              collect_dir_script_deps(tests_path, recursive = FALSE))
+                              }
+
+                              return(sup_pkgs)
                             }))
+
+  prj_tests_path <- file.path(params$prj_path, "tests")
+  if (dir.exists(prj_tests_path)) {
+    sup_pkgs <- c(sup_pkgs,
+                  collect_dir_script_deps(prj_tests_path, recursive = FALSE))
+  }
+
   sup_vers <- vers.build(unique(sup_pkgs))
-  return(sup_vers)
+
+  # collect suggested packages
+  sug_vers <- do.call("vers.union",
+                      lapply(X = names(prj_packages),
+                             FUN = function(pkg_dir) {
+                               sugs <- desc_retrieve_dependencies(params$pkgs_path, pkg_dir, # from 51_pkg_info.R
+                                                                  fields = "Suggests")
+                               vers.from_deps(sugs, prj_packages[[pkg_dir]])
+                             }))
+
+  return(vers.union(sup_vers, sug_vers))
 }
 
 
@@ -127,13 +162,13 @@ collect_pkgs_direct_deps <- function(params) {
          "Packages with unfeasible requirements detected: %s", paste(unfeasibles$pkg, collapse = ", "))
 
   # Check R version
-  req_r_ver <- vers.get(pkgs_vers, 'R')
+  req_r_ver <- vers.get(pkgs_vers, "R")
   if (nrow(req_r_ver)) {
     cur_r_ver <- sprintf("%s.%s", R.version$major, R.version$minor)
-    assert((is.na(req_r_ver$vmin) || req_r_ver$vmin <= cur_r_ver)
-           && (is.na(req_r_ver$vmax) || req_r_ver$vmax >= cur_r_ver),
-           "R version(%s) does not meet requirements: it must be in range %s .. %s",
-           cur_r_ver, req_r_ver$vmin, req_r_ver$vmax)
+    assert( (is.na(req_r_ver$vmin) || req_r_ver$vmin <= cur_r_ver)
+            && (is.na(req_r_ver$vmax) || req_r_ver$vmax >= cur_r_ver),
+            "R version(%s) does not meet requirements: it must be in range %s .. %s",
+            cur_r_ver, req_r_ver$vmin, req_r_ver$vmax)
   }
 
   pkgs_vers <- vers.rm_base(pkgs_vers)
@@ -173,21 +208,36 @@ collect_single_pkg_direct_deps <- function(params, pkg_dir, pkg_name) {
 #' @noRd
 #'
 collect_mscs_direct_deps <- function(params) {
-  script_files <- list.files(path = params$script_path, pattern = "*.(r|R|Rmd)$",
-                             recursive = TRUE, full.names = TRUE)
-  pkgs <- unlist(
-    lapply(X = script_files,
-           FUN = function(sf) {
-             lns <- readLines(sf)
-             loads <- lns[grepl("^\\s*(require|library)\\((.+)\\)", lns)]
-             loads <- gsub("\\s+", "", loads) # remove extra spaces
-             gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
-           }))
+  pkgs <- collect_dir_script_deps(dir = params$script_path, recursive = TRUE)
   mscs_vers <- vers.build(unique(pkgs))
   mscs_vers <- vers.rm_base(mscs_vers)
   return(mscs_vers)
 }
 
+#'
+#' Detects all dependencies in all script files in folder passed.
+#'
+#' @param dir folder to find scrips in. (type: character(1))
+#' @param recursive if TRUE scripts will be detected recursively. (type: logical(1))
+#'
+#' @return vector of all libraries detected in scripts. (type: character(N))
+#'
+#' @keywords internal
+#' @noRd
+#'
+collect_dir_script_deps <- function(dir, recursive = TRUE) {
+  script_files <- list.files(path = dir, pattern = "*.(r|R|Rmd)$",
+                             recursive = recursive, full.names = TRUE)
+  pkgs <- unlist(lapply(
+    X = script_files,
+    FUN = function(sf){
+      lns <- readLines(sf)
+      loads <- lns[grepl("^\\s*(require|library)\\((.+)\\)", lns)]
+      loads <- gsub("\\s+", "", loads) # remove extra spaces
+      gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
+    }))
+  return(unique(pkgs))
+}
 
 #'
 #' Retrieves all subsequent dependencies for packages described by version
@@ -225,7 +275,7 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
   vers_cr <- vers.check_against(vers, avail_vers)
 
   next_cr <- vers_cr
-  while(check_res.has_found(next_cr)) {
+  while (check_res.has_found(next_cr)) {
     dep_avails <- vers.pick_available_pkgs(check_res.get_found(next_cr))
 
     dep_vers <- vers.from_deps_in_avails(dep_avails)

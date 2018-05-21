@@ -42,13 +42,17 @@ get_platform_desc <- function() {
 
   check_syslibs <- switch(
     platform,
-    RPM = '[shell] all_pkgs=$(rpm -qa | sed -e "s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/"); for lib in :params; do if [[ ! "${all_pkgs[@]}" =~ ${lib} ]]; then echo $lib; fi done',
-    DEB = '[shell] all_pkgs=$(dpkg -l | sed -e "s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/"); for lib in :params; do if [[ ! "${all_pkgs[@]}" =~ ${lib} ]]; then echo $lib; fi done'
+    RPM = paste("[shell]",
+                "all_pkgs=$(rpm -qa | sed -e \"s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/\");",
+                "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done"),
+    DEB = paste("[shell]",
+                "all_pkgs=$(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\");",
+                "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done")
   )
   install_syslibs <- switch(
     platform,
-    RPM = '[shell] yum install -y :params',
-    DEB = '[shell] apt-get update && apt-get install -y :params'
+    RPM = "[shell] yum install -y :params",
+    DEB = "[shell] apt-get update && apt-get install -y :params"
   )
 
   return(list(name = platform,
@@ -76,7 +80,7 @@ get_platform_desc <- function() {
     if (file.exists("/etc/redhat-release") || file.exists("/etc/fedora-release")) {
       return("RPM")
     }
-    if(file.exists("/etc/debian_version")) {
+    if (file.exists("/etc/debian_version")) {
       return("DEB")
     }
     return(NA_character_)
@@ -98,7 +102,7 @@ get_platform_desc <- function() {
     if (file.exists("/etc/lsb-release") && any(grepl("DISTRIB[ _]ID=Ubuntu", readLines("/etc/lsb-release")))) {
       return("Ubuntu")
     }
-    if(file.exists('/etc/os-release') && any(grepl("ID=debian", readLines('/etc/os-release')))) {
+    if (file.exists("/etc/os-release") && any(grepl("ID=debian", readLines("/etc/os-release")))) {
       return("Debian")
     }
     return(NA_character_)
@@ -116,7 +120,7 @@ get_platform_desc <- function() {
     if (file.exists("/etc/os-release") && any(grepl("ID=\"?centos\"?", readLines("/etc/os-release")))) {
       return("CentOS")
     }
-    if (file.exists('/etc/redhat-release') && any(grepl("^Red Hat Linux", readLines("/etc/redhat-release")))) {
+    if (file.exists("/etc/redhat-release") && any(grepl("^Red Hat Linux", readLines("/etc/redhat-release")))) {
       return("RedHat")
     }
     return(NA_character_)
@@ -143,7 +147,7 @@ get_platform_desc <- function() {
     if (!file.exists("/etc/lsb-release")) {
       return(NA_character_)
     }
-    codename <- grep("^DISTRIB[ _]CODENAME=", readLines('/etc/lsb-release'), value = TRUE)
+    codename <- grep("^DISTRIB[ _]CODENAME=", readLines("/etc/lsb-release"), value = TRUE)
     if (length(codename) != 1) {
       return(NA_character_)
     }
@@ -151,10 +155,10 @@ get_platform_desc <- function() {
   }
 
   if (distrib == "Debian") {
-    if (!file.exists('/etc/os-release')) {
+    if (!file.exists("/etc/os-release")) {
       return(NA_character_)
     }
-    ver <- grep("^VERSION=", readLines('/etc/os-release'), value = TRUE)
+    ver <- grep("^VERSION=", readLines("/etc/os-release"), value = TRUE)
     if (length(ver) != 1) {
       return(NA_character_)
     }
@@ -162,10 +166,10 @@ get_platform_desc <- function() {
   }
 
   if (distrib == "CentOS") {
-    if (!file.exists('/etc/redhat-release')) {
+    if (!file.exists("/etc/redhat-release")) {
       return(NA_character_)
     }
-    rel_ln <- readLines('/etc/redhat-release')[1]
+    rel_ln <- readLines("/etc/redhat-release")[1]
     if (!grepl("^.+release\\s+([0-9]+[.][0-9]+).+$", rel_ln)) {
       return(NA_character_)
     }
@@ -173,10 +177,10 @@ get_platform_desc <- function() {
   }
 
   if (distrib == "RedHat") {
-    if (!file.exists('/etc/redhat-release')) {
+    if (!file.exists("/etc/redhat-release")) {
       return(NA_character_)
     }
-    rel_ln <- readLines('/etc/redhat-release')[1]
+    rel_ln <- readLines("/etc/redhat-release")[1]
     if (!grepl("^.+release\\s+([0-9]+([.][0-9]+)?)\\s+\\(([^)]+)\\).*$", rel_ln)) {
       return(NA_character_)
     }
@@ -211,7 +215,7 @@ get_sysreqs_for <- function(pkg_name, field) {
   plat_desc <- get_platform_desc()
 
   matched_reqs <- list()
-  for(dbfile in list.files(dbpath, pattern = ".+[.]json")) {
+  for (dbfile in list.files(dbpath, pattern = ".+[.]json")) {
     db_ent <- jsonlite::fromJSON(file.path(dbpath, dbfile))
     db_ent_name <- names(db_ent)[[1]]
     if (db_ent_name %in% names(matched_reqs)) {
@@ -282,7 +286,7 @@ try_build_sysreq <- function(pkg_name, field, db_ent_name, db_ent_val, plat_desc
     return() # not matched
   }
 
-  params <- paste(match_pars[nchar(match_pars) >0])
+  params <- paste(match_pars[nchar(match_pars) > 0])
   pkg_logdebug("... %s requirements matched for %s ... (params: %s)", db_ent_name, pkg_name, params)
   plat_spec <- get_platform_spec(db_ent_val$platforms, db_ent_name, plat_desc)
   if (is.null(plat_spec)) {
@@ -325,15 +329,19 @@ get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
 
 
   req_type <- ifelse(plat_desc$build, "buildtime", "runtime")
-  if (is.data.frame(plat_specs) && all(c("distribution", "releases", "runtime", "buildtime") %in% colnames(plat_specs))) {
+  if (is.data.frame(plat_specs)
+      && all(c("distribution", "releases", "runtime", "buildtime") %in% colnames(plat_specs))) {
     distrib <- plat_desc$distrib
     release <- plat_desc$release
-    dist_specs <- plat_specs[plat_specs$distribution == distrib & grepl(release, plat_specs$releases, fixed = TRUE), ]
+    dist_specs <- plat_specs[plat_specs$distribution == distrib
+                             & grepl(release, plat_specs$releases, fixed = TRUE), ]
     if (nrow(dist_specs) == 0) {
-      dist_specs <- plat_specs[plat_specs$distribution == distrib & unlist(lapply(plat_specs$releases, is.null)), ]
+      dist_specs <- plat_specs[plat_specs$distribution == distrib
+                               & unlist(lapply(plat_specs$releases, is.null)), ]
     }
     if (nrow(dist_specs) == 0) {
-      pkg_logdebug(".\t ... platform %s(%s %s) not supported by %s", plat_desc$name, distrib, release, dbent_name)
+      pkg_logdebug(".\t ... platform %s(%s %s) not supported by %s",
+                   plat_desc$name, distrib, release, dbent_name)
       return()
     }
     return(dist_specs[1, req_type])
@@ -341,7 +349,8 @@ get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
 
   if (is.list(plat_specs)){
     if (!(req_type %in% names(plat_specs))) {
-      pkg_logdebug("... build type %s for platform %s not supported by %s", req_type, plat_desc$name, dbent_name)
+      pkg_logdebug("... build type %s for platform %s not supported by %s",
+                   req_type, plat_desc$name, dbent_name)
       return()
     }
     return(plat_specs[[req_type]])

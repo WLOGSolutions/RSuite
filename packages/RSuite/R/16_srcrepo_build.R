@@ -64,17 +64,23 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
 
   bundle <- tryCatch({
     remote_download <- .get_devtools_intern("remote_download")
-    remote_download(remote, quiet = F)
-  }, error = function(e) { NULL })
+    remote_download(remote, quiet = FALSE)
+  },
+  error = function(e) NULL)
+
   assert(!is.null(bundle), "Failed to download from %s", srcrepo)
-  on.exit({ unlink(bundle, recursive = T, force = T) }, add = TRUE)
+  on.exit({
+    unlink(bundle, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   bld_params <- bld_prj$load_params()
   if (!file.info(bundle)$isdir) {
     bundle_path <- tryCatch({
       decompress <- .get_devtools_intern("decompress")
       decompress(bundle, bld_params$pkgs_path)
-    }, error = function(e) { NULL })
+    },
+    error = function(e) NULL)
     assert(!is.null(bundle_path), "Failed to decompress sources from %s", bundle)
   } else {
     success <- file.copy(from = bundle, to = bld_params$pkgs_path, recursive = T)
@@ -85,20 +91,22 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   source <- tryCatch({
     source_pkg <- .get_devtools_intern("source_pkg")
     source_pkg(bundle_path, subdir = remote$subdir)
-  }, error = function(e) { NULL })
+  },
+  error = function(e) NULL)
+
   assert(!is.null(source), "Failed to retrieve sources out of package download from %s", srcrepo)
 
   # alter packages to point to retrieved package
   prj_path_toks <- unlist(strsplit(bld_params$prj_path, "[\\/]"))
   pkg_path_toks <- unlist(strsplit(rsuite_fullUnifiedPath(dirname(source)), "[\\/]"))
-  pkgs_path <- paste(pkg_path_toks[-(1:length(prj_path_toks))], collapse = "/") # relative to prj_path
+  pkgs_path <- paste(pkg_path_toks[- (1:length(prj_path_toks))], collapse = "/") # relative to prj_path
 
-  bld_params_file <- file.path(bld_prj$path, 'PARAMETERS')
+  bld_params_file <- file.path(bld_prj$path, "PARAMETERS")
   bld_params_df <- data.frame(read.dcf(bld_params_file), stringsAsFactors = F)
-  if (!('PackagesPath' %in% colnames(bld_params_df))) {
+  if (!("PackagesPath" %in% colnames(bld_params_df))) {
     bld_params_df <- cbind(bld_params_df, data.frame(PackagesPath = pkgs_path))
   } else {
-    bld_params_df[, 'PackagesPath'] <- pkgs_path
+    bld_params_df[, "PackagesPath"] <- pkgs_path
   }
   write.dcf(bld_params_df, file = bld_params_file)
 

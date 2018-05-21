@@ -107,7 +107,8 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
 
   avails <- repo_mng_list(repo_manager, pkg_type, no.cache = T)
-  avails <- merge(x = toremove[, c('Package', 'Version')], y = avails[, c('Package', 'Version', 'Repository')],
+  avails <- merge(x = toremove[, c("Package", "Version")],
+                  y = avails[, c("Package", "Version", "Repository")],
                   by.x = c("Package", "Version"), by.y = c("Package", "Version"),
                   all.x = T)
 
@@ -123,8 +124,8 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
   clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
                                  type = pkg_type, rver = mgr_info$rver)
 
-  res$Removed <- T
-  res <- merge(x = toremove[, c('Package', 'Version')], y = res[, c('Package', 'Version', 'Removed')],
+  res$Removed <- TRUE
+  res <- merge(x = toremove[, c("Package", "Version")], y = res[, c("Package", "Version", "Removed")],
                by.x = c("Package", "Version"), by.y = c("Package", "Version"),
                all.x = T)
 
@@ -185,7 +186,8 @@ repo_upload_prj_packages <- function(repo_manager,
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
            && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
+           paste("character(N) expected for skip_build_steps containing entities",
+                 "spec, docs, imps, tests, rcpp_attribs or vignettes"))
   }
 
   prj <- safe_get_prj(prj)
@@ -243,7 +245,10 @@ repo_upload_prj_packages <- function(repo_manager,
                                     skip_build_steps = skip_build_steps)
 
   tmp_path <- tempfile("pkgzip_temp_repo")
-  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+  on.exit({
+    unlink(tmp_path, recursive = T, force = T)
+  },
+  add = TRUE)
 
   temp_repo_prepare(avail_vers, tmp_path, pkg_type, params) # from 18_repo_helpers.R
   temp_repo_copy_proj_pkgs(pkgs, tmp_path, pkg_type, params) # from 18_repo_helpers.R
@@ -295,14 +300,17 @@ repo_upload_package_files <- function(repo_manager, files) {
   pkg_types <- unique(pkg_infos$Type)
 
   tmp_path <- tempfile("upl_temp_repo")
-  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+  on.exit({
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   pkg_loginfo("Preparing temp repository for %s types ...",
               paste(pkg_types, collapse = ", "))
   tmp_mgr <- repo_manager_dir_create(tmp_path, pkg_types, mgr_info$rver)
   repo_manager_init(tmp_mgr)
 
-  for(tp in pkg_types) {
+  for (tp in pkg_types) {
     dest_path <- rsuite_contrib_url(tmp_path, tp, mgr_info$rver)
     src_files <- pkg_infos[pkg_infos$Type == tp, ]$File
     success <- file.copy(from = src_files, to = dest_path)
@@ -317,7 +325,7 @@ repo_upload_package_files <- function(repo_manager, files) {
 
   # sync the temp repository
   repo_manager_upload(repo_manager, tmp_path, pkg_types)
-  for(tp in pkg_types) {
+  for (tp in pkg_types) {
     clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
                                    type = tp, rver = mgr_info$rver)
   }
@@ -377,7 +385,10 @@ repo_upload_ext_packages <- function(repo_manager,
   }
 
   tmp_path <- tempfile("pkgzip_temp_repo")
-  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+  on.exit({
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   temp_repo_prepare(avail_vers, # from 18_repo_helpers.R
                     tmp_path, pkg_type, params,
@@ -412,12 +423,13 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
   prj <- safe_get_prj(NULL)
   stopifnot(!is.null(prj))
 
-  params <- prj$load_params()
-
   mgr_info <- repo_manager_get_info(repo_manager)
 
   tmp_path <- tempfile("upl_temp_repo")
-  on.exit({ unlink(tmp_path, recursive = T, force = T) }, add = TRUE)
+  on.exit({
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   pkg_loginfo("Preparing temp repository ...")
 
@@ -426,12 +438,14 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 
   types <- c("source", "win.binary", "mac.binary", "binary")
   types <- Filter(x = types,
-                  f = function(tp) { dir.exists(rsuite_contrib_url(tmp_path, tp, mgr_info$rver)) })
+                  f = function(tp) {
+                    dir.exists(rsuite_contrib_url(tmp_path, tp, mgr_info$rver))
+                  })
 
   pkg_loginfo("... done. It contains following types: %s", paste(types, collapse = ", "))
 
   repo_manager_upload(repo_manager, tmp_path, types)
-  for(tp in types) {
+  for (tp in types) {
     clear_available_packages_cache(mgr_info$url, # from 53_repositories.R
                                    type = tp, rver = mgr_info$rver)
   }
@@ -485,7 +499,8 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
            && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
+           paste("character(N) expected for skip_build_steps containing entities",
+                 "spec, docs, imps, tests, rcpp_attribs or vignettes"))
   }
   assert(is.logical(keep_sources), "logical expected for keep_sources")
 
@@ -498,7 +513,10 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
 
   bld_prj_path <- tempfile(pattern = "srcrepo_proj_")
   if (!any(keep_sources)) {
-    on.exit({ unlink(bld_prj_path, recursive = T, force = T) }, add = TRUE)
+    on.exit({
+      unlink(bld_prj_path, recursive = T, force = T)
+    },
+    add = TRUE)
   } else {
     bld_prj_path <- file.path(dirname(dirname(bld_prj_path)), basename(bld_prj_path))
     pkg_loginfo("Will keep build project sources at %s", bld_prj_path)

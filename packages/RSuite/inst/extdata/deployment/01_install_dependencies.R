@@ -28,4 +28,3 @@ if (any(grepl("--verbose", args))) {
 RSuite::prj_install_deps(
   clean = any(grepl("--clean", args))
 )
-

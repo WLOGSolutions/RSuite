@@ -24,10 +24,10 @@ perform <- function(recipe) {
 }
 
 sysreqs_recipe_collect_all <- function(recipe, sysreqs) {
-  for(pkg_name in names(sysreqs)) {
+  for (pkg_name in names(sysreqs)) {
     pkg_sysreqs <- sysreqs[[pkg_name]]
     r_sysreqs <- get_sysreqs_for(pkg_name, pkg_sysreqs) # from 56_sysreqs_utils.R
-    for(req_name in names(r_sysreqs)) {
+    for (req_name in names(r_sysreqs)) {
       recipe <- add_recipe(recipe, req_name, r_sysreqs[[req_name]], pkg_name)
     }
   }
@@ -62,18 +62,23 @@ add_recipe.sysreqs_check_recipe <- function(recipe, req_name, sysreq, pkg_name) 
     return(recipe)
   }
 
-  for(req_satisfied in sysreq[[req_name]]$satisfies) {
+  for (req_satisfied in sysreq[[req_name]]$satisfies) {
     recipe$satisfied[[req_satisfied]] <- c(recipe$satisfied[[req_satisfied]], req_name)
   }
   return(recipe)
 }
 
 rm_satisfied.sysreqs_check_recipe <- function(recipe) {
-  for(req_satisfied in names(recipe$satisfied)) {
+  for (req_satisfied in names(recipe$satisfied)) {
     who_satisfies <- recipe$satisfied[[req_satisfied]]
-    pkg_loginfo("Requirement for %s will be satisfied by %s; not checking", req_satisfied, paste(who_satisfies, collapse = ", "))
-    if (req_satisfied %in% names(recipe$tools)) { recipe$tools[[req_satisfied]] <- NULL }
-    if (req_satisfied %in% names(recipe$syslibs)) { recipe$syslibs[[req_satisfied]] <- NULL }
+    pkg_loginfo("Requirement for %s will be satisfied by %s; not checking",
+                req_satisfied, paste(who_satisfies, collapse = ", "))
+    if (req_satisfied %in% names(recipe$tools)) {
+      recipe$tools[[req_satisfied]] <- NULL
+    }
+    if (req_satisfied %in% names(recipe$syslibs)) {
+      recipe$syslibs[[req_satisfied]] <- NULL
+    }
   }
   return(recipe)
 }
@@ -88,7 +93,7 @@ perform.sysreqs_check_recipe <- function(recipe) {
                  paste(result$notools, collapse = ", "))
   }
 
-  required_syslibs <- unlist(lapply(recipe$syslibs, function(sl) { sl$plat_deps }))
+  required_syslibs <- unlist(lapply(recipe$syslibs, function(sl) sl$plat_deps))
   if (is.null(required_syslibs)) {
     return(invisible(result))
   }
@@ -98,7 +103,8 @@ perform.sysreqs_check_recipe <- function(recipe) {
     pkg_loginfo("Checking for system libraries for the platform is not supported")
     return(invisible(result))
   }
-  assert(grepl("^\\[shell\\] ", check_tool), "System libraries check handlers other than [shell] are not supported yet")
+  assert(grepl("^\\[shell\\] ", check_tool),
+         "System libraries check handlers other than [shell] are not supported yet")
   check_tool <- gsub("^\\[shell\\] ", "", check_tool)
 
   cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), check_tool))
@@ -158,19 +164,23 @@ add_recipe.sysreqs_install_recipe <- function(recipe, req_name, sysreq, pkg_name
     recipe$build_specs[[req_name]] <- build_spec
   }
 
-  for(req_satisfied in sysreq$satisfies) {
+  for (req_satisfied in sysreq$satisfies) {
     recipe$satisfied[[req_satisfied]] <- c(recipe$satisfied[[req_satisfied]], req_name)
   }
   return(recipe)
 }
 
 rm_satisfied.sysreqs_install_recipe <- function(recipe) {
-  for(req_satisfied in names(recipe$satisfied)) {
+  for (req_satisfied in names(recipe$satisfied)) {
     who_satisfied <- recipe$satisfied[[req_satisfied]]
     pkg_loginfo("Requirement for %s will be satisfied by %s; not building",
                 req_satisfied, paste(who_satisfied, collapse = ", "))
-    if (req_satisfied %in% names(recipe$build_specs)) { recipe$build_specs[[req_satisfied]] <- NULL }
-    if (req_satisfied %in% names(recipe$install_specs)) { recipe$install_specs[[req_satisfied]] <- NULL }
+    if (req_satisfied %in% names(recipe$build_specs)) {
+      recipe$build_specs[[req_satisfied]] <- NULL
+    }
+    if (req_satisfied %in% names(recipe$install_specs)) {
+      recipe$install_specs[[req_satisfied]] <- NULL
+    }
   }
   return(recipe)
 }
@@ -183,7 +193,7 @@ perform.sysreqs_install_recipe <- function(recipe) {
 
   failed_reqs <- c()
 
-  required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) { sl$syslibs }))
+  required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) sl$syslibs))
   if (!is.null(required_syslibs)) {
     install_tool <- plat_desc$lib_tools$install
     if (is.null(install_tool)) {
@@ -195,19 +205,22 @@ perform.sysreqs_install_recipe <- function(recipe) {
       cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), install_tool))
 
       pkg_loginfo("Installing system libraries(%s) ...", paste(required_syslibs, collapse = ", "))
-      cmd_retcode <- get_cmd_retcode(sprintf("installing system libraries: %s", paste(required_syslibs, collapse = ", ")),
+      cmd_retcode <- get_cmd_retcode(sprintf("installing system libraries: %s",
+                                             paste(required_syslibs, collapse = ", ")),
                                      cmd = cmd,
                                      log_debug = TRUE)
       if (.is_retcode_failure(cmd_retcode, "sys libs")) {
         failed_reqs <- c(failed_reqs, "sys libs")
-        pkg_logwarn("Something went wrong while installing system libraries. Installation process terminated with code: %s.", cmd_retcode)
+        pkg_logwarn(paste("Something went wrong while installing system libraries.",
+                          "Installation process terminated with code: %s."),
+                    cmd_retcode)
       } else {
         pkg_loginfo("... done")
       }
     }
   }
 
-  for(req_name in names(recipe$build_specs)) {
+  for (req_name in names(recipe$build_specs)) {
     build_spec <- recipe$build_specs[[req_name]]
 
     if (!file.exists(Sys.which(build_spec$tool))) {
@@ -223,22 +236,25 @@ perform.sysreqs_install_recipe <- function(recipe) {
     tool_wspace <- gsub("\\", "/", file.path(recipe$prj_path, req_name), fixed = TRUE)
     cmd <- gsub(":path", tool_wspace, cmd, fixed = TRUE)
     cmd <- gsub(":tool", build_spec$tool, cmd, fixed = TRUE)
-    cmd <- paste(cmd, '-v')
+    cmd <- paste(cmd, "-v")
 
-    cmd_retcode <- get_cmd_retcode(sprintf("building %s for %s", req_name, paste(build_spec$packages, collapse = ", ")),
+    cmd_retcode <- get_cmd_retcode(sprintf("building %s for %s",
+                                           req_name, paste(build_spec$packages, collapse = ", ")),
                                    cmd = cmd,
                                    log_debug = TRUE)
-    if(.is_retcode_failure(cmd_retcode)) {
+    if (.is_retcode_failure(cmd_retcode)) {
       failed_reqs <- c(failed_reqs, req_name)
-      pkg_logwarn("Something went wrong while building %s. Building process terminated with code: %s.", req_name, cmd_retcode)
+      pkg_logwarn("Something went wrong while building %s. Building process terminated with code: %s.",
+                  req_name, cmd_retcode)
     } else {
       pkg_loginfo("... done")
     }
   }
 
-  if(length(failed_reqs) > 0){
-    pkg_logwarn('Error(s) occurred while installing following system requirements: %s', paste(failed_reqs, collapse = ", "))
-  }else{
+  if (length(failed_reqs) > 0) {
+    pkg_logwarn("Error(s) occurred while installing following system requirements: %s",
+                paste(failed_reqs, collapse = ", "))
+  } else {
     pkg_loginfo("All system requirements installed.")
   }
 }
@@ -267,7 +283,7 @@ build_win_script <- function(recipe, plat_desc) {
                     "",
                     "set basedir=%~dps0")
 
-  required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) { sl$syslibs }))
+  required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) sl$syslibs))
   if (!is.null(required_syslibs)) {
     check_tool <- plat_desc$lib_tools$check
     if (!is.null(check_tool)) {
@@ -297,17 +313,17 @@ build_win_script <- function(recipe, plat_desc) {
       install_tool <- gsub("^\\[shell\\]\\s*", "", install_tool)
       cmd <- gsub(":params", "%syslibs_to_install%", install_tool)
       script_lines <- c(script_lines,
-                        'if "%syslibs_to_install%" == "" (',
-                        '     echo No system libraries to install',
-                        '     goto check_tools',
-                        ')',
-                        'echo Installing system libraries (%syslibs_to_install%) ..."',
+                        "if \"%syslibs_to_install%\" == \"\" (",
+                        "     echo No system libraries to install",
+                        "     goto check_tools",
+                        ")",
+                        "echo Installing system libraries (%syslibs_to_install%) ...",
                         cmd,
                         ":check_tools")
     }
   }
 
-  for(req_name in names(recipe$build_specs)) {
+  for (req_name in names(recipe$build_specs)) {
     build_spec <- recipe$build_specs[[req_name]]
 
     cmd <- gsub(":params", build_spec$params, build_spec$cmd, fixed = TRUE)
@@ -317,20 +333,20 @@ build_win_script <- function(recipe, plat_desc) {
 
     script_lines <- c(script_lines,
                       "",
-                      sprintf('for %%%%i in (%s) do if "%%%%~$PATH:i" == "" (', build_spec$tool),
-                      sprintf('   echo Tool %s is not available: environment cannot be built', build_spec$tool),
-                      sprintf('   goto %s_failed', build_spec$tool),
-                      sprintf(')'),
-                      sprintf('if exist "%s" rmdir /S/Q "%s"', tool_wspace, tool_wspace),
-                      sprintf('echo Building %s for %s ...', req_name, paste(build_spec$packages, collapse = ", ")),
-                      sprintf('%s', cmd),
-                      sprintf('if NOT ERRORLEVEL 0 ('),
-                      sprintf('       echo ... failed'),
-                      sprintf('       goto %s_failed', build_spec$tool),
-                      sprintf(')'),
-                      sprintf('echo ... done'),
-                      sprintf(':%s_failed', build_spec$tool),
-                      sprintf('echo.'))
+                      sprintf("for %%%%i in (%s) do if \"%%%%~$PATH:i\" == \"\" (", build_spec$tool),
+                      sprintf("   echo Tool %s is not available: environment cannot be built", build_spec$tool),
+                      sprintf("   goto %s_failed", build_spec$tool),
+                      sprintf(")"),
+                      sprintf("if exist \"%s\" rmdir /S/Q \"%s\"", tool_wspace, tool_wspace),
+                      sprintf("echo Building %s for %s ...", req_name, paste(build_spec$packages, collapse = ", ")),
+                      sprintf("%s", cmd),
+                      sprintf("if NOT ERRORLEVEL 0 ("),
+                      sprintf("       echo ... failed"),
+                      sprintf("       goto %s_failed", build_spec$tool),
+                      sprintf(")"),
+                      sprintf("echo ... done"),
+                      sprintf(":%s_failed", build_spec$tool),
+                      sprintf("echo."))
   }
 
   script_fpath <- file.path(recipe$prj_path, "sysreqs_install.cmd")
@@ -345,10 +361,10 @@ build_bash_script <- function(recipe, plat_desc) {
                     "basedir=$(readlink -f $basedir)",
                     "exitcode=0")
 
-  required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) { sl$syslibs }))
+  required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) sl$syslibs))
   if (!is.null(required_syslibs)) {
     script_lines <- c(script_lines,
-                      sprintf('export syslibs_to_install="%s"', paste(required_syslibs, collapse = " ")))
+                      sprintf("export syslibs_to_install=\"%s\"", paste(required_syslibs, collapse = " ")))
 
     check_tool <- plat_desc$lib_tools$check
     if (!is.null(check_tool)) {
@@ -370,22 +386,22 @@ build_bash_script <- function(recipe, plat_desc) {
       install_tool <- gsub("^\\[shell\\]\\s*", "", install_tool)
       cmd <- gsub(":params", "${syslibs_to_install}", install_tool)
       script_lines <- c(script_lines,
-                        'if [ -z "${syslibs_to_install}" ]; then',
-                        '     echo "No system libraries to install"',
-                        'else',
-                        sprintf('     echo "Installing system libraries (${syslibs_to_install}) ..."'),
-                        sprintf('     %s', cmd),
-                        sprintf('     if [ $? == 0 ]; then'),
-                        sprintf('         echo -e "... done\\n\\n"'),
-                        sprintf('     else'),
-                        sprintf('         echo -e "... failed\\n\\n"'),
-                        sprintf('         exitcode=1'),
-                        sprintf('     fi'),
-                        'fi')
+                        "if [ -z \"${syslibs_to_install}\" ]; then",
+                        "     echo \"No system libraries to install\"",
+                        "else",
+                        sprintf("     echo \"Installing system libraries (${syslibs_to_install}) ...\""),
+                        sprintf("     %s", cmd),
+                        sprintf("     if [ $? == 0 ]; then"),
+                        sprintf("         echo -e \"... done\\n\\n\""),
+                        sprintf("     else"),
+                        sprintf("         echo -e \"... failed\\n\\n\""),
+                        sprintf("         exitcode=1"),
+                        sprintf("     fi"),
+                        "fi")
     }
   }
 
-  for(req_name in names(recipe$build_specs)) {
+  for (req_name in names(recipe$build_specs)) {
     build_spec <- recipe$build_specs[[req_name]]
 
     cmd <- gsub(":params", build_spec$params, build_spec$cmd, fixed = TRUE)
@@ -396,20 +412,22 @@ build_bash_script <- function(recipe, plat_desc) {
     script_lines <- c(script_lines,
                       "",
                       sprintf("which %s > /dev/null", build_spec$tool),
-                      sprintf('if [ $? == 0 ]; then'),
-                      sprintf('   if [ -d %s ]; then rm -rf %s; fi', tool_wspace, tool_wspace),
-                      sprintf('   echo "Building %s for %s ..."', req_name, paste(build_spec$packages, collapse = ", ")),
-                      sprintf('   %s', cmd),
-                      sprintf('   if [ $? == 0 ]; then'),
-                      sprintf('       echo -e "... done\\n\\n"'),
-                      sprintf('   else'),
-                      sprintf('       echo -e "... failed\\n\\n"'),
-                      sprintf('       exitcode=1'),
-                      sprintf('   fi'),
-                      sprintf('else'),
-                      sprintf('   echo "Tool %s is not available: environment cannot be built"', build_spec$tool),
-                      sprintf('   exitcode=1'),
-                      sprintf('fi'))
+                      sprintf("if [ $? == 0 ]; then"),
+                      sprintf("   if [ -d %s ]; then rm -rf %s; fi", tool_wspace, tool_wspace),
+                      sprintf("   echo \"Building %s for %s ...\"",
+                              req_name, paste(build_spec$packages, collapse = ", ")),
+                      sprintf("   %s", cmd),
+                      sprintf("   if [ $? == 0 ]; then"),
+                      sprintf("       echo -e \"... done\\n\\n\""),
+                      sprintf("   else"),
+                      sprintf("       echo -e \"... failed\\n\\n\""),
+                      sprintf("       exitcode=1"),
+                      sprintf("   fi"),
+                      sprintf("else"),
+                      sprintf("   echo \"Tool %s is not available: environment cannot be built\"",
+                              build_spec$tool),
+                      sprintf("   exitcode=1"),
+                      sprintf("fi"))
   }
   script_lines <- c(script_lines,
                     "",

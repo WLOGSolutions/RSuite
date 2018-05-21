@@ -18,7 +18,7 @@
 #'
 repo_adapter_create_s3 <- function(name) {
   result <- repo_adapter_create_url(name)
-  class(result) <- c('rsuite_repo_adapter_s3', class(result))
+  class(result) <- c("rsuite_repo_adapter_s3", class(result))
   return(result)
 }
 

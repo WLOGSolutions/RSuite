@@ -131,14 +131,14 @@ zip_project <- function(params, version, odir) {
     success <- file.copy(file.path(params$prj_path, ".Rprofile"), root_dir)
 
     if (dir.exists(params$script_path)) {
-      success <- file.copy(params$script_path, root_dir, recursive = T)
+      success <- file.copy(params$script_path, root_dir, recursive = TRUE)
       assert(success,
              "Failed to copy scripts to temporary folder")
     }
 
-    for(a in gsub("^\\s+|\\s+$", "", unlist(strsplit(params$artifacts, ",")))) {
+    for (a in gsub("^\\s+|\\s+$", "", unlist(strsplit(params$artifacts, ",")))) {
       apath <- file.path(params$prj_path, a)
-      success <- suppressWarnings(file.copy(apath, root_dir, recursive = T))
+      success <- suppressWarnings(file.copy(apath, root_dir, recursive = TRUE))
       assert(success,
              "Failed to copy artifact %s to temporary folder", a)
     }
@@ -166,7 +166,8 @@ zip_project <- function(params, version, odir) {
     zip_file_path <- file.path(rsuite_fullUnifiedPath(odir), zip_file_name)
     success <- zip_folder(wdir, zip_file_path)
     assert(success, "Failed to create zip file (zip returned non 0 return status).")
-  }, finally = {
+  },
+  finally = {
     unlink(wdir, recursive = T, force = T)
   })
   pkg_loginfo("Zip file created: %s", file.path(odir, zip_file_name))
@@ -191,7 +192,8 @@ zip_folder <- function(wspace, zip_file_path) {
                              "stopifnot(retcode == 0)"),
                            rscript_arg("zipfile", zip_file_path),
                            log_debug = FALSE)
-  }, finally = {
+  },
+  finally = {
     setwd(wd)
   })
 

@@ -12,10 +12,10 @@
 #' @noRd
 #'
 internal_env <- new.env()
-assign('loaded_prj', NULL, envir = internal_env)
-assign('prj_reg', list(), envir = internal_env)
-assign('repo_adapter_reg', list(), envir = internal_env)
-assign('rc_adapter_reg', list(), envir = internal_env)
+assign("loaded_prj", NULL, envir = internal_env)
+assign("prj_reg", list(), envir = internal_env)
+assign("repo_adapter_reg", list(), envir = internal_env)
+assign("rc_adapter_reg", list(), envir = internal_env)
 
 #'
 #' If no default project, set argument as default project.
@@ -28,15 +28,15 @@ assign('rc_adapter_reg', list(), envir = internal_env)
 register_prj <- function(prj) {
   stopifnot(is_prj(prj))
 
-  loaded_prj <- get('loaded_prj', envir = internal_env)
+  loaded_prj <- get("loaded_prj", envir = internal_env)
   if (!is.null(loaded_prj) && loaded_prj$path == prj$path) {
-    assign('loaded_prj', prj, envir = internal_env)
+    assign("loaded_prj", prj, envir = internal_env)
   }
 
   # update project registry
-  prj_reg <- get('prj_reg', envir = internal_env)
+  prj_reg <- get("prj_reg", envir = internal_env)
   prj_reg[[prj$path]] <- prj
-  assign('prj_reg', prj_reg, envir = internal_env)
+  assign("prj_reg", prj_reg, envir = internal_env)
 
   return(prj)
 }
@@ -50,9 +50,9 @@ register_prj <- function(prj) {
 find_prj <- function(path) {
   stopifnot(is.character(path) && length(path) == 1)
   stopifnot(!is.null(path)
-            && dir.exists(path) && file.exists(file.path(path, 'PARAMETERS')))
+            && dir.exists(path) && file.exists(file.path(path, "PARAMETERS")))
 
-  prj <- get('prj_reg', envir = internal_env)[[path]]
+  prj <- get("prj_reg", envir = internal_env)[[path]]
   return(prj)
 }
 
@@ -68,8 +68,8 @@ set_loaded_prj <- function(prj) {
     stopifnot(is_prj(prj) && !is.null(find_prj(prj$path))) # registered project
   }
 
-  prev_prj <- get('loaded_prj', envir = internal_env)
-  assign('loaded_prj', prj, envir = internal_env)
+  prev_prj <- get("loaded_prj", envir = internal_env)
+  assign("loaded_prj", prj, envir = internal_env)
 
   invisible(prev_prj)
 }
@@ -81,7 +81,7 @@ set_loaded_prj <- function(prj) {
 #' @noRd
 #'
 get_loaded_prj <- function() {
-  prj <- get('loaded_prj', envir = internal_env)
+  prj <- get("loaded_prj", envir = internal_env)
   return(prj)
 }
 
@@ -95,9 +95,9 @@ get_loaded_prj <- function() {
 reg_repo_adapter <- function(name, repo_adapter) {
   stopifnot(is_repo_adapter(repo_adapter))
 
-  reg <- get('repo_adapter_reg', envir = internal_env)
+  reg <- get("repo_adapter_reg", envir = internal_env)
   reg[[name]] <- repo_adapter
-  assign('repo_adapter_reg', reg, envir = internal_env)
+  assign("repo_adapter_reg", reg, envir = internal_env)
 }
 
 #'
@@ -107,7 +107,7 @@ reg_repo_adapter <- function(name, repo_adapter) {
 #' @noRd
 #'
 reg_repo_adapter_names <- function() {
-  names(get('repo_adapter_reg', envir = internal_env))
+  names(get("repo_adapter_reg", envir = internal_env))
 }
 
 #'
@@ -117,7 +117,7 @@ reg_repo_adapter_names <- function() {
 #' @noRd
 #'
 reg_repo_adapter_names <- function() {
-  names(get('repo_adapter_reg', envir = internal_env))
+  names(get("repo_adapter_reg", envir = internal_env))
 }
 
 
@@ -128,7 +128,7 @@ reg_repo_adapter_names <- function() {
 #' @noRd
 #'
 find_repo_adapter <- function(name) {
-  reg <- get('repo_adapter_reg', envir = internal_env)
+  reg <- get("repo_adapter_reg", envir = internal_env)
   return(reg[[name]])
 }
 
@@ -142,9 +142,9 @@ find_repo_adapter <- function(name) {
 reg_rc_adapter <- function(name, rc_adapter) {
   stopifnot(is_rc_adapter(rc_adapter))
 
-  reg <- get('rc_adapter_reg', envir = internal_env)
+  reg <- get("rc_adapter_reg", envir = internal_env)
   reg[[name]] <- rc_adapter
-  assign('rc_adapter_reg', reg, envir = internal_env)
+  assign("rc_adapter_reg", reg, envir = internal_env)
 }
 
 #'
@@ -154,7 +154,7 @@ reg_rc_adapter <- function(name, rc_adapter) {
 #' @noRd
 #'
 reg_rc_adapter_names <- function() {
-  names(get('rc_adapter_reg', envir = internal_env))
+  names(get("rc_adapter_reg", envir = internal_env))
 }
 
 #'
@@ -164,6 +164,6 @@ reg_rc_adapter_names <- function() {
 #' @noRd
 #'
 find_rc_adapter <- function(name) {
-  reg <- get('rc_adapter_reg', envir = internal_env)
+  reg <- get("rc_adapter_reg", envir = internal_env)
   return(reg[[name]])
 }

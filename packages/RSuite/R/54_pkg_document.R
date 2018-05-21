@@ -53,13 +53,16 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
     ns_con <- file(ns_path, open = "at")
     tryCatch({
       writeLines(ns_lines, con = ns_con)
-    }, finally = { close(ns_con) })
+    },
+    finally = {
+      close(ns_con)
+    })
   }
 
   roclets <- c("collate", "namespace", "rd") # all default roclets
   dcf <- read.dcf(file.path(pkg_path, "DESCRIPTION"))
-  if ('RoxygenExtraRoclets' %in% colnames(dcf)) {
-    roclets <- c(roclets, trimws(strsplit(dcf[1, 'RoxygenExtraRoclets'], ", ")[1]))
+  if ("RoxygenExtraRoclets" %in% colnames(dcf)) {
+    roclets <- c(roclets, trimws(strsplit(dcf[1, "RoxygenExtraRoclets"], ", ")[1]))
     pkg_loginfo("Will use following roclets for documentation building: %s", paste(roclets, collapse = ", "))
   }
 
@@ -152,7 +155,10 @@ validate_package_imports <- function(pkg_name, pkg_path) {
     tryCatch({
       writeLines(c("", sprintf("import(%s)", desc_not_ns)),
                  con = ns_con)
-    }, finally = { close(ns_con) })
+    },
+    finally = {
+      close(ns_con)
+    })
   }
 
   ns_not_desc <- setdiff(ns_imports, desc_imports)
@@ -179,6 +185,7 @@ validate_package_imports <- function(pkg_name, pkg_path) {
 #'
 #' Builds package vignettes and vignette index if required.
 #'
+#' @param pkg_name name of the package. (type: character)
 #' @param pkg_path path to the package. (type: character)
 #' @param rver R version to build package with. (type: character)
 #' @param ex_libpath extra library path to inclide while building vignettes. (type: character)
@@ -188,10 +195,15 @@ validate_package_imports <- function(pkg_name, pkg_path) {
 #' @keywords internal
 #' @noRd
 #'
-pkg_build_vignettes <- function(pkg_path, rver, ex_libpath) {
+pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
   has_vignettes <- length(tools::pkgVignettes(dir = pkg_path)$docs) > 0
   if (!has_vignettes) {
     return(NULL)
+  }
+
+  unlink_paths <- c()
+  if (!dir.exists(file.path(pkg_path, "inst", "doc"))) {
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "inst", "doc"))
   }
 
   vign_res <- run_rscript(c("devtools::build_vignettes(%s)"),
@@ -203,12 +215,16 @@ pkg_build_vignettes <- function(pkg_path, rver, ex_libpath) {
     } else {
       pkg_logwarn("Building vignettes for %s failed: %s", pkg_name, vign_res)
     }
-    return()
+    return(function() {
+      unlink(unlink_paths, recursive = TRUE, force = TRUE)
+    })
   }
 
   if (file.exists(file.path(pkg_path, "build", "vignette.rds"))) {
     # vignette index is enforced by the package: no need to build it
-    return()
+    return(function() {
+      unlink(unlink_paths, recursive = TRUE, force = TRUE)
+    })
   }
 
   # create vignette index as it probably will not be created
@@ -219,10 +235,12 @@ pkg_build_vignettes <- function(pkg_path, rver, ex_libpath) {
       lines <- readLines(vign_fpath)
       lines <- lines[grepl("^\\s*%\\\\VignetteIndexEntry\\{.+\\}$", lines)]
       if (length(lines) > 0) {
+        pdf_file <- list.files(docs_dir, pattern = gsub("[.]Rmd$", ".(html|pdf)$", basename(vign_fpath)))[[1]]
+        r_file <- list.files(docs_dir, pattern = gsub("[.]Rmd$", ".(R|r)$", basename(vign_fpath)))[[1]]
         vign_info <- data.frame(File = basename(vign_fpath),
                                 Title = gsub("^\\s*%\\\\VignetteIndexEntry\\{(.+)\\}$", "\\1", lines)[[1]],
-                                PDF = list.files(docs_dir, pattern = gsub("[.]Rmd$", ".(html|pdf)$", basename(vign_fpath)))[[1]],
-                                R = list.files(docs_dir, pattern = gsub("[.]Rmd$", ".(R|r)$", basename(vign_fpath)))[[1]],
+                                PDF = pdf_file,
+                                R = r_file,
                                 stringsAsFactors = FALSE)
         vign_info$Depends <- list(character(0))
         vign_info$Keywords <- list(character(0))
@@ -231,15 +249,15 @@ pkg_build_vignettes <- function(pkg_path, rver, ex_libpath) {
     })
   vignette <- do.call("rbind", vign_infos)
   if (!dir.exists(file.path(pkg_path, "build"))) {
-    unlink_path <- file.path(pkg_path, "build")
-    dir.create(unlink_path, recursive = TRUE, showWarnings = FALSE)
+    dir.create(file.path(pkg_path, "build"), recursive = TRUE, showWarnings = FALSE)
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build"))
   } else {
-    unlink_path <- file.path(pkg_path, "build", "vignette.rds")
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build", "vignette.rds"))
   }
 
   saveRDS(vignette, file = file.path(pkg_path, "build", "vignette.rds"))
 
   return(function() {
-    unlink(unlink_path, recursive = TRUE, force = TRUE)
+    unlink(unlink_paths, recursive = TRUE, force = TRUE)
   })
 }

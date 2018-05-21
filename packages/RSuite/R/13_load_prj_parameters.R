@@ -18,24 +18,26 @@
 load_prj_parameters <- function(prj_path) {
   assert(is.character(prj_path) && length(prj_path) == 1,
          "character(1) expected for prj_path")
-  assert(file.exists(file.path(prj_path, 'PARAMETERS')),
+  assert(file.exists(file.path(prj_path, "PARAMETERS")),
          "No project PARAMETERS file found at %s", prj_path)
 
-  dcf <- read.dcf(file.path(prj_path, 'PARAMETERS'))
+  dcf <- read.dcf(file.path(prj_path, "PARAMETERS"))
 
   params <- list(
     prj_path = rsuite_fullUnifiedPath(prj_path),
-    rsuite_ver = ifelse('RSuiteVersion' %in% colnames(dcf), dcf[1, 'RSuiteVersion'], NA),
-    r_ver = ifelse('RVersion' %in% colnames(dcf), dcf[1, 'RVersion'], current_rver()), # from 97_rversion.R
+    rsuite_ver = ifelse("RSuiteVersion" %in% colnames(dcf), dcf[1, "RSuiteVersion"], NA),
+    r_ver = ifelse("RVersion" %in% colnames(dcf), dcf[1, "RVersion"], current_rver()), # from 97_rversion.R
 
     # Date of CRAN snapshot to look for dependencies in.
     #  if empty will use official CRAN and newest package versions available
-    snapshot_date = ifelse("SnapshotDate" %in% colnames(dcf), dcf[1, 'SnapshotDate'], ''),
+    snapshot_date = ifelse("SnapshotDate" %in% colnames(dcf), dcf[1, "SnapshotDate"], ""),
 
     pkgs_path = rsuite_fullUnifiedPath(file.path(prj_path,
-                                                 ifelse('PackagesPath' %in% colnames(dcf), dcf[1, 'PackagesPath'], 'packages'))),
+                                                 ifelse("PackagesPath" %in% colnames(dcf),
+                                                        dcf[1, "PackagesPath"], "packages"))),
     script_path = rsuite_fullUnifiedPath(file.path(prj_path,
-                                                   ifelse('ScriptPath' %in% colnames(dcf), dcf[1, 'ScriptPath'], 'R'))),
+                                                   ifelse("ScriptPath" %in% colnames(dcf),
+                                                          dcf[1, "ScriptPath"], "R"))),
     irepo_path = rsuite_fullUnifiedPath(file.path(prj_path, "deployment", "intrepo")),
 
     # Specifies there to put local project environment
@@ -43,13 +45,13 @@ load_prj_parameters <- function(prj_path) {
     # Specifies there to put user installed libraries
     sbox_path = rsuite_fullUnifiedPath(file.path(prj_path, "deployment", "sbox")),
 
-    zip_version = ifelse('ZipVersion' %in% colnames(dcf), dcf[1, 'ZipVersion'], ''),
-    project = ifelse("Project" %in% colnames(dcf), dcf[1, 'Project'], basename(prj_path)),
-    artifacts = ifelse("Artifacts" %in% colnames(dcf), dcf[1, 'Artifacts'], ''),
-    excludes = ifelse("Excludes" %in% colnames(dcf), dcf[1, 'Excludes'], ''),
+    zip_version = ifelse("ZipVersion" %in% colnames(dcf), dcf[1, "ZipVersion"], ""),
+    project = ifelse("Project" %in% colnames(dcf), dcf[1, "Project"], basename(prj_path)),
+    artifacts = ifelse("Artifacts" %in% colnames(dcf), dcf[1, "Artifacts"], ""),
+    excludes = ifelse("Excludes" %in% colnames(dcf), dcf[1, "Excludes"], ""),
 
     # repo_adapters to use for the project
-    repo_adapters = ifelse('Repositories' %in% colnames(dcf), dcf[1, 'Repositories'], 'CRAN'),
+    repo_adapters = ifelse("Repositories" %in% colnames(dcf), dcf[1, "Repositories"], "CRAN"),
 
     # This defines which type of packages are expected on the platform
     #   and how to build project packages.
@@ -59,7 +61,7 @@ load_prj_parameters <- function(prj_path) {
   )
 
   if (!dir.exists(params$sbox_path)) {
-    dir.create(params$sbox_path, recursive = T, showWarnings = F)
+    dir.create(params$sbox_path, recursive = TRUE, showWarnings = FALSE)
   }
 
   params$get_safe_project_name <- function() {
@@ -89,6 +91,6 @@ load_prj_parameters <- function(prj_path) {
     return(rsuite_fullUnifiedPath(params$irepo_path))
   }
 
-  class(params) <- 'rsuite_project_params'
+  class(params) <- "rsuite_project_params"
   return(params)
 }

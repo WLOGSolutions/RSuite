@@ -22,7 +22,7 @@ repo_adapter_create_mran <- function(name) {
     repo_path <- paste0("https://mran.microsoft.com/snapshot/", snapshot_date)
     return(repo_path)
   }
-  class(result) <- c('rsuite_repo_adapter_mran', class(result))
+  class(result) <- c("rsuite_repo_adapter_mran", class(result))
   return(result)
 }
 
@@ -68,4 +68,3 @@ repo_adapter_get_path.rsuite_repo_adapter_mran <- function(repo_adapter, params,
 repo_adapter_create_manager.rsuite_repo_adapter_mran <- function(repo_adapter, ...) {
   assert(FALSE, "MRAN is readonly and cannot be managed")
 }
-

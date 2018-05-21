@@ -29,15 +29,15 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
     ver <- gsub("^(\\d+[.]\\d+)([.]\\d+)?$", "\\1", ver)
     return(ver)
   }
-  if (file.exists('/etc/redhat-release')) {
-    ver <- get_os_version('/etc/redhat-release')
+  if (file.exists("/etc/redhat-release")) {
+    ver <- get_os_version("/etc/redhat-release")
     assert(!is.na(ver), "Failed to detect os version. Tried /etc/redhat-release.")
 
     rel <- paste0("rhel", ver)
-  } else if (file.exists('/etc/debian_version')) {
-    ver <- get_os_version('/etc/debian_version')
+  } else if (file.exists("/etc/debian_version")) {
+    ver <- get_os_version("/etc/debian_version")
     if (is.na(ver)) {
-      rel_str <- readLines('/etc/issue')[[1]]
+      rel_str <- readLines("/etc/issue")[[1]]
       toks <- unlist(strsplit(rel_str, " "))
       toks <- toks[grep("^\\d+[.]\\d+([.]\\d+)?$", toks)]
       ver <- gsub("^(\\d+[.]\\d+)([.]\\d+)?$", "\\1", toks)[1]
@@ -50,7 +50,7 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
 
   os_path <- sprintf("%s_%s", rel, R.version$arch)
 
-  res <- paste(gsub("/$", "", repos), "bin", os_path, "contrib", rver, sep="/")
+  res <- paste(gsub("/$", "", repos), "bin", os_path, "contrib", rver, sep = "/")
   res
 }
 

@@ -25,7 +25,7 @@ rsuite_strver_compliance <- list(
 #' @noRd
 #'
 get_earliest_strver_comliant <- function(ver) {
-  for(v in names(rsuite_strver_compliance)) {
+  for (v in names(rsuite_strver_compliance)) {
     if (ver %in% rsuite_strver_compliance[[v]]) {
       return(norm_version(v))
     }
@@ -43,21 +43,21 @@ get_earliest_strver_comliant <- function(ver) {
 check_project_structure <- function(prj_dir) {
   stopifnot(dir.exists(prj_dir))
 
-  rsuite_ver <- as.character(utils::packageVersion('RSuite'))
+  rsuite_ver <- as.character(utils::packageVersion("RSuite"))
   prj_name <- basename(prj_dir)
 
   # Verify versions and parameters
   params_file <- file.path(prj_dir, "PARAMETERS")
   params <- force_load_PARAMETERS(params_file, prj_name, rsuite_ver)
 
-  create_struct_dir(file.path(prj_dir, 'logs'), 'logs')
-  create_struct_dir(params$pkgs_path, 'packages')
-  create_struct_dir(file.path(prj_dir, 'tests'), 'tests')
-  create_struct_dir(params$script_path, 'master scripts')
+  create_struct_dir(file.path(prj_dir, "logs"), "logs")
+  create_struct_dir(params$pkgs_path, "packages")
+  create_struct_dir(file.path(prj_dir, "tests"), "tests")
+  create_struct_dir(params$script_path, "master scripts")
 
   copy_folder(from = system.file(file.path("extdata", "deployment"), package = "RSuite"),
               to = file.path(prj_dir, "deployment"))
-  create_struct_dir(params$lib_path, 'libraries')
+  create_struct_dir(params$lib_path, "libraries")
 
   # Root project folder
   conf_templ <- file.path(prj_dir, "config_templ.txt")
@@ -93,8 +93,8 @@ check_project_structure <- function(prj_dir) {
   }
 
   # initialize tests folder
-  create_rproj(file.path(prj_dir, 'tests'), paste0(prj_name, "_Tests"))
-  create_rprofile(file.path(prj_dir, 'tests'),
+  create_rproj(file.path(prj_dir, "tests"), paste0(prj_name, "_Tests"))
+  create_rprofile(file.path(prj_dir, "tests"),
                   text = "source(file.path('..', 'R', 'set_env.R'), chdir = T)")
 
   if (params$r_ver == current_rver()) {
@@ -176,13 +176,13 @@ force_load_PARAMETERS <- function(params_file, prj_name, rsuite_ver) {
 update_PARAMETERS <- function(params_file, rsuite_ver) {
   params_dt <- data.frame(read.dcf(params_file), stringsAsFactors = F)
 
-  if (!('RSuiteVersion' %in% colnames(params_dt))) {
+  if (!("RSuiteVersion" %in% colnames(params_dt))) {
     params_dt <- cbind(params_dt, data.frame(RSuiteVersion = rsuite_ver))
   } else {
     params_dt$RSuiteVersion <- rsuite_ver
   }
 
-  if (!('RVersion' %in% colnames(params_dt))) {
+  if (!("RVersion" %in% colnames(params_dt))) {
     params_dt <- cbind(params_dt,
                        data.frame(RVersion = current_rver()))  # from 97_rversion.R
   }
@@ -196,7 +196,7 @@ update_PARAMETERS <- function(params_file, rsuite_ver) {
       repos <- c(repos, "CRAN")
     }
 
-    loc_repo <- ifelse(!is.null(params_dt$LocalRepoPath), params_dt$LocalRepoPath, 'repository')
+    loc_repo <- ifelse(!is.null(params_dt$LocalRepoPath), params_dt$LocalRepoPath, "repository")
     params_dt$LocalRepoPath <- NULL
     if (nchar(loc_repo) > 0 && dir.exists(file.path(dirname(params_file), loc_repo))) {
       repos <- c(repos, sprintf("Dir[%s]", loc_repo))
@@ -226,11 +226,11 @@ create_package_structure <- function(pkg_dir) {
   keywords <- list(
     pkg_name = basename(pkg_dir),
     today = as.character(Sys.Date()),
-    user = iconv(Sys.info()[['user']], from = "utf-8", to = "latin1")
+    user = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
 
   # now replace markers in files
-  for(f in files) {
+  for (f in files) {
     lines <- readLines(con = f, warn = F)
     lines <- gsub("<PackageName>", keywords$pkg_name, lines)
     lines <- gsub("<Date>", keywords$today, lines)
@@ -239,7 +239,7 @@ create_package_structure <- function(pkg_dir) {
   }
 
   create_rproj(pkg_dir, keywords$pkg_name)
-  create_rprofile(pkg_dir, text = "source(file.path('..', '..', 'R', 'set_env.R'), chdir = T)")
+  create_rprofile(pkg_dir, text = "source(file.path('..', '..', 'R', 'set_env.R'), chdir = TRUE)")
 }
 
 
@@ -266,7 +266,7 @@ create_struct_dir <- function(dir, desc) {
 #' @noRd
 #'
 create_rproj <- function(dir, name) {
-  if (length(list.files(path = dir, pattern = "*.Rproj", recursive = F)) > 0) {
+  if (length(list.files(path = dir, pattern = "*.Rproj", recursive = FALSE)) > 0) {
     return()
   }
 
@@ -274,10 +274,12 @@ create_rproj <- function(dir, name) {
     con <- unz(system.file(file.path("extdata", "RStudio_proj_templ.zip"), package = "RSuite"),
                filename = "RStudio_proj_templ.Rproj")
     lines <- readLines(con)
-  }, error = function(e) {
+  },
+  error = function(e) {
     pkg_logwarn("Failed to copy RStudio project: %s", rproj_file)
     return(FALSE)
-  }, finally = {
+  },
+  finally = {
     close(con)
   })
 
@@ -310,13 +312,13 @@ copy_folder <- function(from, to) {
     return(invisible(TRUE))
   }
   if (basename(from) == basename(to)) {
-    success <- file.copy(from = from, to = dirname(to), recursive = T, copy.mode = T)
+    success <- file.copy(from = from, to = dirname(to), recursive = TRUE, copy.mode = TRUE)
     return(invisible(success))
   }
 
-  success <- dir.create(to, recursive = T)
-  for(ent in list.files(from, all.files = T, recursive = F, include.dirs = T, no.. = T)) {
-    success <- (file.copy(from = file.path(from, ent), to = to, recursive = T, copy.mode = T)
+  success <- dir.create(to, recursive = TRUE)
+  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
+    success <- (file.copy(from = file.path(from, ent), to = to, recursive = TRUE, copy.mode = TRUE)
                 && success)
   }
 
@@ -333,7 +335,7 @@ copy_folder <- function(from, to) {
 #' @noRd
 #'
 detect_rc_adapter <- function(prj_dir) {
-  for(rc_name in reg_rc_adapter_names()) {
+  for (rc_name in reg_rc_adapter_names()) {
     rc_adapter <- find_rc_adapter(rc_name)
     stopifnot(!is.null(rc_adapter))
 

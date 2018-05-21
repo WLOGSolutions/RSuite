@@ -12,7 +12,7 @@
 .can_eventualy_have_rw_access <- function(full_path) {
   unlist(lapply(full_path,
                 function(base_dir) {
-                  while(!dir.exists(base_dir)) {
+                  while (!dir.exists(base_dir)) {
                     base_dir <- dirname(base_dir)
                   }
                   return (file.access(base_dir, 2) != -1)
@@ -45,7 +45,7 @@ repo_adapter_create_dir <- function(name) {
     return(rsuite_fullUnifiedPath(full_path))
   }
 
-  class(result) <- c('rsuite_repo_adapter_dir', class(result))
+  class(result) <- c("rsuite_repo_adapter_dir", class(result))
   return(result)
 }
 

@@ -1,0 +1,2 @@
+linters: with_defaults(absolute_paths_linter = NULL, camel_case_linter = NULL, line_length_linter(120))
+exclusions: list("inst/extdata/set_env.R")

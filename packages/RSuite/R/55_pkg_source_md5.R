@@ -85,8 +85,6 @@ save_package_m5sums <- function(pkg_dir, params, pkg_type) {
 #'
 get_package_build_name <- function(pkg_path, pkg_type) {
   desc <- read.dcf(file.path(pkg_path, "DESCRIPTION"))
-  pkg_name <- desc[1, "Package"]
-  pkg_ver <- desc[1, "Version"]
 
   if (pkg_type == "source") {
     ext <- ".tar.gz"
@@ -117,6 +115,6 @@ collect_pkg_source_md5 <- function(pkg_path) {
   sums <- tools::md5sum(files)
 
   res <- data.frame(file = names(sums), md5 = sums, stringsAsFactors = F, row.names = NULL)
-  res$file <- substr(res$file, start = nchar(pkg_path)+1, stop = 1000000L)
+  res$file <- substr(res$file, start = nchar(pkg_path) + 1, stop = 1000000L)
   return(res)
 }

@@ -23,11 +23,11 @@
 norm_version <- function(ver) {
   ver <- as.character(ver)
 
-  ver <- gsub('(?<!\\d)(\\d)(?!\\d)', '0\\1', ver, perl = T)
-  ver <- gsub('(?<!\\d)(\\d\\d)(?!\\d)', '0\\1', ver, perl = T)
-  ver <- gsub('^(\\d+)$', '\\1.000.000', ver, perl = T)
-  ver <- gsub('^(\\d+\\D\\d+)$', '\\1.000', ver, perl = T)
-  ver <- gsub('[-_]', '.', ver, perl = T)
+  ver <- gsub("(?<!\\d)(\\d)(?!\\d)", "0\\1", ver, perl = TRUE)
+  ver <- gsub("(?<!\\d)(\\d\\d)(?!\\d)", "0\\1", ver, perl = TRUE)
+  ver <- gsub("^(\\d+)$", "\\1.000.000", ver, perl = TRUE)
+  ver <- gsub("^(\\d+\\D\\d+)$", "\\1.000", ver, perl = TRUE)
+  ver <- gsub("[-_]", ".", ver, perl = TRUE)
   return(ver)
 }
 
@@ -79,32 +79,32 @@ denorm_version <- function(ver) {
 #' @noRd
 #'
 .df2ver <- function(df, avails = NULL) {
-  stopifnot(is.data.frame(df) && all(c('pkg', 'vmin', 'vmax') %in% colnames(df)))
-  df <- df[, c('pkg', 'vmin', 'vmax')]
+  stopifnot(is.data.frame(df) && all(c("pkg", "vmin", "vmax") %in% colnames(df)))
+  df <- df[, c("pkg", "vmin", "vmax")]
 
   if (!is.null(avails)) {
     stopifnot(is.data.frame(avails)
               && all(.standard_avail_columns() %in% colnames(avails)))
     avails <- avails[avails$Package %in% df$pkg, ]
-    avails <- avails[!duplicated(avails[, c('Package', 'Version')]), ]
+    avails <- avails[!duplicated(avails[, c("Package", "Version")]), ]
 
     stopifnot(all(df$pkg %in% avails$Package                                  # present in avails
                   | (!is.na(df$vmin) & !is.na(df$vmax) && df$vmin > df$vmax))) # or infeasible
 
     avails$NVersion <- norm_version(avails$Version)
-    avails <- merge(x = avails, y = df, by.x = "Package", by.y = "pkg", all.x = F, all.y = T)
+    avails <- merge(x = avails, y = df, by.x = "Package", by.y = "pkg", all.x = FALSE, all.y = TRUE)
 
     avails <- avails[!is.na(avails$NVersion)
                      & (is.na(avails$vmin) | avails$vmin <= avails$NVersion)
                      & (is.na(avails$vmax) | avails$vmax >= avails$NVersion), ]
-    avails <- avails[, c(.standard_avail_columns(), 'NVersion')]
+    avails <- avails[, c(.standard_avail_columns(), "NVersion")]
   }
 
   res <- list(pkgs = df, avails = avails)
   class(res) <- "versions"
 
-  res$get_avails <- function() { res$avails }
-  res$has_avails <- function() { !is.null(res$avails) }
+  res$get_avails <- function() res$avails
+  res$has_avails <- function() !is.null(res$avails)
   return(res)
 }
 
@@ -298,9 +298,9 @@ vers.rm_acceptable <- function(ver, pkgs) {
 
   pkgs$Version <- norm_version(pkgs$Version)
   pkgs <- pkgs[order(pkgs$Package, pkgs$Version, decreasing = T), ]
-  pkgs <- pkgs[!duplicated(pkgs$Package),]
+  pkgs <- pkgs[!duplicated(pkgs$Package), ]
 
-  res_pkgs <- merge(x = ver$pkgs, y = pkgs, by.x = "pkg", by.y = "Package", all.x = T)
+  res_pkgs <- merge(x = ver$pkgs, y = pkgs, by.x = "pkg", by.y = "Package", all.x = TRUE)
   res_pkgs <- res_pkgs[
     is.na(res_pkgs$Version) # not present: unaceptable
     | (!is.na(res_pkgs$vmin) & res_pkgs$vmin > res_pkgs$Version)    # Version is less then required: unacceptable
@@ -357,8 +357,8 @@ vers.pick_available_pkgs <- function(ver) {
   stopifnot(ver$has_avails())
 
   avail_ver <- ver$get_avails()
-  avail_ver <- avail_ver[order(avail_ver$Package, avail_ver$NVersion, decreasing = T), ]
-  avail_ver <- avail_ver[!duplicated(avail_ver$Package),]
+  avail_ver <- avail_ver[order(avail_ver$Package, avail_ver$NVersion, decreasing = TRUE), ]
+  avail_ver <- avail_ver[!duplicated(avail_ver$Package), ]
 
   return(avail_ver)
 }
@@ -453,12 +453,12 @@ vers.union <- function(...) {
 
   ver1 <- vers[[1]]
   stopifnot(is.versions(ver1))
-  for(i in 1:length(vers)) {
+  for (i in 1:length(vers)) {
     ver2 <- vers[[i]]
     stopifnot(is.versions(ver2))
     stopifnot(ver1$has_avails() == ver2$has_avails())
 
-    df <- merge(x = ver1$pkgs, y = ver2$pkgs, by.x = "pkg", by.y = "pkg", all.x = T, all.y = T)
+    df <- merge(x = ver1$pkgs, y = ver2$pkgs, by.x = "pkg", by.y = "pkg", all.x = TRUE, all.y = TRUE)
     df$vmin <- ifelse(!is.na(df$vmin.x) & (is.na(df$vmin.y) | df$vmin.x > df$vmin.y), df$vmin.x, df$vmin.y)
     df$vmax <- ifelse(!is.na(df$vmax.x) & (is.na(df$vmax.y) | df$vmax.x < df$vmax.y), df$vmax.x, df$vmax.y)
 
@@ -510,7 +510,8 @@ vers.from_deps <- function(deps, pkg_name = NA) {
                  FUN = function(pdesc) {
                    pdesc <- gsub("\\s+", "", pdesc)
                    ver_op <- sub(pattern = ".+\\(([><=]+).+\\)", replacement = "\\1", x = pdesc)
-                   if (ver_op == pdesc) { # no version info
+                   if (ver_op == pdesc) {
+                     # no version info
                      return(vers.build(pdesc))
                    }
                    ver <- sub(pattern = ".+\\([><=]+(.+)\\)", replacement = "\\1", x = pdesc)

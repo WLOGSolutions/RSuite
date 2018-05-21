@@ -51,27 +51,26 @@ install_prj_deps <- function(params, ...) {
 #' @noRd
 #'
 resolve_prj_sups <- function(repo_infos, params, only_source = F) {
-  if(only_source) {
-    pkg_types <- "source"
-  } else {
-    pkg_types <- c(params$bin_pkgs_type, "source")
+  pkg_types <- "source"
+  if (!only_source) {
+    pkg_types <- c(params$bin_pkgs_type, pkg_types)
   }
 
 
   pkg_logdebug("Collecting project support packages (for R %s)...", params$r_ver)
-  prjSupVers <- collect_prj_support_pkgs(params)        # from 52_dependencies.R
+  prj_sup_vers <- collect_prj_support_pkgs(params)        # from 52_dependencies.R
 
   # remove project packages
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  prjSupVers <- vers.rm(prjSupVers, project_packages)
+  prj_sup_vers <- vers.rm(prj_sup_vers, project_packages)
 
   # remove installed already packages
   installed <- get_installed_packages(ex_liblocs = c(params$sbox_path, params$lib_path), rver = params$r_ver)
-  prjSupVers <- vers.rm_acceptable(prjSupVers, installed)
+  prj_sup_vers <- vers.rm_acceptable(prj_sup_vers, installed)
 
-  if (!vers.is_empty(prjSupVers)) {
+  if (!vers.is_empty(prj_sup_vers)) {
     pkg_logdebug("Resolving support packages (with deps) (for R %s)...", params$r_ver)
-    avail_vers <- resolve_dependencies(prjSupVers, repo_infos = repo_infos, pkg_types = pkg_types)
+    avail_vers <- resolve_dependencies(prj_sup_vers, repo_infos = repo_infos, pkg_types = pkg_types)
     stopifnot(avail_vers$has_avails())
     return(avail_vers)
   }
@@ -96,21 +95,20 @@ resolve_prj_sups <- function(repo_infos, params, only_source = F) {
 #' @noRd
 #'
 resolve_prj_deps <- function(repo_infos, params, only_source = F) {
-  if(only_source) {
-    pkg_types <- "source"
-  } else {
-    pkg_types <- c(params$bin_pkgs_type, "source")
+  pkg_types <- "source"
+  if (!only_source) {
+    pkg_types <- c(params$bin_pkgs_type, pkg_types)
   }
 
 
   pkg_loginfo("Collecting project dependencies (for R %s)...", params$r_ver)
-  prjDepVers <- collect_prj_direct_deps(params)        # from 52_dependencies.R
+  prj_dep_vers <- collect_prj_direct_deps(params)        # from 52_dependencies.R
 
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  prjDepVers <- vers.rm(prjDepVers, project_packages)
+  prj_dep_vers <- vers.rm(prj_dep_vers, project_packages)
 
   pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
-  avail_vers <- resolve_dependencies(prjDepVers, repo_infos = repo_infos, pkg_types = pkg_types)
+  avail_vers <- resolve_dependencies(prj_dep_vers, repo_infos = repo_infos, pkg_types = pkg_types)
   stopifnot(avail_vers$has_avails())
   return(avail_vers)
 }
@@ -128,14 +126,18 @@ resolve_prj_deps <- function(repo_infos, params, only_source = F) {
 #'
 get_installed_packages <- function(ex_liblocs, rver) {
   ou_file <- tempfile(fileext = ".RData")
-  on.exit({ unlink(ou_file, force = T) }, add = T)
+  on.exit({
+    unlink(ou_file, force = TRUE)
+  },
+  add = TRUE)
 
-  get_result <- run_rscript(c("installed <- utils::installed.packages(lib.loc = c(%s, Sys.getenv('R_LIBS_USER'), .Library.site, .Library))",
-                              "installed <- as.data.frame(installed, stringsAsFactors = F)[, c('Package', 'Version', 'Built')];",
-                              "save(installed, %s)"),
-                            rscript_arg("libs", ex_liblocs),
-                            rscript_arg("file", ou_file),
-                            rver = rver)
+  get_result <- run_rscript(
+    c("installed <- utils::installed.packages(lib.loc = c(%s, Sys.getenv('R_LIBS_USER'), .Library.site, .Library))",
+      "installed <- as.data.frame(installed, stringsAsFactors = F)[, c('Package', 'Version', 'Built')];",
+      "save(installed, %s)"),
+    rscript_arg("libs", ex_liblocs),
+    rscript_arg("file", ou_file),
+    rver = rver)
   if (!is.null(get_result)) {
     if (get_result == FALSE) {
       pkg_logwarn("Get installed aborted")
@@ -143,7 +145,8 @@ get_installed_packages <- function(ex_liblocs, rver) {
       pkg_logwarn("Get installed failed: %s", get_result)
     }
 
-    installed <- as.data.frame(utils::installed.packages(lib.loc = ex_liblocs), stringsAsFactors = F)[, c("Package", "Version", "Built")]
+    installed <- as.data.frame(utils::installed.packages(lib.loc = ex_liblocs),
+                               stringsAsFactors = F)[, c("Package", "Version", "Built")]
   } else {
     installed <- NULL # to prevent warning
     load(ou_file)
@@ -183,8 +186,11 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
   pkg_loginfo("Detected %s support packages to install. Installing...", length(vers.get_names(avail_vers)))
 
   tmp_dir <- tempfile()
-  dir.create(tmp_dir, recursive = T)
-  on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
+  dir.create(tmp_dir, recursive = TRUE)
+  on.exit({
+    unlink(tmp_dir, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   avail_deps <- vers.pick_available_pkgs(avail_vers)
   dloaded <- pkg_download(avail_deps, dest_dir = tmp_dir)
@@ -217,7 +223,8 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
   stopifnot(is_nonempty_char1(lib_dir))
 
   remove_installed <- function(vers) {
-    installed <- as.data.frame(utils::installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Version", "Built")]
+    installed <- as.data.frame(utils::installed.packages(lib.loc = lib_dir),
+                               stringsAsFactors = F)[, c("Package", "Version", "Built")]
     installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
     return(vers.rm_acceptable(vers, installed))
   }
@@ -231,8 +238,11 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
   pkg_loginfo("Detected %s dependencies to install. Installing...", length(vers.get_names(avail_vers)))
 
   tmp_dir <- tempfile()
-  dir.create(tmp_dir, recursive = T)
-  on.exit({ unlink(tmp_dir, recursive = T, force = T) }, add = T)
+  dir.create(tmp_dir, recursive = TRUE)
+  on.exit({
+    unlink(tmp_dir, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
   avail_deps <- vers.pick_available_pkgs(avail_vers)
   dloaded <- pkg_download(avail_deps, dest_dir = tmp_dir)
@@ -270,10 +280,10 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types) {
 
   curr_cr <- check_res.build(missing = vers.rm_base(vers))
   all_deps <- check_res.get_missing(curr_cr)
-  while(!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
+  while (!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
     curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
-    for(ri in repo_infos) {
-      for(tp in pkg_types) {
+    for (ri in repo_infos) {
+      for (tp in pkg_types) {
         tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
                                          repo_info = ri,
                                          type = tp)
@@ -331,8 +341,8 @@ resolve_packages <- function(vers, repo_infos, pkg_types) {
   curr_miss <- vers
   found <- vers.build(avails = data.frame())
 
-  for(ri in repo_infos) {
-    for(tp in pkg_types) {
+  for (ri in repo_infos) {
+    for (tp in pkg_types) {
       contrib_url <- ri$get_contrib_url(tp) # from 53_repositories.R
 
       tp_avails <- vers.collect(contrib_url)
@@ -374,7 +384,7 @@ resolve_packages <- function(vers, repo_infos, pkg_types) {
 #'
 pkg_inst_order <- function(pkgs, db) {
   pkg2deps <- tools::package_dependencies(pkgs, db = db)
-  for(nm in names(pkg2deps)) {
+  for (nm in names(pkg2deps)) {
     pkg2deps[[nm]] <- intersect(pkg2deps[[nm]], db$Package)
   }
 
@@ -382,16 +392,16 @@ pkg_inst_order <- function(pkgs, db) {
 
   result <- c()
   processed <- c()
-  while(length(setdiff(pkgs, processed)) > 0) {
-    nextSet <- pkgs[unlist(lapply(X = pkg2deps[pkgs],
-                                  FUN = function(deps) length(setdiff(deps, processed)) == 0))
-                    & !(pkgs %in% processed)]
-    assert(length(nextSet) > 0,
+  while (length(setdiff(pkgs, processed)) > 0) {
+    next_set <- pkgs[unlist(lapply(X = pkg2deps[pkgs],
+                                   FUN = function(deps) length(setdiff(deps, processed)) == 0))
+                     & !(pkgs %in% processed)]
+    assert(length(next_set) > 0,
            "Dependencies for %s package(s) could not be satisfied",
            paste(setdiff(pkgs, processed), collapse = ", "))
 
-    result <- c(result, idxs[pkgs %in% nextSet]) # append to result their indexes
-    processed <- c(processed, nextSet)
+    result <- c(result, idxs[pkgs %in% next_set]) # append to result their indexes
+    processed <- c(processed, next_set)
   }
 
   stopifnot(length(result) == length(pkgs))

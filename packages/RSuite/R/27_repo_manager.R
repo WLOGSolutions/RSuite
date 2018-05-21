@@ -125,13 +125,13 @@ repo_manager_upload.default <- function(repo_manager, src_dir, types) {
 #'
 repo_manager_remove <- function(repo_manager, toremove, type) {
   assert(is_repo_manager(repo_manager), "rsuite_repo_manager object expected for repo_manager")
-  assert(is.data.frame(toremove) && all(c('Package', 'Version') %in% colnames(toremove)),
+  assert(is.data.frame(toremove) && all(c("Package", "Version") %in% colnames(toremove)),
          "data.frame with at least colums Package and Version expected for toremove")
   assert(is_nonempty_char1(type), "non empty character(1) expected for type")
 
   res <- UseMethod("repo_manager_remove")
 
-  assert(is.data.frame(res) && all(c('Package', 'Version') %in% colnames(toremove)),
+  assert(is.data.frame(res) && all(c("Package", "Version") %in% colnames(toremove)),
          "Unexpected result of repo_manager_remove for %s implementation",
          paste(class(repo_manager), collapse = " "))
   return(res)
@@ -186,4 +186,3 @@ repo_manager_destroy.default <- function(repo_manager) {
 is_repo_manager <- function(obj) {
   return("rsuite_repo_manager" %in% class(obj))
 }
-

@@ -19,14 +19,14 @@
 #'
 build_project_pkgslist <- function(pkgs_path) {
   pkg_dirs <- Filter(x = list.dirs(pkgs_path, full.names = FALSE, recursive = FALSE),
-                     f = function(d) { file.exists(file.path(pkgs_path, d, "DESCRIPTION")) })
+                     f = function(d) file.exists(file.path(pkgs_path, d, "DESCRIPTION")))
   if (!length(pkg_dirs)) {
     return()
   }
 
   dir2deps <- list()
   pkg_names <- sapply(X = pkg_dirs,
-                      FUN = function(pkg_dir) { desc_retrieve_name(pkgs_path, pkg_dir) })
+                      FUN = function(pkg_dir) desc_retrieve_name(pkgs_path, pkg_dir))
 
   for (pkg_dir in pkg_dirs) {
     pkg_deps <- unlist(strsplit(desc_retrieve_dependencies(pkgs_path, pkg_dir), split = ","))
@@ -36,14 +36,16 @@ build_project_pkgslist <- function(pkgs_path) {
   }
   stopifnot(length(pkg_dirs) == length(pkg_names))
 
-  selection <- sapply(pkg_dirs, function(pd) { length(dir2deps[[pd]]) == 0 })
+  selection <- sapply(pkg_dirs, function(pd) {
+    length(dir2deps[[pd]]) == 0
+  })
   ordered_dirs <- pkg_dirs[selection]
   ordered_names <- pkg_names[selection]
 
   pkg_dirs <- setdiff(pkg_dirs, ordered_dirs)
   pkg_names <- setdiff(pkg_names, ordered_names)
-  while(length(pkg_dirs) > 0) {
-    selection <- sapply(pkg_dirs, function(pd) { all(dir2deps[[pd]] %in% ordered_names) })
+  while (length(pkg_dirs) > 0) {
+    selection <- sapply(pkg_dirs, function(pd) all(dir2deps[[pd]] %in% ordered_names))
     ordered_dirs <- c(ordered_dirs, pkg_dirs[selection])
     ordered_names <- c(ordered_names, pkg_names[selection])
 
@@ -70,11 +72,11 @@ retrieve_project_pkgsvers <- function(pkgs_path) {
   project_packages <- Filter(x = list.dirs(pkgs_path,
                                            full.names = FALSE,
                                            recursive = FALSE),
-                             f = function(n) { file.exists(file.path(pkgs_path, n, "DESCRIPTION")) })
+                             f = function(n) file.exists(file.path(pkgs_path, n, "DESCRIPTION")))
   result <- list()
-  for(pkg in project_packages) {
+  for (pkg in project_packages) {
     descr <- read.dcf(file.path(pkgs_path, pkg, "DESCRIPTION"))
-    result[[pkg]] <- as.character(descr[1, 'Version'])
+    result[[pkg]] <- as.character(descr[1, "Version"])
   }
   return(result)
 }
@@ -92,19 +94,19 @@ retrieve_project_pkgsvers <- function(pkgs_path) {
 #' @keywords internal
 #' @noRd
 #'
-update_project_pkgsvers <-function(pkgs_path, pkgsvers) {
+update_project_pkgsvers <- function(pkgs_path, pkgsvers) {
   project_packages <- Filter(x = list.dirs(pkgs_path,
                                            full.names = FALSE,
                                            recursive = FALSE),
-                             f = function(n) { file.exists(file.path(pkgs_path, n, "DESCRIPTION")) })
-  for(pkg in project_packages) {
+                             f = function(n) file.exists(file.path(pkgs_path, n, "DESCRIPTION")))
+  for (pkg in project_packages) {
     if (!(pkg %in% names(pkgsvers))) {
       next
     }
 
     desc_file <- file.path(pkgs_path, pkg, "DESCRIPTION")
     descr <- read.dcf(desc_file)
-    descr[, 'Version'] <- pkgsvers[[pkg]]
+    descr[, "Version"] <- pkgsvers[[pkg]]
     write.dcf(descr, file = desc_file)
   }
 }
@@ -185,11 +187,11 @@ backup_pkgdesc_files <- function(pkgs_path) {
   project_packages <- Filter(x = list.dirs(pkgs_path,
                                            full.names = FALSE,
                                            recursive = FALSE),
-                             f = function(n) { file.exists(file.path(pkgs_path, n, "DESCRIPTION")) })
-  for(pkg in project_packages) {
+                             f = function(n) file.exists(file.path(pkgs_path, n, "DESCRIPTION")))
+  for (pkg in project_packages) {
     success <- file.copy(from = file.path(pkgs_path, pkg, "DESCRIPTION"),
                          to = file.path(bkp_dir, pkg),
-                         copy.date = T)
+                         copy.date = TRUE)
     assert(success, "Failed to backup DESCRIPTION file of %s", pkg)
   }
 
@@ -212,17 +214,17 @@ restore_pkgdesc_files <- function(bkp) {
   project_packages <- Filter(x = list.dirs(bkp$pkgs_path,
                                            full.names = FALSE,
                                            recursive = FALSE),
-                             f = function(n) { file.exists(file.path(bkp$pkgs_path, n, "DESCRIPTION")) })
-  for(pkg in project_packages) {
+                             f = function(n) file.exists(file.path(bkp$pkgs_path, n, "DESCRIPTION")))
+  for (pkg in project_packages) {
     bkp_file <- file.path(bkp$bkp_dir, pkg)
     if (file.exists(bkp_file)) {
       success <- file.copy(from = bkp_file, to = file.path(bkp$pkgs_path, pkg, "DESCRIPTION"),
-                           overwrite = T, copy.date = T)
+                           overwrite = TRUE, copy.date = TRUE)
       assert(success, "Failed to restore DESCRIPTION file of %s", pkg)
     }
   }
 
-  unlink(bkp$bkp_dir, recursive = T, force = T)
+  unlink(bkp$bkp_dir, recursive = TRUE, force = TRUE)
 }
 
 
@@ -253,19 +255,19 @@ get_package_files_info <- function(files) {
     pkg_name <- gsub("^([^_]+)_.+$", "\\1", basename(abs_file))
     dcf <- get_pkg_desc(pkg_name, abs_file)
 
-    if (!('Built' %in% colnames(dcf))) {
-      pkg_type <- 'source'
+    if (!("Built" %in% colnames(dcf))) {
+      pkg_type <- "source"
       rver <- NA
     } else {
-      pkg_type <- ifelse(grepl('; windows$', dcf$Built), 'win.binary', 'mac.binary')
-      rver <- majmin_rver(gsub('^R ([^;]+);.+$', '\\1', dcf$Built))
+      pkg_type <- ifelse(grepl("; windows$", dcf$Built), "win.binary", "mac.binary")
+      rver <- majmin_rver(gsub("^R ([^;]+);.+$", "\\1", dcf$Built))
     }
 
     dcf[, setdiff(c("Depends", "Imports", "LinkingTo"), colnames(dcf))] <- NA
     data.frame(Package = pkg_name, Version = dcf$Version,
                Depends = dcf$Depends, Imports = dcf$Imports, LinkingTo = dcf$LinkingTo,
                Type = pkg_type, RVersion = rver, File = file,
-               stringsAsFactors = F)
+               stringsAsFactors = FALSE)
   }
 
   db <- do.call("rbind", lapply(X = files, FUN = get_pkg_file_info))
@@ -286,20 +288,29 @@ get_package_files_info <- function(files) {
 get_pkg_desc <- function(pkg_name, path) {
   if (dir.exists(path)) {
     dcf <- tryCatch({
-      data.frame(read.dcf(file.path(path, "DESCRIPTION")), stringsAsFactors = F)[1,]
-    }, error = function(e) { NULL })
+      data.frame(read.dcf(file.path(path, "DESCRIPTION")), stringsAsFactors = FALSE)[1, ]
+    },
+    error = function(e) NULL)
   } else if (grepl("[.]zip$", path)) {
     con <- unz(path, file.path(pkg_name, "DESCRIPTION"))
     dcf <- tryCatch({
-      data.frame(read.dcf(con), stringsAsFactors = F)[1,]
-    }, error = function(e) { NULL }, finally = { close(con) })
+      data.frame(read.dcf(con), stringsAsFactors = F)[1, ]
+    },
+    error = function(e) NULL,
+    finally = {
+      close(con)
+    })
   } else {
     tmp_dir <- tempfile(pattern = "pkg_info")
     dir.create(tmp_dir)
     dcf <- tryCatch({
       utils::untar(path, files = file.path(pkg_name, "DESCRIPTION"), exdir = tmp_dir)
-      data.frame(read.dcf(file.path(tmp_dir, pkg_name, "DESCRIPTION")), stringsAsFactors = F)[1,]
-    }, error = function(e) { NULL }, finally = { unlink(tmp_dir, recursive = T, force = T) })
+      data.frame(read.dcf(file.path(tmp_dir, pkg_name, "DESCRIPTION")), stringsAsFactors = FALSE)[1, ]
+    },
+    error = function(e) NULL,
+    finally = {
+      unlink(tmp_dir, recursive = TRUE, force = TRUE)
+    })
   }
 
   assert(!is.null(dcf), "Failed to read DESCRIPTION from package: %s", path)
@@ -327,7 +338,7 @@ get_pkgzip_info <- function(pkgzip) {
   assert(is_nonempty_char1(pkgzip), "Non empty character(1) expected for pkgzip")
   assert(file.exists(pkgzip), "File %s does not exist", pkgzip)
 
-  files <- utils::unzip(pkgzip, list = T)$Name
+  files <- utils::unzip(pkgzip, list = TRUE)$Name
   files <- files[grepl("^.+/[^_]+_[^/]+[.](zip|t(ar[.])?gz)$", files)]
   dummy_urls <- sprintf("http://repo/%s", files)
 

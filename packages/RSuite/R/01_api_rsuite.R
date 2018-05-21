@@ -15,16 +15,16 @@
 #'
 rsuite_check_version <- function() {
   pkgs <- suppressWarnings({
-    utils::available.packages(repos = 'https://wlog-rsuite.s3.amazonaws.com', filters = list())
+    utils::available.packages(repos = "https://wlog-rsuite.s3.amazonaws.com", filters = list())
   })
-  pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)[, c('Package', 'Version')]
-  pkgs <- pkgs[pkgs$Package == 'RSuite', ]
+  pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)[, c("Package", "Version")]
+  pkgs <- pkgs[pkgs$Package == "RSuite", ]
   if (!nrow(pkgs)) {
     return()
   }
 
   max_norm_ver <- gsub("-", ".", max(norm_version(pkgs$Version)))
-  cur_norm_ver <- gsub("-", ".", norm_version(as.character(utils::packageVersion('RSuite'))))
+  cur_norm_ver <- gsub("-", ".", norm_version(as.character(utils::packageVersion("RSuite"))))
   if (max_norm_ver <= cur_norm_ver) {
     return()
   }
@@ -73,7 +73,8 @@ rsuite_update <- function() {
     install_dependencies(avail_vers,
                          lib_dir = .libPaths()[[1]], # install into default location
                          rver = rver)
-  }, finally = {
+  },
+  finally = {
     .libPaths(prev_lib_path)
   })
 
@@ -135,4 +136,3 @@ rsuite_register_rc_adapter <- function(rc_adapter) {
 rsuite_get_rc_adapter_names <- function() {
   reg_rc_adapter_names()
 }
-

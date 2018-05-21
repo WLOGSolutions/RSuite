@@ -19,7 +19,7 @@
 #' @noRd
 #'
 repo_manager_dir_create <- function(path, types, rver) {
-  assert((is.na(rver) && all(types == "source")) || is_nonempty_char1(rver),
+  assert( (is.na(rver) && all(types == "source")) || is_nonempty_char1(rver),
          "Non empty character(1) expected for rver")
   assert(is_nonempty_char1(path), "Non empty character(1) expected for path")
 
@@ -66,7 +66,7 @@ repo_manager_init.rsuite_repo_manager_dir <- function(repo_manager, types) {
   repo_path <- repo_manager$path
 
   was_inited <- TRUE
-  for(tp in types) {
+  for (tp in types) {
     tp_path <- rsuite_contrib_url(repo_path, type = tp, rver = repo_manager$rver)
     if (!file.exists(file.path(tp_path, "PACKAGES"))) {
       success <- dir.create(tp_path, recursive = TRUE)
@@ -92,7 +92,7 @@ repo_manager_upload.rsuite_repo_manager_dir <- function(repo_manager, src_dir, t
     types <- repo_manager$types
   }
 
-  for(tp in types) {
+  for (tp in types) {
     src_path <- rsuite_contrib_url(src_dir, type = tp, rver = repo_manager$rver)
     if (!dir.exists(src_path)) {
       pkg_loginfo("No package files found in %s.", src_path)
@@ -106,7 +106,7 @@ repo_manager_upload.rsuite_repo_manager_dir <- function(repo_manager, src_dir, t
 
     pkg_loginfo("Copying package files from %s into %s ...", src_path, dst_path)
 
-    for(f in list.files(src_path)) {
+    for (f in list.files(src_path)) {
       if (grepl("^PACKAGES", f)) {
         next
       }
@@ -147,7 +147,7 @@ repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, 
 
   rsuite_write_PACKAGES(path, type)
 
-  res <- toremove[toremove$Removed, c('Package', 'Version')]
+  res <- toremove[toremove$Removed, c("Package", "Version")]
   return(res)
 }
 
@@ -160,4 +160,3 @@ repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, 
 repo_manager_destroy.rsuite_repo_manager_dir <- function(repo_manager) {
   # noop
 }
-

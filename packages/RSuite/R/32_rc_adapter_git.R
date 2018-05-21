@@ -17,7 +17,7 @@
 rc_adapter_create_git <- function(name) {
   result <- rc_adapter_create_base(name)
 
-  class(result) <- c('rsuite_rc_adapter_git', class(result))
+  class(result) <- c("rsuite_rc_adapter_git", class(result))
   return(result)
 }
 
@@ -35,9 +35,8 @@ rc_adapter_is_under_control.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
     repo <- git2r::repository(dir, discover = T)
     pkg_logdebug("Git working directory detected: %s", git2r::workdir(repo))
     TRUE
-  }, error = function(e) {
-    return(FALSE)
-  })
+  },
+  error = function(e) FALSE)
 }
 
 #'
@@ -53,7 +52,7 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) 
   if (!nchar(prj_gitbase)) {
     git_path <- file.path
   } else {
-    git_path <- function(...) { file.path(prj_gitbase, ...) }
+    git_path <- function(...) file.path(prj_gitbase, ...)
   }
 
   writeLines(c(".Rproj.user", ".Rhistory", ".Rdata", ".Rbuildignore", ".Ruserdata", "config.txt"),
@@ -112,7 +111,7 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, 
   if (!nchar(pkg_gitbase)) {
     git_path <- file.path
   } else {
-    git_path <- function(...) { file.path(pkg_gitbase, ...) }
+    git_path <- function(...) file.path(pkg_gitbase, ...)
   }
 
   writeLines("", con = file.path(pkg_dir, ".gitignore"))
