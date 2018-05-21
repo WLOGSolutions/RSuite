@@ -214,6 +214,7 @@ sub_commands <- list(
                              "\t imps  - do not perform imports validation",
                              "\t tests - do not run package tests",
                              "\t rcpp_attribs - do not run Rcpp attributes compilation on the package",
+                             "\t vignettes - do not run vignettes building",
                              "(default: %default)",
                              sep = "\n\t\t")),
       make_option(c("--keep-sources"), dest = "keep_sources", action="store_true", default=FALSE,

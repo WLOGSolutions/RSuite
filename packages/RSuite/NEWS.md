@@ -3,6 +3,7 @@
   * #138: Fixes related to project R-cross building. Proper detection of 
      installed packages for Rver. devtools is installed into sbox if not 
      found for Rver required by the project.
+  * Handling vignettes building while building package.
   
 # RSuite 0.25 (2018-04-23)
   * Functionality related to integration with RStutio moved to separate AddIn

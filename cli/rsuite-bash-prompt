@@ -260,7 +260,7 @@ _rsuite() {
 									opts="TRUE FALSE"
 									;;
 								--skip-build-steps)
-									opts="specs docs imps tests rcpp_attribs"
+									opts="specs docs imps tests rcpp_attribs vignettes"
 									;;
 								*)
 									opts="-r -h -b --rver --with-deps --skip-build-steps --keep-sources -d -s $common_opts_short"
@@ -447,7 +447,7 @@ _rsuite() {
 									opts="ubuntu centos debian"
 									;;
 								--rver|-r)
-									opts="3.2 3.3 3.4"									
+									opts="3.2 3.3 3.4"
 									;;
 								*)
 									opts="-i -p -r -n --sh $common_opts_short"

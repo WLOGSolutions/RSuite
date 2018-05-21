@@ -1,12 +1,12 @@
 ---
-title: "RSuite"
-author: "Vignette Author"
+title: "RSuite basic workflow"
+author: "WLOG Solutions"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{RSuite basic workflow}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  \VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}

@@ -166,6 +166,7 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
 #'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
 #'
@@ -183,8 +184,8 @@ repo_upload_prj_packages <- function(repo_manager,
   assert(is.logical(with_deps), "Logical value expected for with_deps")
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
-           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
   }
 
   prj <- safe_get_prj(prj)
@@ -463,6 +464,7 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
 #'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
 #' @param keep_sources if TRUE downloaded package sources will not be removed
@@ -482,8 +484,8 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   assert(is.logical(with_deps), "logical expected for with_deps")
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
-           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
   }
   assert(is.logical(keep_sources), "logical expected for keep_sources")
 

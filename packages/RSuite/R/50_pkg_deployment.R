@@ -131,6 +131,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
 #'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N)).
 #'
@@ -192,6 +193,15 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
     rcpp_attribs_skip_cmd <- c()
   }
 
+  vign_cleanup <- NULL
+  if ('vignettes' %in% skip_build_steps) {
+    pkg_loginfo("Skipping vignettes building")
+  } else {
+    vign_cleanup <- pkg_build_vignettes(pkg_path, # from 54_pkg_document.R
+                                        rver, ex_libpath = c(libpath, sboxpath))
+  }
+  on.exit({ if (!is.null(vign_cleanup)) { vign_cleanup() } }, add = TRUE)
+
   if ("tests" %in% skip_build_steps) {
     pkg_loginfo("Skipping package testing")
   } else if (devtools::uses_testthat(pkg = pkg_path)) {
@@ -214,13 +224,13 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
                 rscript_arg("path", dest_dir),
                 rscript_arg("binary", binary))
   ou_file <- tempfile(fileext = ".RData")
-  on.exit(unlink(ou_file, force = T))
+  on.exit(unlink(ou_file, force = TRUE), add = TRUE)
 
   bld_res <- run_rscript(c("library(devtools)",
                            ".libPaths(%s)",
                            "setwd(%s)", # to prevent loading .Rprofile by R CMD
                            rcpp_attribs_skip_cmd,
-                           "ou_path <- build(%s)",
+                           "ou_path <- build(%s, vignettes = FALSE)",
                            "save(ou_path, %s)"),
                          rscript_arg("new", libpath),
                          rscript_arg("dir", libpath),

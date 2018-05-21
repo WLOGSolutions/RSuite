@@ -18,4 +18,6 @@ Imports:
   git2r,
   jsonlite,
   subprocess
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
 RoxygenNote: 6.0.1

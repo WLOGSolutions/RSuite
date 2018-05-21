@@ -73,6 +73,7 @@
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
 #'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
 #'
@@ -100,8 +101,8 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
   }
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
-           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
   }
 
   prj <- safe_get_prj(prj)
@@ -343,6 +344,7 @@ pkgzip_build_ext_packages <- function(pkgs,
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
 #'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
 #' @param keep_sources if TRUE downloaded package sources will not be removed
@@ -373,8 +375,8 @@ pkgzip_build_github_package <- function(repo, ...,
   }
   if (!is.null(skip_build_steps)) {
     assert(is.character(skip_build_steps)
-           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs")),
-           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests or rcpp_attribs")
+           && all(skip_build_steps %in% c("spec", "docs", "imps", "tests", "rcpp_attribs", "vignettes")),
+           "character(N) expected for skip_build_steps containing entities spec, docs, imps, tests, rcpp_attribs or vignettes")
   }
   assert(is.logical(keep_sources), "logical expected for keep_sources")
 

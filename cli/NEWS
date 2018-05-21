@@ -1,3 +1,7 @@
+VERSION 0.26 (2018-05-??)
+  * support for vignettes in skip-build-step option for 'pkgzip github' and
+    'repo addgithub'
+
 VERSION 0.25 (2018-04-23)
   * install command adapted to install RSuiteRStudio add-in.
   * main windows script adapted to detect non global R installation.
