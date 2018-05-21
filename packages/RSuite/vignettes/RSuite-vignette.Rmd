@@ -79,7 +79,7 @@ config <- load_config()
 args <- args_parser()
 ```
 
-To check if everything is working properly the ```R\master.R``` script:
+To check if everything is working properly run the ```R\master.R``` script:
 ```
 source('R/master.R')
 ```
