@@ -1,6 +1,6 @@
 ---
 title: "RSuite"
-author: "Vignette Author"
+author: "WLOG solutions"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -68,7 +68,7 @@ In folder ```R``` there are master scripts - these are execution scripts in our 
 script_path <- (function() {
 	args <- commandArgs(trailingOnly = FALSE)
 	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return(".") }
+	if (!length(script_path)) { return("R") }
 	return(normalizePath(script_path))
 })()
 
@@ -96,7 +96,7 @@ RSuite::prj_start_package(name='mypackage')
 
 ## Add custom package to master script
 
-Open in any editor R\master.R and change it to look like this:
+Open in any editor ```master.R``` and change it to look like this:
 ```
 # Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
 script_path <- (function() {
@@ -146,7 +146,7 @@ If everything worked properly you shouldn't see any error messages.
 Lets add a function ```hello_world``` to our package ```mypackage```. To do this you have to create a new file in folder ```packages/mypackage/R/hello_world.R```. Edit hello_world.R to have the following content:
 
 ```
-#'@export
+# '@export
 hello_world <- function(name) {
     sprintf("Hello %s!", name)
 }
@@ -413,10 +413,134 @@ When you open this log in an editor you should see content similar to this
 2017-09-23 17:31:22 WARNING::Master warning
 2017-09-23 17:31:22 ERROR::Master error
 ```
-As you can see this is very similar to output you saw in console.
+As you can see this is very similar to the output you saw in console.
 
 ## Loggers in packages
+R Suite allows you to use loggers in your custom packages. Lets open ```hello_world.R``` and change its content to the following one
+
+```
+# '@export
+hello_world <- function(name) {
+  pkg_loginfo("Package info")
+  pkg_logdebug("Package debug")
+  pkg_logwarn("Package warning")
+  pkg_logerror("Package error")
+
+  print(sprintf("Hello %s!", name))
+}
+```
+
+You can check how it works by issuing this command
+```
+source('R/master.R')
+```
+
+The output you should see
+
+```
+Loading mypackage
+Loading required package: data.table
+2017-09-23 17:37:52 INFO::Master info
+2017-09-23 17:37:52 DEBUG::Master debug
+2017-09-23 17:37:52 WARNING::Master warning
+2017-09-23 17:37:52 ERROR::Master error
+2017-09-23 17:37:52 INFO:mypackage:Package info
+2017-09-23 17:37:52 DEBUG:mypackage:Package debug
+2017-09-23 17:37:52 WARNING:mypackage:Package warning
+2017-09-23 17:37:52 ERROR:mypackage:Package error
+[1] "Hello John!"
+```
+
+As you can see there are messages from your package. They are marked with package name ```mypackage```. Please also note that as you used ```devtools``` in your master script you did not have to build package to see the changes.
 
 ## Prepare deployment package
 
+We can now prepare a deployment package to ship our project on a production. To do this you have to first remove ```devtools``` from ```master.R```
+
+```
+# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
+script_path <- (function() {
+	args <- commandArgs(trailingOnly = FALSE)
+	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
+	if (!length(script_path)) { return(".") }
+	return(normalizePath(script_path))
+})()
+
+# Setting .libPaths() to point to libs folder
+source(file.path(script_path, "set_env.R"), chdir = T)
+
+config <- load_config()
+args <- args_parser()
+
+library(mypackage)
+
+loginfo("Master info")
+logdebug("Master debug")
+logwarn("Master warning")
+logerror("Master error")
+
+hello_world("John")
+```
+
+Now you have to install dependecies
+```
+RSuite::prj_install_deps()
+```
+
+As you did not add any new dependencies R Suite smartly understands it and do not repeat lengthy dependencies installation phase.
+
+Lets build our custom packages
+```
+RSuite::prj_build()
+```
+
+You should see the following output
+```
+2017-09-23 17:44:20 INFO:rsuite:Installing mypackage (for R 3.4) ...
+2017-09-23 17:44:25 INFO:rsuite:Successfuly build 1 packages
+```
+
+To build a deployment package you use the following function
+```
+RSuite::prj_zip()
+```
+
+You can see that if the project is not under version controll the command returns error. You have to explicitly give version number for your deployment package
+
+```
+RSuite::prj_zip(zip_ver = '1.0')
+```
+
+The output should be like this
+
+```
+2017-09-23 17:49:01 INFO:rsuite:Installing mypackage (for R 3.4) ...
+2017-09-23 17:49:06 INFO:rsuite:Successfuly build 1 packages
+2017-09-23 17:49:06 INFO:rsuite:Preparing files for zipping...
+2017-09-23 17:49:07 INFO:rsuite:... done. Creating zip file my_project_1.0x.zip ...
+2017-09-23 17:49:08 INFO:rsuite:Zip file created: C:/Workplace/Projects/my_project/my_project_1.0x.zip
+```
+
+You have crated file ```my_project_1.0x.zip``` that contains all information necessary to run your solution on a production environment.
+
 ## Running deployment package
+
+To test if the deployment package is working you can extract ```my_project_1.0x.zip``` created in previous step in a new folder say ```prod```. Now you can run your solution with the command
+
+```
+source('my_project/R/master.R')
+```
+
+The output you should see
+
+```
+2017-09-23 17:53:34 INFO::Master info
+2017-09-23 17:53:34 WARNING::Master warning
+2017-09-23 17:53:34 ERROR::Master error
+2017-09-23 17:53:34 INFO:mypackage:Package info
+2017-09-23 17:53:34 WARNING:mypackage:Package warning
+2017-09-23 17:53:34 ERROR:mypackage:Package error
+[1] "Hello John!"
+```
+
+As you can see the output is exactly the same you would expect.
