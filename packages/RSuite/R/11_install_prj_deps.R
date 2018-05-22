@@ -65,7 +65,8 @@ resolve_prj_sups <- function(repo_infos, params, only_source = F) {
   prj_sup_vers <- vers.rm(prj_sup_vers, project_packages)
 
   # remove installed already packages
-  installed <- get_installed_packages(ex_liblocs = c(params$sbox_path, params$lib_path), rver = params$r_ver)
+  installed <- get_installed_packages(ex_liblocs = c(params$sbox_path, params$lib_path),
+                                      rver = params$r_ver, with_globals = TRUE)
   prj_sup_vers <- vers.rm_acceptable(prj_sup_vers, installed)
 
   if (!vers.is_empty(prj_sup_vers)) {
@@ -118,25 +119,33 @@ resolve_prj_deps <- function(repo_infos, params, only_source = F) {
 #'
 #' @param ex_liblocs path(s) to extra folders to look for installed packages. (type: character(N))
 #' @param rver R version to retrieve installed packages for. (type: character(1))
+#' @param with_globals if TRUE will check also globally installed packages. (type: logical(1))
 #'
 #' @return data.frame with columns Package, Version, Build
 #'
 #' @keywords internal
 #' @noRd
 #'
-get_installed_packages <- function(ex_liblocs, rver) {
+get_installed_packages <- function(ex_liblocs, rver, with_globals = TRUE) {
   ou_file <- tempfile(fileext = ".RData")
   on.exit({
     unlink(ou_file, force = TRUE)
   },
   add = TRUE)
 
+  if (any(with_globals)) {
+    installed_cmd <- "installed <- utils::installed.packages(lib.loc = .libPaths());"
+  } else {
+    installed_cmd <- sprintf("installed <- utils::installed.packages(lib.loc = head(.libPaths(), n = %s));",
+                             length(ex_liblocs))
+  }
+
   get_result <- run_rscript(
-    c("installed <- utils::installed.packages(lib.loc = c(%s, Sys.getenv('R_LIBS_USER'), .Library.site, .Library))",
+    c(installed_cmd,
       "installed <- as.data.frame(installed, stringsAsFactors = F)[, c('Package', 'Version', 'Built')];",
       "save(installed, %s)"),
-    rscript_arg("libs", ex_liblocs),
     rscript_arg("file", ou_file),
+    ex_libpath = ex_liblocs,
     rver = rver)
   if (!is.null(get_result)) {
     if (get_result == FALSE) {
@@ -173,7 +182,8 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
   stopifnot(is_nonempty_char1(lib_dir))
 
   remove_installed <- function(vers) {
-    installed <- get_installed_packages(ex_liblocs = c(sbox_dir, lib_dir), rver = rver)
+    installed <- get_installed_packages(ex_liblocs = c(sbox_dir, lib_dir),
+                                        rver = rver, with_globals = TRUE)
     return(vers.rm_acceptable(vers, installed))
   }
 
