@@ -280,12 +280,14 @@ prj_load <- function(path, prj = NULL) {
 #'    project for working directory. (type: rsuite_project, default: NULL)
 #' @param clean if TRUE clear environment before installing package dependecies.
 #'   (type: logical, default: FALSE)
+#' @param vanilla if TRUE install only base supportive packages (like devtools & roxygen2).
+#'   (type: logical, default: FALSE)
 #'
 #' @return TRUE if all build successfully.
 #'
 #' @export
 #'
-prj_install_deps <- function(prj = NULL, clean = FALSE) {
+prj_install_deps <- function(prj = NULL, clean = FALSE, vanilla = FALSE) {
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
@@ -307,7 +309,7 @@ prj_install_deps <- function(prj = NULL, clean = FALSE) {
     pkg_loginfo("Cleaning up local environment... done")
   }
 
-  install_prj_deps(params)
+  install_prj_deps(params, vanilla = vanilla) # from 11_install_prj_deps.R
 }
 
 

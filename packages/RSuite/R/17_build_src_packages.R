@@ -65,12 +65,12 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
 
   # not to include default packages
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = TRUE),  force = TRUE)
-  prj_install_deps(bld_prj) # build environment
+  prj_install_deps(bld_prj, vanilla = TRUE) # build environment
 
   # build packages itself
   build_install_prj_packages(bld_params, # from 12_build_install_prj_pacakges.R
                              pkg_type,
-                             skip_build_steps = c("docs", "imps", "rcpp_attribs"))
+                             skip_build_steps = c("docs", "imps", "rcpp_attribs", "tests", "vignettes"))
 
   res_url <- sprintf("file:///%s",
                      rsuite_contrib_url(bld_params$irepo_path,

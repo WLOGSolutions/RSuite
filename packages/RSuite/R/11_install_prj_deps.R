@@ -8,8 +8,8 @@
 #'
 #' Builds local project environment.
 #'
-#' @param params prject parameters(type: rsuite_project_params)
-#' @param ... parameters passed to installation process
+#' @param params prject parameters. (type: rsuite_project_params)
+#' @param vanilla if TRUE collects only base supportive packages. (type: logical)
 #'
 #' It collects packages the project depends on and installs them in local
 #' project environment. ependencies are collected from packages and master
@@ -18,7 +18,7 @@
 #' @keywords internal
 #' @noRd
 #'
-install_prj_deps <- function(params, ...) {
+install_prj_deps <- function(params, vanilla = FALSE) {
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
 
   repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
@@ -27,7 +27,7 @@ install_prj_deps <- function(params, ...) {
   avail_vers <- resolve_prj_deps(repo_infos, params)
   install_dependencies(avail_vers, lib_dir = params$lib_path, rver = params$r_ver)
 
-  avail_sup_vers <- resolve_prj_sups(repo_infos, params)
+  avail_sup_vers <- resolve_prj_sups(repo_infos, params, vanilla = vanilla)
   if (!is.null(avail_sup_vers)) {
     install_support_pkgs(avail_sup_vers,
                          sbox_dir = params$sbox_path,
@@ -44,21 +44,22 @@ install_prj_deps <- function(params, ...) {
 #'    to use for dependencies detection.
 #' @param params object of rsuite_project_params
 #' @param only_source detect only source type dependencies
+#' @param vanilla if TRUE resolves only base supportive packages. (type: logical(1))
 #'
 #' @return version object describing available project dependencies.
 #'
 #' @keywords internal
 #' @noRd
 #'
-resolve_prj_sups <- function(repo_infos, params, only_source = F) {
+resolve_prj_sups <- function(repo_infos, params, only_source = FALSE, vanilla = FALSE) {
   pkg_types <- "source"
   if (!only_source) {
     pkg_types <- c(params$bin_pkgs_type, pkg_types)
   }
 
-
-  pkg_logdebug("Collecting project support packages (for R %s)...", params$r_ver)
-  prj_sup_vers <- collect_prj_support_pkgs(params)        # from 52_dependencies.R
+  pkg_logdebug("Collecting project support(%s) packages (for R %s)...",
+               ifelse(any(vanilla), "Base", "All"), params$r_ver)
+  prj_sup_vers <- collect_prj_support_pkgs(params, vanilla)   # from 52_dependencies.R
 
   # remove project packages
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R

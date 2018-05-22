@@ -46,6 +46,7 @@ collect_prj_direct_deps <- function(params) {
 #' Detects all project required support packages.
 #'
 #' @param params object of rsuite_project_params class
+#' @param vanilla if TRUE detects only base supportive packages. (type: logical(1))
 #'
 #' @return object of versions class containing all support packages required.
 #'   Version requirements for support packages included should be empty.
@@ -53,7 +54,7 @@ collect_prj_direct_deps <- function(params) {
 #' @keywords internal
 #' @noRd
 #'
-collect_prj_support_pkgs <- function(params) {
+collect_prj_support_pkgs <- function(params, vanilla = FALSE) {
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
 
   requires_roxygen <- function(pkg_path) {
@@ -98,6 +99,10 @@ collect_prj_support_pkgs <- function(params) {
                                 }
                               }
 
+                              if (any(vanilla)) {
+                                return(sup_pkgs)
+                              }
+
                               if ("VignetteBuilder" %in% colnames(desc)) {
                                 sup_pkgs <- c(sup_pkgs, desc[1, "VignetteBuilder"])
                               }
@@ -115,24 +120,32 @@ collect_prj_support_pkgs <- function(params) {
                               return(sup_pkgs)
                             }))
 
-  prj_tests_path <- file.path(params$prj_path, "tests")
-  if (dir.exists(prj_tests_path)) {
-    sup_pkgs <- c(sup_pkgs,
-                  collect_dir_script_deps(prj_tests_path, recursive = FALSE))
+  if (!any(vanilla)) {
+    prj_tests_path <- file.path(params$prj_path, "tests")
+    if (dir.exists(prj_tests_path)) {
+      sup_pkgs <- c(sup_pkgs,
+                    collect_dir_script_deps(prj_tests_path, recursive = FALSE))
+    }
+    if ("knitr" %in% sup_pkgs) {
+      sup_pkgs <- c(sup_pkgs, "rmarkdown")
+    }
   }
 
-  sup_vers <- vers.build(unique(sup_pkgs))
+  support_vers <- vers.build(unique(sup_pkgs))
 
   # collect suggested packages
-  sug_vers <- do.call("vers.union",
-                      lapply(X = names(prj_packages),
-                             FUN = function(pkg_dir) {
-                               sugs <- desc_retrieve_dependencies(params$pkgs_path, pkg_dir, # from 51_pkg_info.R
-                                                                  fields = "Suggests")
-                               vers.from_deps(sugs, prj_packages[[pkg_dir]])
-                             }))
+  suggest_vers <- do.call(
+    "vers.union",
+    lapply(X = names(prj_packages),
+           FUN = function(pkg_dir) {
+             sugs <- desc_retrieve_dependencies(params$pkgs_path, pkg_dir, # from 51_pkg_info.R
+                                                fields = "Suggests")
+             vers.from_deps(sugs, prj_packages[[pkg_dir]])
+           }))
+  suggest_vers <- vers.rm(suggest_vers,
+                          setdiff(vers.get_names(suggest_vers), vers.get_names(support_vers)))
 
-  return(vers.union(sup_vers, sug_vers))
+  return(vers.union(suggest_vers, support_vers))
 }
 
 
