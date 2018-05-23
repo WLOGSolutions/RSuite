@@ -30,6 +30,8 @@ On Debian like systems (Debian/Ubuntu) you can install them executing:
 $ sudo apt-get install -y libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev
 ```
 
+It is also necessary to have Rtools installed, because RSuite makes use of the zip program.
+
 **Important:** If you are installing using RSuite CLI (see below) the
 required dependencies are installed automatically.
 
