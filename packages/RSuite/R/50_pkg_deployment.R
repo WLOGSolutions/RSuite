@@ -262,7 +262,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   ou_path <- NULL # to prevent warning on ou_path not visible
   load(ou_file)
 
-  if (!file.exists(ou_file)) {
+  if (!file.exists(ou_path)) {
     pkg_logwarn(paste("R reported package(%s) build succeeded but no package file created;",
                       "Verify if tools are available (like zip)"),
                 pkg_name)
