@@ -1,4 +1,4 @@
-VERSION 0.26 (2018-05-??)
+VERSION 0.26 (2018-05-23)
   * support for vignettes in skip-build-step option for 'pkgzip github' and
     'repo addgithub'
 

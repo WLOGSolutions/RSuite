@@ -1,4 +1,4 @@
-# RSuite 0.26 (2018-05-??)
+# RSuite 0.26 (2018-05-23)
   * Saving MD5 sums for package also if it gets build for the first time.
   * #138: Fixes related to project R-cross building. Proper detection of 
      installed packages for Rver. devtools is installed into sbox if not 
