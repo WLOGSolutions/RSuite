@@ -99,7 +99,7 @@ make_detached_repos <- function(params) {
     return(urls)
   }
 
-  for (ix in 1:length(ra_names)) {
+  for (ix in seq_along(ra_names)) {
     ra_name <- ra_names[[ix]]
     repo_adapter <- find_repo_adapter(ra_name)
     if (is.null(repo_adapter)) {
@@ -134,7 +134,7 @@ get_all_repo_infos <- function(params, rver = NULL) {
 
   non_reliable <- c()
   seen_adapters <- list()
-  for (ix in 1:length(ra_names)) {
+  for (ix in seq_along(ra_names)) {
     ra_name <- ra_names[ix]
     if (!(ra_name %in% names(seen_adapters))) {
       repo_adapter <- find_repo_adapter(ra_name)
@@ -164,7 +164,7 @@ get_all_repo_infos <- function(params, rver = NULL) {
       if (length(repo_path) == 1) {
         names(repo_path) <- sprintf("%s#%s", ra_name, ix)
       } else {
-        names(repo_path) <- sprintf("%s#%s", paste0(ra_name, 1:length(repo_path)), ix)
+        names(repo_path) <- sprintf("%s#%s", paste0(ra_name, seq_along(repo_path)), ix)
       }
     }
 
@@ -326,13 +326,13 @@ get_curl_available_packages <- function(contrib_url) {
 
                            # remove R cache
                            r_cache_file <- file.path(tempdir(), paste0("repos_", utils::URLencode(curl, TRUE), ".rds"))
-                           unlink(r_cache_file, force = T)
+                           unlink(r_cache_file, force = TRUE)
                          }
 
                          pkgs <- suppressWarnings({
                            utils::available.packages(contriburl = curl, filters = list())
                          })
-                         pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)
+                         pkgs <- data.frame(pkgs, stringsAsFactors = FALSE, row.names = NULL)
 
                          if (nrow(pkgs) == 0) {
                            return(NULL)
@@ -343,7 +343,7 @@ get_curl_available_packages <- function(contrib_url) {
                              saveRDS(pkgs, file = cfile)
                              pkg_logdebug("Availables from %s cached.", curl)
                            },
-                           silent = T)
+                           silent = TRUE)
                          }
                          pkgs
                        },

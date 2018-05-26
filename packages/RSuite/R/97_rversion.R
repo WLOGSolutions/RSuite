@@ -14,7 +14,7 @@
 #' @noRd
 #'
 current_rver <- function() {
-  paste(c(R.version$major, unlist(strsplit(R.version$minor, ".", fixed = T))[1]), collapse = ".")
+  paste(c(R.version$major, unlist(strsplit(R.version$minor, ".", fixed = TRUE))[1]), collapse = ".")
 }
 
 #'
@@ -99,7 +99,7 @@ get_rscript_path <- function(rver) {
 #' @noRd
 #'
 get_rscript_search_paths <- function(rscript_cmd) {
-  paths <- unlist(strsplit(Sys.getenv("PATH"), split = .Platform$path.sep, fixed = T))
+  paths <- unlist(strsplit(Sys.getenv("PATH"), split = .Platform$path.sep, fixed = TRUE))
 
   if (.Platform$OS.type == "windows") {
     machine_regs <- tryCatch({

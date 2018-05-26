@@ -26,7 +26,7 @@ has_package_changed <- function(pkg_dir, params, pkg_type) {
   md5_fpath <- file.path(contrib_url, gsub("^(.+)[.](tar[.]gz|tgz|zip)$", ".\\1.md5src.rds", build_name))
   if (!file.exists(file.path(contrib_url, build_name))) {
     pkg_logfinest("... no built package file found")
-    unlink(md5_fpath, force = T)
+    unlink(md5_fpath, force = TRUE)
     return(TRUE)
   }
 
@@ -39,7 +39,7 @@ has_package_changed <- function(pkg_dir, params, pkg_type) {
   prev_md5 <- readRDS(md5_fpath)
   changes <- merge(x = curr_md5, y = prev_md5,
                    by.x = c("file"), by.y = c("file"),
-                   all.x = T, all.y = T)
+                   all.x = TRUE, all.y = TRUE)
   changes <- changes[is.na(changes$md5.x) | is.na(changes$md5.y) | changes$md5.x != changes$md5.y, ]
 
   if (nrow(changes) == 0) {
@@ -111,10 +111,10 @@ get_package_build_name <- function(pkg_path, pkg_type) {
 collect_pkg_source_md5 <- function(pkg_path) {
   files <- c(file.path(pkg_path, c("DESCRIPTION", "NAMESPACE")),
              list.files(file.path(pkg_path, c("inst", "data", "man", "R")),
-                        recursive = T, full.names = T))
+                        recursive = TRUE, full.names = TRUE))
   sums <- tools::md5sum(files)
 
-  res <- data.frame(file = names(sums), md5 = sums, stringsAsFactors = F, row.names = NULL)
+  res <- data.frame(file = names(sums), md5 = sums, stringsAsFactors = FALSE, row.names = NULL)
   res$file <- substr(res$file, start = nchar(pkg_path) + 1, stop = 1000000L)
   return(res)
 }

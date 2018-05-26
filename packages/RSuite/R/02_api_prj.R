@@ -411,7 +411,7 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
                                     rebuild = TRUE)
 
   if (!dir.exists(path)) {
-    dir.create(path, recursive = T, showWarnings = F)
+    dir.create(path, recursive = TRUE, showWarnings = FALSE)
   }
   zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
 }
@@ -484,9 +484,9 @@ prj_pack <- function(prj = NULL, path = getwd(),
 
   tmp_dir <- tempfile("pkgpack_")
   on.exit({
-      unlink(tmp_dir, recursive = T, force = T)
+      unlink(tmp_dir, recursive = TRUE, force = TRUE)
   },
-  add = T)
+  add = TRUE)
 
   exp_params <- export_prj(params, # from 19_pack_helpers.R
                            rver,

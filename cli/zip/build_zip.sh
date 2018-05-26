@@ -24,5 +24,5 @@ chmod -x ${build_dir}/R/*.R
 mkdir -p ${base_dir}/zips
 
 pushd ${base_dir} > /dev/null
-zip -r zips/rsuitecli-${ver}.zip ${build_dir}
+zip -r zips/rsuitecli-${ver}.zip rsuitecli
 popd > /dev/null

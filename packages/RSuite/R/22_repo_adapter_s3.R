@@ -36,7 +36,7 @@ repo_adapter_create_s3 <- function(name) {
 #'
 repo_adapter_get_path.rsuite_repo_adapter_s3 <- function(repo_adapter, params, ix = NA) {
   url <- repo_adapter_get_path.rsuite_repo_adapter_url(repo_adapter, params, ix)
-  assert(all(grepl("^https?://[\\w\\d\\._-]+\\.s3\\.amazonaws\\.com(/.*)?$", url, perl = T)),
+  assert(all(grepl("^https?://[\\w\\d\\._-]+\\.s3\\.amazonaws\\.com(/.*)?$", url, perl = TRUE)),
          paste0("Invalid url specified for %s repository in project PARAMETERS file.",
                 " Amazon S3 url should have <schema>://<bucket>.s3.amazonaws.com/<path> form;",
                 " Url does not have required form: %s"),

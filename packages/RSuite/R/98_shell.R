@@ -172,7 +172,7 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
   result <- tryCatch({
     ok <- FALSE
     while (TRUE) {
-      ln <- readLines(con, n = 1, skipNul = T)
+      ln <- readLines(con, n = 1, skipNul = TRUE)
       if (!length(ln)) {
         break
       }
@@ -207,8 +207,8 @@ rscript_arg <- function(name, val) {
   }
 
   val <- gsub("\\\\", "/", val)
-  val <- gsub("\"", "\\\"", val, fixed = T)
-  val <- gsub("'", "\\\"", val, fixed = T)
+  val <- gsub("\"", "\\\"", val, fixed = TRUE)
+  val <- gsub("'", "\\\"", val, fixed = TRUE)
   if (length(val) == 1) {
     sprintf("%s='%s'", name, val)
   } else {

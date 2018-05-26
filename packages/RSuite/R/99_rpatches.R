@@ -74,9 +74,9 @@ rsuite_write_PACKAGES <- function(url, type) {
   }
 
   if (type %in% c("win.binary", "source", "mac.binary")) {
-    nr <- tools::write_PACKAGES(url, type = type, latestOnly = F, addFiles = T)
+    nr <- tools::write_PACKAGES(url, type = type, latestOnly = FALSE, addFiles = TRUE)
   } else {
-    nr <- tools::write_PACKAGES(url, latestOnly = F, addFiles = T)
+    nr <- tools::write_PACKAGES(url, latestOnly = FALSE, addFiles = TRUE)
   }
 
   if (!file.exists(file.path(url, "PACKAGES")) || nr == 0) {
@@ -93,7 +93,7 @@ rsuite_write_PACKAGES <- function(url, type) {
 
   if (file.exists(file.path(url, "PACKAGES.rds"))) {
     # get rid of PACKAGES.rds as it does not support package version history
-    unlink(file.path(url, "PACKAGES.rds"), recursive = T, force = T)
+    unlink(file.path(url, "PACKAGES.rds"), recursive = TRUE, force = TRUE)
   }
 }
 

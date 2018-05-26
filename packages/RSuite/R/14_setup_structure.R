@@ -66,10 +66,10 @@ check_project_structure <- function(prj_dir) {
   }
 
   create_rproj(prj_dir, prj_name)
-  create_rprofile(prj_dir, text = "source(file.path('R', 'set_env.R'), chdir = T)")
+  create_rprofile(prj_dir, text = "source(file.path('R', 'set_env.R'), chdir = TRUE)")
 
   # Scripts folder
-  if (length(list.files(path = params$script_path, pattern = "*.R", recursive = F)) == 0) {
+  if (length(list.files(path = params$script_path, pattern = "*.R", recursive = FALSE)) == 0) {
     msc_templ <- file.path(params$script_path, "master.R")
     success <- file.copy(
       from = system.file(file.path("extdata", "script_templ.R"), package = "RSuite"),
@@ -79,7 +79,7 @@ check_project_structure <- function(prj_dir) {
     }
   }
 
-  create_rprofile(params$script_path, text = "source('set_env.R', chdir = T)")
+  create_rprofile(params$script_path, text = "source('set_env.R', chdir = TRUE)")
 
   set_env_r <- file.path(params$script_path, "set_env.R")
   if (!file.exists(set_env_r)) {
@@ -95,7 +95,7 @@ check_project_structure <- function(prj_dir) {
   # initialize tests folder
   create_rproj(file.path(prj_dir, "tests"), paste0(prj_name, "_Tests"))
   create_rprofile(file.path(prj_dir, "tests"),
-                  text = "source(file.path('..', 'R', 'set_env.R'), chdir = T)")
+                  text = "source(file.path('..', 'R', 'set_env.R'), chdir = TRUE)")
 
   if (params$r_ver == current_rver()) {
     # add logger to libraries folder as it will be required for sure
@@ -174,7 +174,7 @@ force_load_PARAMETERS <- function(params_file, prj_name, rsuite_ver) {
 #' @noRd
 #'
 update_PARAMETERS <- function(params_file, rsuite_ver) {
-  params_dt <- data.frame(read.dcf(params_file), stringsAsFactors = F)
+  params_dt <- data.frame(read.dcf(params_file), stringsAsFactors = FALSE)
 
   if (!("RSuiteVersion" %in% colnames(params_dt))) {
     params_dt <- cbind(params_dt, data.frame(RSuiteVersion = rsuite_ver))
@@ -231,7 +231,7 @@ create_package_structure <- function(pkg_dir) {
 
   # now replace markers in files
   for (f in files) {
-    lines <- readLines(con = f, warn = F)
+    lines <- readLines(con = f, warn = FALSE)
     lines <- gsub("<PackageName>", keywords$pkg_name, lines)
     lines <- gsub("<Date>", keywords$today, lines)
     lines <- gsub("<User>", keywords$user, lines)
@@ -252,7 +252,7 @@ create_package_structure <- function(pkg_dir) {
 #'
 create_struct_dir <- function(dir, desc) {
   if (!dir.exists(dir)) {
-    created <- dir.create(dir, recursive = T)
+    created <- dir.create(dir, recursive = TRUE)
     assert(created, "Failed to create %s directory: %s.", desc, dir)
   }
 }

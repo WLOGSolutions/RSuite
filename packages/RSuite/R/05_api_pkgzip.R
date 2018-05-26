@@ -235,7 +235,7 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
     return(invisible(zip_file_path))
   },
   finally = {
-    unlink(tmp_path, recursive = T, force = T)
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
   })
 }
 
@@ -397,7 +397,7 @@ pkgzip_build_github_package <- function(repo, ...,
   bld_prj_path <- tempfile(pattern = "srcrepo_proj_")
   if (!any(keep_sources)) {
     on.exit({
-      unlink(bld_prj_path, recursive = T, force = T)
+      unlink(bld_prj_path, recursive = TRUE, force = TRUE)
     },
     add = TRUE)
   } else {
@@ -407,7 +407,7 @@ pkgzip_build_github_package <- function(repo, ...,
 
   bld_prj <- prj_start(name = basename(bld_prj_path),
                        path = dirname(bld_prj_path),
-                       skip_rc = T)
+                       skip_rc = TRUE)
 
   prj_config_set_rversion(rver = params$r_ver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
@@ -417,7 +417,7 @@ pkgzip_build_github_package <- function(repo, ...,
   bld_params <- bld_prj$load_params()
 
   # not to include default packages
-  unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = T), force = TRUE)
+  unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = TRUE), force = TRUE)
   prj_install_deps(bld_prj)
 
   pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_info$dir, "DESCRIPTION"))[1, "Version"]

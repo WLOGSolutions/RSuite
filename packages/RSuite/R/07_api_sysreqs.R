@@ -42,7 +42,7 @@ sysreqs_collect <- function(prj = NULL) {
   result <- list()
 
   dloaded <- pkg_download(avail_vers$avails, dest_dir = tmp_dir)
-  for (r in 1:nrow(dloaded)) {
+  for (r in seq_len(nrow(dloaded))) {
     dl <- dloaded[r, ]
     dcf <- get_pkg_desc(dl$Package, dl$Path) # from 51_pkg_info.R
 

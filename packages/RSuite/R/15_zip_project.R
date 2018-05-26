@@ -105,7 +105,7 @@ detect_consistent_revision <- function(params) {
 zip_project <- function(params, version, odir) {
   wdir <- tempfile()
   if (!dir.exists(wdir)) {
-    success <- dir.create(wdir, recursive = T)
+    success <- dir.create(wdir, recursive = TRUE)
     assert(success, "Failed to create temporary folder %s", wdir)
   }
 
@@ -114,7 +114,7 @@ zip_project <- function(params, version, odir) {
 
   pkg_loginfo("Preparing files for zipping...")
   if (dir.exists(root_dir)) {
-    unlink(root_dir, recursive = T, force = T)
+    unlink(root_dir, recursive = TRUE, force = TRUE)
   }
   success <- dir.create(root_dir)
   assert(success, "Failed to create temporary folder")
@@ -124,7 +124,7 @@ zip_project <- function(params, version, odir) {
     assert(success,
            "Failed to create logs folder in temporary folder")
 
-    success <- file.copy(params$lib_path, root_dir, recursive = T)
+    success <- file.copy(params$lib_path, root_dir, recursive = TRUE)
     assert(success,
            "Failed to copy project libraries to temporary folder")
 
@@ -150,7 +150,7 @@ zip_project <- function(params, version, odir) {
       list.files(root_dir, pattern = "^[.]Rhistory", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
       list.files(root_dir, pattern = "^[.]svn", recursive = TRUE, include.dirs = TRUE, all.files = TRUE)
     )
-    unlink(file.path(root_dir, to_rem), recursive = T, force = T)
+    unlink(file.path(root_dir, to_rem), recursive = TRUE, force = TRUE)
 
     # remove any RC administratives from in root_dir
     rc_adapter <- detect_rc_adapter(params$prj_path)
@@ -168,7 +168,7 @@ zip_project <- function(params, version, odir) {
     assert(success, "Failed to create zip file (zip returned non 0 return status).")
   },
   finally = {
-    unlink(wdir, recursive = T, force = T)
+    unlink(wdir, recursive = TRUE, force = TRUE)
   })
   pkg_loginfo("Zip file created: %s", file.path(odir, zip_file_name))
 }

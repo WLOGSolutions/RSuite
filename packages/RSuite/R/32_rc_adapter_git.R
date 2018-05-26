@@ -32,7 +32,7 @@ rc_adapter_create_git <- function(name) {
 #'
 rc_adapter_is_under_control.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   tryCatch({
-    repo <- git2r::repository(dir, discover = T)
+    repo <- git2r::repository(dir, discover = TRUE)
     pkg_logdebug("Git working directory detected: %s", git2r::workdir(repo))
     TRUE
   },
@@ -46,9 +46,9 @@ rc_adapter_is_under_control.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
 #' @noRd
 #'
 rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) {
-  repo <- git2r::repository(params$prj_path, discover = T)
+  repo <- git2r::repository(params$prj_path, discover = TRUE)
 
-  prj_gitbase <- sub(rsuite_fullUnifiedPath(workdir(repo)), "", params$prj_path, fixed = T)
+  prj_gitbase <- sub(rsuite_fullUnifiedPath(workdir(repo)), "", params$prj_path, fixed = TRUE)
   if (!nchar(prj_gitbase)) {
     git_path <- file.path
   } else {
@@ -105,9 +105,9 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) 
 #'
 rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, name) {
   pkg_dir <- file.path(params$pkgs_path, name)
-  repo <- git2r::repository(pkg_dir, discover = T)
+  repo <- git2r::repository(pkg_dir, discover = TRUE)
 
-  pkg_gitbase <- sub(rsuite_fullUnifiedPath(workdir(repo)), "", pkg_dir, fixed = T)
+  pkg_gitbase <- sub(rsuite_fullUnifiedPath(workdir(repo)), "", pkg_dir, fixed = TRUE)
   if (!nchar(pkg_gitbase)) {
     git_path <- file.path
   } else {
@@ -144,7 +144,7 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, 
 #' @noRd
 #'
 rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
-  repo <- git2r::repository(dir, discover = T)
+  repo <- git2r::repository(dir, discover = TRUE)
   st <- git2r::status(repo)
 
   # detect head target
@@ -162,7 +162,7 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
       return(act_tag@sha)
     }
   }
-  head_tag <- names(repo_tags)[sapply(repo_tags, function(x) tag_target(x) == head_target)]
+  head_tag <- names(repo_tags)[vapply(repo_tags, function(x) tag_target(x) == head_target)]
   assert(length(head_tag), "Failed to find HEAD commit tag. Is it tagged?")
   assert(length(head_tag) == 1, "More than one HEAD commit tag found: %s.", paste(head_tag, collapse = ", "))
 
@@ -187,5 +187,5 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
 #'
 rc_adapter_remove_admins.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   admins <- list.files(dir, pattern = ".gitignore", recursive = TRUE, all.files = TRUE)
-  unlink(file.path(dir, admins), force = T)
+  unlink(file.path(dir, admins), force = TRUE)
 }

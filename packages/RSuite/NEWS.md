@@ -1,3 +1,11 @@
+# RSuite 0.27 (2018-06-??)
+  * Handling downloaded packages cache have had error: then multiple packages
+     were checks inproper repository cache folder was selected. Due to that
+     binary packages there installed for inproper R version.
+  * RSuite processed with goodpractices and most of detected issues fixed. 
+     goodpractices unfortunatly does not use .lintr in package file, so 
+     default lintr configuration (inproper for RSuite) is in use while checked. 
+
 # RSuite 0.26 (2018-05-23)
   * Saving MD5 sums for package also if it gets build for the first time.
   * #138: Fixes related to project R-cross building. Proper detection of 

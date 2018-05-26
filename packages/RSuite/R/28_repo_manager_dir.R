@@ -112,7 +112,7 @@ repo_manager_upload.rsuite_repo_manager_dir <- function(repo_manager, src_dir, t
       }
 
       success <- file.copy(from = file.path(src_path, f), to = file.path(dst_path, f),
-                           overwrite = T)
+                           overwrite = TRUE)
       assert(success, "Failed to copy %s into %s.", f, dst_path)
     }
     rsuite_write_PACKAGES(dst_path, tp)
@@ -136,9 +136,9 @@ repo_manager_remove.rsuite_repo_manager_dir <- function(repo_manager, toremove, 
   toremove$Removed <- unlist(
     lapply(X = sprintf("%s_%s.*", toremove$Package, toremove$Version),
            FUN = function(pattern) {
-             file <- list.files(path = path, pattern = pattern, full.names = T)
+             file <- list.files(path = path, pattern = pattern, full.names = TRUE)
              if (length(file) > 0) {
-               unlink(file, force = T) == 0
+               unlink(file, force = TRUE) == 0
              } else {
                FALSE
              }

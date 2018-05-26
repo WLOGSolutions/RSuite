@@ -106,11 +106,11 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
          "data.frame with at least Package and Version columns expected for toremove")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
 
-  avails <- repo_mng_list(repo_manager, pkg_type, no.cache = T)
+  avails <- repo_mng_list(repo_manager, pkg_type, no.cache = TRUE)
   avails <- merge(x = toremove[, c("Package", "Version")],
                   y = avails[, c("Package", "Version", "Repository")],
                   by.x = c("Package", "Version"), by.y = c("Package", "Version"),
-                  all.x = T)
+                  all.x = TRUE)
 
   unknown <- avails[is.na(avails$Repository), ]
   assert(nrow(unknown) == 0,
@@ -127,7 +127,7 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
   res$Removed <- TRUE
   res <- merge(x = toremove[, c("Package", "Version")], y = res[, c("Package", "Version", "Removed")],
                by.x = c("Package", "Version"), by.y = c("Package", "Version"),
-               all.x = T)
+               all.x = TRUE)
 
   failed <- res[is.na(res$Removed), ]
   assert(nrow(failed) == 0,
@@ -246,7 +246,7 @@ repo_upload_prj_packages <- function(repo_manager,
 
   tmp_path <- tempfile("pkgzip_temp_repo")
   on.exit({
-    unlink(tmp_path, recursive = T, force = T)
+    unlink(tmp_path, recursive = TRUE, force = TRUE)
   },
   add = TRUE)
 
@@ -514,7 +514,7 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   bld_prj_path <- tempfile(pattern = "srcrepo_proj_")
   if (!any(keep_sources)) {
     on.exit({
-      unlink(bld_prj_path, recursive = T, force = T)
+      unlink(bld_prj_path, recursive = TRUE, force = TRUE)
     },
     add = TRUE)
   } else {
@@ -524,7 +524,7 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
 
   bld_prj <- prj_start(name = basename(bld_prj_path),
                        path = dirname(bld_prj_path),
-                       skip_rc = T)
+                       skip_rc = TRUE)
 
   prj_config_set_rversion(rver = mgr_info$rver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
@@ -532,12 +532,12 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   pkg_info <- get_srcrepo_package(bld_prj, "github", repo, ...)
 
   unlink(list.files(bld_prj$load_params()$script_path, # not to include default packages
-                    pattern = ".+[.]R$", full.names = T),
-         force = T)
+                    pattern = ".+[.]R$", full.names = TRUE),
+         force = TRUE)
   prj_install_deps(bld_prj)
 
   repo_upload_prj_packages(repo_manager, pkgs = pkg_info$name, prj = bld_prj,
-                           skip_rc = T, pkg_type = pkg_type,
+                           skip_rc = TRUE, pkg_type = pkg_type,
                            with_deps = with_deps,
                            skip_build_steps = skip_build_steps)
 }

@@ -83,7 +83,7 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
     error = function(e) NULL)
     assert(!is.null(bundle_path), "Failed to decompress sources from %s", bundle)
   } else {
-    success <- file.copy(from = bundle, to = bld_params$pkgs_path, recursive = T)
+    success <- file.copy(from = bundle, to = bld_params$pkgs_path, recursive = TRUE)
     assert(success, "Failed to retrieve downloaded package source")
     bundle_path <- bundle
   }
@@ -99,10 +99,10 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   # alter packages to point to retrieved package
   prj_path_toks <- unlist(strsplit(bld_params$prj_path, "[\\/]"))
   pkg_path_toks <- unlist(strsplit(rsuite_fullUnifiedPath(dirname(source)), "[\\/]"))
-  pkgs_path <- paste(pkg_path_toks[- (1:length(prj_path_toks))], collapse = "/") # relative to prj_path
+  pkgs_path <- paste(pkg_path_toks[- seq_along(prj_path_toks)], collapse = "/") # relative to prj_path
 
   bld_params_file <- file.path(bld_prj$path, "PARAMETERS")
-  bld_params_df <- data.frame(read.dcf(bld_params_file), stringsAsFactors = F)
+  bld_params_df <- data.frame(read.dcf(bld_params_file), stringsAsFactors = FALSE)
   if (!("PackagesPath" %in% colnames(bld_params_df))) {
     bld_params_df <- cbind(bld_params_df, data.frame(PackagesPath = pkgs_path))
   } else {

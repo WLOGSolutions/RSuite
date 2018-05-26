@@ -46,10 +46,10 @@ norm_version <- function(ver) {
 #'
 denorm_version <- function(ver) {
   ver <- as.character(ver)
-  ver <- gsub("(?<!\\d)0+([1-9]\\d*)(?!\\d)", "\\1", ver, perl = T)
-  ver <- gsub("(?<!\\d)0{3}(?!\\d)", "0", ver, perl = T)
-  ver <- gsub("\\D0$", "", ver, perl = T)
-  ver <- gsub("\\D0$", "", ver, perl = T)
+  ver <- gsub("(?<!\\d)0+([1-9]\\d*)(?!\\d)", "\\1", ver, perl = TRUE)
+  ver <- gsub("(?<!\\d)0{3}(?!\\d)", "0", ver, perl = TRUE)
+  ver <- gsub("\\D0$", "", ver, perl = TRUE)
+  ver <- gsub("\\D0$", "", ver, perl = TRUE)
   return(ver)
 }
 
@@ -147,20 +147,21 @@ vers.build <- function(pkg_names = c(), vmin = NA, vmax = NA, avails = NULL) {
       col_names <- .standard_avail_columns()
       avails <- data.frame(
         matrix(character(), nrow = 0, ncol = length(col_names), dimnames = list(c(), col_names)),
-        stringsAsFactors = F)
+        stringsAsFactors = FALSE)
     } else {
       stopifnot(all(.standard_avail_columns() %in% colnames(avails)))
       avails <- avails[, .standard_avail_columns()]
     }
   }
   if (!length(pkg_names)) {
-    return(.df2ver(data.frame(pkg = as.character(), vmin = as.character(), vmax = as.character(), stringsAsFactors = F),
+    return(.df2ver(data.frame(pkg = as.character(), vmin = as.character(), vmax = as.character(),
+                              stringsAsFactors = FALSE),
                    avails = avails))
   }
   return(.df2ver(data.frame(pkg = pkg_names,
                             vmin = norm_version(vmin),
                             vmax = norm_version(vmax),
-                            stringsAsFactors = F),
+                            stringsAsFactors = FALSE),
                  avails = avails))
 }
 
@@ -186,7 +187,7 @@ vers.check_against <- function(ver, oth) {
   stopifnot(is.versions(oth))
   stopifnot(ver$has_avails() || oth$has_avails())
 
-  ver_diff <- merge(x = ver$pkgs, y = oth$pkgs, by.x = "pkg", by.y = "pkg", all.x = T)
+  ver_diff <- merge(x = ver$pkgs, y = oth$pkgs, by.x = "pkg", by.y = "pkg", all.x = TRUE)
   ver_diff$vmin <- ifelse(!is.na(ver_diff$vmin.x) & (is.na(ver_diff$vmin.y) | ver_diff$vmin.x > ver_diff$vmin.y),
                           ver_diff$vmin.x,
                           ver_diff$vmin.y)
@@ -297,7 +298,7 @@ vers.rm_acceptable <- function(ver, pkgs) {
   pkgs <- pkgs[, c("Package", "Version")]
 
   pkgs$Version <- norm_version(pkgs$Version)
-  pkgs <- pkgs[order(pkgs$Package, pkgs$Version, decreasing = T), ]
+  pkgs <- pkgs[order(pkgs$Package, pkgs$Version, decreasing = TRUE), ]
   pkgs <- pkgs[!duplicated(pkgs$Package), ]
 
   res_pkgs <- merge(x = ver$pkgs, y = pkgs, by.x = "pkg", by.y = "Package", all.x = TRUE)
@@ -453,7 +454,7 @@ vers.union <- function(...) {
 
   ver1 <- vers[[1]]
   stopifnot(is.versions(ver1))
-  for (i in 1:length(vers)) {
+  for (i in seq_along(vers)) {
     ver2 <- vers[[i]]
     stopifnot(is.versions(ver2))
     stopifnot(ver1$has_avails() == ver2$has_avails())
@@ -556,7 +557,7 @@ vers.from_deps_in_avails <- function(avails) {
             && all(c("Package", "Depends", "Imports", "LinkingTo") %in% colnames(avails)))
   stopifnot(nrow(avails) > 0)
 
-  pdfs <- by(avails, 1:nrow(avails), FUN = function(deps) {
+  pdfs <- by(avails, seq_len(nrow(avails)), FUN = function(deps) {
     pkg_deps <- unname(unlist(deps[, c("Depends", "Imports", "LinkingTo")]))
     pkg_vers <- vers.from_deps(deps = paste(pkg_deps[!is.na(pkg_deps)], collapse = ", "),
                                pkg_name = deps$Package)

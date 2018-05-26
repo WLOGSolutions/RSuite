@@ -17,7 +17,7 @@ rsuite_check_version <- function() {
   pkgs <- suppressWarnings({
     utils::available.packages(repos = "https://wlog-rsuite.s3.amazonaws.com", filters = list())
   })
-  pkgs <- data.frame(pkgs, stringsAsFactors = F, row.names = NULL)[, c("Package", "Version")]
+  pkgs <- data.frame(pkgs, stringsAsFactors = FALSE, row.names = NULL)[, c("Package", "Version")]
   pkgs <- pkgs[pkgs$Package == "RSuite", ]
   if (!nrow(pkgs)) {
     return()

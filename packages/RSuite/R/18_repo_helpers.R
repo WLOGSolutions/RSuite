@@ -176,7 +176,7 @@ temp_repo_copy_proj_pkgs <- function(pkgs, tmp_path, pkg_type, params) {
   # copy into temp repo package files built
   pkgs_fpath <- list.files(rsuite_contrib_url(params$irepo_path, pkg_type, params$r_ver),
                            pattern = sprintf("^(%s)_.*", paste(pkgs, collapse = "|")),
-                           full.names = T)
+                           full.names = TRUE)
   dest_curl <- rsuite_contrib_url(tmp_path, pkg_type, params$r_ver)
   success <- file.copy(from = pkgs_fpath, to = dest_curl)
   assert(all(success),

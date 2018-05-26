@@ -68,7 +68,9 @@ pkg_download <- function(avail_pkgs, dest_dir) {
                        utils::shortPathName(Sys.getenv("USERPROFILE")),
                        Sys.getenv("HOME"))
     cache_files <- file.path(home_dir, ".rsuite", "dload_cache",
-                             utils::URLencode(remote_pkgs$Repository, TRUE),
+                             vapply(X = remote_pkgs$Repository,
+                                    FUN = function(repo) utils::URLencode(repo, TRUE),
+                                    FUN.VALUE = ""),
                              remote_pkgs$File)
     cache_exists <- file.exists(cache_files)
     if (!all(cache_exists)) {
@@ -102,10 +104,10 @@ pkg_download <- function(avail_pkgs, dest_dir) {
     # download.packages does not copy local files
     #   here they are copied manually
     local_paths <- do_dload(local_pkgs)
-    local_paths <- as.data.frame(local_paths, stringsAsFactors = F)
+    local_paths <- as.data.frame(local_paths, stringsAsFactors = FALSE)
     colnames(local_paths) <- c("Package", "Path")
 
-    file.copy(from = local_paths$Path, to = dest_dir, overwrite = T)
+    file.copy(from = local_paths$Path, to = dest_dir, overwrite = TRUE)
     local_paths$Path <- file.path(dest_dir, basename(local_paths$Path))
 
     dloaded <- rbind(dloaded, local_paths[, c("Package", "Path")])
@@ -156,7 +158,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
 
   # remove oprevious installed version if exists
   if (dir.exists(file.path(libpath, pkg_name))) {
-    unlink(file.path(libpath, pkg_name), recursive = T, force = T)
+    unlink(file.path(libpath, pkg_name), recursive = TRUE, force = TRUE)
   }
 
   # remove previous build package version if exists
@@ -169,10 +171,10 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
     makevars <- file.path(pkg_path, "src",
                           ifelse(.Platform$OS.type == "windows", "Makevars.win", "Makevars.in"))
     if (file.exists(makevars)) {
-      spec_desc <- get_pkg_specifics(pkg_name, for_source = T, load_specifics())
+      spec_desc <- get_pkg_specifics(pkg_name, for_source = TRUE, load_specifics())
       if (!is.null(spec_desc$Makefile)) {
-        lines <- unlist(strsplit(spec_desc$Makefile[!is.na(spec_desc$Makefile)], "\\n", fixed = T))
-        cat(lines, file = makevars, sep = "\n", append = T)
+        lines <- unlist(strsplit(spec_desc$Makefile[!is.na(spec_desc$Makefile)], "\\n", fixed = TRUE))
+        cat(lines, file = makevars, sep = "\n", append = TRUE)
       }
     }
   }
@@ -359,7 +361,7 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
                pkg_logwarn(paste("It is propably cause of inconsistent repository state.",
                                  "Package %s will be deleted as it is unusable."),
                            pkg_name)
-               unlink(pkg_path, recursive = T, force = T)
+               unlink(pkg_path, recursive = TRUE, force = TRUE)
              }
            }
          })
@@ -404,7 +406,7 @@ load_specifics <- function() {
   }
 
   dcf <- read.dcf(textConnection(lines))
-  spec_desc <- data.frame(dcf, stringsAsFactors = F)
+  spec_desc <- data.frame(dcf, stringsAsFactors = FALSE)
   return(spec_desc)
 }
 
@@ -502,7 +504,8 @@ get_specific_args <- function(pkg_file, spec_desc) {
 #' @noRd
 #'
 get_package_build_rver <- function(lib_dir, pkg_name) {
-  installed <- data.frame(utils::installed.packages(lib.loc = lib_dir), stringsAsFactors = F)[, c("Package", "Built")]
+  installed <- data.frame(utils::installed.packages(lib.loc = lib_dir),
+                          stringsAsFactors = FALSE)[, c("Package", "Built")]
   if (!(pkg_name %in% installed$Package)) {
     return(NA)
   }

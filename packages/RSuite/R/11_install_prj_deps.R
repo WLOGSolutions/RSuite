@@ -96,7 +96,7 @@ resolve_prj_sups <- function(repo_infos, params, only_source = FALSE, vanilla = 
 #' @keywords internal
 #' @noRd
 #'
-resolve_prj_deps <- function(repo_infos, params, only_source = F) {
+resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   pkg_types <- "source"
   if (!only_source) {
     pkg_types <- c(params$bin_pkgs_type, pkg_types)
@@ -156,7 +156,7 @@ get_installed_packages <- function(ex_liblocs, rver, with_globals = TRUE) {
     }
 
     installed <- as.data.frame(utils::installed.packages(lib.loc = ex_liblocs),
-                               stringsAsFactors = F)[, c("Package", "Version", "Built")]
+                               stringsAsFactors = FALSE)[, c("Package", "Version", "Built")]
   } else {
     installed <- NULL # to prevent warning
     load(ou_file)
@@ -235,7 +235,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
 
   remove_installed <- function(vers) {
     installed <- as.data.frame(utils::installed.packages(lib.loc = lib_dir),
-                               stringsAsFactors = F)[, c("Package", "Version", "Built")]
+                               stringsAsFactors = FALSE)[, c("Package", "Version", "Built")]
     installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
     return(vers.rm_acceptable(vers, installed))
   }
@@ -399,7 +399,7 @@ pkg_inst_order <- function(pkgs, db) {
     pkg2deps[[nm]] <- intersect(pkg2deps[[nm]], db$Package)
   }
 
-  idxs <- 1:length(pkgs)
+  idxs <- seq_along(pkgs)
 
   result <- c()
   processed <- c()
@@ -427,7 +427,7 @@ pkg_inst_order <- function(pkgs, db) {
 #' @keywords internal
 #'
 clean_prj_deps <- function(params) {
-  all_installed <- data.frame(utils::installed.packages(lib.loc = params$lib_path), stringsAsFactors = F)
+  all_installed <- data.frame(utils::installed.packages(lib.loc = params$lib_path), stringsAsFactors = FALSE)
 
   is_rver_valid <- majmin_rver(all_installed$Built) == majmin_rver(params$r_ver)
   installed <- all_installed[is_rver_valid, ]

@@ -149,7 +149,7 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
     info_lns <- .get_output_with_eng_lang("svn status", "%s status -v --depth=files %s", svn_cmd, dir)
     new_files <- basename(sub("^\\?\\s+", "", info_lns[grepl("^\\?", info_lns)]))
 
-    for (f in list.files(dir, pattern = paste(files, collapse = "|"), all.files = T)) {
+    for (f in list.files(dir, pattern = paste(files, collapse = "|"), all.files = TRUE)) {
       if (!(f %in% new_files)) {
         pkg_loginfo("File was added already to svn: %s", file.path(dir, f))
         next
@@ -210,8 +210,8 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) 
   if (svn$get_root_path(file.path(params$prj_path, "deployment")) != svn$get_root_path(params$prj_path)) {
     # deployment is external
     .svn_dirs <- list.files(file.path(params$prj_path, "deployment"), pattern = "[.]svn$",
-                            include.dirs = T, recursive = T, all.files = T, full.names = T)
-    unlink(.svn_dirs, recursive = T, force = T)
+                            include.dirs = TRUE, recursive = TRUE, all.files = TRUE, full.names = TRUE)
+    unlink(.svn_dirs, recursive = TRUE, force = TRUE)
   }
 
   svn$prop_set(params$prj_path, "svn:ignore", c(".Rproj.user", ".Rhistory", ".Rdata", "config.txt"))
@@ -321,5 +321,5 @@ rc_adapter_get_version.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 rc_adapter_remove_admins.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
   admins <- list.files(dir, pattern = ".svn", recursive = TRUE, include.dirs = TRUE, all.files = TRUE)
   admins <- admins[dir.exists(file.path(dir, admins))]
-  unlink(file.path(dir, admins), recursive = T, force = T)
+  unlink(file.path(dir, admins), recursive = TRUE, force = TRUE)
 }

@@ -25,8 +25,9 @@ build_project_pkgslist <- function(pkgs_path) {
   }
 
   dir2deps <- list()
-  pkg_names <- sapply(X = pkg_dirs,
-                      FUN = function(pkg_dir) desc_retrieve_name(pkgs_path, pkg_dir))
+  pkg_names <- vapply(X = pkg_dirs,
+                      FUN = function(pkg_dir) desc_retrieve_name(pkgs_path, pkg_dir),
+                      FUN.VALUE = "")
 
   for (pkg_dir in pkg_dirs) {
     pkg_deps <- unlist(strsplit(desc_retrieve_dependencies(pkgs_path, pkg_dir), split = ","))
@@ -36,16 +37,18 @@ build_project_pkgslist <- function(pkgs_path) {
   }
   stopifnot(length(pkg_dirs) == length(pkg_names))
 
-  selection <- sapply(pkg_dirs, function(pd) {
-    length(dir2deps[[pd]]) == 0
-  })
+  selection <- vapply(X = pkg_dirs,
+                      FUN = function(pd) length(dir2deps[[pd]]) == 0,
+                      FUN.VALUE = TRUE)
   ordered_dirs <- pkg_dirs[selection]
   ordered_names <- pkg_names[selection]
 
   pkg_dirs <- setdiff(pkg_dirs, ordered_dirs)
   pkg_names <- setdiff(pkg_names, ordered_names)
   while (length(pkg_dirs) > 0) {
-    selection <- sapply(pkg_dirs, function(pd) all(dir2deps[[pd]] %in% ordered_names))
+    selection <- vapply(X = pkg_dirs,
+                        FUN = function(pd) all(dir2deps[[pd]] %in% ordered_names),
+                        FUN.VALUE = TRUE)
     ordered_dirs <- c(ordered_dirs, pkg_dirs[selection])
     ordered_names <- c(ordered_names, pkg_names[selection])
 
@@ -294,7 +297,7 @@ get_pkg_desc <- function(pkg_name, path) {
   } else if (grepl("[.]zip$", path)) {
     con <- unz(path, file.path(pkg_name, "DESCRIPTION"))
     dcf <- tryCatch({
-      data.frame(read.dcf(con), stringsAsFactors = F)[1, ]
+      data.frame(read.dcf(con), stringsAsFactors = FALSE)[1, ]
     },
     error = function(e) NULL,
     finally = {
@@ -409,7 +412,7 @@ get_package_url_infos <- function(urls) {
     Type = types,
     RVersion = rvers,
     Url = urls,
-    stringsAsFactors = F
+    stringsAsFactors = FALSE
   ))
 }
 

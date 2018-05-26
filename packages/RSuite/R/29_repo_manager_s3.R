@@ -21,7 +21,7 @@
 #'
 repo_manager_s3_create <- function(url, types, rver, s3_profile) {
   assert(is_nonempty_char1(url), "Non empty character(1) expected for url")
-  assert(grepl("^https?://[\\w\\d\\._-]+\\.s3\\.amazonaws\\.com(/.*)?$", url, perl = T),
+  assert(grepl("^https?://[\\w\\d\\._-]+\\.s3\\.amazonaws\\.com(/.*)?$", url, perl = TRUE),
          paste0("Invalid url specified.",
                 " Amazon S3 url should have <schema>://<bucket>.s3.amazonaws.com/<path> form;",
                 " Url does not have required form: %s"), url)
@@ -37,14 +37,14 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
 
   bucket_url <- gsub("^https?://([\\w\\d\\._-]+)\\.s3\\.amazonaws\\.com(/.*)?$", "s3://\\1\\2",
                      url,
-                     perl = T)
+                     perl = TRUE)
   aws_cmd <- Sys.which("aws")
   assert(aws_cmd != "",
          "Failed to detect AWS CLI for management of S3 %s bucket.", bucket_url)
 
 
   # Create temporary file, upload it and delete. If succeeds bucket is potentially RW.
-  bucket_base <- gsub("^s3://([^/]+)(/.+)?$", "\\1", bucket_url, perl = T)
+  bucket_base <- gsub("^s3://([^/]+)(/.+)?$", "\\1", bucket_url, perl = TRUE)
   tmp_file <- tempfile(paste0(bucket_base, "_rwtest_"), fileext = ".txt")
   writeLines(sprintf("It is a file for testing RW access to %s", bucket_url),
              con = tmp_file)
@@ -58,7 +58,7 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
     upl_success <- any(grepl("^upload: ", upl_lines))
   },
   finally = {
-    unlink(tmp_file, force = T)
+    unlink(tmp_file, force = TRUE)
   })
 
   assert(upl_success,
@@ -135,7 +135,7 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
     }
   },
   finally = {
-    unlink(tmp_file, force = T)
+    unlink(tmp_file, force = TRUE)
   })
 
   if (!length(types)) {
@@ -166,7 +166,7 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
                 repo_manager$bucket_url, paste(types, collapse = ", "))
   },
   finally = {
-    unlink(tmp_dir, recursive = T, force = T)
+    unlink(tmp_dir, recursive = TRUE, force = TRUE)
   })
 
   return(TRUE)
@@ -266,8 +266,8 @@ repo_manager_upload.rsuite_repo_manager_s3 <- function(repo_manager, src_dir, ty
 #' @noRd
 #'
 .merge_dcfs <- function(dcf1, dcf2) {
-  dcf1 <- as.data.frame(dcf1, stringsAsFactors = F)
-  dcf2 <- as.data.frame(dcf2, stringsAsFactors = F)
+  dcf1 <- as.data.frame(dcf1, stringsAsFactors = FALSE)
+  dcf2 <- as.data.frame(dcf2, stringsAsFactors = FALSE)
 
   if (!nrow(dcf1)) {
     return(dcf2)
@@ -303,8 +303,8 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
   pkg_loginfo("Updating %s ...", file.path(dst_url, "PACKAGES"))
 
   tmp_dir <- tempfile(pattern = "s3_remove_")
-  dir.create(path = tmp_dir, recursive = T)
-  on.exit(unlink(tmp_dir, force = T, recursive = T))
+  dir.create(path = tmp_dir, recursive = TRUE)
+  on.exit(unlink(tmp_dir, force = TRUE, recursive = TRUE))
 
   dld_lines <- get_cmd_outlines("aws cp",
                                 "%s s3 --profile=%s cp %s %s",
@@ -321,7 +321,7 @@ repo_manager_remove.rsuite_repo_manager_s3 <- function(repo_manager, toremove, t
     return(data.frame(Package = as.character(), Version = as.character()))
   }
 
-  pkgs_dcf <- data.frame(read.dcf(file.path(tmp_dir, "PACKAGES")), stringsAsFactors = F)
+  pkgs_dcf <- data.frame(read.dcf(file.path(tmp_dir, "PACKAGES")), stringsAsFactors = FALSE)
 
   to_remove_mask <- (sprintf("%s_%s", pkgs_dcf$Package, pkgs_dcf$Version)
                      %in% sprintf("%s_%s", toremove$Package, toremove$Version))

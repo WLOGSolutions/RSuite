@@ -46,7 +46,7 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
   write.dcf(params_dt, file = params_file)
 
   params <- prj$load_params()
-  for (ra_ix in 1:length(ra_specs)) {
+  for (ra_ix in seq_along(ra_specs)) {
     ra_name <- names(ra_specs)[[ra_ix]]
     repo_adapter <- find_repo_adapter(ra_name)
     stopifnot(!is.null(repo_adapter))
