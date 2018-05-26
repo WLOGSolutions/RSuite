@@ -26,8 +26,8 @@ install_prj_deps <- function(params, vanilla = FALSE) {
 
   avail_vers <- resolve_prj_deps(repo_infos, params)
 
-  env_lock_verse <- get_lock_env_vers(params) #from 100_lock_env.R
-  vers.unique(avail_vers, env_lock_verse) # from 60_versions.R
+  #env_lock_verse <- get_lock_env_vers(params) #from 100_lock_env.R
+  #vers.unique(avail_vers, env_lock_verse) # from 60_versions.R
 
   install_dependencies(avail_vers, lib_dir = params$lib_path, rver = params$r_ver)
 
