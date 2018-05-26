@@ -300,3 +300,23 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
 
   return(vers_cr)
 }
+
+
+#' Gets project dependencies lock
+#'
+#' @param params project parameters. (type: rsuite_project_params)
+#'
+#' @return vers with locked environment dependencies
+#'
+get_lock_env_vers <- function(params){
+  deployment_path <- file.path(params$prj_path, 'deployment')
+  filename <- paste('env_', params$project, '.lock', sep="")
+
+  env_lock_info <- read.table(file.path(deployment_path, filename), header = T)
+  col_names <- .standard_avail_columns() # from 60_versions.R
+  missing <- setdiff(col_names, names(env_lock_info))
+
+  env_lock_info[missing] <- NA
+
+  return(vers.build(env_lock_info$Package,avails = env_lock_info)) # from 60_versions.R
+}

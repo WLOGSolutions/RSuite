@@ -331,6 +331,7 @@ prj_clean_deps <- function(prj = NULL) {
 
   clean_prj_deps(params) # from 11_install_prj_deps.R
 }
+#'
 
 
 #'
@@ -505,4 +506,27 @@ prj_pack <- function(prj = NULL, path = getwd(),
   assert(success, "Failed to create pack file (zip returned non 0 return status).")
 
   invisible(pack_fpath)
+}
+
+#'
+#' Locks the project environment, creates a file with used packages and their versions
+#'
+#' @export
+#'
+prj_lock_env <- function(prj = NULL){
+  prj <- safe_get_prj(prj)
+  stopifnot(!is.null(prj))
+
+  params <- prj$load_params()
+  prj_dep_vers <- collect_prj_direct_deps(params) # from 52_dependencies.R
+
+  prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  prj_dep_vers <- vers.rm(prj_dep_vers, prj_pkgs)
+
+  available_packages <- available.packages()
+  deployment_path <- file.path(params$prj_path, 'deployment')
+
+  filename <- paste('env_', params$project, '.lock', sep="")
+  lock_data <- data.frame(available_packages[prj_dep_vers$pkgs$pkg, c("Package", "Version")])
+  write.table(lock_data, file.path(deployment_path, filename), row.names = FALSE, quote = FALSE)
 }

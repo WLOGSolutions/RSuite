@@ -38,7 +38,7 @@ If the folder you're working in is not under git/svn control the output should l
 2018-05-21 09:49:23 WARNING:rsuite:Failed to detect RC manager for test-project
 ```
 
-To avoid warning messages you can set the ```skip_rc``` argument to ```True```
+To avoid warning messages you can set the ```skip_rc``` argument to ```TRUE```
 
 ### Run master file
 Every project has a special structure. Lets change working directory to the project we just created to check it.
@@ -130,7 +130,7 @@ Execution halted
 
 ## Building custom packages
 
-Adding a package to the project is not enough to use it. You have to build it. You can do this calling the following function:
+Adding a package to the project is not enough to use it. You have to build it. You can do this by calling the following function:
 ```
 RSuite::prj_build()
 ```
@@ -146,7 +146,7 @@ If everything worked properly you shouldn't see any error messages.
 Lets add a function ```hello_world``` to our package ```mypackage```. To do this you have to create a new file in folder ```packages/mypackage/R/hello_world.R```. Edit hello_world.R to have the following content:
 
 ```
-# '@export
+#'@export
 hello_world <- function(name) {
     sprintf("Hello %s!", name)
 }
@@ -178,6 +178,14 @@ hello_world("John")
 In order to check if everything works, run the master script:
 ```
 source('R/master.R')
+``` 
+
+As you can see you got an error message that there is no such function as ```hello_world```
+
+```
+Loading required package: methods
+Error in hello_world("John") : could not find function "hello_world"
+Execution halted
 ```
 
 ## Rebuild custom package
@@ -188,7 +196,7 @@ RSuite::prj_build()
 
 And check if ```master.R``` works:
 ```
-source('R/master.R')
+source('R/master.R', print.eval=TRUE)
 ```
 
 You should see the following output:
@@ -521,7 +529,7 @@ The output should be like this
 2017-09-23 17:49:08 INFO:rsuite:Zip file created: C:/Workplace/Projects/my_project/my_project_1.0x.zip
 ```
 
-You have crated file ```my_project_1.0x.zip``` that contains all information necessary to run your solution on a production environment.
+You have created file ```my_project_1.0x.zip``` that contains all information necessary to run your solution on a production environment.
 
 ## Running deployment package
 
