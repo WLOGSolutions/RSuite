@@ -44,6 +44,8 @@ load_prj_parameters <- function(prj_path) {
     lib_path = rsuite_fullUnifiedPath(file.path(prj_path, "deployment", "libs")),
     # Specifies there to put user installed libraries
     sbox_path = rsuite_fullUnifiedPath(file.path(prj_path, "deployment", "sbox")),
+    # Speciefies there to put environment lock file
+    lock_path = rsuite_fullUnifiedPath(file.path(prj_path, "deployment", "env.lock")),
 
     zip_version = ifelse("ZipVersion" %in% colnames(dcf), dcf[1, "ZipVersion"], ""),
     project = ifelse("Project" %in% colnames(dcf), dcf[1, "Project"], basename(prj_path)),
