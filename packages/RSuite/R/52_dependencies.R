@@ -12,7 +12,7 @@
 #' @param params object of rsuite_project_params class
 #'
 #' @return object of versions class containing direct project dependencies
-#'   which are not installed in prject local environment.
+#'   which are not installed in project local environment.
 #'
 #' @keywords internal
 #' @noRd
@@ -301,20 +301,6 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
   return(vers_cr)
 }
 
-#' Returns the filepath to the project lock file
-#'
-#' @param params project parameters. (type: rsuite_project_params)
-#'
-#' @return string containing the filepath to the project lock file
-#'
-get_lock_env_filepath <- function(params){
-  deployment_path <- file.path(params$prj_path, "deployment")
-  filename <- paste("env_", params$project, ".lock", sep = "")
-
-  filepath <- file.path(deployment_path, filename)
-  return(filepath)
-}
-
 
 #' Gets project dependencies lock
 #'
@@ -326,15 +312,14 @@ get_lock_env_filepath <- function(params){
 #' @noRd
 #'
 get_lock_env_vers <- function(params){
-  filepath <- get_lock_env_filepath(params)
+  env_lock_info <- read.dcf(params$lock_path)
+  avails <- as.data.frame(available.packages())
+  avails <- avails[avails$Package %in% env_lock_info[, "Package"], ]
 
-  env_lock_info <- read.table(filepath, header = T)
-  col_names <- .standard_avail_columns() # from 60_versions.R
-  missing <- setdiff(col_names, names(env_lock_info))
-
-  env_lock_info[missing] <- NA
-
-  return(vers.build(env_lock_info$Package, avails = env_lock_info)) # from 60_versions.R
+  return(vers.build(pkg_names = env_lock_info[, "Package"],
+                    vmin = env_lock_info[, "Version"],
+                      vmax = env_lock_info[, "Version"],
+                        avails = as.data.frame(avails))) # from 60_versions.R
 }
 
 
@@ -348,8 +333,7 @@ get_lock_env_vers <- function(params){
 #' @noRd
 #'
 check_lock_env_file <-  function(params){
-  filepath <- get_lock_env_filepath(params)
-
+  filepath <- params$lock_path
   return(file.exists(filepath))
 }
 
@@ -365,10 +349,11 @@ check_lock_env_file <-  function(params){
 check_lock_env_deps <- function(avail_vers, params){
   if (check_lock_env_file(params)){
     env_lock_verse <- get_lock_env_vers(params) #from 52_dependencies.R
-    diff_vers <- vers.unique(avail_vers, env_lock_verse) # from 60_versions.R
+    locked_avail_verse <- vers.union(env_lock_verse, avail_vers)
+    unfeasibles <- vers.get_unfeasibles(locked_avail_verse)
 
-    if (nrow(diff_vers) != 0){
-      logwarn("Some packages will be updated from last lock!")
+    if (length(unfeasibles) != 0){
+      pkg_logwarn("Some packages will be updated from last lock!")
     }
   }
 }
