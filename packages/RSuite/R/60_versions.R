@@ -586,17 +586,15 @@ is.versions <- function(ver) {
 #'
 #' @param env_lock lock info
 #'
-#' @return data frame packages that will change versions when installing
+#' @return data frame of packages that will change versions when installing
 #'
 vers.unique <- function(avail_vers, env_lock_vers){
-  colnames <- c('Package', 'Version')
+  colnames <- c("Package", "Version")
   lock_pkg_vers <- env_lock_vers$avails[,  colnames]
   pkg_vers <- avail_vers$avails[avail_vers$avails$Package %in% lock_pkg_vers$Package, colnames]
 
-  df_vers <- merge(lock_pkg_vers, pkg_vers, by = 'Package')
-  df_vers <- df_vers[which(df_vers$Version.x != df_vers$Version.y),]
+  df_vers <- merge(lock_pkg_vers, pkg_vers, by = "Package")
+  df_vers <- df_vers[which(df_vers$Version.x != df_vers$Version.y), ]
 
-  if(nrow(df_vers) != 0){
-    logwarn("Some packages will be updated from last lock!")
-  }
+  return(df_vers)
 }

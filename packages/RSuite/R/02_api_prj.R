@@ -524,9 +524,8 @@ prj_lock_env <- function(prj = NULL){
   prj_dep_vers <- vers.rm(prj_dep_vers, prj_pkgs)
 
   available_packages <- available.packages()
-  deployment_path <- file.path(params$prj_path, 'deployment')
+  filepath <- get_lock_env_filepath(params)
 
-  filename <- paste('env_', params$project, '.lock', sep="")
   lock_data <- data.frame(available_packages[prj_dep_vers$pkgs$pkg, c("Package", "Version")])
-  write.table(lock_data, file.path(deployment_path, filename), row.names = FALSE, quote = FALSE)
+  write.table(lock_data, filepath, row.names = FALSE, quote = FALSE)
 }

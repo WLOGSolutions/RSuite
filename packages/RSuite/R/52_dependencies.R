@@ -301,6 +301,20 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
   return(vers_cr)
 }
 
+#' Returns the filepath to the project lock file
+#'
+#' @param params project parameters. (type: rsuite_project_params)
+#'
+#' @return string containing the filepath to the project lock file
+#'
+get_lock_env_filepath <- function(params){
+  deployment_path <- file.path(params$prj_path, "deployment")
+  filename <- paste("env_", params$project, ".lock", sep = "")
+
+  filepath <- file.path(deployment_path, filename)
+  return(filepath)
+}
+
 
 #' Gets project dependencies lock
 #'
@@ -308,15 +322,53 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
 #'
 #' @return vers with locked environment dependencies
 #'
+#' @keywords internal
+#' @noRd
+#'
 get_lock_env_vers <- function(params){
-  deployment_path <- file.path(params$prj_path, 'deployment')
-  filename <- paste('env_', params$project, '.lock', sep="")
+  filepath <- get_lock_env_filepath(params)
 
-  env_lock_info <- read.table(file.path(deployment_path, filename), header = T)
+  env_lock_info <- read.table(filepath, header = T)
   col_names <- .standard_avail_columns() # from 60_versions.R
   missing <- setdiff(col_names, names(env_lock_info))
 
   env_lock_info[missing] <- NA
 
-  return(vers.build(env_lock_info$Package,avails = env_lock_info)) # from 60_versions.R
+  return(vers.build(env_lock_info$Package, avails = env_lock_info)) # from 60_versions.R
+}
+
+
+#' Checks whether there is an existing lock file in the project
+#'
+#' @param params project parameters (type" rsuite_project_params)
+#'
+#' @return TRUE or FALSE depending whether the lock file exists or not
+#'
+#' @keywords internal
+#' @noRd
+#'
+check_lock_env_file <-  function(params){
+  filepath <- get_lock_env_filepath(params)
+
+  return(file.exists(filepath))
+}
+
+#' Checks whether dependencies from lock will be updated, if so a warning message is displayed
+#'
+#' @params avail_vers version object describing available project dependencies.
+#'
+#' @param params project parameters (type" rsuite_project_params)
+#'
+#' @keywords internal
+#' @noRd
+#'
+check_lock_env_deps <- function(avail_vers, params){
+  if (check_lock_env_file(params)){
+    env_lock_verse <- get_lock_env_vers(params) #from 52_dependencies.R
+    diff_vers <- vers.unique(avail_vers, env_lock_verse) # from 60_versions.R
+
+    if (nrow(diff_vers) != 0){
+      logwarn("Some packages will be updated from last lock!")
+    }
+  }
 }
