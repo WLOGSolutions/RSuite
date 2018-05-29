@@ -8,7 +8,7 @@
 #'
 #' Builds local project environment.
 #'
-#' @param params prject parameters. (type: rsuite_project_params)
+#' @param params project parameters. (type: rsuite_project_params)
 #' @param vanilla if TRUE collects only base supportive packages. (type: logical)
 #'
 #' It collects packages the project depends on and installs them in local
@@ -26,8 +26,7 @@ install_prj_deps <- function(params, vanilla = FALSE) {
 
   avail_vers <- resolve_prj_deps(repo_infos, params)
 
-  #env_lock_verse <- get_lock_env_vers(params) #from 100_lock_env.R
-  #vers.unique(avail_vers, env_lock_verse) # from 60_versions.R
+  check_lock_env_deps(avail_vers, params) # from 52_dependencies.R
 
   install_dependencies(avail_vers, lib_dir = params$lib_path, rver = params$r_ver)
 
@@ -249,6 +248,8 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
     pkg_loginfo("No dependencies to install.")
     return(invisible())
   }
+
+  # Check if environment is locked and examine if package versions will change after installing
 
   pkg_loginfo("Detected %s dependencies to install. Installing...", length(vers.get_names(avail_vers)))
 
