@@ -82,6 +82,7 @@ denorm_version <- function(ver) {
   stopifnot(is.data.frame(df) && all(c("pkg", "vmin", "vmax") %in% colnames(df)))
   df <- df[, c("pkg", "vmin", "vmax")]
 
+
   if (!is.null(avails)) {
     stopifnot(is.data.frame(avails)
               && all(.standard_avail_columns() %in% colnames(avails)))
@@ -89,7 +90,7 @@ denorm_version <- function(ver) {
     avails <- avails[!duplicated(avails[, c("Package", "Version")]), ]
 
     stopifnot(all(df$pkg %in% avails$Package                                  # present in avails
-                  | (!is.na(df$vmin) & !is.na(df$vmax) && df$vmin >= df$vmax))) # or infeasible
+                  | (!is.na(df$vmin) & !is.na(df$vmax) && df$vmin > df$vmax))) # or infeasible
 
     avails$NVersion <- norm_version(avails$Version)
     avails <- merge(x = avails, y = df, by.x = "Package", by.y = "pkg", all.x = FALSE, all.y = TRUE)
@@ -578,23 +579,4 @@ vers.from_deps_in_avails <- function(avails) {
 #'
 is.versions <- function(ver) {
   return(class(ver) == "versions")
-}
-
-#' Checks whether dependencies versions have changed since last lock
-#'
-#' @param avail_vers version object describing packages to be installed
-#'
-#' @param env_lock lock info
-#'
-#' @return data frame of packages that will change versions when installing
-#'
-vers.unique <- function(avail_vers, env_lock_vers){
-  colnames <- c("Package", "Version")
-  lock_pkg_vers <- env_lock_vers$avails[,  colnames]
-  pkg_vers <- avail_vers$avails[avail_vers$avails$Package %in% lock_pkg_vers$Package, colnames]
-
-  df_vers <- merge(lock_pkg_vers, pkg_vers, by = "Package")
-  df_vers <- df_vers[which(df_vers$Version.x != df_vers$Version.y), ]
-
-  return(df_vers)
 }
