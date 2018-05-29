@@ -1,3 +1,6 @@
+VERSION 0.27 (2018-05-29)
+  * just adopted for new version of RSuite
+
 VERSION 0.26 (2018-05-23)
   * support for vignettes in skip-build-step option for 'pkgzip github' and
     'repo addgithub'

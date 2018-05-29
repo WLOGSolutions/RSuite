@@ -1,4 +1,4 @@
-# RSuite 0.27 (2018-06-??)
+# RSuite 0.27 (2018-05-29)
   * Handling downloaded packages cache have had error: then multiple packages
      were checks inproper repository cache folder was selected. Due to that
      binary packages there installed for inproper R version.

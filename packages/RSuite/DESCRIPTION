@@ -1,7 +1,7 @@
 Package: RSuite
 Type: Package
 Title: Supports Developing, Building and Deploying R Solution
-Version: 0.26
+Version: 0.27
 Authors@R: c(
     person("Walerian", "Sokolowski", email = "rsuite@wlogsolutions.com", role = c("aut", "cre")),
     person("Wit", "Jakuczun", email = "w.jakuczun@wlogsolutions.com", role = "aut"),
