@@ -312,11 +312,8 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
 #' @keywords internal
 #' @noRd
 #'
-get_lock_env_vers <- function(params){
+get_lock_env_vers <- function(params) {
   env_lock <- read.dcf(params$lock_path)
-  avails <- as.data.frame(available.packages())
-  avails <- avails[avails$Package %in% env_lock[, "Package"], ]
-
   env_lock_vers <- do.call("vers.union",
                            apply(X = env_lock, 1,
                                   FUN = function(pkg){
@@ -329,24 +326,25 @@ get_lock_env_vers <- function(params){
 #' Checks whether dependencies from the locked environment will be updated,
 #' if so a warning message with the concerned packages is displayed
 #'
-#' @params avail_vers version object describing available project dependencies.
-#'
+#' @param avail_vers version object describing available project dependencies.
 #' @param params project parameters (type" rsuite_project_params)
 #'
 #' @keywords internal
 #' @noRd
 #'
 check_lock_env_deps <- function(avail_vers, params){
-  if (file.exists(params$lock_path)){
-    env_lock_verse <- get_lock_env_vers(params) #from 52_dependencies.R
-    avail_vers <- vers.drop_avails(avail_vers)
+  if (!file.exists(params$lock_path)) {
+    return(invisible())
+  }
 
-    locked_avail_verse <- vers.union(env_lock_verse, avail_vers)
-    unfeasibles <- vers.get_unfeasibles(locked_avail_verse)
+  env_lock_verse <- get_lock_env_vers(params) #from 52_dependencies.R
+  avail_vers <- vers.drop_avails(avail_vers)
 
-    if (length(unfeasibles) != 0){
-      warn_msg <- paste("The following packages will be updated from last lock:", unfeasibles, sep = " ")
-      pkg_logwarn(warn_msg)
-    }
+  locked_avail_verse <- vers.union(env_lock_verse, avail_vers)
+  unfeasibles <- vers.get_unfeasibles(locked_avail_verse)
+
+  if (length(unfeasibles) != 0){
+    warn_msg <- paste("The following packages will be updated from last lock:", unfeasibles, sep = " ")
+    pkg_logwarn(warn_msg)
   }
 }

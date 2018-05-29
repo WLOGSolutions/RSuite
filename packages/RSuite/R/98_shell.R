@@ -226,7 +226,8 @@ rscript_arg <- function(name, val) {
 #' @noRd
 #'
 get_cache_base_dir <- function() {
-  cache_base_dir <- file.path(dirname(tempdir()), ".rsuite")
+  user_name <- iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
+  cache_base_dir <- file.path(dirname(tempdir()), paste0(".rsuite-", user_name))
   if (.Platform$OS.type == "windows") {
     cache_base_dir <- utils::shortPathName(cache_base_dir)
   }

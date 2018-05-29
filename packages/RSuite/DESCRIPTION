@@ -3,7 +3,7 @@ Type: Package
 Title: Supports Developing, Building and Deploying R Solution
 Version: 0.26
 Authors@R: c(
-    person("Walerian", "Sokolowski", email = "w.sokolowski@wlogsolutions.com", role = c("aut", "cre")),
+    person("Walerian", "Sokolowski", email = "rsuite@wlogsolutions.com", role = c("aut", "cre")),
     person("Wit", "Jakuczun", email = "w.jakuczun@wlogsolutions.com", role = "aut"),
     person("Mateusz", "Kalinowski", email = "m.kalinowski@wlogsolutions.com", role = "aut"),
     person("Ryszard", "Szymanski", email = "rszymanski@wlogsolutions.com", role = "aut"),

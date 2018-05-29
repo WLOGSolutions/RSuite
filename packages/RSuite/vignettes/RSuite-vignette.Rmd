@@ -99,12 +99,13 @@ You can notice an error saying there is no such package as ```mypackage```. This
 ## Building custom packages
 
 Adding a package to the project is not enough to use it. You have to build it. You can do this by calling the following function:
-```{r}
+```{r error = TRUE}
+logging::setLevel('FINEST')
 RSuite::prj_build(prj)
 ```
 
 Now you can check if your master script has access to the package ```mypackage```
-```{r}
+```{r error = TRUE}
 setwd(file.path(prj$path))
 source('R/master.R')
 print("master.R sourced successfully and loaded mypackage.")
@@ -149,7 +150,7 @@ As you can see you got an error message that there is no such function as ```hel
 
 ## Rebuild custom package
 You have to rebuild packages to have all the functionality available to master scripts. You do it with the following function call.
-```{r}
+```{r error = TRUE}
 RSuite::prj_build(prj)
 ```
 
@@ -189,19 +190,19 @@ You can conclude that you have to install dependencies to build your package.
 ## Install dependencies
 
 To install dependecies you have to call the following function:
-```{r}
+```{r error = TRUE}
 RSuite::prj_install_deps(prj)
 ```
 
 From this output you can see that we use ```MRAN``` as our package repository. Moreover R Suite detected 1 dependency to be installed.
 
 You can check if installation succedded by calling the following function:
-```{r}
+```{r error = TRUE}
 RSuite::prj_build(prj)
 ```
 
 Lets check what happens if you run our master script
-```{r message = TRUE, warning = TRUE}
+```{r message = TRUE, warning = TRUE, error = TRUE}
 setwd(prj$path)
 source('R/master.R', print.eval = TRUE)
 ```
@@ -225,13 +226,13 @@ cat(readLines(con = src_file), sep = "\n")
 ```
 
 Now we can load the changed package for testing without rebuilding it with following command:
-```{r}
+```{r error = TRUE}
 devtools::load_all(file.path(prj$path, "packages", "mypackage"))
 ```
 
 Lets see how ```hello_world``` function behaves now:
-```{r}
-mypackage::hello_world("John")
+```{r error = TRUE}
+hello_world("John")
 ```
 
 As you can see that no package rebuild was required and changed package is reloaded.
@@ -263,7 +264,7 @@ cat(readLines(master_file), sep = "\n")
 
 Lets check how it works
 
-```{r}
+```{r error = TRUE}
 setwd(prj$path)
 source('R/master.R')
 ```
@@ -282,7 +283,7 @@ cat(readLines(config_file), sep = "\n")
 
 Lets check how it works
 
-```{r}
+```{r error = TRUE}
 setwd(prj$path)
 source('R/master.R')
 ```
@@ -324,7 +325,7 @@ cat(readLines(hello_file), sep = "\n")
 ```
 
 Lets load changed package with devtools and see how ```hello_world``` function behaves:
-```{r}
+```{r error = TRUE}
 devtools::load_all(file.path(prj$path, "packages", "mypackage"))
 hello_world("John")
 ```
@@ -356,19 +357,19 @@ cat(readLines(master_file), sep = "\n")
 ```
 
 Now lets check that all project dependencies have been collected:
-```{r}
+```{r error = TRUE}
 RSuite::prj_install_deps(prj)
 ```
 
 As you did not add any new dependencies R Suite smartly understands it and do not repeat lengthy dependencies installation phase.
 
 Lets rebuild our custom packages:
-```{r}
+```{r error = TRUE}
 RSuite::prj_build(prj)
 ```
 
 To build a deployment package you use the following function (we specify there to put the deployment package with ```path``` argument):
-```{r}
+```{r error = TRUE}
 RSuite::prj_zip(prj, path = tempdir())
 ```
 
@@ -381,7 +382,7 @@ deployment package is versioned by source code tag (tag under Git or revision nu
 If project inconsistency with repository is detected (like new/uncontrolled files or source code changes) R Suite 
 prevents building deployment package unless you enforce deployment package version explicitly:
 
-```{r}
+```{r error = TRUE}
 RSuite::prj_zip(prj, path = tempdir(), zip_ver = '1.0')
 ```
 
@@ -391,7 +392,7 @@ You have created file ```my_project_1.0x.zip``` that contains all information ne
 
 To test if the deployment package is working you can extract ```my_project_1.0x.zip``` created in previous step in a new folder say ```prod```:
 
-```{r}
+```{r error = TRUE}
 dir.create(path = file.path(tempdir(), "prod"), showWarnings = FALSE)
 unzip(zipfile = file.path(tempdir(), "my_project_1.0x.zip"), 
       exdir = file.path(tempdir(), "prod"))
@@ -401,13 +402,13 @@ cat(list.files(path = file.path(tempdir(), "prod", "my_project")), sep = "\n")
 
 ```readme.txt``` file contains version number the project has been tagged with:
 
-```{r comment = "", echo = FALSE}
+```{r comment = "", echo = FALSE, error = TRUE}
 cat(readLines(file.path(tempdir(), "prod", "my_project", "readme.txt")))
 ```
 
 Now you can run your solution with the command
 
-```{r}
+```{r error = TRUE}
 output <- system2(command = Sys.which("Rscript"), 
                   args = file.path(tempdir(), "prod", "my_project", "R", "master.R"),
                   stdout = TRUE)

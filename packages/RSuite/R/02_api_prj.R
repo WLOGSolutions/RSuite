@@ -529,20 +529,23 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #' The feature allows to prevent unwanted errors caused by newer versions of packages which might work
 #' differently than previous versions used in the project.
 #'
+#' @param prj project object to be locked. if not passed will lock loaded project or
+#'    default whichever exists. Will init default project from working
+#'    directory if no default project exists. (type: rsuite_project, default: NULL)
+#'
 #' @export
 #'
 prj_lock_env <- function(prj = NULL){
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
+
   params <- prj$load_params()
 
-  env_pkgs <- as.data.frame(installed.packages(params$lib_path),
-                             stringsAsFactors = FALSE)[, c("Package", "Version")]
+  env_pkgs <- as.data.frame(utils::installed.packages(lib.loc = params$lib_path),
+                            stringsAsFactors = FALSE)[, c("Package", "Version")]
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
 
-  env_pkgs <- env_pkgs[!env_pkgs$Package %in% prj_pkgs, ]
-
-  lock_data <- as.data.frame(env_pkgs, strigAsFactors = FALSE)
+  lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
   write.dcf(lock_data, file = params$lock_path)
 }
