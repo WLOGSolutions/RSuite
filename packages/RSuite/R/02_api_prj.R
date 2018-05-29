@@ -509,23 +509,40 @@ prj_pack <- function(prj = NULL, path = getwd(),
 }
 
 #'
-#' Locks the project environment, creates a file with used packages and their versions
+#' Locks the project environment.
+#'
+#' It collects all packages, their versions and stores them in the 'env.lock' file
+#' which is saved in the following directory: <my_project>/deployment/
+#'
+#' The 'env.lock' file is a dcf file storing information about installed packages
+#' and their versions. A sample record from the 'env.lock' file:
+#'
+#'  Package: RSuite
+#'  Version: 0.26.235
+#'
+#' When dependencies are being installed (using prj_install_deps()) the 'env.lock'
+#' file will be used to detect whether any package will change versions. If that's
+#' the case a warning message will be displayed. An example of warning message:
+#'
+#' 2018-05-29 15:29:55 WARNING:rsuite:The following packages will be updated from last lock: RSuite
+#'
+#' The feature allows to prevent unwanted errors caused by newer versions of packages which might work
+#' differently than previous versions used in the project.
 #'
 #' @export
 #'
 prj_lock_env <- function(prj = NULL){
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
-
   params <- prj$load_params()
-  prj_dep_vers <- collect_prj_direct_deps(params) # from 52_dependencies.R
+
+  env_pkgs <- as.data.frame(installed.packages(params$lib_path),
+                             stringsAsFactors = FALSE)[, c("Package", "Version")]
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  prj_dep_vers <- vers.rm(prj_dep_vers, prj_pkgs)
 
-  available_packages <- available.packages()
-  filepath <- get_lock_env_filepath(params)
+  env_pkgs <- env_pkgs[!env_pkgs$Package %in% prj_pkgs, ]
 
-  lock_data <- data.frame(available_packages[prj_dep_vers$pkgs$pkg, c("Package", "Version")])
-  write.table(lock_data, filepath, row.names = FALSE, quote = FALSE)
+  lock_data <- as.data.frame(env_pkgs, strigAsFactors = FALSE)
+  write.dcf(lock_data, file = params$lock_path)
 }
