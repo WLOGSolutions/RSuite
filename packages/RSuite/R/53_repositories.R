@@ -275,10 +275,8 @@ get_available_packages <- function(path, type, rver) {
 get_curl_available_packages <- function(contrib_url) {
   stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", contrib_url) != -1)) # url expected
 
-  home_dir <- ifelse(.Platform$OS.type == "windows",
-                     utils::shortPathName(Sys.getenv("USERPROFILE")),
-                     Sys.getenv("HOME"))
-  cache_dir <- file.path(home_dir, ".rsuite", "repos_cache")
+  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+  cache_dir <- file.path(cache_base_dir, "repos_cache")
 
   if (!dir.exists(cache_dir) && !dir.create(cache_dir, recursive = TRUE)) {
     curl2cfile <- as.list(rep("", length(contrib_url)))
@@ -377,7 +375,8 @@ clear_available_packages_cache <- function(path, type, rver) {
   r_cache_file <- file.path(tempdir(), paste0("repos_", utils::URLencode(contrib_url, TRUE), ".rds"))
   unlink(r_cache_file, force = TRUE)
 
-  cache_dir <- file.path(Sys.getenv("HOME"), ".rsuite", "repos_cache")
+  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+  cache_dir <- file.path(cache_base_dir, "repos_cache")
   if (dir.exists(cache_dir)
       && !grepl("^file://", # repository is not local
                 path)) {

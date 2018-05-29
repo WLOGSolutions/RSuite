@@ -14,6 +14,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+try(detach("package:mypackage", unload = TRUE), silent = TRUE)
+unlink(file.path(tempdir(), "my_project"), recursive = TRUE, force = TRUE)
 ```
 
 In this document we present a basic R Suite usage. It covers:
@@ -27,61 +30,41 @@ In this document we present a basic R Suite usage. It covers:
 
 ## Start a new project
 To create a new project (called ```my_project```) we have to call the following function:
-```
-RSuite::prj_start(name='my_project')
-```
-
-If the folder you're working in is not under git/svn control the output should look like this:  
-```
-2018-05-21 09:49:22 INFO:rsuite:Project test-project has structure compliant with current version of RSuite(v0.25).
-2018-05-21 09:49:23 INFO:rsuite:Project test-project started.
-2018-05-21 09:49:23 WARNING:rsuite:Failed to detect RC manager for test-project
+```{r}
+prj <- RSuite::prj_start(name = 'my_project', path = tempdir())
 ```
 
-To avoid warning messages you can set the ```skip_rc``` argument to ```TRUE```
+The RSuite project is beeing created in tempdir which is not under git/svn control. This is the cause of warning you can see
+above.
+To avoid that warning messages you can pass the ```TRUE``` for ```skip_rc``` argument.
 
 ### Run master file
 Every project has a special structure. Lets change working directory to the project we just created to check it.
-```
-setwd('my_project')
-```
-
-The project folder should contain the following elements:
-```
-2017-09-23  16:39    <DIR>          .                 
-2017-09-23  16:39    <DIR>          ..                
-2017-09-23  16:39                20 .Rprofile         
-2017-09-23  16:39                16 config_templ.txt  
-2017-09-23  16:39    <DIR>          deployment        
-2017-09-23  16:39    <DIR>          logs              
-2017-09-23  16:39               371 my_project.Rproj  
-2017-09-23  16:39    <DIR>          packages          
-2017-09-23  16:39               121 PARAMETERS        
-2017-09-23  16:39    <DIR>          R                 
-2017-09-23  16:39    <DIR>          tests        
-```
-
-In folder ```R``` there are master scripts - these are execution scripts in our project. R Suite by default creates exemplary script ```R\master.R```
 
 ```
-# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
-script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return("R") }
-	return(normalizePath(script_path))
-})()
-
-# Setting .libPaths() to point to libs folder
-source(file.path(script_path, "set_env.R"), chdir = T)
-
-config <- load_config()
-args <- args_parser()
+setwd(file.path(tempdir(), "my_project"))
 ```
 
-To check if everything is working properly run the ```R\master.R``` script:
+Lets see the contents of the project folder created:
+
+```{r}
+cat(list.files(prj$path, all.files = TRUE), sep = "\n")
 ```
-source('R/master.R')
+
+In folder ```R``` there are master scripts - these are execution scripts in our project. R Suite by default creates exemplary
+script ```R\master.R``` of following contents:
+
+```{r comment = '', echo = FALSE}
+master_file <- file.path(prj$path, "R", "master.R")
+cat(readLines(con = master_file), sep = "\n")
+```
+
+To check if everything is working properly run the ```R/master.R``` script:
+
+```{r}
+setwd(file.path(prj$path))
+source("R/master.R")
+print("master.R sourced successfully.")
 ```
 
 You should not see any error messages.
@@ -90,54 +73,41 @@ You should not see any error messages.
 ## Add first package
 
 R Suite forces the users to keep logic in packages. To create a package (called ```mypackage```) call the following function:
-```
-RSuite::prj_start_package(name='mypackage')
+```{r}
+RSuite::prj_start_package(name = "mypackage", prj = prj, skip_rc = TRUE)
 ```
 
 ## Add custom package to master script
 
-Open in any editor ```master.R``` and change it to look like this:
-```
-# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
-script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return("R") }
-	return(normalizePath(script_path))
-})()
+Open in any editor ```R/master.R``` and change it to look like this:
 
-# Setting .libPaths() to point to libs folder
-source(file.path(script_path, "set_env.R"), chdir = T)
+```{r comment = '', echo = FALSE}
+master_file <- file.path(prj$path, "R", "master.R")
+write("\nlibrary(mypackage)\n", file = master_file, append = TRUE)
 
-config <- load_config()
-args <- args_parser()
-
-library(mypackage)
+cat(readLines(con = master_file), sep = "\n")
 ```
 
 You can check if your package is visible to your master script by running the master script
-```
+```{r error = TRUE}
+setwd(file.path(prj$path))
 source('R/master.R')
 ```
 
-You will notice an error saying there is no such package as mypackage. This is fine because in R you have to install package to have access to it.
-
-```
-Loading required package: methods
-Error in library(mypackage) : there is no package called 'mypackage'
-Execution halted
-```
+You can notice an error saying there is no such package as ```mypackage```. This is fine because in R you have to install package to have access to it.
 
 ## Building custom packages
 
 Adding a package to the project is not enough to use it. You have to build it. You can do this by calling the following function:
-```
-RSuite::prj_build()
+```{r}
+RSuite::prj_build(prj)
 ```
 
 Now you can check if your master script has access to the package ```mypackage```
-```
+```{r}
+setwd(file.path(prj$path))
 source('R/master.R')
+print("master.R sourced successfully and loaded mypackage.")
 ```
 
 If everything worked properly you shouldn't see any error messages.
@@ -145,63 +115,48 @@ If everything worked properly you shouldn't see any error messages.
 ## Adding function to a custom package
 Lets add a function ```hello_world``` to our package ```mypackage```. To do this you have to create a new file in folder ```packages/mypackage/R/hello_world.R```. Edit hello_world.R to have the following content:
 
-```
-#'@export
-hello_world <- function(name) {
-    sprintf("Hello %s!", name)
-}
+```{r comment = '', echo = FALSE}
+src_file <- file.path(prj$path, "packages", "mypackage", "R", "hello_world.R")
+writeLines(c("#' @export",
+             "hello_world <- function(name) {",
+             "    sprintf(\"Hello %s!\", name)",
+             "}"),
+           con = src_file)
+
+cat(readLines(con = src_file), sep = "\n")
 ```
 
-Please remember to add ```#'@export``` if you want to see this function in global namespace.
+Please remember to add ```#' @export```. It is requered to expose the function into global namespace.
 
 Now you can change master script by adding one line to it:
-```
-# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
-script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return("R") }
-	return(normalizePath(script_path))
-})()
 
-# Setting .libPaths() to point to libs folder
-source(file.path(script_path, "set_env.R"), chdir = T)
+```{r comment = '', echo = FALSE}
+master_file <- file.path(prj$path, "R", "master.R")
+write("hello_world(\"John\")\n", 
+      file = master_file, 
+      append = TRUE)
 
-config <- load_config()
-args <- args_parser()
-
-library(mypackage)
-
-hello_world("John")
+cat(readLines(con = master_file), sep = "\n")
 ```
 
 In order to check if everything works, run the master script:
-```
+```{r error = TRUE}
+setwd(file.path(prj$path))
 source('R/master.R')
 ``` 
 
 As you can see you got an error message that there is no such function as ```hello_world```
 
-```
-Loading required package: methods
-Error in hello_world("John") : could not find function "hello_world"
-Execution halted
-```
-
 ## Rebuild custom package
 You have to rebuild packages to have all the functionality available to master scripts. You do it with the following function call.
-```
-RSuite::prj_build()
-```
-
-And check if ```master.R``` works:
-```
-source('R/master.R', print.eval=TRUE)
+```{r}
+RSuite::prj_build(prj)
 ```
 
-You should see the following output:
-```
-[1] "Hello John!"
+And check if ```R/master.R``` works:
+```{r error = TRUE}
+setwd(file.path(prj$path))
+source('R/master.R', print.eval = TRUE)
 ```
 
 ## Adding dependencies
@@ -212,33 +167,20 @@ You can add dependencies to external packages in two ways:
  
 To add a dependency to an external package we will edit file ```packages\mypackage\DESCRIPTION``` like below:
 
+```{r comment='', echo = FALSE}
+desc_file <- file.path(prj$path, "packages", "mypackage", "DESCRIPTION")
+dcf <- read.dcf(file = desc_file)
+dcf <- cbind(dcf, Depends = "data.table (>= 1.10.1)")
+write.dcf(dcf, file = desc_file)
+
+cat(readLines(con = desc_file), sep = "\n")
 ```
-Package: mypackage
-Type: Package
-Title: What the package does (short line)
-Version: 0.1
-Date: 2018-04-25
-Author: WitJakuczun
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
-Imports: 
-	logging,
-	data.table (>= 1.10.1)
-RoxygenNote: 6.0.1
-```
-  
-I have added the line ```data.table (>= 1.10.1)``` to the Depends section. This means I declared that mypackage depends on data.table package in version 1.10.1 or newer.
+
+I have added ```data.table (>= 1.10.1)``` to the Depends section. This means I declared that mypackage depends on data.table package in version 1.10.1 or newer.
 
 Lets rebuild package to have master scripts see the changes:
-```
-RSuite::prj_build()
-```
-
-The output is:
-```
-2017-09-23 17:15:21 ERROR:rsuite:Some dependencies are not installed in project env: data.table. Please, install dependencies(Call RSuite::prj_install_deps)
-ERROR: Some dependencies are not installed in project env: data.table. Please, install dependencies(Call RSuite::prj_install_deps)
+```{r error = TRUE}
+RSuite::prj_build(prj)
 ```
 
 You can conclude that you have to install dependencies to build your package.
@@ -247,147 +189,102 @@ You can conclude that you have to install dependencies to build your package.
 ## Install dependencies
 
 To install dependecies you have to call the following function:
-```
-RSuite::prj_install_deps()
-```
-
-You should see the following output:
-```
-2017-09-23 17:12:38 INFO:rsuite:Detecting repositories (for R 3.4)...
-2017-09-23 17:12:39 INFO:rsuite:Will look for dependencies in ...
-2017-09-23 17:12:39 INFO:rsuite:.          MRAN#1 = http://mran.microsoft.com/snapshot/2018-04-18 (win.binary, source)
-2017-09-23 17:12:39 INFO:rsuite:Collecting project dependencies (for R 3.4)...
-2017-09-23 17:12:39 INFO:rsuite:Resolving dependencies (for R 3.4)...
-2017-09-23 17:12:46 INFO:rsuite:Detected 1 dependencies to install. Installing...
-2017-09-23 17:12:51 INFO:rsuite:All dependencies successfully installed.
+```{r}
+RSuite::prj_install_deps(prj)
 ```
 
 From this output you can see that we use ```MRAN``` as our package repository. Moreover R Suite detected 1 dependency to be installed.
 
 You can check if installation succedded by calling the following function:
-```
-RSuite::prj_build()
-```
-
-The output you should see if everything worked:
-```
-2017-09-23 17:18:23 INFO:rsuite:Installing mypackage (for R 3.4) ...
-2017-09-23 17:18:28 INFO:rsuite:Successfuly build 1 packages
+```{r}
+RSuite::prj_build(prj)
 ```
 
 Lets check what happens if you run our master script
-```
-source('R/master.R')
+```{r message = TRUE, warning = TRUE}
+setwd(prj$path)
+source('R/master.R', print.eval = TRUE)
 ```
 
 The output says that ```data.table``` was loaded. This is exactly what we wanted to be.
 
 ## Developing custom package using ```devtools```
 
-If you want to develop a package the cycle dev-build can take too long. This is especially important if the packages are bigger. You can use devtools to speedup this process.
+If you want to develop a package the cycle dev-build can take too long. This is especially important if the packages are bigger. You can use devtools to speedup this process. Lets go through such process.
 
-To do this edit ```R\master.R``` like this:
-```
-# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
-script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return(".") }
-	return(normalizePath(script_path))
-})()
+Lets perform change in our ```mypackage``` in ```packages/mypackage/R/hello_world.R``` file to look it like this:
+```{r comment = '', echo = FALSE}
+src_file <- file.path(prj$path, "packages", "mypackage", "R", "hello_world.R")
+writeLines(c("#' @export",
+             "hello_world <- function(name) {",
+             "    sprintf(\"Hello %s! Good to see you again.\", name)",
+             "}"),
+           con = src_file)
 
-# Setting .libPaths() to point to libs folder
-source(file.path(script_path, "set_env.R"), chdir = T)
-
-config <- load_config()
-args <- args_parser()
-
-#library(mypackage)
-devtools::load_all(file.path(script_path, "../packages/mypackage"))
-
-hello_world("John")
+cat(readLines(con = src_file), sep = "\n")
 ```
 
-We commented the line ```library(mypackage)``` and added a new line
+Now we can load the changed package for testing without rebuilding it with following command:
+```{r}
+devtools::load_all(file.path(prj$path, "packages", "mypackage"))
 ```
-devtools::load_all(file.path(script_path, "../packages/mypackage"))
+
+Lets see how ```hello_world``` function behaves now:
+```{r}
+mypackage::hello_world("John")
 ```
-This line uses devtools to dynamically load your package. We are using variable ```script_path``` which is auto-initialized by R Suite and is a path pointing to ```master.R```.
+
+As you can see that no package rebuild was required and changed package is reloaded.
 
 ## Loggers in master scripts
 
 R Suite promotes good programming practices and using loggers is one of them. R Suite is based on ```logging``` package.
 
-Lets update R/master.R as follows
+Lets update ```R/master.R``` as follows
 
-```
-# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
-script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return(".") }
-	return(normalizePath(script_path))
-})()
+```{r echo = FALSE}
+master_file <- file.path(prj$path, "R", "master.R")
+lines <- readLines(master_file)
+lines <- c(lines[c(1:15)],
+           "",
+           "#library(mypackage)",
+           "",
+           "#hello_world(\"Jony\")",
+           "",
+           "loginfo(\"Master info\")",
+           "logdebug(\"Master debug\")",
+           "logwarn(\"Master warning\")",
+           "logerror(\"Master error\")",
+           "")
+writeLines(lines, con = master_file)
 
-# Setting .libPaths() to point to libs folder
-source(file.path(script_path, "set_env.R"), chdir = T)
-
-config <- load_config()
-args <- args_parser()
-
-#library(mypackage)
-devtools::load_all(file.path(script_path, "../packages/mypackage"))
-
-loginfo("Master info")
-logdebug("Master debug")
-logwarn("Master warning")
-logerror("Master error")
-
-hello_world("John")
+cat(readLines(master_file), sep = "\n")
 ```
 
 Lets check how it works
 
-```
+```{r}
+setwd(prj$path)
 source('R/master.R')
 ```
 
-The output should look like this
-
-```
-Loading mypackage
-Loading required package: data.table
-2017-09-23 17:27:14 INFO::Master info
-2017-09-23 17:27:14 WARNING::Master warning
-2017-09-23 17:27:14 ERROR::Master error
-[1] "Hello John!"
-```
-
-As you can see there are logging messages. You can see that debug message is missing.
+As you can see there are logging messages. You can see that debug message is missing as by default logging level is set to present only messages on ```INFO``` and higher levels.
 
 ### Controlling loggers level
 
-To see debug logging message you have to edit file ```config.txt``` in project root folder to look like this
-```
-LogLevel: DEBUG
+To see debug logging message change project configuration file. Project configuration is in ```config.txt``` file in project root folder. Please change the file to look like this:
+```{r comment = "", echo = FALSE}
+config_file <- file.path(prj$path, "config.txt")
+writeLines("LogLevel: DEBUG", con = config_file)
+
+cat(readLines(config_file), sep = "\n")
 ```
 
 Lets check how it works
 
-```
+```{r}
+setwd(prj$path)
 source('R/master.R')
-```
-
-The output should look like this
-
-```
-Loading mypackage
-Loading required package: data.table
-2017-09-23 17:31:22 INFO::Master info
-2017-09-23 17:31:22 DEBUG::Master debug
-2017-09-23 17:31:22 WARNING::Master warning
-2017-09-23 17:31:22 ERROR::Master error
-[1] "Hello John!"
 ```
 
 As you can see now debug logging message is printed.
@@ -395,160 +292,126 @@ As you can see now debug logging message is printed.
 ### ```Logs``` folder
 Logging messages are stored in logs folder in files named with current date. You can check this by issuing a command
 
-```
-list.files(path = 'logs')
-```
-The output on my laptop looks like this
-
-```
-[1] "2017_09_23.log" 
+```{r}
+list.files(path = file.path(prj$path, "logs"))
 ```
 
 When you open this log in an editor you should see content similar to this
 
-```
-2017-09-23 17:27:14 INFO::Master info
-2017-09-23 17:27:14 WARNING::Master warning
-2017-09-23 17:27:14 ERROR::Master error
-2017-09-23 17:30:54 INFO::Master info
-2017-09-23 17:30:54 WARNING::Master warning
-2017-09-23 17:30:54 ERROR::Master error
-2017-09-23 17:31:06 INFO::Master info
-2017-09-23 17:31:06 WARNING::Master warning
-2017-09-23 17:31:06 ERROR::Master error
-2017-09-23 17:31:22 INFO::Master info
-2017-09-23 17:31:22 DEBUG::Master debug
-2017-09-23 17:31:22 WARNING::Master warning
-2017-09-23 17:31:22 ERROR::Master error
+```{r echo = FALSE}
+log_file <- list.files(path = file.path(prj$path, "logs"), pattern = "*.log", full.names = TRUE)[1]
+cat(tail(readLines(log_file), n = 7), sep = "\n")
 ```
 As you can see this is very similar to the output you saw in console.
 
 ## Loggers in packages
-R Suite allows you to use loggers in your custom packages. Lets open ```hello_world.R``` and change its content to the following one
+R Suite allows you to use loggers in your custom packages. Lets open ```packages/mypackage/R/hello_world.R``` and change its content to the following one
 
-```
-# '@export
-hello_world <- function(name) {
-  pkg_loginfo("Package info")
-  pkg_logdebug("Package debug")
-  pkg_logwarn("Package warning")
-  pkg_logerror("Package error")
+```{r comment = "", echo = FALSE}
+hello_file <- file.path(prj$path, "packages", "mypackage", "R", "hello_world.R")
+writeLines(c("#' @export",
+             "hello_world <- function(name) {",
+             "  pkg_loginfo(\"Package info\")",
+             "  pkg_logdebug(\"Package debug\")",
+             "  pkg_logwarn(\"Package warning\")",
+             "  pkg_logerror(\"Package error\")",
+             "",
+             "  print(sprintf(\"Hello %s!\", name))",
+             "}"),
+           con = hello_file)
 
-  print(sprintf("Hello %s!", name))
-}
-```
-
-You can check how it works by issuing this command
-```
-source('R/master.R')
-```
-
-The output you should see
-
-```
-Loading mypackage
-Loading required package: data.table
-2017-09-23 17:37:52 INFO::Master info
-2017-09-23 17:37:52 DEBUG::Master debug
-2017-09-23 17:37:52 WARNING::Master warning
-2017-09-23 17:37:52 ERROR::Master error
-2017-09-23 17:37:52 INFO:mypackage:Package info
-2017-09-23 17:37:52 DEBUG:mypackage:Package debug
-2017-09-23 17:37:52 WARNING:mypackage:Package warning
-2017-09-23 17:37:52 ERROR:mypackage:Package error
-[1] "Hello John!"
+cat(readLines(hello_file), sep = "\n")
 ```
 
-As you can see there are messages from your package. They are marked with package name ```mypackage```. Please also note that as you used ```devtools``` in your master script you did not have to build package to see the changes.
-
-## Prepare deployment package
-
-We can now prepare a deployment package to ship our project on a production. To do this you have to first remove ```devtools``` from ```master.R```
-
-```
-# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
-script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
-	if (!length(script_path)) { return(".") }
-	return(normalizePath(script_path))
-})()
-
-# Setting .libPaths() to point to libs folder
-source(file.path(script_path, "set_env.R"), chdir = T)
-
-config <- load_config()
-args <- args_parser()
-
-library(mypackage)
-
-loginfo("Master info")
-logdebug("Master debug")
-logwarn("Master warning")
-logerror("Master error")
-
+Lets load changed package with devtools and see how ```hello_world``` function behaves:
+```{r}
+devtools::load_all(file.path(prj$path, "packages", "mypackage"))
 hello_world("John")
 ```
 
-Now you have to install dependecies
+As you can see there are messages from your package. They are marked with package name ```mypackage```. Please also note that as you used ```devtools``` you did not have to rebuild package to see the changes.
+
+Lets restore log level to default value:
+```{r}
+logging::setLevel('INFO')
 ```
-RSuite::prj_install_deps()
+
+## Prepare deployment package
+
+We can now prepare a deployment package to ship our project on a production.
+
+First lets restore ```R/master.R``` contents:
+```{r comment = "", echo = FALSE}
+master_file <- file.path(prj$path, "R", "master.R")
+lines <- readLines(master_file)
+lines <- c(lines[c(1:15)],
+           "",
+           "library(mypackage)",
+           "",
+           "hello_world(\"Jony\")",
+           "")
+writeLines(lines, con = master_file)
+
+cat(readLines(master_file), sep = "\n")
+```
+
+Now lets check that all project dependencies have been collected:
+```{r}
+RSuite::prj_install_deps(prj)
 ```
 
 As you did not add any new dependencies R Suite smartly understands it and do not repeat lengthy dependencies installation phase.
 
-Lets build our custom packages
-```
-RSuite::prj_build()
-```
-
-You should see the following output
-```
-2017-09-23 17:44:20 INFO:rsuite:Installing mypackage (for R 3.4) ...
-2017-09-23 17:44:25 INFO:rsuite:Successfuly build 1 packages
+Lets rebuild our custom packages:
+```{r}
+RSuite::prj_build(prj)
 ```
 
-To build a deployment package you use the following function
-```
-RSuite::prj_zip()
-```
-
-You can see that if the project is not under version controll the command returns error. You have to explicitly give version number for your deployment package
-
-```
-RSuite::prj_zip(zip_ver = '1.0')
+To build a deployment package you use the following function (we specify there to put the deployment package with ```path``` argument):
+```{r}
+RSuite::prj_zip(prj, path = tempdir())
 ```
 
-The output should be like this
+As project is not under version control and contains only one package R Suite chooses default version for the deployment
+package to be the same as package version(0.1). Suffix ```x``` means that it is not a real tag. 
 
-```
-2017-09-23 17:49:01 INFO:rsuite:Installing mypackage (for R 3.4) ...
-2017-09-23 17:49:06 INFO:rsuite:Successfuly build 1 packages
-2017-09-23 17:49:06 INFO:rsuite:Preparing files for zipping...
-2017-09-23 17:49:07 INFO:rsuite:... done. Creating zip file my_project_1.0x.zip ...
-2017-09-23 17:49:08 INFO:rsuite:Zip file created: C:/Workplace/Projects/my_project/my_project_1.0x.zip
+For projects under version control consistency of project source code with repository state is checked and 
+deployment package is versioned by source code tag (tag under Git or revision number under SVN) without ```x``` suffix. 
+
+If project inconsistency with repository is detected (like new/uncontrolled files or source code changes) R Suite 
+prevents building deployment package unless you enforce deployment package version explicitly:
+
+```{r}
+RSuite::prj_zip(prj, path = tempdir(), zip_ver = '1.0')
 ```
 
 You have created file ```my_project_1.0x.zip``` that contains all information necessary to run your solution on a production environment.
 
 ## Running deployment package
 
-To test if the deployment package is working you can extract ```my_project_1.0x.zip``` created in previous step in a new folder say ```prod```. Now you can run your solution with the command
+To test if the deployment package is working you can extract ```my_project_1.0x.zip``` created in previous step in a new folder say ```prod```:
 
-```
-source('my_project/R/master.R')
+```{r}
+dir.create(path = file.path(tempdir(), "prod"), showWarnings = FALSE)
+unzip(zipfile = file.path(tempdir(), "my_project_1.0x.zip"), 
+      exdir = file.path(tempdir(), "prod"))
+
+cat(list.files(path = file.path(tempdir(), "prod", "my_project")), sep = "\n")
 ```
 
-The output you should see
+```readme.txt``` file contains version number the project has been tagged with:
 
+```{r comment = "", echo = FALSE}
+cat(readLines(file.path(tempdir(), "prod", "my_project", "readme.txt")))
 ```
-2017-09-23 17:53:34 INFO::Master info
-2017-09-23 17:53:34 WARNING::Master warning
-2017-09-23 17:53:34 ERROR::Master error
-2017-09-23 17:53:34 INFO:mypackage:Package info
-2017-09-23 17:53:34 WARNING:mypackage:Package warning
-2017-09-23 17:53:34 ERROR:mypackage:Package error
-[1] "Hello John!"
+
+Now you can run your solution with the command
+
+```{r}
+output <- system2(command = Sys.which("Rscript"), 
+                  args = file.path(tempdir(), "prod", "my_project", "R", "master.R"),
+                  stdout = TRUE)
+cat(output, sep = "\n")
 ```
 
 As you can see the output is exactly the same you would expect.

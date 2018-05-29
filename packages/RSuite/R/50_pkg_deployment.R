@@ -64,10 +64,8 @@ pkg_download <- function(avail_pkgs, dest_dir) {
   local_pkgs <- data.frame()
   if (nrow(remote_pkgs)) {
     # check/build download cache
-    home_dir <- ifelse(.Platform$OS.type == "windows",
-                       utils::shortPathName(Sys.getenv("USERPROFILE")),
-                       Sys.getenv("HOME"))
-    cache_files <- file.path(home_dir, ".rsuite", "dload_cache",
+    cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+    cache_files <- file.path(cache_base_dir, "dload_cache",
                              vapply(X = remote_pkgs$Repository,
                                     FUN = function(repo) utils::URLencode(repo, TRUE),
                                     FUN.VALUE = ""),
@@ -155,11 +153,6 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   dest_dir <- rsuite_fullUnifiedPath(dest_dir)
   libpath <- rsuite_fullUnifiedPath(libpath)
   sboxpath <- rsuite_fullUnifiedPath(sboxpath)
-
-  # remove oprevious installed version if exists
-  if (dir.exists(file.path(libpath, pkg_name))) {
-    unlink(file.path(libpath, pkg_name), recursive = TRUE, force = TRUE)
-  }
 
   # remove previous build package version if exists
   unlink(list.files(dest_dir, pattern = paste0(pkg_name, "_.*"), full.names = TRUE),

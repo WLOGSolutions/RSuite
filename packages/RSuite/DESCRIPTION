@@ -2,7 +2,15 @@ Package: RSuite
 Type: Package
 Title: Supports Developing, Building and Deploying R Solution
 Version: 0.26
-Author: WLOG Solutions
+Authors@R: c(
+    person("Walerian", "Sokolowski", email = "w.sokolowski@wlogsolutions.com", role = c("aut", "cre")),
+    person("Wit", "Jakuczun", email = "w.jakuczun@wlogsolutions.com", role = "aut"),
+    person("Mateusz", "Kalinowski", email = "m.kalinowski@wlogsolutions.com", role = "aut"),
+    person("Ryszard", "Szymanski", email = "rszymanski@wlogsolutions.com", role = "aut"),
+    person("WLOG Solutions", role = "cph"),
+    person("R Consortium", role = "ctb",
+      comment = "Definitions of system requerements are taken from sysreqsdb project.")
+    )
 Maintainer: Walerian Sokolowski <rsuite@wlogsolutions.com>
 Description: The main package purpose is to support safe and supportable 
   solutions development in R. It will help you with environment separation per

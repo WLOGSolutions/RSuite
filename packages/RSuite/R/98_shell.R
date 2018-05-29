@@ -215,3 +215,23 @@ rscript_arg <- function(name, val) {
     sprintf("%s=c('%s')", name, paste(val, collapse = "', '"))
   }
 }
+
+
+#'
+#' Retrieves RSuite cache base directory.
+#'
+#' Usually  it is $TEMP/.rsuite .
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_cache_base_dir <- function() {
+  cache_base_dir <- file.path(dirname(tempdir()), ".rsuite")
+  if (.Platform$OS.type == "windows") {
+    cache_base_dir <- utils::shortPathName(cache_base_dir)
+  }
+  if (!dir.exists(cache_base_dir)) {
+    dir.create(cache_base_dir, recursive = TRUE)
+  }
+  return(cache_base_dir)
+}

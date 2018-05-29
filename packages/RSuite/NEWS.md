@@ -4,7 +4,17 @@
      binary packages there installed for inproper R version.
   * RSuite processed with goodpractices and most of detected issues fixed. 
      goodpractices unfortunatly does not use .lintr in package file, so 
-     default lintr configuration (inproper for RSuite) is in use while checked. 
+     default lintr configuration (inproper for RSuite) is in use while checked.
+  * RSuite cache is stored in dirname(tempdir()) as writing to user workspace is 
+     forbidden by CRAN policies.
+  * Vignettes are also checked if changed while detecting package changes.
+  * While building package its installation folder (in libs) is not removed. The
+     folder is cleared only during package removal. Warning that DESCRIPTION is
+     not available while building package vanished.
+  * RSuite vignette refactored to run step by step basic workflow with presenting
+     intermediate results.
+  * Authors in DESCRIPTION updated to contain all contributors and copyright 
+     holders.
 
 # RSuite 0.26 (2018-05-23)
   * Saving MD5 sums for package also if it gets build for the first time.
