@@ -26,8 +26,6 @@ install_prj_deps <- function(params, vanilla = FALSE) {
 
   avail_vers <- resolve_prj_deps(repo_infos, params)
 
-  check_lock_env_deps(avail_vers, params) # from 52_dependencies.R
-
   install_dependencies(avail_vers, lib_dir = params$lib_path, rver = params$r_ver)
 
   avail_sup_vers <- resolve_prj_sups(repo_infos, params, vanilla = vanilla)
@@ -112,8 +110,20 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   prj_dep_vers <- vers.rm(prj_dep_vers, project_packages)
 
+  if(file.exists(params$lock_path)){
+    env_lock_vers <- get_lock_env_vers(params) #from 52_dependencies.R
+    prj_dep_vers <- vers.union(prj_dep_vers, env_lock_vers)
+  }
+
   pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
   avail_vers <- resolve_dependencies(prj_dep_vers, repo_infos = repo_infos, pkg_types = pkg_types)
+
+  unfeasibles <- vers.get_unfeasibles(avail_vers)
+  if(length(unfeasibles) != 0){
+    warn_msg <- paste("The following dependencies weren't resolved:", unfeasibles, sep = " ")
+    pkg_logwarn(warn_msg)
+  }
+
   stopifnot(avail_vers$has_avails())
   return(avail_vers)
 }
@@ -248,8 +258,6 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
     pkg_loginfo("No dependencies to install.")
     return(invisible())
   }
-
-  # Check if environment is locked and examine if package versions will change after installing
 
   pkg_loginfo("Detected %s dependencies to install. Installing...", length(vers.get_names(avail_vers)))
 
