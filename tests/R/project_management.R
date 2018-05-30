@@ -31,6 +31,12 @@ deploy_package_to_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
   RSuite:::rsuite_write_PACKAGES(loc_repo, type = type)
 }
 
+remove_package_from_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
+  loc_repo <- .get_local_repo_path(prj, type)
+  file.remove(file.path(loc_repo, pkg_file), loc_repo, overwrite = T)
+  RSuite:::rsuite_write_PACKAGES(loc_repo, type = type)
+}
+
 create_test_package <- function(name, prj, ver = "1.0", deps = "", imps = "") {
   RSuite::prj_start_package(name, prj = prj, skip_rc = T)
   pkg_path <- file.path(prj$path, "packages", name)

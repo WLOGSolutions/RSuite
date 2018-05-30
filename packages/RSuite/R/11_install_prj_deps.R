@@ -110,19 +110,22 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   prj_dep_vers <- vers.rm(prj_dep_vers, project_packages)
 
-  if(file.exists(params$lock_path)){
+  if (file.exists(params$lock_path)){
     env_lock_vers <- get_lock_env_vers(params) #from 52_dependencies.R
+    prj_dep_vers_copy <- prj_dep_vers
     prj_dep_vers <- vers.union(prj_dep_vers, env_lock_vers)
+
+    unfeasibles <- vers.get_unfeasibles(prj_dep_vers)
+    if (length(unfeasibles) != 0){
+      warn_msg <- paste("Lock made the following package unfeasible:", unfeasibles, sep = " ")
+      pkg_logwarn(warn_msg)
+      prj_dep_vers <- prj_dep_vers_copy
+    }
   }
 
   pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
   avail_vers <- resolve_dependencies(prj_dep_vers, repo_infos = repo_infos, pkg_types = pkg_types)
 
-  unfeasibles <- vers.get_unfeasibles(avail_vers)
-  if(length(unfeasibles) != 0){
-    warn_msg <- paste("The following dependencies weren't resolved:", unfeasibles, sep = " ")
-    pkg_logwarn(warn_msg)
-  }
 
   stopifnot(avail_vers$has_avails())
   return(avail_vers)
@@ -308,7 +311,7 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types) {
     curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
     for (ri in repo_infos) {
       for (tp in pkg_types) {
-        tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
+          tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
                                          repo_info = ri,
                                          type = tp)
         if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
