@@ -8,10 +8,31 @@
 #'
 #' Starts managment over repository.
 #'
+#' Created object to manage the repository.
+#'
 #' @param ra_name name of repository to re-initialize adapter. (type: character)
 #' @param ... repository specific parameters. See repo_adapter_create_manager
 #'   for concrete implementation of repo adapter for more details.
 #' @return repo manager object.
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -33,6 +54,28 @@ repo_mng_start <- function(ra_name, ...) {
 #' @param repo_manager repo manager object retrieved with repo_mgr_start.
 #'   (type: rsuite_repo_manager)
 #'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # initialize its structure
+#' repo_mng_init(rmgr)
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
+#'
 #' @export
 #'
 repo_mng_init <- function(repo_manager) {
@@ -45,6 +88,25 @@ repo_mng_init <- function(repo_manager) {
 #'
 #' @param repo_manager repo manager object retrieved with repo_mgr_start.
 #'   (type: rsuite_repo_manager)
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -66,6 +128,31 @@ repo_mng_stop <- function(repo_manager) {
 #'   (type: locical(1), default: FALSE)
 #'
 #' @return data.frame of the same structure as available.packages returns.
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # upload logging package from CRAN into the repository
+#' repo_upload_ext_packages(rmgr, pkgs = "logging", prj = prj)
+#'
+#' # list available packages
+#' repo_mng_list(rmgr)
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -90,13 +177,46 @@ repo_mng_list <- function(repo_manager, pkg_type = .Platform$pkgType, no.cache =
 }
 
 #'
-#' Removes packages specified from repository.
+#' Removes packages from repository.
 #'
 #' @param repo_manager repo manager to remove packages from.
 #'   (type: rsuite_repo_manager)
 #' @param toremove data.frame with same structure as available.packages returns.
 #'   At lease Package and Version columns must be present. (type: data.frame)
-#' @param pkg_type type of packages to remove. (type: character, default: .Platform$pkgType)
+#' @param pkg_type type of packages to remove.
+#'   (type: character, default: .Platform$pkgType)
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # upload logging package from CRAN into the repository
+#' repo_upload_ext_packages(rmgr, pkgs = "logging", prj = prj)
+#'
+#' # list available packages before removal
+#' avail_pkgs <- repo_mng_list(rmgr)
+#' avail_pkgs
+#'
+#' # remove logging from the repository
+#' repo_mng_remove(rmgr, avail_pkgs[avail_pkgs$Package == "logging", ])
+#'
+#' # list available packages after removal
+#' repo_mng_list(rmgr)
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -138,15 +258,15 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 }
 
 #'
-#' Builds and uploads project package(s) into managed repository.
+#' Builds and uploads project package(s) into repository.
 #'
 #' If not specified to skip RC it will detect revision version and tag packages
 #' before uploading. In that case check for changes in project sources is
 #' performed for consistency and project packages will be rebuilt with version
-#' altered: revision will be added as least number to package version.
-#'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
-#' verbosity.
+#' altered: revision will be added as least number to package version.\cr
+#' \cr
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
+#' control logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param pkgs vector of project packages which should be uploaded into repository
@@ -170,6 +290,40 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start src project
+#' src_prj <- prj_start("my_project_src", skip_rc = TRUE, path = prj_base)
+#'
+#' # create project package
+#' prj_start_package("mypackage", prj = src_prj, skip_rc = TRUE)
+#'
+#' # build project environment
+#' prj_install_deps(prj = src_prj)
+#'
+#' # start dest project
+#' dst_prj <- prj_start("my_project_dst", skip_rc = TRUE, path = prj_base)
+#'
+#' # set dest to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = dst_prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = dst_prj, ix = 1)
+#'
+#' # upload mypackage from src into dest's in project repository
+#' # repo_upload_prj_packages(rmgr, prj = src_prj, skip_rc = TRUE)
+#'
+#' # list available packages
+#' repo_mng_list(rmgr)
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -262,13 +416,44 @@ repo_upload_prj_packages <- function(repo_manager,
 }
 
 #'
-#' Uploads file passed into managed repository.
+#' Uploads package file(s) into managed repository.
 #'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
-#' verbosity.
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control
+#' logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param files vector of files to upload. (type: character)
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # download logging package
+#' pkg_fpath <- utils::download.packages("logging",
+#'                                       repos = "https://cloud.r-project.org/",
+#'                                       destdir = tempdir(),
+#'                                       type = "source")[1,2]
+#'
+#' # upload downloaded package into the repository
+#' repo_upload_package_files(rmgr, files = pkg_fpath)
+#'
+#' # list available packages
+#' repo_mng_list(rmgr, pkg_type = "source")
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -333,11 +518,11 @@ repo_upload_package_files <- function(repo_manager, files) {
 
 
 #'
-#' Uploads external packages passed into managed repository. It uses project
-#' to detect repositories to look for packages in.
+#' Uploads external packages into managed repository.
 #'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
-#' verbosity.
+#' It uses project to detect repositories to look for external packages in.\cr
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
+#' control logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param pkgs vector of names of external packages which should be included in
@@ -348,6 +533,31 @@ repo_upload_package_files <- function(repo_manager, files) {
 #' @param with_deps If TRUE will include pkgs dependencies while uploading into
 #'    repository. Packages in repository satisfying pkgs requirements will not be
 #'    included. (type: logical, default: FALSE)
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # upload logging package from CRAN into the repository
+#' repo_upload_ext_packages(rmgr, "logging", prj = prj, pkg_type = "source")
+#'
+#' # list available packages
+#' repo_mng_list(rmgr, pkg_type = "source")
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -406,11 +616,40 @@ repo_upload_ext_packages <- function(repo_manager,
 #'
 #' Uploads PKGZIP into managed repository.
 #'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
-#' verbosity.
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
+#' control logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param pkgzip PKGZIP path to upload. It must exist. (type: character(1))
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # create PKGZIP containing logging package
+#' pkgzip_fpath <- pkgzip_build_ext_packages("logging", prj = prj, pkg_type = "source",
+#'                                           path = tempdir())
+#'
+#' # upload PKGZIP into the repository
+#' repo_upload_pkgzip(rmgr, pkgzip_fpath)
+#'
+#' # list available packages
+#' repo_mng_list(rmgr, pkg_type = "source")
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
@@ -453,17 +692,19 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 
 
 #'
-#' Loads package from github repository, packages it into package file and uploads.
+#' Loads package from github repository.
 #'
-#' It will search dependencies in provided project repositories.
-#'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
-#' verbosity.
+#' It will downlod github repository, build package into package file and will
+#' upload it into the repository. It will search dependencies in provided
+#' project's repositories.\cr
+#' \cr
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
+#' control logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param repo repository address in format username/repo[/subdir][\@ref|#pull]. See
-#'   devtools::install_github for more information.
-#' @param ... github specific parametrs passed to devtools::install_github.
+#'   \code{devtools::install_github} for more information.
+#' @param ... github specific parametrs passed to \code{devtools::install_github}.
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
@@ -483,6 +724,32 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #' (type: character(N), default: NULL).
 #' @param keep_sources if TRUE downloaded package sources will not be removed
 #'   after build. (type: logical, default: FALSE)
+#'
+#' @family in repository management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # set it to use in project repository and CRAN
+#' prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#' # start managing in project repository
+#' rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#' # upload logging package from cran repository
+#' repo_upload_github_package(rmgr, repo = "cran/logging",
+#'                            prj = prj, pkg_type = "source")
+#'
+#' # list available packages
+#' repo_mng_list(rmgr, pkg_type = "source")
+#'
+#' # stop repository management
+#' repo_mng_stop(rmgr)
 #'
 #' @export
 #'
