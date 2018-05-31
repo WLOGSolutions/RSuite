@@ -5,6 +5,7 @@ Version: 0.27
 Authors@R: c(
     person("Walerian", "Sokolowski", email = "rsuite@wlogsolutions.com", role = c("aut", "cre")),
     person("Wit", "Jakuczun", email = "w.jakuczun@wlogsolutions.com", role = "aut"),
+    person("Yulia", "Yakimechko", email = "yakimechko@wlogsolutions.com", role = "aut"),
     person("Mateusz", "Kalinowski", email = "m.kalinowski@wlogsolutions.com", role = "aut"),
     person("Ryszard", "Szymanski", email = "rszymanski@wlogsolutions.com", role = "aut"),
     person("WLOG Solutions", role = "cph"),

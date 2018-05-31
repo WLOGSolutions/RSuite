@@ -1,3 +1,8 @@
+# RSuite 0.28 (2018-05-??)
+  * Documentation changes: package main documentation added, sections added, 
+     dockumentation reviewed for API functions.
+  * vignettes argument added to prj_build. Passing FALSE skips vuilding vignettes.
+
 # RSuite 0.27 (2018-05-29)
   * Handling downloaded packages cache have had error: then multiple packages
      were checks inproper repository cache folder was selected. Due to that

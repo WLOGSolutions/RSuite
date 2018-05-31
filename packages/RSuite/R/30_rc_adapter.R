@@ -191,7 +191,8 @@ rc_adapter_remove_admins.default <- function(rc_adapter, dir) {
 #' @param obj object to check.
 #' @return TRUE if object is of class rsuite_rc_adapter
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 #'
 is_rc_adapter <- function(obj) {
   return("rsuite_rc_adapter" %in%  class(obj))

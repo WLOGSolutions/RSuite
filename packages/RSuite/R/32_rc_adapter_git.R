@@ -162,7 +162,9 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
       return(act_tag@sha)
     }
   }
-  head_tag <- names(repo_tags)[vapply(repo_tags, function(x) tag_target(x) == head_target)]
+  head_tag <- names(repo_tags)[vapply(X = repo_tags,
+                                      FUN = function(x) tag_target(x) == head_target,
+                                      FUN.VALUE = TRUE)]
   assert(length(head_tag), "Failed to find HEAD commit tag. Is it tagged?")
   assert(length(head_tag) == 1, "More than one HEAD commit tag found: %s.", paste(head_tag, collapse = ", "))
 

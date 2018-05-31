@@ -181,7 +181,8 @@ repo_manager_destroy.default <- function(repo_manager) {
 #' @param obj object to check.
 #' @return TRUE if object is of class rsuite_repo_manager
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 #'
 is_repo_manager <- function(obj) {
   return("rsuite_repo_manager" %in% class(obj))

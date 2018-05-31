@@ -60,13 +60,26 @@ safe_get_prj <- function(prj, prj_param_name = "prj") {
   return(prj)
 }
 
+#'
+#' Checks if object is rsuite project.
+#'
+#' @param prj object to check for beeing rsuite project.
+#' @return TRUE if prj is rsuite project.
+#'
+#' @keywords internal
+#' @noRd
+#'
+is_prj <- function(prj) {
+  class(prj) == "rsuite_project"
+}
+
 
 #'
 #' Loads project settings without loading it into environment.
 #'
 #' Project parameters are searched and loaded. If project has been loaded
 #' previously from the path the same project instance will be used without
-#' reloading.
+#' reloading.\cr
 #' It project is the first one loaded it will became default project (used then
 #' NULL is passed as project for project management functions).
 #'
@@ -75,10 +88,18 @@ safe_get_prj <- function(prj, prj_param_name = "prj") {
 #'   (type: character, defalt: getwd())
 #' @return object of type rsuite_project
 #'
+#' @family in project management
+#'
 #' @examples
-#' \dontrun{
-#' prj <- prj_init() # tries to init project somethere from working folder up.
-#' }
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # init project
+#' prj <- prj_init(path = file.path(prj_base, "my_project"))
 #'
 #' @export
 #'
@@ -109,25 +130,16 @@ prj_init <- function(path = getwd()) {
 }
 
 #'
-#' Checks if object is rsuite project.
-#'
-#' @param prj object to check for beeing rsuite project.
-#' @return TRUE if prj is rsuite project.
-#'
-#' @export
-#'
-is_prj <- function(prj) {
-  class(prj) == "rsuite_project"
-}
-
-#'
 #' Creates project structure at specified path.
 #'
-#' Project is not loaded, just created
-#'
+#' Project is not loaded, just created.\cr
+#' \cr
 #' If name passed folder under such name will be created and project structure
 #' will be placed under it. If not passed folder under path will contain project
-#' structure and project name will be assumed to be basename of path.
+#' structure and project name will be assumed to be basename of path.\cr
+#' \cr
+#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
 #' @param name name of project to create. It must not contain special characters
 #'   like \\/\"\'<> otherwise project folder could not be created. It can be NULL.
@@ -138,6 +150,16 @@ is_prj <- function(prj) {
 #'   (type: logical, default: FALSE)
 #'
 #' @return rsuite_project object for project just created.
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
 #' @export
 #'
@@ -185,6 +207,11 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE) {
 #'
 #' Creates package structure inside project.
 #'
+#' It fails if package exists already in the project.\cr
+#' \cr
+#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on build and download messages.
+#'
 #' @param name name of package to create. It must not contain special characters
 #'    like \\/\"\'<> otherwise package folder could not be created. It must not
 #'    contain _ also as it is requirement enforced on R package names. Folder
@@ -194,6 +221,19 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE) {
 #'    project from working directory. (type: rsuite_project, default: NULL)
 #' @param skip_rc if TRUE skip adding package under revision control.
 #'    (type: logical, default: FALSE)
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # start package in it
+#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
 #'
 #' @export
 #'
@@ -227,7 +267,10 @@ prj_start_package <- function(name, prj = NULL, skip_rc = FALSE) {
 
 
 #'
-#' Loads project into environment to use so all master scripts can be used run.
+#' Loads project into environment so all master scripts can run.
+#'
+#' It changes \code{.libPaths()} so project internal environment is visible
+#' for R. Use \code{\link{prj_unload}} to restore your environment.
 #'
 #' @param prj project to load or NULL to use path for new project
 #'   initialization. If not path passed project will be inited from working
@@ -236,6 +279,24 @@ prj_start_package <- function(name, prj = NULL, skip_rc = FALSE) {
 #'   If passed must be existing folder path. (type: character)
 #'
 #' @return previously loaded project or NULL if no project have been loaded.
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' cat(.libPaths(), sep = "\n") # show inital contents of .libPaths()
+#'
+#' prj_load(prj = prj) # load project
+#' cat(.libPaths(), sep = "\n") # show contents of .libPaths()
+#'
+#' prj_unload() # restore environment
+#' cat(.libPaths(), sep = "\n") # show final contents of .libPaths()
 #'
 #' @export
 #'
@@ -271,10 +332,48 @@ prj_load <- function(path, prj = NULL) {
 }
 
 #'
-#' Installs all project dependencies.
+#' Unloads last loaded project.
 #'
-#' Logs all messages from build onto rsuite logger. Use logging::setLevel to
-#'   control logs verbosity. DEBUG level turns on build and download messages.
+#' It changes \code{.libPaths()} removing all references to currently loaded project internal environmet.
+#'
+#' @return Project unloaded or NULL if there was no project to unload.
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' cat(.libPaths(), sep = "\n") # show inital contents of .libPaths()
+#'
+#' prj_load(prj = prj) # load project
+#' cat(.libPaths(), sep = "\n") # show contents of .libPaths()
+#'
+#' prj_unload() # restore environment
+#' cat(.libPaths(), sep = "\n") # show final contents of .libPaths()
+#'
+#' @export
+#'
+prj_unload <- function() {
+  prev_prj <- set_loaded_prj(NULL)
+
+  cur_lpath <- .libPaths()
+  cur_lpath <- cur_lpath[!grepl("[\\/]deployment[\\/](libs|sbox)[\\/]?$", cur_lpath)]
+  .libPaths(cur_lpath)
+
+  invisible(prev_prj)
+}
+
+
+#'
+#' Installs project dependencies and needed supportive packages.
+#'
+#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
 #' @param prj project to collect dependencies for if not passed will build
 #'    project for working directory. (type: rsuite_project, default: NULL)
@@ -284,6 +383,19 @@ prj_load <- function(path, prj = NULL) {
 #'   (type: logical, default: FALSE)
 #'
 #' @return TRUE if all build successfully.
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # reinstall logging package into project environment
+#' prj_install_deps(prj = prj, clean = TRUE)
 #'
 #' @export
 #'
@@ -312,13 +424,41 @@ prj_install_deps <- function(prj = NULL, clean = FALSE, vanilla = FALSE) {
   install_prj_deps(params, vanilla = vanilla) # from 11_install_prj_deps.R
 }
 
-
+#'
+#' Uninstalls unused packages from project local environment.
 #'
 #' Checks if all dependencies installed are required by project packages or
-#'  master scripts and removed those which are not required any more.
+#' master scripts and removes those which are not required any more.\cr
+#' \cr
+#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
 #' @param prj project to clean dependencies of. If not passed will use project
 #'    base in working directory. (type: rsuite_project, default: NULL)
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # add colorspace to master script
+#' master_script_fpath <- file.path(prj$path, "R", "master.R")
+#' write("library(colorspace)", file = master_script_fpath, append = TRUE)
+#'
+#' # install colorspace into project local environment
+#' prj_install_deps(prj = prj)
+#'
+#' # remove dependency to colorspace
+#' writeLines(head(readLines(master_script_fpath), n = -1),
+#'            con = master_script_fpath)
+#'
+#' # uninstall colorspace from project local environment
+#' prj_clean_deps(prj = prj)
 #'
 #' @export
 #'
@@ -331,14 +471,13 @@ prj_clean_deps <- function(prj = NULL) {
 
   clean_prj_deps(params) # from 11_install_prj_deps.R
 }
-#'
 
 
 #'
-#' Builds project installing dependencies first if they changed.
+#' Builds project internal packages and installs them.
 #'
-#' Logs all messages from build onto rsuite logger. Use logging::setLevel to
-#'   control logs verbosity. DEBUG level turns on build and download messages.
+#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
 #' @param prj project to build if not passed will build project for working
 #'    directory. (type: rsuite_project, default: NULL)
@@ -346,10 +485,31 @@ prj_clean_deps <- function(prj = NULL) {
 #'    (type: character)
 #' @param rebuild if TRUE will force rebuild all project packages event if no
 #'    changes detected (type: logical)
+#' @param vignettes if FALSE will not build vignettes which can highly decrease
+#'    package building time (type: logical, default: TRUE)
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # create package in the project
+#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
+#'
+#' # build project local environment
+#' prj_install_deps(prj = prj)
+#'
+#' # build mypackage and install it into project environment
+#' prj_build(prj = prj)
 #'
 #' @export
 #'
-prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE) {
+prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE) {
   assert(is.logical(rebuild), "logical expected for rebuild")
 
   prj <- safe_get_prj(prj)
@@ -361,10 +521,17 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE) {
   if (is.null(type)) {
     type <- params$pkgs_type
   }
+
+  skip_build_steps <- NULL
+  if (!any(vignettes)) {
+    skip_build_steps <- "vignettes"
+  }
+
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     revision = NULL,
                                     build_type = type,
-                                    rebuild = rebuild)
+                                    rebuild = rebuild,
+                                    skip_build_steps = skip_build_steps)
 }
 
 #'
@@ -372,29 +539,51 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE) {
 #'
 #' It collects all dependecies and project packages installed in local project
 #' environment together with master scripts and artifacts and zips them into
-#' single zip file.
-#'
+#' single zip file.\cr
+#' \cr
 #' Zip package generated is stamped with version. It can be enforced with zip_ver
 #' parameter (zip will have suffix <zip_ver>x in the case). If version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
 #' from maximal project packages version number. In that case revision numer is
 #' appended to version: version number will be <zip_ver>_<rc_ver>. Check for
-#' changes in project sources is performed for zip package consistency.
-#'
+#' changes in project sources is performed for zip package consistency.\cr
+#' \cr
 #' Before building zip package project is built. If revision number detected
 #' project packages will have version altered: revision will be added as least
-#' number to package version.
-#'
-#' Logs all messages from build onto rsuite logger. Use logging::setLevel to
-#'   control logs verbosity. DEBUG level turns on build and download messages.
+#' number to package version.\cr
+#' \cr
+#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
 #' @param prj project object to zip. if not passed will zip loaded project or
 #'    default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
 #' @param path folder path to put output zip into. If folder does not exist, will
-#'    create it. (type: characted: default: getwd())
+#'    create it. (type: characted: default: \code{getwd()})
 #' @param zip_ver if passed enforce version of zip package to passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
+#'
+#' @return invisible file path to pack file created. The file name will be
+#'    in form <ProjectName>_<version>.zip
+#
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # create package in the project
+#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
+#'
+#' # build project local environment
+#' prj_install_deps(prj = prj)
+#'
+#' # build deployment zip
+#' zip_fpath <- prj_zip(prj = prj, path = tempdir(), zip_ver = "1.0")
 #'
 #' @export
 #'
@@ -414,7 +603,9 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
   if (!dir.exists(path)) {
     dir.create(path, recursive = TRUE, showWarnings = FALSE)
   }
-  zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
+
+  zip_fpath <- zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
+  return(invisible(zip_fpath))
 }
 
 
@@ -422,8 +613,10 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #' Prepares project source pack tagged with version.
 #'
 #' It collects all sources and assemblies found in project folder and packs them
-#' into single zip file.
-#'
+#' into single zip file.\cr
+#' The function is heavily used for building project for alternative environments
+#' (like in docker).\cr
+#' \cr
 #' Pack generated is stamped with version. It can be enforced with pack_ver
 #' parameter (zip will have suffix <pack_ver>x in the case). If version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
@@ -431,18 +624,19 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #' appended to version: version number will be <ZipVersion>_<rc_ver>. Check for
 #' changes in project sources is performed for pack consistency. Resulted pack
 #' is marked with the version detected so while buiding zip after unpacking will
-#' have the same version as original project.
-#'
+#' have the same version as original project.\cr
+#' \cr
 #' Before building pack project packages will have version altered: revision will
-#' be added as least number to package version.
-#'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs verbosity.
+#' be added as least number to package version.\cr
+#' \cr
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control
+#' logs verbosity.
 #'
 #' @param prj project object to pack. if not passed will pack loaded project or
 #'    default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
 #' @param path folder path to put output pack into. The folder must exist.
-#'    (type: character, default: getwd())
+#'    (type: character, default: \code{getwd()})
 #' @param pkgs names of packages to include into pack. If NULL will include all
 #'    project packages (type: character, default: NULL)
 #' @param inc_master if TRUE will include master scripts into pack.
@@ -454,6 +648,22 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #'
 #' @return invisible file path to pack file created. The file name will be
 #'    in form prjpack_<ProjectName>_<version>.zip
+#'
+#' @family in project management
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # create package in the project
+#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
+#'
+#' # build project source pack
+#' pack_fpath <- prj_pack(prj = prj, path = tempdir(), pack_ver = "1.0")
 #'
 #' @export
 #'
@@ -511,27 +721,47 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #'
 #' Locks the project environment.
 #'
-#' It collects all packages, their versions and stores them in the 'env.lock' file
-#' which is saved in the following directory: <my_project>/deployment/
+#' It collects all packages, their versions and stores them in the 'env.lock'
+#' file which is saved in the following directory: <my_project>/deployment/\cr
+#' \cr
+#' The 'env.lock' file is a dcf file storing information about installed
+#' packages and their versions. A sample record from the 'env.lock' file:\cr
+#' \cr
+#'  Package: RSuite\cr
+#'  Version: 0.26.235\cr
+#' \cr
+#' When dependencies are being installed (using \code{\link{prj_install_deps}})
+#' the 'env.lock' file will be used to detect whether any package will change
+#' versions. If that's the case a warning message will be displayed like this:\cr
+#' \cr
+#' \code{...:rsuite: The following packages will be updated from last lock: colorspace}\cr
+#' \cr
+#' The feature allows preventing errors caused by newer versions of packages
+#' which might work differently than previous versions used in the project.
 #'
-#' The 'env.lock' file is a dcf file storing information about installed packages
-#' and their versions. A sample record from the 'env.lock' file:
+#' @param prj project object to be locked. if not passed will lock loaded
+#'    project or default whichever exists. Will init default project from working
+#'    directory if no default project exists.
+#'    (type: rsuite_project, default: NULL)
 #'
-#'  Package: RSuite
-#'  Version: 0.26.235
+#' @family in project management
 #'
-#' When dependencies are being installed (using prj_install_deps()) the 'env.lock'
-#' file will be used to detect whether any package will change versions. If that's
-#' the case a warning message will be displayed. An example of warning message:
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' 2018-05-29 15:29:55 WARNING:rsuite:The following packages will be updated from last lock: RSuite
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' The feature allows to prevent unwanted errors caused by newer versions of packages which might work
-#' differently than previous versions used in the project.
+#' # build project local environment
+#' prj_install_deps(prj = prj)
 #'
-#' @param prj project object to be locked. if not passed will lock loaded project or
-#'    default whichever exists. Will init default project from working
-#'    directory if no default project exists. (type: rsuite_project, default: NULL)
+#' # lock project environment
+#' prj_lock_env(prj = prj)
+#'
+#' # present contents of lock file created
+#' cat(readLines(file.path(prj$path, "deployment", "env.lock")), sep = "\n")
 #'
 #' @export
 #'
@@ -541,6 +771,8 @@ prj_lock_env <- function(prj = NULL){
 
   params <- prj$load_params()
 
+  # TODO: check that at least direct project dependencies are installed
+
   env_pkgs <- as.data.frame(utils::installed.packages(lib.loc = params$lib_path),
                             stringsAsFactors = FALSE)[, c("Package", "Version")]
 
@@ -548,4 +780,6 @@ prj_lock_env <- function(prj = NULL){
 
   lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
   write.dcf(lock_data, file = params$lock_path)
+
+  invisible()
 }

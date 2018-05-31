@@ -137,7 +137,8 @@ repo_adapter_create_manager.default <- function(repo_adapter, ...) {
 #' @param obj object to check.
 #' @return TRUE if object is of class rsuite_repo_adapter
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 #'
 is_repo_adapter <- function(obj) {
   return("rsuite_repo_adapter" %in%  class(obj))
