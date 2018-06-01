@@ -132,7 +132,7 @@ rsuite_register_repo_adapter <- function(repo_adapter) {
 #'
 #' Gets all names of known repository adapters.
 #'
-#' @return names of registered repository management adapters as chracter vector.
+#' @return names of registered repository management adapters as character vector.
 #'
 #' @family miscellaneous
 #'
@@ -203,7 +203,7 @@ rsuite_unregister_rc_adapter <- function(name) {
 #'
 #' Gets all names of known RC (revision control) adapters.
 #'
-#' @return names of registered rc adapters as chracter vector.
+#' @return names of registered rc adapters as character vector.
 #'
 #' @family miscellaneous
 #'

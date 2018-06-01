@@ -54,19 +54,19 @@
 #' verbosity.
 #'
 #' @param pkgs vector of project packages which should be included in PKGZIP
-#'   or NULL to include all project packages (type: characted, default: NULL)
+#'   or NULL to include all project packages (type: character, default: NULL)
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param zip_ver if passed enforce version of PKGZIP package to passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
 #' @param pkg_type type of packages to build (type: character, default: platform default)
 #' @param path folder path to put output zip into. The folder must exist.
-#'    (type: characted: default:  \code{getwd()})
+#'    (type: character: default:  \code{getwd()})
 #' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
 #'    (type: logical, default: FALSE)
 #' @param filter_repo repository address to not include dependencies available in.
 #'     In project dependencies will nether be filtered. If NULL will not filter
-#'     dependencies. Will be omited if with_deps is FALSE. (type: character(1), default: NULL)
+#'     dependencies. Will be omitted if with_deps is FALSE. (type: character(1), default: NULL)
 #' @param skip_build_steps character vector with steps to skip while building
 #'    project packages. Can contain following entries:
 #' \describe{
@@ -200,9 +200,9 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
 #' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
 #'
-#' @param files vector of files to upload. (type: characted)
+#' @param files vector of files to upload. (type: character)
 #' @param path folder path to put output zip into. The folder must exist.
-#'    (type: characted: default:  \code{getwd()})
+#'    (type: character: default:  \code{getwd()})
 #'
 #' @return created pkgzip file path (invisible).
 #'
@@ -289,7 +289,7 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 #' verbosity.
 #'
 #' @param pkgs vector of names of external packages which should be included in
-#'   PKGZIP. (type: characted)
+#'   PKGZIP. (type: character)
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to build (type: character, default: platform default)
@@ -298,7 +298,7 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 #' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
 #'    (type: logical, default: FALSE)
 #' @param filter_repo repository address to not include dependencies available in.
-#'     If NULL will not filter dependencies. Will be omited if with_deps is FALSE.
+#'     If NULL will not filter dependencies. Will be omitted if with_deps is FALSE.
 #'     (type: character(1), default: NULL)
 #'
 #' @return created pkgzip file path (invisible).
@@ -393,16 +393,16 @@ pkgzip_build_ext_packages <- function(pkgs,
 #'
 #' @param repo repository address in format username/repo[/subdir][\@ref|#pull]. See
 #'   devtools::install_github for more information.
-#' @param ... github specific parametrs passed to  \code{devtools::install_github}.
+#' @param ... github specific parameters passed to  \code{devtools::install_github}.
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to build (type: character, default: platform default)
 #' @param path folder path to put output zip into. The folder must exist.
-#'    (type: characted: default: getwd())
+#'    (type: character: default: \code{getwd()})
 #' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
 #'    (type: logical, default: FALSE)
 #' @param filter_repo repository address to not include dependencies available in.
-#'     If NULL will not filter dependencies. Will be omited if with_deps is FALSE.
+#'     If NULL will not filter dependencies. Will be omitted if with_deps is FALSE.
 #'     (type: character(1), default: NULL)
 #' @param skip_build_steps character vector with steps to skip while building
 #'    project packages. Can contain following entries:

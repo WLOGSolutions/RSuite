@@ -196,7 +196,7 @@ get_installed_packages <- function(ex_liblocs, rver, with_globals = TRUE) {
 #'
 #' @param avail_vers version object describing resolved dependencies to install.
 #' @param sbox_dir directory to install into. Must not be NULL.
-#' @param lib_dir directory there dependecies have been installed. Must not be NULL.
+#' @param lib_dir directory there dependencies have been installed. Must not be NULL.
 #' @param rver R version to install dependencies for. (type: character)
 #' @param check_repos_consistency if TRUE will prevent installing
 #'   packages built for another R ver. (type: logical, default: TRUE)
@@ -436,7 +436,7 @@ resolve_packages <- function(vers, repo_infos, pkg_types) {
 #' @param pkgs vector of package names to permutate
 #' @param db data frame of available packages as returned by available.packages
 #'
-#' @return numeric vertor which is defining permutation of packages ta align
+#' @return numeric vector which is defining permutation of packages ta align
 #' them in order of installation (less dependent to more dependent).
 #'
 #' @keywords internal

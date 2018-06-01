@@ -25,7 +25,7 @@ NULL
 #'
 #' @section Project management:
 #' These functions will help you start new RSuite project or package inside
-#' it, detect and install dependencies into local environemnt, build you
+#' it, detect and install dependencies into local environment, build you
 #' project packages and prepare deployment zip then you are done with development.
 #'
 #' \describe{
@@ -46,9 +46,9 @@ NULL
 #' repositories.
 #'
 #' \describe{
-#'   \item{\code{\link{repo_mng_start}}}{Starts managment over repository.}
+#'   \item{\code{\link{repo_mng_start}}}{Starts management over repository.}
 #'   \item{\code{\link{repo_mng_init}}}{Initializes repository (creates its structure).}
-#'   \item{\code{\link{repo_mng_stop}}}{Stops managment over repository.}
+#'   \item{\code{\link{repo_mng_stop}}}{Stops management over repository.}
 #'   \item{\code{\link{repo_mng_list}}}{Retrieve list of packages available in repository.}
 #'   \item{\code{\link{repo_mng_remove}}}{Removes packages from repository.}
 #'   \item{\code{\link{repo_upload_prj_packages}}}{Builds and uploads project package(s) into repository.}
@@ -61,7 +61,7 @@ NULL
 #' @section PKGZIP building:
 #' PKGZIPs are for management of repositories in internet-less environment.
 #' On corporate servers often you do not have access to internet. In that
-#' case you can prepare PKGZIP with required packages somethere with internet
+#' case you can prepare PKGZIP with required packages somewhere with internet
 #' connection and use it to update internal CRAN-like repository which has no
 #' access to internet.
 #'
@@ -94,9 +94,9 @@ NULL
 #' to work also in connection-less environments database they created is
 #' included into RSuite.
 #'
-#' These functions extract system requements for the whole project environment
+#' These functions extract system requirements for the whole project environment
 #' and makes it possible to prepare installation script or update your system
-#' if you have priviledged access.
+#' if you have privileged access.
 #'
 #' \describe{
 #'   \item{\code{\link{sysreqs_collect}}}{Prints out all system requirements from dependencies and project packages.}
@@ -106,7 +106,7 @@ NULL
 #' }
 #'
 #' @section Extending RSuite - RC adapter:
-#' This API alows you to implement your own RC (revision control) adapter for
+#' This API allows you to implement your own RC (revision control) adapter for
 #' RSuite.
 #'
 #' RSuite has SVN and Git adapters in-build for you.
@@ -118,7 +118,7 @@ NULL
 #'   \item{\code{\link{rc_adapter_create_base}}}{
 #'      Creates base presentation for RC adapter to use by concrete implementations.
 #'   }
-#'   \item{\code{\link{rc_adapter_is_under_control}}}{Detects if dir is under adapter's managed versison control.}
+#'   \item{\code{\link{rc_adapter_is_under_control}}}{Detects if dir is under adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_prj_struct_add}}}{Puts project structure under RC adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_pkg_struct_add}}}{Puts package structure under RC adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_get_version}}}{
@@ -130,7 +130,7 @@ NULL
 #' }
 #'
 #' @section Extending RSuite - Repository adapter and manager:
-#' This API alows you to implement your own repository adapter for RSuite.
+#' This API allows you to implement your own repository adapter for RSuite.
 #' If the repository can be managed (you can add/remove/update packages in it)
 #' you can provide repo manager object creation ability to manage it with
 #' RSuite.
@@ -172,7 +172,7 @@ NULL
 #' }
 #'
 #' @section Project configuration:
-#' These functions are conviniet way to change project global configuration.
+#' These functions are convenient way to change project global configuration.
 #'
 #' You normally will not need to use these functions unless you want perform some scripting
 #' with use of RSuite.

@@ -8,7 +8,8 @@
 ## R CMD check results
 There were no ERRORs, WARNINGs.
 
-NOTES are reported that running of examples took too much time:
+NOTES are reported that running of examples took too much time.
+For example:
 ```
 ** running examples for arch 'i386' ... [400s] NOTE
 Examples with CPU or elapsed time > 10s
@@ -20,16 +21,11 @@ prj_build                   3.85   0.92   66.55
 pkgzip_build_github_package 3.11   0.91   38.07
 repo_upload_github_package  2.83   0.70   34.19
 sysreqs_script              0.91   0.25   11.25
-** running examples for arch 'x64' ... [307s] NOTE
-Examples with CPU or elapsed time > 10s
-                            user system elapsed
-pkgzip_build_prj_packages   4.10   0.73   53.54
-prj_zip                     4.03   0.78   52.23
-repo_upload_prj_packages    3.90   0.78   51.57
-prj_build                   3.95   0.66   54.75
-pkgzip_build_github_package 3.29   0.67   32.12
-repo_upload_github_package  2.87   0.78   29.62
 ```
+
+Examples for R Suite are heavy: they download logging and 
+colorspace packages from CRAN and logging from cran/logging
+Git Hub repository. They also present package building abilities.
 
 ## Downstream dependencies
 No issues detected

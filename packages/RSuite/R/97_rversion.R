@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #
-# Tools for handling diffrent R versions.
+# Tools for handling different R versions.
 #----------------------------------------------------------------------------
 
 #'
@@ -91,9 +91,9 @@ get_rscript_path <- function(rver) {
 #' Retrieves all path to check Rscripts from. All paths returned are ensured to
 #' contain passed command.
 #'
-#' @param rscript_cmd command to check for existance in candidate folders. (type: character)
+#' @param rscript_cmd command to check for existence in candidate folders. (type: character)
 #'
-#' @return vertor of paths containing command. (type: character)
+#' @return vector of paths containing command. (type: character)
 #'
 #' @keywords internal
 #' @noRd

@@ -17,7 +17,8 @@
 #' @param pkg_type type of package to build. Must not be source. (type: character)
 #' @param params rsuite_prj_params object to get repository settings from. Dependencies
 #'    will be resolved from the specified repositories.
-#' @param rver version of R to build packages for. (type: characted, default: params$r_ver)
+#' @param rver version of R to build packages for.
+#'    (type: character, default: \code{params$r_ver})
 #'
 #' @keywords internal
 #' @noRd

@@ -6,7 +6,7 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Starts managment over repository.
+#' Starts management over repository.
 #'
 #' Created object to manage the repository.
 #'
@@ -84,7 +84,7 @@ repo_mng_init <- function(repo_manager) {
 }
 
 #'
-#' Stops managment over repository.
+#' Stops management over repository.
 #'
 #' @param repo_manager repo manager object retrieved with repo_mgr_start.
 #'   (type: rsuite_repo_manager)
@@ -123,9 +123,9 @@ repo_mng_stop <- function(repo_manager) {
 #' @param repo_manager repo manager to retrieve package list from.
 #'   (type: rsuite_repo_manager)
 #' @param pkg_type type of packages to retrieve list of.
-#'   (type: character, default to platform default pakcage type)
+#'   (type: character, default to platform default package type)
 #' @param no.cache it TRUE will delete cached list before retrieving.
-#'   (type: locical(1), default: FALSE)
+#'   (type: logical(1), default: FALSE)
 #'
 #' @return data.frame of the same structure as available.packages returns.
 #'
@@ -271,7 +271,7 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param pkgs vector of project packages which should be uploaded into repository
-#'   or NULL to upload all project packages (type: characted, default: NULL)
+#'   or NULL to upload all project packages (type: character, default: NULL)
 #' @param prj project object to use.If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param skip_rc if TRUE skip detection of package revision and package tagging.
@@ -530,7 +530,7 @@ repo_upload_package_files <- function(repo_manager, files) {
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param pkgs vector of names of external packages which should be included in
-#'   PKGZIP. (type: characted)
+#'   PKGZIP. (type: character)
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
@@ -696,7 +696,7 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #'
 #' Loads package from github repository.
 #'
-#' It will downlod github repository, build package into package file and will
+#' It will download github repository, build package into package file and will
 #' upload it into the repository. It will search dependencies in provided
 #' project's repositories.
 #'
@@ -707,7 +707,7 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param repo repository address in format username/repo[/subdir][\@ref|#pull]. See
 #'   \code{devtools::install_github} for more information.
-#' @param ... github specific parametrs passed to \code{devtools::install_github}.
+#' @param ... github specific parameters passed to \code{devtools::install_github}.
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)

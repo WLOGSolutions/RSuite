@@ -199,7 +199,7 @@ repo_manager_upload.default <- function(repo_manager, src_dir, types) {
 #'   Version(type: character) columns. (type: data.frame)
 #' @param type package type to remove
 #'
-#' @return data.frame containig packages removed with Package and Version columns.
+#' @return data.frame containing packages removed with Package and Version columns.
 #'
 #' @family in extending RSuite with Repo adapter
 #'

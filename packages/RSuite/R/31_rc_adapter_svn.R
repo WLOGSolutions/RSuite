@@ -68,7 +68,7 @@ rc_adapter_create_svn <- function(name) {
 #' @noRd
 #'
 rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
-  # check if there is administrative .svn somethere up folder structure
+  # check if there is administrative .svn somewhere up folder structure
   candidate_dir <- dir
   while (!dir.exists(file.path(candidate_dir, ".svn"))) {
     parent <- dirname(candidate_dir)
