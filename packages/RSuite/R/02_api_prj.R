@@ -864,8 +864,10 @@ prj_unlock_env <- function(prj = NULL) {
   if (!file.exists(params$lock_path)) {
     error_msg <- "The project environment is not locked"
     pkg_logerror(error_msg)
-    error(error_msg)
+    stop(error_msg)
   }
 
   file.remove(params$lock_path)
+
+  return(invisible())
 }
