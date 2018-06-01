@@ -94,6 +94,9 @@
 #' # start package in my_project
 #' prj_start_package("mypackage", skip_rc = TRUE, prj = prj)
 #'
+#' # build project environment and install supportives
+#' prj_install_deps(prj = prj, vanilla_sups = TRUE)
+#'
 #' # build PKGZIP
 #' pkgzip_fpath <- pkgzip_build_prj_packages(prj = prj, path = tempdir())
 #'
