@@ -765,7 +765,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #'
 #' @export
 #'
-prj_lock_env <- function(prj = NULL){
+prj_lock_env <- function(prj = NULL) {
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
   params <- prj$load_params()
@@ -782,7 +782,7 @@ prj_lock_env <- function(prj = NULL){
 
   # Check if direct dependencies are installed
   missing_deps_vers <- vers.rm_acceptable(prj_dep_vers, env_pkgs)
-  if (!vers.is_empty(missing_deps_vers)){
+  if (!vers.is_empty(missing_deps_vers)) {
     missing_pkgs_msg <- do.call(paste, as.list(missing_deps_vers$pkgs$pkg))
     pkg_logerror(missing_pkgs_msg)
     fail_msg <- paste("Can't lock project environment if dependencies are not installed:",
@@ -796,4 +796,31 @@ prj_lock_env <- function(prj = NULL){
   write.dcf(lock_data, file = params$lock_path)
 
   invisible()
+}
+
+#'
+#' Unlocks the project environment. It deletes the 'env.lock' file which is
+#' saved in the following directory: <my_project>/deployment/. If the project
+#' environment is not locked (there is no env.lock file) the prj_unlock_env will end with an error.
+#'
+#' @param prj project object to be unlocked. if not passed will lock loaded
+#'    project or default whichever exists. Will init default project from working
+#'    directory if no default project exists.
+#'    (type: rsuite_project, default: NULL)
+#'
+#' @export
+#'
+prj_unlock_env <- function(prj = NULL) {
+  prj <- safe_get_prj(prj)
+  stopifnot(!is.null(prj))
+  params <- prj$load_params()
+
+  # project environment is not locked
+  if (!file.exists(params$lock_path)) {
+    error_msg <- "The project environment is not locked"
+    pkg_logerror(error_msg)
+    error(error_msg)
+  }
+
+  file.remove(params$lock_path)
 }
