@@ -20,6 +20,8 @@ Description: The main package purpose is to support safe and supportable
 URL: http://rsuite.io
 BugReports: https://github.com/WLOGSolutions/RSuite/issues
 License: MIT + file LICENSE
+Depends:
+  R (>= 3.2.0)
 Imports: 
   logging,
   devtools,
