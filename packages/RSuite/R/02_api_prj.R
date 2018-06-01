@@ -768,16 +768,30 @@ prj_pack <- function(prj = NULL, path = getwd(),
 prj_lock_env <- function(prj = NULL){
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
-
   params <- prj$load_params()
 
-  # TODO: check that at least direct project dependencies are installed
+  # Retrieve direct dependencies
+  prj_dep_vers <- collect_prj_direct_deps(params)        # from 52_dependencies.R
 
+  prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  prj_dep_vers <- vers.rm(prj_dep_vers, prj_pkgs)
+
+  # Retrieve installed packages
   env_pkgs <- as.data.frame(utils::installed.packages(lib.loc = params$lib_path),
                             stringsAsFactors = FALSE)[, c("Package", "Version")]
 
-  prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  # Check if direct dependencies are installed
+  missing_deps_vers <- vers.rm_acceptable(prj_dep_vers, env_pkgs)
+  if (!vers.is_empty(missing_deps_vers)){
+    missing_pkgs_msg <- do.call(paste, as.list(missing_deps_vers$pkgs$pkg))
+    pkg_logerror(missing_pkgs_msg)
+    fail_msg <- paste("Can't lock project environment if dependencies are not installed:",
+                      missing_pkgs_msg,
+                      sep = " ")
+    stop(fail_msg, call. = FALSE)
+  }
 
+  # Create lock data and save to 'env.lock' file
   lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
   write.dcf(lock_data, file = params$lock_path)
 
