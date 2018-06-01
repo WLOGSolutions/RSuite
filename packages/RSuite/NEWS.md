@@ -1,7 +1,12 @@
 # RSuite 0.28 (2018-05-??)
   * Documentation changes: package main documentation added, sections added, 
-     dockumentation reviewed for API functions.
+     documentation reviewed for API functions.
   * vignettes argument added to prj_build. Passing FALSE skips vuilding vignettes.
+  * vanilla_sups flag added to prj_install_deps. It causes check/install only 
+     basic supportive dependencies required for project package building.
+  * check_repos_consistency flag added to prj_install_deps. For R-devel CRAN has 
+     packages not rebuilt for R-devel version, so consistency check breaks 
+     building project environment.
 
 # RSuite 0.27 (2018-05-29)
   * Handling downloaded packages cache have had error: then multiple packages

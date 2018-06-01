@@ -44,18 +44,24 @@ rsuite_check_version <- function() {
 #'
 #' Updates RSuite to newest available version.
 #'
+#' @param lib.dir folder path to install RSuite into. Folder must exist.
+#'   (type: character(1); default: \code{Sys.getevn("R_LIBS_USER")})
+#'
 #' @return TRUE if updated (invisible).
 #'
 #' @family miscellaneous
 #'
 #' @examples
 #' \donttest{
-#'   rsuite_update()
+#'   lib_dir <- tempfile("Rsuite_")
+#'   dir.create(lib_dir, recursive = TRUE, showWarnings = FALSE)
+#'
+#'   rsuite_update(lib_dir)
 #' }
 #'
 #' @export
 #'
-rsuite_update <- function() {
+rsuite_update <- function(lib.dir = Sys.getenv("R_LIBS_USER")) {
   ver <- rsuite_check_version()
   if (is.null(ver)) {
     pkg_loginfo("Latest version of RSuite installed.")
@@ -83,11 +89,12 @@ rsuite_update <- function() {
 
   prev_lib_path <- .libPaths()
   tryCatch({
-    .libPaths(Sys.getenv("R_LIBS_USER")) # install it globally or in user env
+    .libPaths(lib.dir) # install it globally or in user env
 
     install_dependencies(avail_vers,
                          lib_dir = .libPaths()[[1]], # install into default location
-                         rver = rver)
+                         rver = rver,
+                         check_repos_consistency = FALSE)
   },
   finally = {
     .libPaths(prev_lib_path)

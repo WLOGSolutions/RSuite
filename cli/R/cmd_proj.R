@@ -44,10 +44,25 @@ sub_commands <- list(
     help = "Install required dependencies into project local environment.",
     options = list(
       make_option(c("-c", "--clean"), dest = "clean", action="store_true", default=FALSE,
-                  help="Clean local project environment before installing dependencies (default: %default)")
+                  help="Clean local project environment before installing dependencies (default: %default)"),
+      make_option(c("--vanilla-sups"), dest = "vanilla_sups", action="store_true", default=FALSE,
+                  help=paste("If passed only basic supportive packages will be installed into sandbox",
+                             "in case not found in R environment. Basic supportive packages are ones that",
+                             "are definitly required to build project packages: roxygen2, devtools or",
+                             "vignette builder.",
+                             "By default all packages required for package testing and documentation",
+                             "building are installed. (default: %default)",
+                             sep = "\n\t\t")),
+      make_option(c("--no-built-check"), dest = "no_built_check", action="store_true", default=FALSE,
+                  help=paste("If passed will skip checking if packages installed from repositories are",
+                             "built for required R version. Useful then using new R versions which have",
+                             "not repositories fully updated yet. (default: %default)",
+                             sep = "\n\t\t"))
     ),
     run = function(opts) {
-      RSuite::prj_install_deps(clean = opts$clean)
+      RSuite::prj_install_deps(clean = opts$clean,
+                               vanilla_sups = opts$vanilla_sups,
+                               check_repos_consistency = !opts$no_built_check)
     }
   ),
   build = list(
@@ -62,7 +77,8 @@ sub_commands <- list(
     ),
     run = function(opts) {
       pkg_type <- get_pkg_type(opts$binary)
-      RSuite::prj_build(type = pkg_type, rebuild = opts$rebuild, vignettes = !opts$no_vignettes)
+      RSuite::prj_build(type = pkg_type, rebuild = opts$rebuild,
+                        vignettes = !opts$no_vignettes)
     }
   ),
   test = list(

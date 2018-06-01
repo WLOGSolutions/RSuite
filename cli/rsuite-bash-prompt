@@ -46,7 +46,7 @@ _rsuite() {
 				case "${COMP_WORDS[2]}" in
 					build)
 						if [[ $cur == --* ]]; then
-							opts="--binary --force $common_opts_long"
+							opts="--binary --force --no-vignettes $common_opts_long"
 						else
 							case "${prev}" in
 								--binary|-b)
@@ -74,7 +74,7 @@ _rsuite() {
 						;;
 					depsinst)
 						if [[ $cur == --* ]]; then
-							opts="--clean $common_opts_long"
+							opts="--clean --vanilla-sups --no-built-check $common_opts_long"
 						else
 							opts="-c $common_opts_short"
 						fi

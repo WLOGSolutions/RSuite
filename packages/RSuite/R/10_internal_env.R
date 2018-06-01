@@ -136,11 +136,14 @@ find_repo_adapter <- function(name) {
 #'
 #' Register rc_adapter in internal environment under name.
 #'
+#' @param name name of adapter to (un)register.
+#' @param rc_adapter adapter to register. if NULL unregister it.
+#'
 #' @keywords internal
 #' @noRd
 #'
 reg_rc_adapter <- function(name, rc_adapter) {
-  stopifnot(is_rc_adapter(rc_adapter))
+  stopifnot(is.null(rc_adapter) || is_rc_adapter(rc_adapter))
 
   reg <- get("rc_adapter_reg", envir = internal_env)
   reg[[name]] <- rc_adapter

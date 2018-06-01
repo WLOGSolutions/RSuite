@@ -8,17 +8,22 @@
 #'
 #' Builds local project environment.
 #'
-#' @param params project parameters. (type: rsuite_project_params)
-#' @param vanilla if TRUE collects only base supportive packages. (type: logical)
-#'
 #' It collects packages the project depends on and installs them in local
-#' project environment. ependencies are collected from packages and master
+#' project environment. Dependencies are collected from packages and master
 #' scripts.
+#'
+#' @param params project parameters. (type: rsuite_project_params)
+#' @param vanilla_sups if TRUE collects only base supportive packages.
+#'   (type: logical, default: FALSE)
+#' @param check_repos_consistency if TRUE will prevent installing
+#'   packages built for another R ver. (type: logical, default: TRUE)
 #'
 #' @keywords internal
 #' @noRd
 #'
-install_prj_deps <- function(params, vanilla = FALSE) {
+install_prj_deps <- function(params,
+                             vanilla_sups = FALSE,
+                             check_repos_consistency = TRUE) {
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
 
   repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
@@ -26,14 +31,18 @@ install_prj_deps <- function(params, vanilla = FALSE) {
 
   avail_vers <- resolve_prj_deps(repo_infos, params)
 
-  install_dependencies(avail_vers, lib_dir = params$lib_path, rver = params$r_ver)
+  install_dependencies(avail_vers,
+                       lib_dir = params$lib_path,
+                       rver = params$r_ver,
+                       check_repos_consistency = check_repos_consistency)
 
-  avail_sup_vers <- resolve_prj_sups(repo_infos, params, vanilla = vanilla)
+  avail_sup_vers <- resolve_prj_sups(repo_infos, params, vanilla = vanilla_sups)
   if (!is.null(avail_sup_vers)) {
     install_support_pkgs(avail_sup_vers,
                          sbox_dir = params$sbox_path,
                          lib_dir = params$lib_path,
-                         rver = params$r_ver)
+                         rver = params$r_ver,
+                         check_repos_consistency = check_repos_consistency)
   }
 }
 
@@ -69,6 +78,8 @@ resolve_prj_sups <- function(repo_infos, params, only_source = FALSE, vanilla = 
   # remove installed already packages
   installed <- get_installed_packages(ex_liblocs = c(params$sbox_path, params$lib_path),
                                       rver = params$r_ver, with_globals = TRUE)
+  # TODO: verify if installed are loadable
+
   prj_sup_vers <- vers.rm_acceptable(prj_sup_vers, installed)
 
   if (!vers.is_empty(prj_sup_vers)) {
@@ -110,13 +121,13 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   prj_dep_vers <- vers.rm(prj_dep_vers, project_packages)
 
-  if (file.exists(params$lock_path)){
+  if (file.exists(params$lock_path)) {
     env_lock_vers <- get_lock_env_vers(params) #from 52_dependencies.R
     prj_dep_vers_copy <- prj_dep_vers
     prj_dep_vers <- vers.union(prj_dep_vers, env_lock_vers)
 
     unfeasibles <- vers.get_unfeasibles(prj_dep_vers)
-    if (length(unfeasibles) != 0){
+    if (length(unfeasibles) != 0) {
       warn_msg <- paste("Lock made the following package unfeasible:", unfeasibles, sep = " ")
       pkg_logwarn(warn_msg)
       prj_dep_vers <- prj_dep_vers_copy
@@ -177,7 +188,6 @@ get_installed_packages <- function(ex_liblocs, rver, with_globals = TRUE) {
     installed <- NULL # to prevent warning
     load(ou_file)
   }
-  installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
   return(installed)
 }
 
@@ -188,23 +198,29 @@ get_installed_packages <- function(ex_liblocs, rver, with_globals = TRUE) {
 #' @param sbox_dir directory to install into. Must not be NULL.
 #' @param lib_dir directory there dependecies have been installed. Must not be NULL.
 #' @param rver R version to install dependencies for. (type: character)
+#' @param check_repos_consistency if TRUE will prevent installing
+#'   packages built for another R ver. (type: logical, default: TRUE)
 #'
 #' @keywords internal
 #' @noRd
 #'
-install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
+install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver,
+                                 check_repos_consistency = TRUE) {
   stopifnot(is.versions(avail_vers))
   stopifnot(avail_vers$has_avails())
   stopifnot(is_nonempty_char1(sbox_dir))
   stopifnot(is_nonempty_char1(lib_dir))
 
-  remove_installed <- function(vers) {
+  remove_installed <- function(vers, check_built_rver) {
     installed <- get_installed_packages(ex_liblocs = c(sbox_dir, lib_dir),
                                         rver = rver, with_globals = TRUE)
+    if (any(check_built_rver)) {
+      installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
+    }
     return(vers.rm_acceptable(vers, installed))
   }
 
-  avail_vers <- remove_installed(avail_vers)
+  avail_vers <- remove_installed(avail_vers, TRUE)
   if (vers.is_empty(avail_vers)) {
     pkg_logdebug("No support packages to install.")
     return(invisible())
@@ -226,9 +242,14 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
 
   # this type = "source" does not matter, it is passed just to prevent complaining
   #  on windows that "both" type cannot be used with repos = NULL
-  pkg_install(dloaded$Path, lib_dir = sbox_dir, type = "source", repos = NULL, rver = rver)
+  pkg_install(dloaded$Path,
+              lib_dir = sbox_dir,
+              type = "source",
+              repos = NULL,
+              rver = rver,
+              check_repos_consistency = check_repos_consistency)
 
-  avail_vers <- remove_installed(avail_vers)
+  avail_vers <- remove_installed(avail_vers, check_repos_consistency)
   assert(vers.is_empty(avail_vers),
          "Failed to install some support packages: %s", paste(vers.get_names(avail_vers), collapse = ", "))
   pkg_loginfo("All support packages successfully installed.")
@@ -240,23 +261,29 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver) {
 #' @param avail_vers version object describing resolved dependencies to install.
 #' @param lib_dir directory to install into. Must not be NULL.
 #' @param rver R version to install dependencies for. (type: character)
+#' @param check_repos_consistency If TRUE binary consistency with rver will be
+#'   checked after installation of each package.
+#'   (type: logical(1), default: TRUE)
 #'
 #' @keywords internal
 #' @noRd
 #'
-install_dependencies <- function(avail_vers, lib_dir, rver) {
+install_dependencies <- function(avail_vers, lib_dir, rver,
+                                 check_repos_consistency = TRUE) {
   stopifnot(is.versions(avail_vers))
   stopifnot(avail_vers$has_avails())
   stopifnot(is_nonempty_char1(lib_dir))
 
-  remove_installed <- function(vers) {
+  remove_installed <- function(vers, check_built_rver) {
     installed <- as.data.frame(utils::installed.packages(lib.loc = lib_dir),
                                stringsAsFactors = FALSE)[, c("Package", "Version", "Built")]
-    installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
+    if (any(check_built_rver)) {
+      installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
+    }
     return(vers.rm_acceptable(vers, installed))
   }
 
-  avail_vers <- remove_installed(avail_vers)
+  avail_vers <- remove_installed(avail_vers, TRUE)
   if (vers.is_empty(avail_vers)) {
     pkg_loginfo("No dependencies to install.")
     return(invisible())
@@ -278,9 +305,14 @@ install_dependencies <- function(avail_vers, lib_dir, rver) {
 
   # this type = "source" does not matter, it is passed just to prevent complaining
   #  on windows that "both" type cannot be used with repos = NULL
-  pkg_install(dloaded$Path, lib_dir = lib_dir, type = "source", repos = NULL, rver = rver)
+  pkg_install(dloaded$Path,
+              lib_dir = lib_dir,
+              type = "source",
+              repos = NULL,
+              rver = rver,
+              check_repos_consistency = check_repos_consistency)
 
-  avail_vers <- remove_installed(avail_vers)
+  avail_vers <- remove_installed(avail_vers, check_repos_consistency)
   assert(vers.is_empty(avail_vers),
          "Failed to install some dependencies: %s", paste(vers.get_names(avail_vers), collapse = ", "))
   pkg_loginfo("All dependencies successfully installed.")

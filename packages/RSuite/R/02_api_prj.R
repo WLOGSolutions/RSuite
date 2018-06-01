@@ -77,9 +77,11 @@ is_prj <- function(prj) {
 #'
 #' Loads project settings without loading it into environment.
 #'
+#' @details
 #' Project parameters are searched and loaded. If project has been loaded
 #' previously from the path the same project instance will be used without
-#' reloading.\cr
+#' reloading.
+#'
 #' It project is the first one loaded it will became default project (used then
 #' NULL is passed as project for project management functions).
 #'
@@ -132,12 +134,13 @@ prj_init <- function(path = getwd()) {
 #'
 #' Creates project structure at specified path.
 #'
-#' Project is not loaded, just created.\cr
-#' \cr
+#' @details
+#' Project is not loaded, just created.
+#'
 #' If name passed folder under such name will be created and project structure
 #' will be placed under it. If not passed folder under path will contain project
-#' structure and project name will be assumed to be basename of path.\cr
-#' \cr
+#' structure and project name will be assumed to be basename of path.
+#'
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
@@ -207,8 +210,9 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE) {
 #'
 #' Creates package structure inside project.
 #'
-#' It fails if package exists already in the project.\cr
-#' \cr
+#' @details
+#' It fails if package exists already in the project.
+#'
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
@@ -334,7 +338,8 @@ prj_load <- function(path, prj = NULL) {
 #'
 #' Unloads last loaded project.
 #'
-#' It changes \code{.libPaths()} removing all references to currently loaded project internal environmet.
+#' It changes \code{.libPaths()} removing all references to currently loaded
+#' project internal environmet.
 #'
 #' @return Project unloaded or NULL if there was no project to unload.
 #'
@@ -372,6 +377,7 @@ prj_unload <- function() {
 #'
 #' Installs project dependencies and needed supportive packages.
 #'
+#' @details
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
@@ -379,8 +385,14 @@ prj_unload <- function() {
 #'    project for working directory. (type: rsuite_project, default: NULL)
 #' @param clean if TRUE clear environment before installing package dependecies.
 #'   (type: logical, default: FALSE)
-#' @param vanilla if TRUE install only base supportive packages (like devtools & roxygen2).
+#' @param vanilla_sups if TRUE install only base supportive packages (like devtools & roxygen2).
 #'   (type: logical, default: FALSE)
+#' @param check_repos_consistency if TRUE will check installed packages if they are
+#'   consistent with required R version (info taken from DESCRIPTION Built field).
+#'   If package is built for diffrent version repository probably contains packages
+#'   not rebuilt for the R version required. If check for target R version fails
+#'   package is removed from local project environment and error is reported that it
+#'   is not available. (type: logical, default: TRUE)
 #'
 #' @return TRUE if all build successfully.
 #'
@@ -395,11 +407,14 @@ prj_unload <- function() {
 #' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
 #' # reinstall logging package into project environment
-#' prj_install_deps(prj = prj, clean = TRUE)
+#' prj_install_deps(prj = prj, clean = TRUE, check_repos_consistency = FALSE)
 #'
 #' @export
 #'
-prj_install_deps <- function(prj = NULL, clean = FALSE, vanilla = FALSE) {
+prj_install_deps <- function(prj = NULL,
+                             clean = FALSE,
+                             vanilla_sups = FALSE,
+                             check_repos_consistency = TRUE) {
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
@@ -421,15 +436,18 @@ prj_install_deps <- function(prj = NULL, clean = FALSE, vanilla = FALSE) {
     pkg_loginfo("Cleaning up local environment... done")
   }
 
-  install_prj_deps(params, vanilla = vanilla) # from 11_install_prj_deps.R
+  install_prj_deps(params, # from 11_install_prj_deps.R
+                   vanilla_sups = vanilla_sups,
+                   check_repos_consistency = check_repos_consistency)
 }
 
 #'
 #' Uninstalls unused packages from project local environment.
 #'
 #' Checks if all dependencies installed are required by project packages or
-#' master scripts and removes those which are not required any more.\cr
-#' \cr
+#' master scripts and removes those which are not required any more.
+#'
+#' @details
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
@@ -451,7 +469,7 @@ prj_install_deps <- function(prj = NULL, clean = FALSE, vanilla = FALSE) {
 #' write("library(colorspace)", file = master_script_fpath, append = TRUE)
 #'
 #' # install colorspace into project local environment
-#' prj_install_deps(prj = prj)
+#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
 #'
 #' # remove dependency to colorspace
 #' writeLines(head(readLines(master_script_fpath), n = -1),
@@ -476,6 +494,7 @@ prj_clean_deps <- function(prj = NULL) {
 #'
 #' Builds project internal packages and installs them.
 #'
+#' @details
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
@@ -502,7 +521,7 @@ prj_clean_deps <- function(prj = NULL) {
 #' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
 #'
 #' # build project local environment
-#' prj_install_deps(prj = prj)
+#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
 #'
 #' # build mypackage and install it into project environment
 #' prj_build(prj = prj)
@@ -539,19 +558,20 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #'
 #' It collects all dependecies and project packages installed in local project
 #' environment together with master scripts and artifacts and zips them into
-#' single zip file.\cr
-#' \cr
+#' single zip file.
+#'
+#' @details
 #' Zip package generated is stamped with version. It can be enforced with zip_ver
 #' parameter (zip will have suffix <zip_ver>x in the case). If version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
 #' from maximal project packages version number. In that case revision numer is
 #' appended to version: version number will be <zip_ver>_<rc_ver>. Check for
-#' changes in project sources is performed for zip package consistency.\cr
-#' \cr
+#' changes in project sources is performed for zip package consistency.
+#'
 #' Before building zip package project is built. If revision number detected
 #' project packages will have version altered: revision will be added as least
-#' number to package version.\cr
-#' \cr
+#' number to package version.
+#'
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
@@ -580,7 +600,7 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
 #'
 #' # build project local environment
-#' prj_install_deps(prj = prj)
+#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
 #'
 #' # build deployment zip
 #' zip_fpath <- prj_zip(prj = prj, path = tempdir(), zip_ver = "1.0")
@@ -613,10 +633,12 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #' Prepares project source pack tagged with version.
 #'
 #' It collects all sources and assemblies found in project folder and packs them
-#' into single zip file.\cr
+#' into single zip file.
+#'
+#' @details
 #' The function is heavily used for building project for alternative environments
-#' (like in docker).\cr
-#' \cr
+#' (like in docker).
+#'
 #' Pack generated is stamped with version. It can be enforced with pack_ver
 #' parameter (zip will have suffix <pack_ver>x in the case). If version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
@@ -624,11 +646,11 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #' appended to version: version number will be <ZipVersion>_<rc_ver>. Check for
 #' changes in project sources is performed for pack consistency. Resulted pack
 #' is marked with the version detected so while buiding zip after unpacking will
-#' have the same version as original project.\cr
-#' \cr
+#' have the same version as original project.
+#'
 #' Before building pack project packages will have version altered: revision will
-#' be added as least number to package version.\cr
-#' \cr
+#' be added as least number to package version.
+#'
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control
 #' logs verbosity.
 #'
@@ -721,27 +743,30 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #'
 #' Locks the project environment.
 #'
-#' It collects all packages, their versions and stores them in the 'env.lock'
-#' file which is saved in the following directory: <my_project>/deployment/\cr
-#' \cr
-#' The 'env.lock' file is a dcf file storing information about installed
-#' packages and their versions. A sample record from the 'env.lock' file:\cr
-#' \cr
+#' It collects all dependencies' versions and stores them in lock file to
+#' enforce exact dependency versions in future.
+#'
+#' @details
+#' The lock file is saved in <my_project>/deployment/ under 'env.lock' name.
+#' It is in dcf format with information about packages installed in local
+#' project environment together with their versions. A sample record from
+#' the lock file:
+#'
 #'  Package: RSuite\cr
-#'  Version: 0.26.235\cr
-#' \cr
+#'  Version: 0.26.235
+#'
 #' When dependencies are being installed (using \code{\link{prj_install_deps}})
 #' the 'env.lock' file will be used to detect whether any package will change
-#' versions. If that's the case a warning message will be displayed like this:\cr
-#' \cr
-#' \code{...:rsuite: The following packages will be updated from last lock: colorspace}\cr
-#' \cr
+#' versions. If that's the case a warning message will be displayed like this:
+#'
+#' \code{...:rsuite: The following packages will be updated from last lock: colorspace}
+#'
 #' The feature allows preventing errors caused by newer versions of packages
 #' which might work differently than previous versions used in the project.
 #'
-#' @param prj project object to be locked. if not passed will lock loaded
-#'    project or default whichever exists. Will init default project from working
-#'    directory if no default project exists.
+#' @param prj project object to be locked. If not passed will lock loaded
+#'    project or default whichever exists. Will init default project from
+#'    working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
 #'
 #' @family in project management
@@ -755,7 +780,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
 #' # build project local environment
-#' prj_install_deps(prj = prj)
+#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
 #'
 #' # lock project environment
 #' prj_lock_env(prj = prj)

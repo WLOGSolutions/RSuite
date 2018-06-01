@@ -144,7 +144,7 @@ sysreqs_check <- function(prj = NULL) {
 #'
 #' Updates system to satisfy detected requirements.
 #'
-#' Collects system requirements with \code{\link{sysreqs_collect }}
+#' Collects system requirements with \code{\link{sysreqs_collect}}
 #' and builds/installs them.
 #'
 #' @param prj project object to handle sys requiremens for. If not passed will

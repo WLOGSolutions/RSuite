@@ -259,7 +259,7 @@ rc_adapter_get_version.default <- function(rc_adapter, dir) {
 #'
 #'   #' @export
 #'   rc_adapter_remove_admins.rc_adapter_own <- function(rc_adapter, dir) {
-#'     # unlink(...)
+#'     # ... unlink RC administrative folders from dir (like .svn or .git) ...
 #'   }
 #' }
 #'
