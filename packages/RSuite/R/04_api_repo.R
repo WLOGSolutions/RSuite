@@ -260,11 +260,12 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #'
 #' Builds and uploads project package(s) into repository.
 #'
+#' @details
 #' If not specified to skip RC it will detect revision version and tag packages
 #' before uploading. In that case check for changes in project sources is
 #' performed for consistency and project packages will be rebuilt with version
-#' altered: revision will be added as least number to package version.\cr
-#' \cr
+#' altered: revision will be added as least number to package version.
+#'
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
 #' control logs verbosity.
 #'
@@ -305,7 +306,7 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #' prj_start_package("mypackage", prj = src_prj, skip_rc = TRUE)
 #'
 #' # build project environment
-#' prj_install_deps(prj = src_prj)
+#' prj_install_deps(prj = src_prj, check_repos_consistency = FALSE)
 #'
 #' # start dest project
 #' dst_prj <- prj_start("my_project_dst", skip_rc = TRUE, path = prj_base)
@@ -317,7 +318,7 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #' rmgr <- repo_mng_start("Dir", prj = dst_prj, ix = 1)
 #'
 #' # upload mypackage from src into dest's in project repository
-#' # repo_upload_prj_packages(rmgr, prj = src_prj, skip_rc = TRUE)
+#' repo_upload_prj_packages(rmgr, prj = src_prj, skip_rc = TRUE)
 #'
 #' # list available packages
 #' repo_mng_list(rmgr)
@@ -418,6 +419,7 @@ repo_upload_prj_packages <- function(repo_manager,
 #'
 #' Uploads package file(s) into managed repository.
 #'
+#' @details
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control
 #' logs verbosity.
 #'
@@ -520,7 +522,9 @@ repo_upload_package_files <- function(repo_manager, files) {
 #'
 #' Uploads external packages into managed repository.
 #'
-#' It uses project to detect repositories to look for external packages in.\cr
+#' It uses project to detect repositories to look for external packages in.
+#'
+#' @details
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
 #' control logs verbosity.
 #'
@@ -616,6 +620,7 @@ repo_upload_ext_packages <- function(repo_manager,
 #'
 #' Uploads PKGZIP into managed repository.
 #'
+#' @details
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
 #' control logs verbosity.
 #'
@@ -659,9 +664,6 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
          "Non empty character(1) expected for pkgzip")
   assert(file.exists(pkgzip), "Existing PKGZIP expected for pkgzip")
 
-  prj <- safe_get_prj(NULL)
-  stopifnot(!is.null(prj))
-
   mgr_info <- repo_manager_get_info(repo_manager)
 
   tmp_path <- tempfile("upl_temp_repo")
@@ -696,8 +698,9 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #'
 #' It will downlod github repository, build package into package file and will
 #' upload it into the repository. It will search dependencies in provided
-#' project's repositories.\cr
-#' \cr
+#' project's repositories.
+#'
+#' @details
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
 #' control logs verbosity.
 #'
@@ -801,7 +804,7 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   unlink(list.files(bld_prj$load_params()$script_path, # not to include default packages
                     pattern = ".+[.]R$", full.names = TRUE),
          force = TRUE)
-  prj_install_deps(bld_prj)
+  prj_install_deps(bld_prj, vanilla_sups = TRUE)
 
   repo_upload_prj_packages(repo_manager, pkgs = pkg_info$name, prj = bld_prj,
                            skip_rc = TRUE, pkg_type = pkg_type,

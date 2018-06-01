@@ -8,12 +8,13 @@
 #'
 #' Updates project configuration to use only specified repository adapters.
 #'
+#' @details
 #' Project configuration (together with repositories to be used) is stored in
-#' PARAMETERS file in project folder.\cr
-#' \cr
+#' PARAMETERS file in project folder.
+#'
 #' After project configuration have been changed repository adapters are
-#' initialized on the project.\cr
-#' \cr
+#' initialized on the project.
+#'
 #' Repository adapters will be used for dependencies detection in the same
 #' order as passed in names.
 #'

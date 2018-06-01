@@ -300,10 +300,20 @@ pkg_remove <- function(pkgs, lib_dir) {
 #' Simple wrapped around utils::install.packages with consideration
 #' of specific package pecularities.
 #'
+#' @param pkgs packages to install. (type: character(N))
+#' @param lib_dir path to folder to install to. (type: character(1))
+#' @param type package type to install. One of source, win-binary, binary etc.
+#'   (type: character(1))
+#' @param repos repositories to use. (type: character(N), optional)
+#' @param rver R version to install packages for. (type: character(1))
+#' @param check_repo_consistency If TRUE binary consistency with rver will be
+#'   checked after installation of each package.
+#'   (type: logical(1), default: TRUE)
+#'
 #' @keywords internal
 #' @noRd
 #'
-pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
+pkg_install <- function(pkgs, lib_dir, type, repos, rver, check_repos_consistency = TRUE) {
   common_args <- c(rscript_arg("lib", lib_dir), "quiet = FALSE")
   if (!missing(type)) {
     common_args <- c(common_args, rscript_arg("type", type))
@@ -351,10 +361,14 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver) {
                pkg_logwarn(paste("Package %s is succesfully installed but R version it is build for(%s)",
                                  "is not the one requested(%s)."),
                            pkg_name, pkg_rver, rver)
-               pkg_logwarn(paste("It is propably cause of inconsistent repository state.",
-                                 "Package %s will be deleted as it is unusable."),
-                           pkg_name)
-               unlink(pkg_path, recursive = TRUE, force = TRUE)
+               if (any(check_repos_consistency)) {
+                 pkg_logwarn(paste("It is propably cause of inconsistent repository state.",
+                                   "Package %s will be deleted as it is unusable."),
+                             pkg_name)
+                 unlink(pkg_path, recursive = TRUE, force = TRUE)
+               } else {
+                 pkg_logwarn("It is propably cause of inconsistent repository state.")
+               }
              }
            }
          })

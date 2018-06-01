@@ -47,8 +47,9 @@
 #'
 #' Builds PKGZIP out of project packages.
 #'
-#' PKGZIP will be tagged with the same way as project zip.\cr
-#' \cr
+#' @details
+#' PKGZIP will be tagged with the same way as project zip.
+#'
 #' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
 #'
@@ -192,6 +193,7 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
 #'
 #' Builds PKGZIP out of passed package files.
 #'
+#' @details
 #' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
 #'
@@ -277,8 +279,9 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 #'
 #' Builds PKGZIP out of passed external packages.
 #'
-#' It uses project to detect repositories to look for packages in.\cr
-#' \cr
+#' @details
+#' It uses project to detect repositories to look for packages in.
+#'
 #' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
 #'
@@ -379,8 +382,9 @@ pkgzip_build_ext_packages <- function(pkgs,
 #'
 #' Loads package from github repository, packages it into package file and builds
 #' PKGZIP out of it. It uses project to detect repositories to look for dependencies
-#' and to detect rversion if required.\cr
-#' \cr
+#' and to detect rversion if required.
+#'
+#' @details
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control logs
 #' verbosity.
 #'
@@ -487,7 +491,7 @@ pkgzip_build_github_package <- function(repo, ...,
 
   # not to include default packages
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = TRUE), force = TRUE)
-  prj_install_deps(bld_prj)
+  prj_install_deps(bld_prj, vanilla_sups = TRUE, check_repos_consistency = FALSE)
 
   pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_info$dir, "DESCRIPTION"))[1, "Version"]
 

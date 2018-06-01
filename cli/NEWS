@@ -1,3 +1,7 @@
+VERSION 0.28 (2018-06-??)
+  * --no-vignettes added to `proj build`
+  * --vanilla_sups and --no-built-check added to `proj depsinst`
+
 VERSION 0.27 (2018-05-29)
   * just adopted for new version of RSuite
 
