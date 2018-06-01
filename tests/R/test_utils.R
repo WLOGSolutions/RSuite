@@ -80,3 +80,13 @@ get_repo_path <- function(dir) {
   return("")
 }
 
+
+expect_log_message <- function(fun, regexp = NULL, ...){
+  logging::addHandler(action = logging::writeToConsole,
+                      handler = "RSuite.tests.console.logger",
+                      logger = RSuite::rsuite_getLogger())
+  
+  expect_output(fun(...), regexp = regexp)
+  
+  logging::removeHandler(handler = "RSuite.tests.console.logger", logger = RSuite::rsuite_getLogger())
+}

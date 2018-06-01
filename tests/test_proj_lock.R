@@ -55,6 +55,7 @@ test_that_managed("Locked environment, no unfeasibles", {
    expect_that_packages_installed(c("TestDependency", "logging"), prj, versions = c("1.0", "0.7-103"))
  })
 
+
 test_that_managed("Locked environment, unfeasibles", {
   prj <- init_test_project(repo_adapters = c("Dir"))
   params <- prj$load_params()
@@ -77,5 +78,5 @@ test_that_managed("Locked environment, unfeasibles", {
   
   
   warn_msg <- paste("Lock made the following package unfeasible:", pkg_deps, sep = " ")
-  expect_warning(RSuite::prj_install_deps(prj, clean = TRUE), regexp = "unfeasible") 
+  expect_log_message(RSuite::prj_install_deps, prj = prj, clean = TRUE, regexp = warn_msg) 
 })
