@@ -7,6 +7,9 @@
   * check_repos_consistency flag added to prj_install_deps. For R-devel CRAN has 
      packages not rebuilt for R-devel version, so consistency check breaks 
      building project environment.
+  * detection of OS version for binary packages repository path fixed. It failed
+     on some Debians. If regular detection does not work warning is logged and 
+     generic R.version$platform is used.
 
 # RSuite 0.27 (2018-05-29)
   * Handling downloaded packages cache have had error: then multiple packages
