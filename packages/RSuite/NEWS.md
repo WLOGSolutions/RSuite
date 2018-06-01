@@ -1,4 +1,4 @@
-# RSuite 0.28 (2018-05-??)
+# RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 
      documentation reviewed for API functions.
   * vignettes argument added to prj_build. Passing FALSE skips vuilding vignettes.

@@ -90,10 +90,10 @@ test_that_managed("Locked environment, unfeasibles", {
   # Add newer version and rebuild
   create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.1")
   create_test_package("TestPackage2", prj, deps = "TestDependency(>= 1.1)")
-  
+
   # Expect warning message
   warn_msg <- paste("Lock made the following package unfeasible:", pkg_deps, sep = " ")
-  expect_log_message(RSuite::prj_install_deps, prj = prj, clean = TRUE, regexp = warn_msg) 
+  expect_log_message(RSuite::prj_install_deps, prj = prj, clean = TRUE, regexp = warn_msg)
 })
 
 
@@ -101,17 +101,17 @@ test_that_managed("Unlocking locked environment", {
    # Prepare project
    prj <- init_test_project(repo_adapters = c("Dir"))
    params <- prj$load_params()
-   
+
    # Prepare repo
    deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
    create_test_package("TestPackage", prj, deps = c("logging"))
 
    # install dependencies
    RSuite::prj_install_deps(prj)
-   
+
    # Lock project environment
    RSuite::prj_lock_env(prj)
-   
+
    # Unlock project environment
    RSuite::prj_unlock_env(prj)
 
