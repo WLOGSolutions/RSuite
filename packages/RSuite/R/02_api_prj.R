@@ -790,21 +790,84 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #'
 #' @export
 #'
-prj_lock_env <- function(prj = NULL){
+prj_lock_env <- function(prj = NULL) {
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
-
   params <- prj$load_params()
 
-  # TODO: check that at least direct project dependencies are installed
+  # Retrieve direct dependencies
+  prj_dep_vers <- collect_prj_direct_deps(params)        # from 52_dependencies.R
 
+  prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  prj_dep_vers <- vers.rm(prj_dep_vers, prj_pkgs)
+
+  # Retrieve installed packages
   env_pkgs <- as.data.frame(utils::installed.packages(lib.loc = params$lib_path),
                             stringsAsFactors = FALSE)[, c("Package", "Version")]
 
-  prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  # Check if direct dependencies are installed
+  missing_deps_vers <- vers.rm_acceptable(prj_dep_vers, env_pkgs)
+  if (!vers.is_empty(missing_deps_vers)) {
+    missing_pkgs_msg <- do.call(paste, as.list(missing_deps_vers$pkgs$pkg))
+    pkg_logerror(missing_pkgs_msg)
+    fail_msg <- paste("Can't lock project environment if dependencies are not installed:",
+                      missing_pkgs_msg,
+                      sep = " ")
+    stop(fail_msg, call. = FALSE)
+  }
 
+  # Create lock data and save to 'env.lock' file
   lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
   write.dcf(lock_data, file = params$lock_path)
 
   invisible()
+}
+
+#'
+#' Unlocks the project environment.
+#'
+#' It deletes the 'env.lock' file which is
+#' saved in the following directory: <my_project>/deployment/. If the project
+#' environment is not locked (there is no env.lock file) the prj_unlock_env will end with an error.
+#'
+#' @param prj project object to be unlocked. if not passed will lock loaded
+#'    project or default whichever exists. Will init default project from working
+#'    directory if no default project exists.
+#'    (type: rsuite_project, default: NULL)
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # build project local environment
+#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
+#'
+#' # lock project environment
+#' prj_lock_env(prj = prj)
+#'
+#' # unlock project environment
+#' prj_unlock_env(prj = prj)
+#'
+#'
+#' @export
+#'
+prj_unlock_env <- function(prj = NULL) {
+  prj <- safe_get_prj(prj)
+  stopifnot(!is.null(prj))
+  params <- prj$load_params()
+
+  # project environment is not locked
+  if (!file.exists(params$lock_path)) {
+    error_msg <- "The project environment is not locked"
+    pkg_logerror(error_msg)
+    stop(error_msg)
+  }
+
+  file.remove(params$lock_path)
+
+  return(invisible())
 }

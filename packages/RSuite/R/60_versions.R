@@ -126,7 +126,7 @@ print.versions <- function(ver) {
 
 
 #'
-#' Builds version object containing names with specified reqiurements.
+#' Builds version object containing names with specified requirements.
 #'
 #' version object can have information on available packages or it can contain
 #' just bare version requirements.
