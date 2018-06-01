@@ -392,7 +392,7 @@ prj_unload <- function() {
 #'   If package is built for diffrent version repository probably contains packages
 #'   not rebuilt for the R version required. If check for target R version fails
 #'   package is removed from local project environment and error is reported that it
-#'   is not available. (type: logical, default: TRUE)
+#'   is not available. (type: logical, default: \code{!grepl("unstable", R.version$status)})
 #'
 #' @return TRUE if all build successfully.
 #'
@@ -407,14 +407,14 @@ prj_unload <- function() {
 #' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
 #' # reinstall logging package into project environment
-#' prj_install_deps(prj = prj, clean = TRUE, check_repos_consistency = FALSE)
+#' prj_install_deps(prj = prj, clean = TRUE)
 #'
 #' @export
 #'
 prj_install_deps <- function(prj = NULL,
                              clean = FALSE,
                              vanilla_sups = FALSE,
-                             check_repos_consistency = TRUE) {
+                             check_repos_consistency = !grepl("unstable", R.version$status)) {
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
