@@ -15,6 +15,27 @@
 #' @return named list with named with package names and containing system
 #'    requirements as value.
 #'
+#' @family in SYSREQS
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # add package to the project
+#' prj_start_package("mypackage", prj = prj)
+#'
+#' # add system requirements specification
+#' write("SystemRequirements: some requirement",
+#'       file = file.path(prj$path, "packages", "mypackage", "DESCRIPTION"),
+#'       append = TRUE)
+#'
+#' # list content of pkgzip created
+#' sysreqs_collect(prj)
+#'
 #' @export
 #'
 sysreqs_collect <- function(prj = NULL) {
@@ -68,13 +89,36 @@ sysreqs_collect <- function(prj = NULL) {
 }
 
 #'
-#' Collects system requirements with sysreqs_collect and performs checks for
-#'   their existance.
+#' Checks for system requirements availability.
+#'
+#' Collects system requirements with \code{\link{sysreqs_collect}}
+#' and performs checks for their existance. Fill fail if some system
+#' requirements are not satisfied.
 #'
 #' @param prj project object to check sys requiremens for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
 #'    from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
+#'
+#' @family in SYSREQS
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # add dependency to XML
+#' write("library(XML)",
+#'       file = file.path(prj$path, "R", "master.R"),
+#'       append = TRUE)
+#'
+#' \donttest{
+#'   # check if requirements or XML are satisfied
+#'   sysreqs_check(prj)
+#' }
 #'
 #' @export
 #'
@@ -98,12 +142,35 @@ sysreqs_check <- function(prj = NULL) {
 
 
 #'
-#' Collects system requirements with sysreqs_collect and builds/installs them.
+#' Updates system to satisfy detected requirements.
+#'
+#' Collects system requirements with \code{\link{sysreqs_collect }}
+#' and builds/installs them.
 #'
 #' @param prj project object to handle sys requiremens for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
 #'    from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
+#'
+#' @family in SYSREQS
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # add dependency to XML
+#' write("library(XML)",
+#'       file = file.path(prj$path, "R", "master.R"),
+#'       append = TRUE)
+#'
+#' \donttest{
+#'   # check if requirements or XML are satisfied
+#'   sysreqs_install(prj)
+#' }
 #'
 #' @export
 #'
@@ -124,13 +191,38 @@ sysreqs_install <- function(prj = NULL) {
 }
 
 #'
-#' Collects system requirements with sysreqs_collect and creates script to builds/
-#'  install them.
+#' Creates script to update system to satisfy project requirements.
+#'
+#' Collects system requirements with \code{\link{sysreqs_collect}} and creates
+#' script to builds/install them. It creates .cmd script for Windows and bash
+#' script for linuxes.
 #'
 #' @param prj project object to process sys requiremens for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
 #'    from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
+#'
+#' @return invisible path to script file created or NULL if no system
+#'   requirements detected.
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # add dependency to XML
+#' write("library(XML)",
+#'       file = file.path(prj$path, "R", "master.R"),
+#'       append = TRUE)
+#'
+#' # generate script
+#' sysreqs_fpath <- sysreqs_script(prj)
+#'
+#' # present script contents
+#' cat(readLines(sysreqs_fpath), sep = "\n")
 #'
 #' @export
 #'
@@ -149,4 +241,6 @@ sysreqs_script <- function(prj = NULL) {
   script <- perform(recipe)
 
   pkg_loginfo("Building script created at %s.", script)
+
+  return(invisible(script))
 }

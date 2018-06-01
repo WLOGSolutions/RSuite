@@ -99,6 +99,8 @@ detect_consistent_revision <- function(params) {
 #' @param version package version to use.
 #' @param odir otput dir path.
 #'
+#' @return created zip file path (type: character(1), invisible)
+#'
 #' @keywords internal
 #' @noRd
 #'
@@ -171,6 +173,8 @@ zip_project <- function(params, version, odir) {
     unlink(wdir, recursive = TRUE, force = TRUE)
   })
   pkg_loginfo("Zip file created: %s", file.path(odir, zip_file_name))
+
+  return(invisible(zip_file_path))
 }
 
 

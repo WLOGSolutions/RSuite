@@ -21,9 +21,14 @@ pkg_logfinest <- function(msg, ...) tryCatch(logging::logfinest(msg, ..., logger
                                              error = function(e) warning(e))
 
 #'
-#' Retrieves RSuite logger
+#' Retrieves RSuite logger.
 #'
 #' @return logger object
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' logging::loginfo("This is an INFO from RSuite", logger = rsuite_getLogger())
 #'
 #' @export
 #'

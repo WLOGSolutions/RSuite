@@ -19,6 +19,35 @@
 #'   \item{url}{Url to repository. (type: character)}
 #' }
 #'
+#' @family in extending RSuite with Repo adapter
+#'
+#' @examples
+#' \donttest{
+#'   # create you own Repo adapter
+#'   repo_adapter_create_own <- function() {
+#'     result <- repo_adapter_create_base("Own")
+#'     class(result) <- c("repo_adapter_own", class(result))
+#'     return(result)
+#'   }
+#'
+#'   #' create own repo manager
+#'   #' @export
+#'   repo_adapter_create_manager.repo_adapter_own <- function(repo_adapter, ...) {
+#'     repo_manager <- list() # create you own repo manager
+#'     class(repo_manager) <- c("repo_manager_own", "rsuite_repo_manager")
+#'     return(repo_manager)
+#'   }
+#'
+#'   #' @export
+#'   repo_manager_get_info.repo_manager_own <- function(repo_manager) {
+#'     return(list(
+#'        types = c("source", "win-binary"), # package types supported by the manager
+#'        rver = "3.5", # R version supported by the manager
+#'        url = "file:///..." # base URL of repository
+#'     ))
+#'   }
+#' }
+#'
 #' @export
 #'
 repo_manager_get_info <- function(repo_manager) {
@@ -40,8 +69,7 @@ repo_manager_get_info.default <- function(repo_manager) {
 }
 
 #'
-#' Initializes repository structure to use for uploading and dependency
-#' detection.
+#' Initializes managed repository structure.
 #'
 #' @param repo_manager repo manager object
 #' @param types package types for which repository should be initialized.
@@ -49,6 +77,33 @@ repo_manager_get_info.default <- function(repo_manager) {
 #'
 #' @return TRUE if initialized repository for at least one type, FALSE if
 #'   structure was fully initialized already. (type:logical, invisible)
+#'
+#' @family in extending RSuite with Repo adapter
+#'
+#' @examples
+#' \donttest{
+#'   # create you own Repo adapter
+#'   repo_adapter_create_own <- function() {
+#'     result <- repo_adapter_create_base("Own")
+#'     class(result) <- c("repo_adapter_own", class(result))
+#'     return(result)
+#'   }
+#'
+#'   #' create own repo manager
+#'   #' @export
+#'   repo_adapter_create_manager.repo_adapter_own <- function(repo_adapter, ...) {
+#'     repo_manager <- list() # create you own repo manager
+#'     class(repo_manager) <- c("repo_manager_own", "rsuite_repo_manager")
+#'     return(repo_manager)
+#'   }
+#'
+#'   #' @export
+#'   repo_manager_init.repo_manager_own <- function(repo_manager, types) {
+#'     was_inited_already <- TRUE
+#'     # ... if repository structure was not initialized initialize it  ...
+#'     return(invisible(was_inited_already))
+#'   }
+#' }
 #'
 #' @export
 #'
@@ -76,13 +131,38 @@ repo_manager_init.default <- function(repo_manager, types) {
 
 
 #'
-#' Puts packages of specified type located in local directory repository
-#' into managed repository.
+#' Adds packages to managed repository.
 #'
 #' @param repo_manager repo manager object.
 #' @param src_dir local directory repository path. Directory must exist. (type: character)
 #' @param types type of packages to sync. If missing all project supported
 #'   package types will by synced. (type: character(N))
+#'
+#' @family in extending RSuite with Repo adapter
+#'
+#' @examples
+#' \donttest{
+#'   # create you own repo adapter
+#'   repo_adapter_create_own <- function() {
+#'     result <- repo_adapter_create_base("Own")
+#'     class(result) <- c("repo_adapter_own", class(result))
+#'     return(result)
+#'   }
+#'
+#'   #' create own repo manager
+#'   #' @export
+#'   repo_adapter_create_manager.repo_adapter_own <- function(repo_adapter, ...) {
+#'     repo_manager <- list() # create you own repo manager
+#'     class(repo_manager) <- c("repo_manager_own", "rsuite_repo_manager")
+#'     return(repo_manager)
+#'   }
+#'
+#'   #' @export
+#'   repo_manager_upload.repo_manager_own <- function(repo_manager, src_dir, types) {
+#'     # ... upload packages in src_dir into the repository ...
+#'     # ... update PACKAGES ...
+#'   }
+#' }
 #'
 #' @export
 #'
@@ -112,7 +192,7 @@ repo_manager_upload.default <- function(repo_manager, src_dir, types) {
 }
 
 #'
-#' Removes specified packages of specified types from the repository.
+#' Removes specified packages from the repository.
 #'
 #' @param repo_manager repo manager object.
 #' @param toremove data.frame with at lease Package(type:character) and
@@ -120,6 +200,35 @@ repo_manager_upload.default <- function(repo_manager, src_dir, types) {
 #' @param type package type to remove
 #'
 #' @return data.frame containig packages removed with Package and Version columns.
+#'
+#' @family in extending RSuite with Repo adapter
+#'
+#' @examples
+#' \donttest{
+#'   # create you own repo adapter
+#'   repo_adapter_create_own <- function() {
+#'     result <- repo_adapter_create_base("Own")
+#'     class(result) <- c("repo_adapter_own", class(result))
+#'     return(result)
+#'   }
+#'
+#'   #' create own repo manager
+#'   #' @export
+#'   repo_adapter_create_manager.repo_adapter_own <- function(repo_adapter, ...) {
+#'     repo_manager <- list() # create you own repo manager
+#'     class(repo_manager) <- c("repo_manager_own", "rsuite_repo_manager")
+#'     return(repo_manager)
+#'   }
+#'
+#'   #' @export
+#'   repo_manager_remove.repo_manager_own <- function(repo_manager, toremove, type) {
+#'     # ... remove packages from the repository ...
+#'     # ... update PACKAGES ...
+#'     return(data.frame(Package = c(),   # return packages removed
+#'                       Version = c(),
+#'                       stringsAsFactors = FALSE))
+#'   }
+#' }
 #'
 #' @export
 #'
@@ -151,10 +260,37 @@ repo_manager_remove.default <- function(repo_manager, toremove, type) {
 
 
 #'
+#' Releases resources allocated to manage the repository.
+#'
 #' For repositories which needs some kind of connection to manage it cleans up
-#'   previously initialized connection and releases all appropriate resources.
+#' previously initialized connection and releases all appropriate resources.
 #'
 #' @param repo_manager repo adapter object.
+#'
+#' @family in extending RSuite with Repo adapter
+#'
+#' @examples
+#' \donttest{
+#'   # create you own repo adapter
+#'   repo_adapter_create_own <- function() {
+#'     result <- repo_adapter_create_base("Own")
+#'     class(result) <- c("repo_adapter_own", class(result))
+#'     return(result)
+#'   }
+#'
+#'   #' create own repo manager
+#'   #' @export
+#'   repo_adapter_create_manager.repo_adapter_own <- function(repo_adapter, ...) {
+#'     repo_manager <- list() # create you own repo manager
+#'     class(repo_manager) <- c("repo_manager_own", "rsuite_repo_manager")
+#'     return(repo_manager)
+#'   }
+#'
+#'   #' @export
+#'   repo_manager_destroy.repo_manager_own <- function(repo_manager) {
+#'     # ... release resources ...
+#'   }
+#' }
 #'
 #' @export
 #'
@@ -181,7 +317,8 @@ repo_manager_destroy.default <- function(repo_manager) {
 #' @param obj object to check.
 #' @return TRUE if object is of class rsuite_repo_manager
 #'
-#' @export
+#' @keywords internal
+#' @noRd
 #'
 is_repo_manager <- function(obj) {
   return("rsuite_repo_manager" %in% class(obj))

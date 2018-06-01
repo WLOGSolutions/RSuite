@@ -8,10 +8,13 @@
 #'
 #' Updates project configuration to use only specified repository adapters.
 #'
+#' Project configuration (together with repositories to be used) is stored in
+#' PARAMETERS file in project folder.\cr
+#' \cr
 #' After project configuration have been changed repository adapters are
-#' initialized on the project.
-#'
-#' For dependencies detection repository adapters will be used in the same
+#' initialized on the project.\cr
+#' \cr
+#' Repository adapters will be used for dependencies detection in the same
 #' order as passed in names.
 #'
 #' @param repos vector of repository adapters configuration to use by the project.
@@ -20,6 +23,25 @@
 #' @param prj project object to update configuration for. If not passed will use loaded
 #'    project or default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
+#'
+#' @family in project configuration
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # present initial project configuration
+#' cat(readLines(file.path(prj$path, "PARAMETERS")), sep = "\n")
+#'
+#' # set repositories to use
+#' prj_config_set_repo_adapters(c("CRAN", "MRAN[2018-01-01]"), prj = prj)
+#'
+#' # present final project configuration
+#' cat(readLines(file.path(prj$path, "PARAMETERS")), sep = "\n")
 #'
 #' @export
 #'
@@ -64,12 +86,34 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
 #'
 #' Updates project configuration to use specified R Version.
 #'
+#' Project configuration (together with R version to be used) is stored in
+#' PARAMETERS file in project folder.
+#'
 #' @param rver R version to be used by the project. (type: character)
 #' @param prj project object to update configuration for. If not passed will use loaded
 #'    project or default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
 #' @param validate If TRUE will check if R version is valid for the platform.
 #'    (type: logical, default: TRUE)
+#'
+#' @family in project configuration
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # present initial project configuration
+#' cat(readLines(file.path(prj$path, "PARAMETERS")), sep = "\n")
+#'
+#' # set repositories to use
+#' prj_config_set_rversion("3.2", prj = prj, validate = FALSE)
+#'
+#' # present final project configuration
+#' cat(readLines(file.path(prj$path, "PARAMETERS")), sep = "\n")
 #'
 #' @export
 #'

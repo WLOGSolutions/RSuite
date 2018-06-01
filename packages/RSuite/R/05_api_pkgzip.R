@@ -45,10 +45,11 @@
 }
 
 #'
-#' Builds PKGZIP out of project packages. PKGZIP will be tagged with the same
-#'   way az project zip.
+#' Builds PKGZIP out of project packages.
 #'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
+#' PKGZIP will be tagged with the same way as project zip.\cr
+#' \cr
+#' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
 #'
 #' @param pkgs vector of project packages which should be included in PKGZIP
@@ -59,7 +60,7 @@
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
 #' @param pkg_type type of packages to build (type: character, default: platform default)
 #' @param path folder path to put output zip into. The folder must exist.
-#'    (type: characted: default: getwd())
+#'    (type: characted: default:  \code{getwd()})
 #' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
 #'    (type: logical, default: FALSE)
 #' @param filter_repo repository address to not include dependencies available in.
@@ -78,6 +79,25 @@
 #' (type: character(N), default: NULL).
 #'
 #' @return created pkgzip file path (invisible).
+#'
+#' @family in PKGZIP building
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # start package in my_project
+#' prj_start_package("mypackage", skip_rc = TRUE, prj = prj)
+#'
+#' # build PKGZIP
+#' pkgzip_fpath <- pkgzip_build_prj_packages(prj = prj, path = tempdir())
+#'
+#' # list content of pkgzip created
+#' unzip(pkgzip_fpath, list = TRUE)
 #'
 #' @export
 #'
@@ -172,14 +192,28 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
 #'
 #' Builds PKGZIP out of passed package files.
 #'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
+#' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
 #'
 #' @param files vector of files to upload. (type: characted)
 #' @param path folder path to put output zip into. The folder must exist.
-#'    (type: characted: default: getwd())
+#'    (type: characted: default:  \code{getwd()})
 #'
 #' @return created pkgzip file path (invisible).
+#'
+#' @family in PKGZIP building
+#'
+#' @examples
+#' # download logging package
+#' pkg_fpath <- utils::download.packages("logging",
+#'                                       repos = "https://cloud.r-project.org/",
+#'                                       destdir = tempdir())[1,2]
+#'
+#' # build PKGZIP
+#' pkgzip_fpath <- pkgzip_build_package_files(files = pkg_fpath, path = tempdir())
+#'
+#' # list content of pkgzip created
+#' unzip(pkgzip_fpath, list = TRUE)
 #'
 #' @export
 #'
@@ -241,10 +275,11 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 
 
 #'
-#' Builds PKGZIP out of passed external packages. It uses project to detect
-#' repositories to look for packages in.
+#' Builds PKGZIP out of passed external packages.
 #'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
+#' It uses project to detect repositories to look for packages in.\cr
+#' \cr
+#' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
 #'
 #' @param pkgs vector of names of external packages which should be included in
@@ -261,6 +296,22 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 #'     (type: character(1), default: NULL)
 #'
 #' @return created pkgzip file path (invisible).
+#'
+#' @family in PKGZIP building
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # build PKGZIP with logging package
+#' pkgzip_fpath <- pkgzip_build_ext_packages("logging", prj = prj, path = tempdir())
+#'
+#' # list content of pkgzip created
+#' unzip(pkgzip_fpath, list = TRUE)
 #'
 #' @export
 #'
@@ -324,16 +375,18 @@ pkgzip_build_ext_packages <- function(pkgs,
 
 
 #'
+#' Builds PKGZIP out of package on GitHub.
+#'
 #' Loads package from github repository, packages it into package file and builds
 #' PKGZIP out of it. It uses project to detect repositories to look for dependencies
-#' and to detect rversion if required.
-#'
-#' Logs all messages onto rsuite logger. Use logging::setLevel to control logs
+#' and to detect rversion if required.\cr
+#' \cr
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control logs
 #' verbosity.
 #'
 #' @param repo repository address in format username/repo[/subdir][\@ref|#pull]. See
 #'   devtools::install_github for more information.
-#' @param ... github specific parametrs passed to devtools::install_github.
+#' @param ... github specific parametrs passed to  \code{devtools::install_github}.
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to build (type: character, default: platform default)
@@ -359,6 +412,22 @@ pkgzip_build_ext_packages <- function(pkgs,
 #'   after build. (type: logical, default: FALSE)
 #'
 #' @return created pkgzip file path (invisible).
+#'
+#' @family in PKGZIP building
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # build PKGZIP with logging package from cran repository
+#' pkgzip_fpath <- pkgzip_build_github_package("cran/logging", prj = prj, path = tempdir())
+#'
+#' # list content of pkgzip created
+#' unzip(pkgzip_fpath, list = TRUE)
 #'
 #' @export
 #'

@@ -11,6 +11,14 @@
 #'
 #' @return NULL if newer version is not available or newest available version number.
 #'
+#' @family miscellaneous
+#'
+#' @examples
+#' \donttest{
+#'   # print latest version available or NULL if latest is currently installed
+#'   rsuite_check_version()
+#' }
+#'
 #' @export
 #'
 rsuite_check_version <- function() {
@@ -34,9 +42,16 @@ rsuite_check_version <- function() {
 }
 
 #'
-#' Updates RSuite.
+#' Updates RSuite to newest available version.
 #'
 #' @return TRUE if updated (invisible).
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' \donttest{
+#'   rsuite_update()
+#' }
 #'
 #' @export
 #'
@@ -83,9 +98,18 @@ rsuite_update <- function() {
 }
 
 #'
-#' Registers repository management adapter to use for projects.
+#' Registers repository adapter to use for projects.
 #'
 #' @param repo_adapter object complying rsuite_repo_adapter signature.
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' \donttest{
+#'   repo_adapter <- repo_adapter_create_base("Own") # create your custom adapter
+#'   class(repo_adapter) <- c("repo_adapter_own", class(repo_adapter))
+#'   rsuite_register_repo_adapter(repo_adapter)
+#' }
 #'
 #' @export
 #'
@@ -99,9 +123,14 @@ rsuite_register_repo_adapter <- function(repo_adapter) {
 }
 
 #'
-#' Gets all names of registered repository management adapters.
+#' Gets all names of known repository adapters.
 #'
 #' @return names of registered repository management adapters as chracter vector.
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' rsuite_get_repo_adapter_names()
 #'
 #' @export
 #'
@@ -115,6 +144,18 @@ rsuite_get_repo_adapter_names <- function() {
 #'
 #' @param rc_adapter object complying rsuite_rc_adapter signature.
 #'
+#' @family miscellaneous
+#'
+#' @examples
+#' rc_adapter <- rc_adapter_create_base("Own") # create your custom adapter
+#' class(rc_adapter) <- c("rc_adapter_own", class(rc_adapter))
+#'
+#' # register it
+#' rsuite_register_rc_adapter(rc_adapter)
+#'
+#' # unregister it
+#' rsuite_unregister_rc_adapter("Own")
+#'
 #' @export
 #'
 rsuite_register_rc_adapter <- function(rc_adapter) {
@@ -127,9 +168,40 @@ rsuite_register_rc_adapter <- function(rc_adapter) {
 }
 
 #'
-#' Gets all names of registered RC (revision control) adapters.
+#' Unregisters RC (revision control) adapter.
+#'
+#' @param name RC adapter name to unregister.
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' rc_adapter <- rc_adapter_create_base("Own") # create your custom adapter
+#' class(rc_adapter) <- c("rc_adapter_own", class(rc_adapter))
+#'
+#' # register it
+#' rsuite_register_rc_adapter(rc_adapter)
+#'
+#' # unregister it
+#' rsuite_unregister_rc_adapter("Own")
+#'
+#' @export
+#'
+rsuite_unregister_rc_adapter <- function(name) {
+  assert(!is.null(name) && is.character(name) && length(name) == 1 && nchar(name) > 0,
+         "Non empty character(1) required for name")
+  reg_rc_adapter(name, NULL)
+}
+
+
+#'
+#' Gets all names of known RC (revision control) adapters.
 #'
 #' @return names of registered rc adapters as chracter vector.
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' rsuite_get_rc_adapter_names()
 #'
 #' @export
 #'

@@ -50,7 +50,6 @@ handle_subcommands <- function(sub_commands, cmd_help) {
         suppressPackageStartupMessages(library(RSuite, lib.loc = rsuite_libloc))
       })
     }, error = function(e) {
-      print(.libPaths())
       print(e)
       .fatal_error(c(geterrmessage(),
                      "RSuite seems not to be available. Please run 'rsuite install' to install it.",
