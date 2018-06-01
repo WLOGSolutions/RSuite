@@ -37,6 +37,7 @@ NULL
 #'   \item{\code{\link{prj_zip}}}{Prepares deployment zip tagged with version.}
 #'   \item{\code{\link{prj_pack}}}{Prepares project source pack tagged with version.}
 #'   \item{\code{\link{prj_lock_env}}}{Locks the project environment.}
+#'   \item{\code{\link{prj_unlock_env}}}{Unlocks the project environment.}
 #' }
 #'
 #' @section Repository management:

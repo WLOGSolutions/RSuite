@@ -306,7 +306,7 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #' prj_start_package("mypackage", prj = src_prj, skip_rc = TRUE)
 #'
 #' # build project environment
-#' prj_install_deps(prj = src_prj, check_repos_consistency = FALSE)
+#' prj_install_deps(prj = src_prj)
 #'
 #' # start dest project
 #' dst_prj <- prj_start("my_project_dst", skip_rc = TRUE, path = prj_base)
