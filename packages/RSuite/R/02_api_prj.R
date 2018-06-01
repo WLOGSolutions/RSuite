@@ -469,7 +469,7 @@ prj_install_deps <- function(prj = NULL,
 #' write("library(colorspace)", file = master_script_fpath, append = TRUE)
 #'
 #' # install colorspace into project local environment
-#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
+#' prj_install_deps(prj = prj)
 #'
 #' # remove dependency to colorspace
 #' writeLines(head(readLines(master_script_fpath), n = -1),
@@ -521,7 +521,7 @@ prj_clean_deps <- function(prj = NULL) {
 #' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
 #'
 #' # build project local environment
-#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
+#' prj_install_deps(prj = prj)
 #'
 #' # build mypackage and install it into project environment
 #' prj_build(prj = prj)
@@ -600,7 +600,7 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
 #'
 #' # build project local environment
-#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
+#' prj_install_deps(prj = prj)
 #'
 #' # build deployment zip
 #' zip_fpath <- prj_zip(prj = prj, path = tempdir(), zip_ver = "1.0")
@@ -780,7 +780,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
 #' # build project local environment
-#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
+#' prj_install_deps(prj = prj)
 #'
 #' # lock project environment
 #' prj_lock_env(prj = prj)
@@ -826,9 +826,8 @@ prj_lock_env <- function(prj = NULL) {
 #'
 #' Unlocks the project environment.
 #'
-#' It deletes the 'env.lock' file which is
-#' saved in the following directory: <my_project>/deployment/. If the project
-#' environment is not locked (there is no env.lock file) the prj_unlock_env will end with an error.
+#' It removes the lock file created with \code{\link{prj_lock_env}}. If the project
+#' environment is not locked (there is no lock file) the prj_unlock_env will fail.
 #'
 #' @param prj project object to be unlocked. if not passed will lock loaded
 #'    project or default whichever exists. Will init default project from working
@@ -844,14 +843,13 @@ prj_lock_env <- function(prj = NULL) {
 #' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
 #' # build project local environment
-#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
+#' prj_install_deps(prj = prj)
 #'
 #' # lock project environment
 #' prj_lock_env(prj = prj)
 #'
 #' # unlock project environment
 #' prj_unlock_env(prj = prj)
-#'
 #'
 #' @export
 #'
@@ -860,14 +858,13 @@ prj_unlock_env <- function(prj = NULL) {
   stopifnot(!is.null(prj))
   params <- prj$load_params()
 
-  # project environment is not locked
   if (!file.exists(params$lock_path)) {
     error_msg <- "The project environment is not locked"
     pkg_logerror(error_msg)
-    stop(error_msg)
+    stop(error_msg, call. = FALSE)
   }
 
-  file.remove(params$lock_path)
+  unlink(params$lock_path, force = TRUE)
 
-  return(invisible())
+  invisible()
 }

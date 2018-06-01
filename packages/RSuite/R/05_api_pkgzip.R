@@ -491,7 +491,7 @@ pkgzip_build_github_package <- function(repo, ...,
 
   # not to include default packages
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = TRUE), force = TRUE)
-  prj_install_deps(bld_prj, vanilla_sups = TRUE, check_repos_consistency = FALSE)
+  prj_install_deps(bld_prj, vanilla_sups = TRUE)
 
   pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_info$dir, "DESCRIPTION"))[1, "Version"]
 
