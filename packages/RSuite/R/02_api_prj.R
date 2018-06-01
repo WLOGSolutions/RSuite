@@ -624,6 +624,11 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
     dir.create(path, recursive = TRUE, showWarnings = FALSE)
   }
 
+  # Check if environment is locked
+  if (!file.exists(params$lock_path)) {
+    pkg_logwarn("Project environment is not locked!")
+  }
+
   zip_fpath <- zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
   return(invisible(zip_fpath))
 }
@@ -703,6 +708,11 @@ prj_pack <- function(prj = NULL, path = getwd(),
 
   params <- prj$load_params()
   # no need to check R version here. We will not build anything
+
+  # Check if project environment is locked
+  if (!file.exists(params$lock_path)) {
+    pkg_logwarn("Project environment is not locked!")
+  }
 
   prj_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   if (is.null(pkgs)) {
