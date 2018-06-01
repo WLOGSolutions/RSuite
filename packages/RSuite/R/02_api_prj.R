@@ -824,7 +824,9 @@ prj_lock_env <- function(prj = NULL) {
 }
 
 #'
-#' Unlocks the project environment. It deletes the 'env.lock' file which is
+#' Unlocks the project environment.
+#'
+#' It deletes the 'env.lock' file which is
 #' saved in the following directory: <my_project>/deployment/. If the project
 #' environment is not locked (there is no env.lock file) the prj_unlock_env will end with an error.
 #'
@@ -832,6 +834,24 @@ prj_lock_env <- function(prj = NULL) {
 #'    project or default whichever exists. Will init default project from working
 #'    directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
+#'
+#' @examples
+#' # create exemplary project base folder
+#' prj_base <- tempfile("example_")
+#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#' # start project
+#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#' # build project local environment
+#' prj_install_deps(prj = prj, check_repos_consistency = FALSE)
+#'
+#' # lock project environment
+#' prj_lock_env(prj = prj)
+#'
+#' # unlock project environment
+#' prj_unlock_env(prj = prj)
+#'
 #'
 #' @export
 #'
