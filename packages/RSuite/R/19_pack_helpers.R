@@ -57,6 +57,15 @@ export_prj <- function(params, rver, pkgs, inc_master, dest_dir) {
     return()
   }
 
+  if (file.exists(params$lock_path)) {
+    success <- file.copy(from = normalizePath(params$lock_path), to = file.path(base_dir, "deployment"))
+
+    if (!all(success)) {
+      pkg_logwarn("Failed to copy env.lock file to export folder")
+      return()
+    }
+  }
+
   # cleanup: remove any .Rproj.user, .Rhistory, .RData, .log if exists in root_dir
   to_rem <- c(
     list.files(base_dir, pattern = "^[.]Rproj.user", recursive = TRUE, include.dirs = TRUE, all.files = TRUE),
