@@ -187,7 +187,6 @@ sysreqs_install <- function(prj = NULL) {
   recipe <- sysreqs_recipe_collect_all(recipe, sysreqs) # from 57_sysreqs_recipies.R
   recipe <- rm_satisfied(recipe) # from 57_sysreqs_recipies.R
   perform(recipe)
-
 }
 
 #'
@@ -206,23 +205,25 @@ sysreqs_install <- function(prj = NULL) {
 #'   requirements detected.
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # add dependency to XML
-#' write("library(XML)",
-#'       file = file.path(prj$path, "R", "master.R"),
-#'       append = TRUE)
+#'   # add dependency to XML
+#'   write("library(XML)",
+#'         file = file.path(prj$path, "R", "master.R"),
+#'         append = TRUE)
 #'
-#' # generate script
-#' sysreqs_fpath <- sysreqs_script(prj)
+#'   # generate script
+#'   sysreqs_fpath <- sysreqs_script(prj)
 #'
-#' # present script contents
-#' cat(readLines(sysreqs_fpath), sep = "\n")
+#'   # present script contents
+#'   cat(readLines(sysreqs_fpath), sep = "\n")
+#' }
 #'
 #' @export
 #'

@@ -220,7 +220,8 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver,
     return(vers.rm_acceptable(vers, installed))
   }
 
-  avail_vers <- remove_installed(avail_vers, TRUE)
+  is_r_stable <- !grepl("unstable", R.version$status)
+  avail_vers <- remove_installed(avail_vers, is_r_stable)
   if (vers.is_empty(avail_vers)) {
     pkg_logdebug("No support packages to install.")
     return(invisible())
@@ -283,7 +284,8 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
     return(vers.rm_acceptable(vers, installed))
   }
 
-  avail_vers <- remove_installed(avail_vers, TRUE)
+  is_r_stable <- !grepl("unstable", R.version$status)
+  avail_vers <- remove_installed(avail_vers, is_r_stable)
   if (vers.is_empty(avail_vers)) {
     pkg_loginfo("No dependencies to install.")
     return(invisible())

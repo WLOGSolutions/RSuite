@@ -16,13 +16,11 @@
 #' @family in extending RSuite with RC adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own RC adapter
-#'   rc_adapter_create_own <- function() {
-#'     result <- rc_adapter_create_base("Own")
-#'     class(result) <- c("rc_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own RC adapter
+#' rc_adapter_create_own <- function() {
+#'   result <- rc_adapter_create_base("Own")
+#'   class(result) <- c("rc_adapter_own", class(result))
+#'   return(result)
 #' }
 #'
 #' @export
@@ -48,19 +46,17 @@ rc_adapter_create_base <- function(name) {
 #' @family in extending RSuite with RC adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own RC adapter
-#'   rc_adapter_create_own <- function() {
-#'     result <- rc_adapter_create_base("Own")
-#'     class(result) <- c("rc_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own RC adapter
+#' rc_adapter_create_own <- function() {
+#'   result <- rc_adapter_create_base("Own")
+#'   class(result) <- c("rc_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   rc_adapter_is_under_control.rc_adapter_own <- function(rc_adapter, dir) {
-#'     # ... check ...
-#'     return(TRUE)
-#'   }
+#' #' @export
+#' rc_adapter_is_under_control.rc_adapter_own <- function(rc_adapter, dir) {
+#'   # ... check ...
+#'   return(TRUE)
 #' }
 #'
 #' @export
@@ -94,18 +90,16 @@ rc_adapter_is_under_control.default <- function(rc_adapter, dir) {
 #' @family in extending RSuite with RC adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own RC adapter
-#'   rc_adapter_create_own <- function() {
-#'     result <- rc_adapter_create_base("Own")
-#'     class(result) <- c("rc_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own RC adapter
+#' rc_adapter_create_own <- function() {
+#'   result <- rc_adapter_create_base("Own")
+#'   class(result) <- c("rc_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   rc_adapter_prj_struct_add.rc_adapter_own <- function(rc_adapter, params) {
-#'     # ... add project specified by params under RC ...
-#'   }
+#' #' @export
+#' rc_adapter_prj_struct_add.rc_adapter_own <- function(rc_adapter, params) {
+#'   # ... add project specified by params under RC ...
 #' }
 #'
 #' @export
@@ -141,18 +135,16 @@ rc_adapter_prj_struct_add.default <- function(rc_adapter, params) {
 #' @family in extending RSuite with RC adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own RC adapter
-#'   rc_adapter_create_own <- function() {
-#'     result <- rc_adapter_create_base("Own")
-#'     class(result) <- c("rc_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own RC adapter
+#' rc_adapter_create_own <- function() {
+#'   result <- rc_adapter_create_base("Own")
+#'   class(result) <- c("rc_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   rc_adapter_pkg_struct_add.rc_adapter_own <- function(rc_adapter, params, name) {
-#'     # ... add package specified by name under RC in project specified by params ...
-#'   }
+#' #' @export
+#' rc_adapter_pkg_struct_add.rc_adapter_own <- function(rc_adapter, params, name) {
+#'   # ... add package specified by name under RC in project specified by params ...
 #' }
 #'
 #' @export
@@ -195,21 +187,19 @@ rc_adapter_pkg_struct_add.default <- function(rc_adapter, params, name) {
 #' @family in extending RSuite with RC adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own RC adapter
-#'   rc_adapter_create_own <- function() {
-#'     result <- rc_adapter_create_base("Own")
-#'     class(result) <- c("rc_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own RC adapter
+#' rc_adapter_create_own <- function() {
+#'   result <- rc_adapter_create_base("Own")
+#'   class(result) <- c("rc_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   rc_adapter_get_version.rc_adapter_own <- function(rc_adapter, dir) {
-#'     # ... detect if working copy is consistent with repository state ...
-#'     return(list(has_changes = TRUE,
-#'                 revision = "0.0",
-#'                 latest = FALSE))
-#'   }
+#' #' @export
+#' rc_adapter_get_version.rc_adapter_own <- function(rc_adapter, dir) {
+#'   # ... detect if working copy is consistent with repository state ...
+#'   return(list(has_changes = TRUE,
+#'               revision = "0.0",
+#'               latest = FALSE))
 #' }
 #'
 #' @export
@@ -249,18 +239,16 @@ rc_adapter_get_version.default <- function(rc_adapter, dir) {
 #' @family in extending RSuite with RC adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own RC adapter
-#'   rc_adapter_create_own <- function() {
-#'     result <- rc_adapter_create_base("Own")
-#'     class(result) <- c("rc_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own RC adapter
+#' rc_adapter_create_own <- function() {
+#'   result <- rc_adapter_create_base("Own")
+#'   class(result) <- c("rc_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   rc_adapter_remove_admins.rc_adapter_own <- function(rc_adapter, dir) {
-#'     # ... unlink RC administrative folders from dir (like .svn or .git) ...
-#'   }
+#' #' @export
+#' rc_adapter_remove_admins.rc_adapter_own <- function(rc_adapter, dir) {
+#'   # ... unlink RC administrative folders from dir (like .svn or .git) ...
 #' }
 #'
 #' @export

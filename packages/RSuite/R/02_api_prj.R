@@ -399,15 +399,17 @@ prj_unload <- function() {
 #' @family in project management
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # reinstall logging package into project environment
-#' prj_install_deps(prj = prj, clean = TRUE)
+#'   # reinstall logging package into project environment
+#'   prj_install_deps(prj = prj, clean = TRUE)
+#' }
 #'
 #' @export
 #'
@@ -457,26 +459,28 @@ prj_install_deps <- function(prj = NULL,
 #' @family in project management
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # add colorspace to master script
-#' master_script_fpath <- file.path(prj$path, "R", "master.R")
-#' write("library(colorspace)", file = master_script_fpath, append = TRUE)
+#'   # add colorspace to master script
+#'   master_script_fpath <- file.path(prj$path, "R", "master.R")
+#'   write("library(colorspace)", file = master_script_fpath, append = TRUE)
 #'
-#' # install colorspace into project local environment
-#' prj_install_deps(prj = prj)
+#'   # install colorspace into project local environment
+#'   prj_install_deps(prj = prj)
 #'
-#' # remove dependency to colorspace
-#' writeLines(head(readLines(master_script_fpath), n = -1),
-#'            con = master_script_fpath)
+#'   # remove dependency to colorspace
+#'   writeLines(head(readLines(master_script_fpath), n = -1),
+#'              con = master_script_fpath)
 #'
-#' # uninstall colorspace from project local environment
-#' prj_clean_deps(prj = prj)
+#'   # uninstall colorspace from project local environment
+#'   prj_clean_deps(prj = prj)
+#' }
 #'
 #' @export
 #'
@@ -510,21 +514,23 @@ prj_clean_deps <- function(prj = NULL) {
 #' @family in project management
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # create package in the project
-#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
+#'   # create package in the project
+#'   prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
 #'
-#' # build project local environment
-#' prj_install_deps(prj = prj)
+#'   # build project local environment
+#'   prj_install_deps(prj = prj)
 #'
-#' # build mypackage and install it into project environment
-#' prj_build(prj = prj)
+#'   # build mypackage and install it into project environment
+#'   prj_build(prj = prj)
+#' }
 #'
 #' @export
 #'
@@ -595,12 +601,6 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #'
 #' # start project
 #' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
-#'
-#' # create package in the project
-#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
-#'
-#' # build project local environment
-#' prj_install_deps(prj = prj)
 #'
 #' # build deployment zip
 #' zip_fpath <- prj_zip(prj = prj, path = tempdir(), zip_ver = "1.0")

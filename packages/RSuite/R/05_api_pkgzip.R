@@ -84,24 +84,26 @@
 #' @family in PKGZIP building
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # start package in my_project
-#' prj_start_package("mypackage", skip_rc = TRUE, prj = prj)
+#'   # start package in my_project
+#'   prj_start_package("mypackage", skip_rc = TRUE, prj = prj)
 #'
-#' # build project environment and install supportives
-#' prj_install_deps(prj = prj, vanilla_sups = TRUE)
+#'   # build project environment and install supportives
+#'   prj_install_deps(prj = prj, vanilla_sups = TRUE)
 #'
-#' # build PKGZIP
-#' pkgzip_fpath <- pkgzip_build_prj_packages(prj = prj, path = tempdir())
+#'   # build PKGZIP
+#'   pkgzip_fpath <- pkgzip_build_prj_packages(prj = prj, path = tempdir())
 #'
-#' # list content of pkgzip created
-#' unzip(pkgzip_fpath, list = TRUE)
+#'   # list content of pkgzip created
+#'   unzip(pkgzip_fpath, list = TRUE)
+#' }
 #'
 #' @export
 #'
@@ -209,16 +211,18 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
 #' @family in PKGZIP building
 #'
 #' @examples
-#' # download logging package
-#' pkg_fpath <- utils::download.packages("logging",
-#'                                       repos = "https://cloud.r-project.org/",
-#'                                       destdir = tempdir())[1,2]
+#' \donttest{
+#'   # download logging package
+#'   pkg_fpath <- utils::download.packages("logging",
+#'                                         repos = "https://cloud.r-project.org/",
+#'                                         destdir = tempdir())[1,2]
 #'
-#' # build PKGZIP
-#' pkgzip_fpath <- pkgzip_build_package_files(files = pkg_fpath, path = tempdir())
+#'   # build PKGZIP
+#'   pkgzip_fpath <- pkgzip_build_package_files(files = pkg_fpath, path = tempdir())
 #'
-#' # list content of pkgzip created
-#' unzip(pkgzip_fpath, list = TRUE)
+#'   # list content of pkgzip created
+#'   unzip(pkgzip_fpath, list = TRUE)
+#' }
 #'
 #' @export
 #'
@@ -306,18 +310,20 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 #' @family in PKGZIP building
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # build PKGZIP with logging package
-#' pkgzip_fpath <- pkgzip_build_ext_packages("logging", prj = prj, path = tempdir())
+#'   # build PKGZIP with logging package
+#'   pkgzip_fpath <- pkgzip_build_ext_packages("logging", prj = prj, path = tempdir())
 #'
-#' # list content of pkgzip created
-#' unzip(pkgzip_fpath, list = TRUE)
+#'   # list content of pkgzip created
+#'   unzip(pkgzip_fpath, list = TRUE)
+#' }
 #'
 #' @export
 #'
@@ -423,18 +429,20 @@ pkgzip_build_ext_packages <- function(pkgs,
 #' @family in PKGZIP building
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # build PKGZIP with logging package from cran repository
-#' pkgzip_fpath <- pkgzip_build_github_package("cran/logging", prj = prj, path = tempdir())
+#'   # build PKGZIP with logging package from cran repository
+#'   pkgzip_fpath <- pkgzip_build_github_package("cran/logging", prj = prj, path = tempdir())
 #'
-#' # list content of pkgzip created
-#' unzip(pkgzip_fpath, list = TRUE)
+#'   # list content of pkgzip created
+#'   unzip(pkgzip_fpath, list = TRUE)
+#' }
 #'
 #' @export
 #'
