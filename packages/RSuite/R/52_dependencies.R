@@ -323,28 +323,74 @@ get_lock_env_vers <- function(params) {
 }
 
 
-#' Checks whether dependencies from the locked environment will be updated,
-#' if so a warning message with the concerned packages is displayed
+#' Locks the project dependencies.
+#'
+#' The function is also responsible for updating the env.lock file in the following
+#' cases:
+#'
+#' - A new dependency was added (in that case the new dependency is appended to the
+#' env.lock file)
+#'
+#' - An existing dependency was deleted (depending on the relock flag the funcion will
+#' either return an error or update the env.lock file)
+#'
+#' - An existing dependency was updated e.g. RSuite was updated from version 0.26 to 0.27
+#' (depending on the relock flag the funcion will either return an error or update the
+#'  env.lock file)
+#'
 #'
 #' @param avail_vers version object describing available project dependencies.
 #' @param params project parameters (type" rsuite_project_params)
+#' @param relock if TRUE allows to update the env.lock file
+#'   (type: logical, default: FALSE)
 #'
 #' @keywords internal
 #' @noRd
 #'
-check_lock_env_deps <- function(avail_vers, params){
-  if (!file.exists(params$lock_path)) {
-    return(invisible())
+check_lock_env_deps <- function(avail_vers, params, relock = FALSE) {
+  if (file.exists(params$lock_path)) {
+    # remove project packages
+    project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+    env_lock_vers <- get_lock_env_vers(params) #from 52_dependencies.R
+    env_lock_vers <- vers.rm(env_lock_vers, project_packages)
+
+    avail_vers_locked <- vers.drop_avails(avail_vers)
+    avail_vers_locked <- vers.union(avail_vers_locked, env_lock_vers)
+
+    # look for new dependencies
+    new_deps <- avail_vers$pkgs$pkg[!avail_vers$pkgs$pkg %in% env_lock_vers$pkgs$pkg]
+    if (length(new_deps) != 0) {
+        Package <- NULL
+        cat("\n", file = params$lock_path, append = TRUE)
+        write.dcf(subset(avail_vers$avails[, c("Package", "Version")], Package == new_deps),
+                  append = TRUE,
+                  file = params$lock_path)
+    }
+
+    # look for deleted dependencies
+    deleted_deps <- env_lock_vers$pkgs$pkg[!env_lock_vers$pkgs$pkg %in% avail_vers$pkgs$pkg]
+    if (length(deleted_deps) != 0) {
+      avail_vers_locked <- vers.rm(avail_vers_locked, deleted_deps)
+    }
+
+    # look for updated dependencies
+    unfeasibles <- vers.get_unfeasibles(avail_vers_locked)
+    if (length(unfeasibles) != 0) {
+      warn_msg <- paste("The following packages will be updated from last lock:", unfeasibles, sep = " ")
+      pkg_logwarn(warn_msg)
+    } else {
+      # assign locked package requirements
+      avail_vers$pkgs <- avail_vers_locked$pkgs
+    }
+
+    if (length(unfeasibles) != 0 || length(deleted_deps) != 0) {
+      if (!relock) {
+        stop("Unfeasible/Deleted packages found and relock flag is set to false")
+      } else {
+        write.dcf(avail_vers$avails[, c("Package", "Version")], file = params$lock_path)
+      }
+    }
   }
 
-  env_lock_verse <- get_lock_env_vers(params) #from 52_dependencies.R
-  avail_vers <- vers.drop_avails(avail_vers)
-
-  locked_avail_verse <- vers.union(env_lock_verse, avail_vers)
-  unfeasibles <- vers.get_unfeasibles(locked_avail_verse)
-
-  if (length(unfeasibles) != 0){
-    warn_msg <- paste("The following packages will be updated from last lock:", unfeasibles, sep = " ")
-    pkg_logwarn(warn_msg)
-  }
+  return(avail_vers)
 }

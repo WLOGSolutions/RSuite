@@ -387,6 +387,8 @@ prj_unload <- function() {
 #'   (type: logical, default: FALSE)
 #' @param vanilla_sups if TRUE install only base supportive packages (like devtools & roxygen2).
 #'   (type: logical, default: FALSE)
+#' @param relock if TRUE allows to update the env.lock file
+#'   (type: logical, default: FALSE)
 #' @param check_repos_consistency if TRUE will check installed packages if they are
 #'   consistent with required R version (info taken from DESCRIPTION Built field).
 #'   If package is built for diffrent version repository probably contains packages
@@ -414,6 +416,7 @@ prj_unload <- function() {
 prj_install_deps <- function(prj = NULL,
                              clean = FALSE,
                              vanilla_sups = FALSE,
+                             relock = FALSE,
                              check_repos_consistency = !grepl("unstable", R.version$status)) {
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -438,6 +441,7 @@ prj_install_deps <- function(prj = NULL,
 
   install_prj_deps(params, # from 11_install_prj_deps.R
                    vanilla_sups = vanilla_sups,
+                   relock = relock,
                    check_repos_consistency = check_repos_consistency)
 }
 
@@ -754,7 +758,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #' Locks the project environment.
 #'
 #' It collects all dependencies' versions and stores them in lock file to
-#' enforce exact dependency versions in future.
+#' enforce exact dependency versions in the future.
 #'
 #' @details
 #' The lock file is saved in <my_project>/deployment/ under 'env.lock' name.
@@ -830,7 +834,7 @@ prj_lock_env <- function(prj = NULL) {
   lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
   write.dcf(lock_data, file = params$lock_path)
 
-  invisible()
+  return(invisible())
 }
 
 #'

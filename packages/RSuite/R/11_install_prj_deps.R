@@ -15,6 +15,8 @@
 #' @param params project parameters. (type: rsuite_project_params)
 #' @param vanilla_sups if TRUE collects only base supportive packages.
 #'   (type: logical, default: FALSE)
+#' @param relock if TRUE allows to update the env.lock file
+#'   (type: logical, default: FALSE)
 #' @param check_repos_consistency if TRUE will prevent installing
 #'   packages built for another R ver. (type: logical, default: TRUE)
 #'
@@ -23,6 +25,7 @@
 #'
 install_prj_deps <- function(params,
                              vanilla_sups = FALSE,
+                             relock = FALSE,
                              check_repos_consistency = TRUE) {
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
 
@@ -31,10 +34,13 @@ install_prj_deps <- function(params,
 
   avail_vers <- resolve_prj_deps(repo_infos, params)
 
+  avail_vers <- check_lock_env_deps(avail_vers, params, relock) # from 52_dependencies.R
+
   install_dependencies(avail_vers,
                        lib_dir = params$lib_path,
                        rver = params$r_ver,
                        check_repos_consistency = check_repos_consistency)
+
 
   avail_sup_vers <- resolve_prj_sups(repo_infos, params, vanilla = vanilla_sups)
   if (!is.null(avail_sup_vers)) {
@@ -121,18 +127,6 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   prj_dep_vers <- vers.rm(prj_dep_vers, project_packages)
 
-  if (file.exists(params$lock_path)) {
-    env_lock_vers <- get_lock_env_vers(params) #from 52_dependencies.R
-    prj_dep_vers_copy <- prj_dep_vers
-    prj_dep_vers <- vers.union(prj_dep_vers, env_lock_vers)
-
-    unfeasibles <- vers.get_unfeasibles(prj_dep_vers)
-    if (length(unfeasibles) != 0) {
-      warn_msg <- paste("Lock made the following package unfeasible:", unfeasibles, sep = " ")
-      pkg_logwarn(warn_msg)
-      prj_dep_vers <- prj_dep_vers_copy
-    }
-  }
 
   pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
   avail_vers <- resolve_dependencies(prj_dep_vers, repo_infos = repo_infos, pkg_types = pkg_types)
