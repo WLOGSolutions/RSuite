@@ -824,7 +824,7 @@ prj_lock_env <- function(prj = NULL) {
   if (!vers.is_empty(missing_deps_vers)) {
     missing_pkgs_msg <- do.call(paste, as.list(missing_deps_vers$pkgs$pkg))
     pkg_logerror(missing_pkgs_msg)
-    fail_msg <- paste("Can't lock project environment if dependencies are not installed:",
+    fail_msg <- paste("Can't lock project environment. Some dependencies are not installed:",
                       missing_pkgs_msg,
                       sep = " ")
     stop(fail_msg, call. = FALSE)

@@ -54,10 +54,12 @@ pkg_download <- function(avail_pkgs, dest_dir) {
       } else {
         pkg_logwarn("Downloading failed: %s", build_result)
       }
-    } else {
-      load(ou_file)
-      return(remote_paths)
+      return(data.frame(Package = character(0), Version = character(0), stringsAsFactors = FASLE))
     }
+
+    load(ou_file)
+    # TODO: check if packages indeed download. Remove if not
+    return(remote_paths)
   }
 
   remote_pkgs <- avail_pkgs[!grepl("^file:///", avail_pkgs$Repository), ]
@@ -244,7 +246,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
                          paste(bld_args, collapse = ", "),
                          rscript_arg("file", ou_file),
                          rver = rver,
-                         ex_libpath = sboxpath)
+                         ex_libpath = c(sboxpath, libpath))
   if (!is.null(bld_res)) {
     if (bld_res == FALSE) {
       pkg_logwarn("Building of %s aborted", pkg_name)

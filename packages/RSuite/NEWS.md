@@ -1,3 +1,11 @@
+# RSuite 0.29 (2018-06-??)
+  * #169: if project package depends on some dependents of devtools and devtools
+     is installed into sbox as supportive package not available in the 
+     environment (e.g. for R without RSuite) devtools could not be loaded for 
+     project package building beacause only packages from sbox there visible 
+     while loading devtools. Now devtools are loaded with sbox & libs 
+     visibility.
+
 # RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 
      documentation reviewed for API functions.
