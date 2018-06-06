@@ -200,7 +200,7 @@ get_platform_desc <- function() {
 #' \describe{
 #'   \item{plat_spec}{Platform specific specification}
 #'   \item{handlers}{Handlers specification to check, install, built requirement.}
-#'   \item{satisfies}{Character vertor of other requirements the requirement satisfies.}
+#'   \item{satisfies}{Character vector of other requirements the requirement satisfies.}
 #'   \item{params}{Requirement parameters (like libraries to install) detected out of
 #'      requirement specification.}
 #' }

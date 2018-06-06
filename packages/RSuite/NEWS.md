@@ -1,4 +1,4 @@
-# RSuite 0.28 (2018-05-??)
+# RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 
      documentation reviewed for API functions.
   * vignettes argument added to prj_build. Passing FALSE skips vuilding vignettes.
@@ -7,6 +7,9 @@
   * check_repos_consistency flag added to prj_install_deps. For R-devel CRAN has 
      packages not rebuilt for R-devel version, so consistency check breaks 
      building project environment.
+  * detection of OS version for binary packages repository path fixed. It failed
+     on some Debians. If regular detection does not work warning is logged and 
+     generic R.version$platform is used.
 
 # RSuite 0.27 (2018-05-29)
   * Handling downloaded packages cache have had error: then multiple packages

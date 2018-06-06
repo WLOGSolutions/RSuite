@@ -16,13 +16,11 @@
 #' @family in extending RSuite with Repo adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own Repo adapter
-#'   repo_adapter_create_own <- function() {
-#'     result <- repo_adapter_create_base("Own")
-#'     class(result) <- c("repo_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own Repo adapter
+#' repo_adapter_create_own <- function() {
+#'   result <- repo_adapter_create_base("Own")
+#'   class(result) <- c("repo_adapter_own", class(result))
+#'   return(result)
 #' }
 #'
 #' @export
@@ -55,21 +53,19 @@ repo_adapter_create_base <- function(name) {
 #' @family in extending RSuite with Repo adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own Repo adapter
-#'   repo_adapter_create_own <- function() {
-#'     result <- repo_adapter_create_base("Own")
-#'     class(result) <- c("repo_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own Repo adapter
+#' repo_adapter_create_own <- function() {
+#'   result <- repo_adapter_create_base("Own")
+#'   class(result) <- c("repo_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   repo_adapter_get_info.repo_adapter_own <- function(repo_adapter, params) {
-#'     return(list(
-#'        readonly = TRUE, # cannot be managed
-#'        reliable = FALSE # package versions can change in time
-#'     ))
-#'   }
+#' #' @export
+#' repo_adapter_get_info.repo_adapter_own <- function(repo_adapter, params) {
+#'   return(list(
+#'      readonly = TRUE, # cannot be managed
+#'      reliable = FALSE # package versions can change in time
+#'   ))
 #' }
 #'
 #' @export
@@ -106,21 +102,19 @@ repo_adapter_get_info.default <- function(repo_adapter, params) {
 #' @family in extending RSuite with Repo adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own Repo adapter
-#'   repo_adapter_create_own <- function() {
-#'     result <- repo_adapter_create_base("Own")
-#'     class(result) <- c("repo_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own Repo adapter
+#' repo_adapter_create_own <- function() {
+#'   result <- repo_adapter_create_base("Own")
+#'   class(result) <- c("repo_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   repo_adapter_get_path.repo_adapter_own <- function(repo_adapter, params, ix = NA) {
-#'     # get arguments of the repo adapter specified in project PARAMETERS
-#'     arg <- params$get_repo_adapter_arg(repo_adapter$name, default = "", ix = ix)
-#'     url <- "https://..." # make url to repository base on arg
-#'     return(url)
-#'   }
+#' #' @export
+#' repo_adapter_get_path.repo_adapter_own <- function(repo_adapter, params, ix = NA) {
+#'   # get arguments of the repo adapter specified in project PARAMETERS
+#'   arg <- params$get_repo_adapter_arg(repo_adapter$name, default = "", ix = ix)
+#'   url <- "https://..." # make url to repository base on arg
+#'   return(url)
 #' }
 #'
 #' @export
@@ -162,20 +156,18 @@ repo_adapter_get_path.default <- function(repo_adapter, params) {
 #' @family in extending RSuite with Repo adapter
 #'
 #' @examples
-#' \donttest{
-#'   # create you own Repo adapter
-#'   repo_adapter_create_own <- function() {
-#'     result <- repo_adapter_create_base("Own")
-#'     class(result) <- c("repo_adapter_own", class(result))
-#'     return(result)
-#'   }
+#' # create you own Repo adapter
+#' repo_adapter_create_own <- function() {
+#'   result <- repo_adapter_create_base("Own")
+#'   class(result) <- c("repo_adapter_own", class(result))
+#'   return(result)
+#' }
 #'
-#'   #' @export
-#'   repo_adapter_create_manager.repo_adapter_own <- function(repo_adapter, ...) {
-#'     repo_manager <- list() # create you own repo manager
-#'     class(repo_manager) <- c("repo_manager_own", "rsuite_repo_manager")
-#'     return(repo_manager)
-#'   }
+#' #' @export
+#' repo_adapter_create_manager.repo_adapter_own <- function(repo_adapter, ...) {
+#'   repo_manager <- list() # create you own repo manager
+#'   class(repo_manager) <- c("repo_manager_own", "rsuite_repo_manager")
+#'   return(repo_manager)
 #' }
 #'
 #' @export

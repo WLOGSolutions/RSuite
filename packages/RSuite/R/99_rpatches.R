@@ -31,9 +31,13 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
   }
   if (file.exists("/etc/redhat-release")) {
     ver <- get_os_version("/etc/redhat-release")
-    assert(!is.na(ver), "Failed to detect os version. Tried /etc/redhat-release.")
-
-    rel <- paste0("rhel", ver)
+    if (is.na(ver)) {
+      os_path <- sprintf("rhel_%s",  R.version$platform)
+      pkg_logwarn("Failed to detect os version. Tried /etc/redhat-release. Will use generic %s",
+                  os_path)
+    } else {
+      os_path <- sprintf("rhel%s_%s", ver, R.version$arch)
+    }
   } else if (file.exists("/etc/debian_version")) {
     ver <- get_os_version("/etc/debian_version")
     if (is.na(ver)) {
@@ -42,13 +46,17 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
       toks <- toks[grep("^\\d+[.]\\d+([.]\\d+)?$", toks)]
       ver <- gsub("^(\\d+[.]\\d+)([.]\\d+)?$", "\\1", toks)[1]
     }
-    assert(!is.na(ver), "Failed to detect os version. Tried /etc/debian_version and /etc/issue.")
-    rel <- paste0("deb", ver)
+    if (is.na(ver)) {
+      os_path <- sprintf("deb_%s",  R.version$platform)
+      pkg_logwarn("Failed to detect os version. Tried /etc/debian_version and /etc/issue. Will use generic %s",
+                  os_path)
+    } else {
+      os_path <- sprintf("deb%s_%s", ver, R.version$arch)
+    }
   } else {
-    rel <- .Platform$OS.type
+    os_path <- sprintf("%s_%s", R.version$platform, R.version$arch)
+    pkg_logwarn("Unknown platform neigher Debian-like nor RedHat-like. Will use generic %s", os_path)
   }
-
-  os_path <- sprintf("%s_%s", rel, R.version$arch)
 
   res <- paste(gsub("/$", "", repos), "bin", os_path, "contrib", rver, sep = "/")
   res

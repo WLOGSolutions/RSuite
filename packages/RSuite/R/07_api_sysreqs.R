@@ -8,7 +8,7 @@
 #'
 #' Prints out all system requirements from dependencies and project packages.
 #'
-#' @param prj project object to collect sys requiremens for. If not passed will
+#' @param prj project object to collect sys requirements for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
 #'    from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
@@ -92,10 +92,10 @@ sysreqs_collect <- function(prj = NULL) {
 #' Checks for system requirements availability.
 #'
 #' Collects system requirements with \code{\link{sysreqs_collect}}
-#' and performs checks for their existance. Fill fail if some system
+#' and performs checks for their existence. Fill fail if some system
 #' requirements are not satisfied.
 #'
-#' @param prj project object to check sys requiremens for. If not passed will
+#' @param prj project object to check sys requirements for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
 #'    from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
@@ -147,7 +147,7 @@ sysreqs_check <- function(prj = NULL) {
 #' Collects system requirements with \code{\link{sysreqs_collect}}
 #' and builds/installs them.
 #'
-#' @param prj project object to handle sys requiremens for. If not passed will
+#' @param prj project object to handle sys requirements for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
 #'    from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
@@ -187,7 +187,6 @@ sysreqs_install <- function(prj = NULL) {
   recipe <- sysreqs_recipe_collect_all(recipe, sysreqs) # from 57_sysreqs_recipies.R
   recipe <- rm_satisfied(recipe) # from 57_sysreqs_recipies.R
   perform(recipe)
-
 }
 
 #'
@@ -197,7 +196,7 @@ sysreqs_install <- function(prj = NULL) {
 #' script to builds/install them. It creates .cmd script for Windows and bash
 #' script for linuxes.
 #'
-#' @param prj project object to process sys requiremens for. If not passed will
+#' @param prj project object to process sys requirements for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
 #'    from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
@@ -206,23 +205,25 @@ sysreqs_install <- function(prj = NULL) {
 #'   requirements detected.
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # add dependency to XML
-#' write("library(XML)",
-#'       file = file.path(prj$path, "R", "master.R"),
-#'       append = TRUE)
+#'   # add dependency to XML
+#'   write("library(XML)",
+#'         file = file.path(prj$path, "R", "master.R"),
+#'         append = TRUE)
 #'
-#' # generate script
-#' sysreqs_fpath <- sysreqs_script(prj)
+#'   # generate script
+#'   sysreqs_fpath <- sysreqs_script(prj)
 #'
-#' # present script contents
-#' cat(readLines(sysreqs_fpath), sep = "\n")
+#'   # present script contents
+#'   cat(readLines(sysreqs_fpath), sep = "\n")
+#' }
 #'
 #' @export
 #'

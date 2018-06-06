@@ -87,7 +87,7 @@ is_prj <- function(prj) {
 #'
 #' @param path path to start searching project base folder from. Search is
 #'   performed upwards folder structure. Should be existing directory.
-#'   (type: character, defalt: getwd())
+#'   (type: character, default: getwd())
 #' @return object of type rsuite_project
 #'
 #' @family in project management
@@ -146,7 +146,7 @@ prj_init <- function(path = getwd()) {
 #'
 #' @param name name of project to create. It must not contain special characters
 #'   like \\/\"\'<> otherwise project folder could not be created. It can be NULL.
-#'   If so project will be created at path directly with name of the forst folder.
+#'   If so project will be created at path directly with name of the first folder.
 #'   (type: character).
 #' @param path path to folder there project structure should be created.
 #' @param skip_rc if TRUE skip adding project under revision control.
@@ -339,7 +339,7 @@ prj_load <- function(path, prj = NULL) {
 #' Unloads last loaded project.
 #'
 #' It changes \code{.libPaths()} removing all references to currently loaded
-#' project internal environmet.
+#' project internal environment.
 #'
 #' @return Project unloaded or NULL if there was no project to unload.
 #'
@@ -383,7 +383,7 @@ prj_unload <- function() {
 #'
 #' @param prj project to collect dependencies for if not passed will build
 #'    project for working directory. (type: rsuite_project, default: NULL)
-#' @param clean if TRUE clear environment before installing package dependecies.
+#' @param clean if TRUE clear environment before installing package dependencies.
 #'   (type: logical, default: FALSE)
 #' @param vanilla_sups if TRUE install only base supportive packages (like devtools & roxygen2).
 #'   (type: logical, default: FALSE)
@@ -391,7 +391,7 @@ prj_unload <- function() {
 #'   (type: logical, default: FALSE)
 #' @param check_repos_consistency if TRUE will check installed packages if they are
 #'   consistent with required R version (info taken from DESCRIPTION Built field).
-#'   If package is built for diffrent version repository probably contains packages
+#'   If package is built for different version repository probably contains packages
 #'   not rebuilt for the R version required. If check for target R version fails
 #'   package is removed from local project environment and error is reported that it
 #'   is not available. (type: logical, default: \code{!grepl("unstable", R.version$status)})
@@ -401,15 +401,17 @@ prj_unload <- function() {
 #' @family in project management
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # reinstall logging package into project environment
-#' prj_install_deps(prj = prj, clean = TRUE)
+#'   # reinstall logging package into project environment
+#'   prj_install_deps(prj = prj, clean = TRUE)
+#' }
 #'
 #' @export
 #'
@@ -461,26 +463,28 @@ prj_install_deps <- function(prj = NULL,
 #' @family in project management
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # add colorspace to master script
-#' master_script_fpath <- file.path(prj$path, "R", "master.R")
-#' write("library(colorspace)", file = master_script_fpath, append = TRUE)
+#'   # add colorspace to master script
+#'   master_script_fpath <- file.path(prj$path, "R", "master.R")
+#'   write("library(colorspace)", file = master_script_fpath, append = TRUE)
 #'
-#' # install colorspace into project local environment
-#' prj_install_deps(prj = prj)
+#'   # install colorspace into project local environment
+#'   prj_install_deps(prj = prj)
 #'
-#' # remove dependency to colorspace
-#' writeLines(head(readLines(master_script_fpath), n = -1),
-#'            con = master_script_fpath)
+#'   # remove dependency to colorspace
+#'   writeLines(head(readLines(master_script_fpath), n = -1),
+#'              con = master_script_fpath)
 #'
-#' # uninstall colorspace from project local environment
-#' prj_clean_deps(prj = prj)
+#'   # uninstall colorspace from project local environment
+#'   prj_clean_deps(prj = prj)
+#' }
 #'
 #' @export
 #'
@@ -514,21 +518,23 @@ prj_clean_deps <- function(prj = NULL) {
 #' @family in project management
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # create package in the project
-#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
+#'   # create package in the project
+#'   prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
 #'
-#' # build project local environment
-#' prj_install_deps(prj = prj)
+#'   # build project local environment
+#'   prj_install_deps(prj = prj)
 #'
-#' # build mypackage and install it into project environment
-#' prj_build(prj = prj)
+#'   # build mypackage and install it into project environment
+#'   prj_build(prj = prj)
+#' }
 #'
 #' @export
 #'
@@ -560,7 +566,7 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #'
 #' Prepares deployment zip tagged with version.
 #'
-#' It collects all dependecies and project packages installed in local project
+#' It collects all dependencies and project packages installed in local project
 #' environment together with master scripts and artifacts and zips them into
 #' single zip file.
 #'
@@ -568,7 +574,7 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #' Zip package generated is stamped with version. It can be enforced with zip_ver
 #' parameter (zip will have suffix <zip_ver>x in the case). If version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
-#' from maximal project packages version number. In that case revision numer is
+#' from maximal project packages version number. In that case revision number is
 #' appended to version: version number will be <zip_ver>_<rc_ver>. Check for
 #' changes in project sources is performed for zip package consistency.
 #'
@@ -583,7 +589,7 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #'    default whichever exists. Will init default project from working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
 #' @param path folder path to put output zip into. If folder does not exist, will
-#'    create it. (type: characted: default: \code{getwd()})
+#'    create it. (type: character: default: \code{getwd()})
 #' @param zip_ver if passed enforce version of zip package to passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
 #'
@@ -599,12 +605,6 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #'
 #' # start project
 #' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
-#'
-#' # create package in the project
-#' prj_start_package("mypackage", prj = prj, skip_rc = TRUE)
-#'
-#' # build project local environment
-#' prj_install_deps(prj = prj)
 #'
 #' # build deployment zip
 #' zip_fpath <- prj_zip(prj = prj, path = tempdir(), zip_ver = "1.0")
@@ -651,10 +651,10 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #' Pack generated is stamped with version. It can be enforced with pack_ver
 #' parameter (zip will have suffix <pack_ver>x in the case). If version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
-#' from maximal project packages version number. In that case revision numer is
+#' from maximal project packages version number. In that case revision number is
 #' appended to version: version number will be <ZipVersion>_<rc_ver>. Check for
 #' changes in project sources is performed for pack consistency. Resulted pack
-#' is marked with the version detected so while buiding zip after unpacking will
+#' is marked with the version detected so while building zip after unpacking will
 #' have the same version as original project.
 #'
 #' Before building pack project packages will have version altered: revision will
