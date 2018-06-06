@@ -28,6 +28,7 @@ In this document we present a basic R Suite usage. It covers:
 - installing dependencies
 - developing custom package with devtools
 - understanding loggers
+- project environment locking
 
 ## Start a new project
 To create a new project (called ```my_project```) we have to call the following function:
@@ -36,7 +37,7 @@ To create a new project (called ```my_project```) we have to call the following 
 RSuite::prj_start(name = 'my_project')
 ```
 
-The RSuite project is beeing created in forlder not under git/svn control. This is the cause of warning you can see
+The RSuite project is being created in folder not under git/svn control. This is the cause of warning you can see
 above.
 To avoid that warning messages you can pass the ```TRUE``` for ```skip_rc``` argument.
 
@@ -127,7 +128,7 @@ writeLines(c("#' @export",
 cat(readLines("packages/mypackage/R/hello_world.R"), sep = "\n")
 ```
 
-Please remember to add ```#' @export```. It is requered to expose the function into global namespace.
+Please remember to add ```#' @export```. It is required to expose the function into global namespace.
 
 Now you can change master script by adding one line to it:
 
@@ -185,14 +186,14 @@ You can conclude that you have to install dependencies to build your package.
 
 ## Install dependencies
 
-To install dependecies you have to call the following function:
+To install dependencies you have to call the following function:
 ```{r error = TRUE}
 RSuite::prj_install_deps()
 ```
 
 From this output you can see that we use ```MRAN``` as our package repository. Moreover R Suite detected 1 dependency to be installed.
 
-You can check if installation succedded by calling the following function:
+You can check if installation succeeded by calling the following function:
 ```{r error = TRUE}
 RSuite::prj_build()
 ```
@@ -404,3 +405,32 @@ cat(output, sep = "\n")
 ```
 
 As you can see the output is exactly the same you would expect.
+
+## Project environment locking
+RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to call the following function:
+
+```{r}
+RSuite::prj_lock_env()
+```
+
+The lock file is in the <my_project>/deployment directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions. A sample record from the 'env.lock' file is presented below:
+
+```
+Package: RSuite
+Version: 0.26.235
+```
+
+When dependencies are being installed using ```RSuite::prj_install_deps()``` the 'env.lock' file will be used to detect whether any package will change versions. If that's the case a warning message will be displayed like this:
+
+```
+rsuite: The following packages will be updated from last lock: colorspace
+```
+
+The feature allows preventing errors cause by newer versions of packages which might work differently than previous versions used in the project.
+
+To safely unlock the local project environment we use the following function:
+
+```{r}
+RSuite::prj_unlock_env()
+```
+The function deletes an existing 'env.lock' file.
