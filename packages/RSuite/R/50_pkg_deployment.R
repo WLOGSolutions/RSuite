@@ -54,7 +54,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
       } else {
         pkg_logwarn("Downloading failed: %s", build_result)
       }
-      return(data.frame(Package = character(0), Version = character(0), stringsAsFactors = FASLE))
+      return(data.frame(Package = character(0), Version = character(0), stringsAsFactors = FALSE))
     }
 
     load(ou_file)

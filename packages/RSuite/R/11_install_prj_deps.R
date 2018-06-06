@@ -82,10 +82,9 @@ resolve_prj_sups <- function(repo_infos, params, only_source = FALSE, vanilla = 
   prj_sup_vers <- vers.rm(prj_sup_vers, project_packages)
 
   # remove installed already packages
-  installed <- get_installed_packages(ex_liblocs = c(params$sbox_path, params$lib_path),
-                                      rver = params$r_ver, with_globals = TRUE)
-  # TODO: verify if installed are loadable
-
+  installed <- get_loadable_packages(vers.get_names(prj_sup_vers),
+                                     ex_liblocs = c(params$sbox_path, params$lib_path),
+                                     rver = params$r_ver)
   prj_sup_vers <- vers.rm_acceptable(prj_sup_vers, installed)
 
   if (!vers.is_empty(prj_sup_vers)) {
@@ -131,59 +130,67 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
   avail_vers <- resolve_dependencies(prj_dep_vers, repo_infos = repo_infos, pkg_types = pkg_types)
 
-
   stopifnot(avail_vers$has_avails())
   return(avail_vers)
 }
 
 #'
-#' Retrieves all packages installed for specific rver.
+#' Retrieves packages among passed installed and loadable for specific rver.
 #'
+#' @param pkgs packages to check if installed and loadable. (type: character(N))
 #' @param ex_liblocs path(s) to extra folders to look for installed packages. (type: character(N))
 #' @param rver R version to retrieve installed packages for. (type: character(1))
-#' @param with_globals if TRUE will check also globally installed packages. (type: logical(1))
 #'
 #' @return data.frame with columns Package, Version, Build
 #'
 #' @keywords internal
 #' @noRd
 #'
-get_installed_packages <- function(ex_liblocs, rver, with_globals = TRUE) {
+get_loadable_packages <- function(pkgs, ex_liblocs, rver) {
+  in_file <- tempfile(fileext = ".RData")
+  save(pkgs, file = in_file)
+
   ou_file <- tempfile(fileext = ".RData")
   on.exit({
     unlink(ou_file, force = TRUE)
   },
   add = TRUE)
 
-  if (any(with_globals)) {
-    installed_cmd <- "installed <- utils::installed.packages(lib.loc = .libPaths());"
-  } else {
-    installed_cmd <- sprintf("installed <- utils::installed.packages(lib.loc = head(.libPaths(), n = %s));",
-                             length(ex_liblocs))
-  }
-
   get_result <- run_rscript(
-    c(installed_cmd,
-      "installed <- as.data.frame(installed, stringsAsFactors = F)[, c('Package', 'Version', 'Built')];",
+    c("installed <- utils::installed.packages()",
+      "installed <- as.data.frame(installed, stringsAsFactors = F)[, c('Package', 'Version', 'Built')]",
+      "load(%s)",
+      "installed <- installed[installed$Package %%in%% pkgs, ]",
+      paste0("loadable <- unlist(lapply(",
+             "   X = installed$Package,",
+             "   FUN = function(pkg) {",
+             "     tryCatch({",
+             "      suppressPackageStartupMessages(library(pkg, character.only = TRUE));",
+             "      pkg",
+             "     },",
+             "     error = function(e) NULL)",
+             "   }))"),
+      "installed <- installed[installed$Package %%in%% loadable, ]",
       "save(installed, %s)"),
+    rscript_arg("file", in_file),
     rscript_arg("file", ou_file),
     ex_libpath = ex_liblocs,
     rver = rver)
   if (!is.null(get_result)) {
     if (get_result == FALSE) {
-      pkg_logwarn("Get installed aborted")
+      pkg_logwarn("Get loadable aborted")
     } else {
-      pkg_logwarn("Get installed failed: %s", get_result)
+      pkg_logwarn("Get loadable failed: %s", get_result)
     }
 
-    installed <- as.data.frame(utils::installed.packages(lib.loc = ex_liblocs),
-                               stringsAsFactors = FALSE)[, c("Package", "Version", "Built")]
-  } else {
-    installed <- NULL # to prevent warning
-    load(ou_file)
+    return(NULL)
   }
+
+  installed <- NULL # to prevent warning
+  load(ou_file)
   return(installed)
 }
+
 
 #'
 #' Installs supportive packages specified by avail_vers.
@@ -206,8 +213,9 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver,
   stopifnot(is_nonempty_char1(lib_dir))
 
   remove_installed <- function(vers, check_built_rver) {
-    installed <- get_installed_packages(ex_liblocs = c(sbox_dir, lib_dir),
-                                        rver = rver, with_globals = TRUE)
+    installed <- get_loadable_packages(vers.get_names(vers),
+                                       ex_liblocs = c(sbox_dir, lib_dir),
+                                       rver = rver)
     if (any(check_built_rver)) {
       installed <- installed[majmin_rver(installed$Built) == majmin_rver(rver), ]
     }

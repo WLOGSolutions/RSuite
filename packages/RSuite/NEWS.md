@@ -5,6 +5,9 @@
      project package building beacause only packages from sbox there visible 
      while loading devtools. Now devtools are loaded with sbox & libs 
      visibility.
+  * #168: while detecting supportive packages to install checking if available
+     external package is loadable in project environment. If not it gets 
+     installed.
 
 # RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 
