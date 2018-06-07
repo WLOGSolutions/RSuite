@@ -618,6 +618,11 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
   params <- prj$load_params()
   get_rscript_path(params$r_ver) # from 97_rversion.R; ensure R version is available
 
+  # Check if environment is locked
+  if (!file.exists(params$lock_path)) {
+    pkg_logwarn("Project environment is not locked!")
+  }
+
   ver_inf <- detect_zip_version(params, zip_ver) # from 15_zip_project.R
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
                                     ver_inf$rev,
@@ -626,11 +631,6 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 
   if (!dir.exists(path)) {
     dir.create(path, recursive = TRUE, showWarnings = FALSE)
-  }
-
-  # Check if environment is locked
-  if (!file.exists(params$lock_path)) {
-    pkg_logwarn("Project environment is not locked!")
   }
 
   zip_fpath <- zip_project(params, ver_inf$ver, path) # from 15_zip_project.R
@@ -821,14 +821,9 @@ prj_lock_env <- function(prj = NULL) {
 
   # Check if direct dependencies are installed
   missing_deps_vers <- vers.rm_acceptable(prj_dep_vers, env_pkgs)
-  if (!vers.is_empty(missing_deps_vers)) {
-    missing_pkgs_msg <- do.call(paste, as.list(missing_deps_vers$pkgs$pkg))
-    pkg_logerror(missing_pkgs_msg)
-    fail_msg <- paste("Can't lock project environment. Some dependencies are not installed:",
-                      missing_pkgs_msg,
-                      sep = " ")
-    stop(fail_msg, call. = FALSE)
-  }
+  error_msg <- sprintf("Can't lock project environment. Some dependencies are not installed: %s",
+                       paste(vers.get_names(missing_deps_vers), collapse = ","))
+  assert(vers.is_empty(missing_deps_vers), error_msg)
 
   # Create lock data and save to 'env.lock' file
   lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
@@ -873,12 +868,11 @@ prj_unlock_env <- function(prj = NULL) {
   params <- prj$load_params()
 
   if (!file.exists(params$lock_path)) {
-    error_msg <- "The project environment is not locked"
-    pkg_logerror(error_msg)
-    stop(error_msg, call. = FALSE)
+    pkg_logwarn("The project environment is not locked")
+    return(invisible())
   }
 
   unlink(params$lock_path, force = TRUE)
-
+  pkg_loginfo("The project environment was unlocked successfully")
   invisible()
 }

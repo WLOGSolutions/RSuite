@@ -327,6 +327,24 @@ vers.rm_base <- function(ver) {
   vers.rm(ver, c(base_pkgs, "R"))
 }
 
+
+#'
+#' Creates version object with same requirements but with avails.
+#'
+#' @param ver version object to modify.
+#'
+#' @return same version object with avails added.
+#'
+#' @keywords internal
+#' @noRd
+#'
+vers.add_avails <- function(ver, avails) {
+  stopifnot(is.versions(ver))
+
+  return(.df2ver(ver$pkgs, avails))
+}
+
+
 #'
 #' Creates version object with same requirements but without avails.
 #'

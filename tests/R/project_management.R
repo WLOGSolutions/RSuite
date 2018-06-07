@@ -159,3 +159,35 @@ expect_that_has_docs <- function(topics, pkg_name, prj) {
   }
   expect(pass, msg)
 }
+
+expect_that_packages_locked <- function(names, params, versions) {
+  stopifnot(length(names) == length(versions))
+  
+  
+  lock_data <- read.dcf(params$lock_path)
+  expected_data <- data.frame(Package = names, Expected = versions)
+  
+  locked <- lock_data[, c("Package")]
+  pass <- setequal(locked, names)
+  if (pass) {
+    msg <- ""
+  } else if (length(setdiff(locked, names)) > 0) {
+    msg <- sprintf("Package(s) %s failed to lock", paste(setdiff(names, locked), collapse = ", "))
+  } else if (length(setdiff(locked, names)) > 0) {
+    msg <- sprintf("Unexpected package(s) %s locked", paste(setdiff(installed, names), collapse = ", "))
+  } else {
+    stop(sprintf("Unexpected condition occured: %s != %s!!!", paste(names, collapse = ", "), paste(locked, collapse = ", ")))
+  }
+  
+  if (pass) {
+    failed_vers <- merge(x = lock_data, y = expected_data, by.x = "Package", by.y = "Package")
+    failed_vers <- failed_vers[!is.na(failed_vers$Expected) & failed_vers$Version != failed_vers$Expected, ]
+    
+    pass <- nrow(failed_vers) == 0
+    msg <- sprintf("Unexpected versions locked ([pkg]ver!=exp): %s",
+                   paste(sprintf("[%s]%s!=%s", failed_vers$Package, failed_vers$Version, failed_vers$Expected),
+                       collapse = ", "))
+  }
+  
+  expect(pass, msg)
+}

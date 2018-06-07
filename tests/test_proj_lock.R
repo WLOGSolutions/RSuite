@@ -30,9 +30,8 @@ test_that_managed("Project environment lock file creation", {
    lock_data <- read.dcf(params$lock_path)
 
    # Check if all installed packages where locked
-   expected_lock_data <- utils::installed.packages(lib.loc = params$lib_path)
    expect_true(file.exists(params$lock_path))
-   expect_equal(lock_data[, c("Package", "Version")], expected_lock_data[, c("Package", "Version")])
+   expect_that_packages_locked(c("logging"), params, c("0.7-103"))
  })
 
 
@@ -92,7 +91,7 @@ test_that_managed("Locked environment, unfeasibles", {
 
   # Add newer version and rebuild
   create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.1")
-  create_test_package("TestPackage2", prj, deps = "TestDependency(>= 1.1)")
+  create_test_package("TestPackage2", prj, deps = "TestDependency (>= 1.1)")
   
   # Expect warning message
   warn_msg <- paste("The following packages will be updated from last lock:", pkg_deps, sep = " ")
@@ -129,7 +128,7 @@ test_that_managed("Unlocking unlocked environment", {
    params <- prj$load_params()
 
    # Unlock project environment
-   expect_error(RSuite::prj_unlock_env(prj))
+   expect_log_message(RSuite::prj_unlock_env, "The project environment is not locked", prj)
 })
 
 
@@ -155,10 +154,9 @@ test_that_managed("Add new dependency, lock updating", {
   # Install new dependencies (lock should be automatically updated)
   RSuite::prj_install_deps(prj)
   
-  lock_data <- as.data.frame(read.dcf(params$lock_path))
-  expected_lock_data <- utils::installed.packages(lib.loc = params$lib_path)
-  expect_true(nrow(subset(lock_data, Package == "TestDependency" & Version == "1.0")) == 1)
-  expect_true(nrow(subset(lock_data, Package == "logging" & Version == "0.7-103")) == 1)
+  expect_that_packages_locked(c("logging", "TestDependency"),
+                              params,
+                              c("0.7-103", "1.0"))
 })
 
 
@@ -180,7 +178,7 @@ test_that_managed("Udpate dependency, no relocking", {
 
   # Update dependency
   create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.1")
-  create_test_package("TestPackage2", prj, deps = "TestDependency(>= 1.1)")
+  create_test_package("TestPackage2", prj, deps = "TestDependency (>= 1.1)")
   
   # Expect error
   expect_error(prj_install_deps(prj))
@@ -205,13 +203,14 @@ test_that_managed("Udpate dependency, relocking", {
 
   # Update dependency
   create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.1")
-  create_test_package("TestPackage2", prj, deps = "TestDependency(>= 1.1)")
+  create_test_package("TestPackage2", prj, deps = "TestDependency (>= 1.1)")
   
   RSuite::prj_install_deps(prj = prj, relock = TRUE)
   
   # Check if lock was updated
-  lock_data <- as.data.frame(read.dcf(params$lock_path))
-  expect_true(nrow(subset(lock_data, Package == "TestDependency" & Version == "1.1")) != 0)
+  expect_that_packages_locked(c("logging", "TestDependency"),
+                              params,
+                              c("0.7-103", "1.1"))
 })
 
 
@@ -264,7 +263,7 @@ test_that_managed("Remove dependency, relocking", {
 
   # Check updated lock
   lock_data <- as.data.frame(read.dcf(params$lock_path))
-  expect_true(nrow(subset(lock_data, Package == "TestDependency" & Version == "1.0")) == 0)
+  expect_that_packages_locked(c("logging"), params, c("0.7-103"))
 })
 
 
@@ -296,9 +295,9 @@ test_that_managed("Add and Remove dependency, relocking", {
   RSuite::prj_install_deps(prj, relock = TRUE)
 
   # Check updated lock
-  lock_data <- as.data.frame(read.dcf(params$lock_path))
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_remove & Version == "1.0")) == 0)
-  expect_true(nrow(subset(lock_data, Package == added_pkg_deps & Version == "1.0")) == 1)
+  expect_that_packages_locked(c("logging", "AddedTestDependency"),
+                              params,
+                              c("0.7-103", "1.0"))
 })
 
 
@@ -325,16 +324,16 @@ test_that_managed("Add and Update dependency, relocking", {
   
   # Add package with updated dependency
   create_package_deploy_to_lrepo(name = pkg_deps_to_update, prj = prj, ver = "1.1")
-  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate(>= 1.1)")
+  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate (>= 1.1)")
   
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)
 
   # Check updated lock
   lock_data <- as.data.frame(read.dcf(params$lock_path))
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_update & Version == "1.0")) == 0)
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_update & Version == "1.1")) == 1)
-  expect_true(nrow(subset(lock_data, Package == added_pkg_deps & Version == "1.0")) == 1)
+  expect_that_packages_locked(c("logging", added_pkg_deps, pkg_deps_to_update),
+                              params,
+                              c("0.7-103", "1.0", "1.1"))
 })
 
 
@@ -365,16 +364,16 @@ test_that_managed("Remove and Update dependency, relocking", {
   # Remove dependencies
   remove_test_packages(prj)
   
-  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate(>= 1.1)")
+  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate (>= 1.1)")
   
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)
 
   # Check updated lock
   lock_data <- as.data.frame(read.dcf(params$lock_path))
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_update & Version == "1.0")) == 0)
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_update & Version == "1.1")) == 1)
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_remove & Version == "1.0")) == 0)
+  expect_that_packages_locked(c("logging", pkg_deps_to_update),
+                              params,
+                              c("0.7-103", "1.1"))
 })
 
 
@@ -407,7 +406,7 @@ test_that_managed("Add, Remove and Update dependency, relocking", {
   # Remove dependencies
   remove_test_packages(prj)
   
-  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate(>= 1.1)")
+  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate (>= 1.1)")
   
   # Add package with new dependency
   create_test_package("TestPackageWithNewDependency", prj, deps = added_pkg_deps)
@@ -417,8 +416,7 @@ test_that_managed("Add, Remove and Update dependency, relocking", {
 
   # Check updated lock
   lock_data <- as.data.frame(read.dcf(params$lock_path))
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_update & Version == "1.0")) == 0)
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_update & Version == "1.1")) == 1)
-  expect_true(nrow(subset(lock_data, Package == pkg_deps_to_remove & Version == "1.0")) == 0)
-  expect_true(nrow(subset(lock_data, Package == added_pkg_deps & Version == "1.0")) == 1)
+  expect_that_packages_locked(c("logging", added_pkg_deps, pkg_deps_to_update),
+                              params,
+                              c("0.7-103", "1.0", "1.1"))
 })

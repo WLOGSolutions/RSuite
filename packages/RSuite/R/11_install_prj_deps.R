@@ -34,7 +34,7 @@ install_prj_deps <- function(params,
 
   avail_vers <- resolve_prj_deps(repo_infos, params)
 
-  avail_vers <- check_lock_env_deps(avail_vers, params, relock) # from 52_dependencies.R
+  avail_vers <- lock_prj_deps(avail_vers, params, relock) # from 52_dependencies.R
 
   install_dependencies(avail_vers,
                        lib_dir = params$lib_path,
