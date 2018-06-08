@@ -121,7 +121,7 @@ _rsuite() {
 						fi
 						;;
 					lock|unlock)
-						if [[ $cur == --*]]; then
+						if [[ $cur == --* ]]; then
 							opts="$common_opts_long"
 						else
 							opts="$common_opts_short"
