@@ -413,20 +413,13 @@ RSuite allows the user to lock the project environment. It collects all dependen
 RSuite::prj_lock_env()
 ```
 
-The lock file is in the <my_project>/deployment directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions. A sample record from the 'env.lock' file is presented below:
+The lock file is in the 'deployment' directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions. A sample record from the 'env.lock' file is presented below:
 
-```
-Package: RSuite
-Version: 0.26.235
-```
-
-When dependencies are being installed using ```RSuite::prj_install_deps()``` the 'env.lock' file will be used to detect whether any package will change versions. If that's the case a warning message will be displayed like this:
-
-```
-rsuite: The following packages will be updated from last lock: colorspace
+```{r}
+cat(readLines("deployment/env.lock"), sep = "\n")
 ```
 
-The feature allows preventing errors cause by newer versions of packages which might work differently than previous versions used in the project.
+When dependencies are being installed using ```RSuite::prj_install_deps()``` the 'env.lock' file will be used to detect whether any package will change versions. If that's the case an appropriate warning message will be displayed. The feature allows to safely deploy packages with specific dependencies' versions. It prevent errors caused by newer versions of packages which might work differently than previous ones used in the project. 
 
 To safely unlock the local project environment we use the following function:
 
