@@ -81,13 +81,30 @@ get_repo_path <- function(dir) {
 }
 
 
-expect_log_message <- function(fun, regexp = NULL, ...){
-  logging::addHandler(action = logging::writeToConsole,
-                      handler = "RSuite.tests.console.logger",
+expect_log_message <- function(object, regexp) {
+  log_file <- tempfile(fileext = ".log")
+
+  logging::addHandler(action = logging::writeToFile,
+                      file = log_file,
+                      handler = "RSuite.tests.expect_file.logger", level = "DEBUG",
                       logger = RSuite::rsuite_getLogger())
-  
-  on.exit(logging::removeHandler(handler = "RSuite.tests.console.logger",
-                                 logger = RSuite::rsuite_getLogger()),
-          add = TRUE)
-  expect_output(fun(...), regexp = regexp)
+
+  on.exit({
+    logging::removeHandler(handler = "RSuite.tests.expect_file.logger",
+                           logger = RSuite::rsuite_getLogger())
+    unlink(log_file, force = TRUE)
+  },
+  add = TRUE)
+
+  call <- deparse(substitute(object))
+  try(object, silent = T)
+
+  if (!file.exists(log_file)) {
+    expect(FALSE, sprintf("%s produced no output", call))
+  } else {
+    output <- readLines(log_file)
+    matched <- output[grepl(regexp, output)]
+    expect(length(matched) != 0,
+           sprintf("%s produced no output matching '%s'", call, regexp))
+  }
 }

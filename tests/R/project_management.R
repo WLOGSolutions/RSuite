@@ -160,34 +160,31 @@ expect_that_has_docs <- function(topics, pkg_name, prj) {
   expect(pass, msg)
 }
 
-expect_that_packages_locked <- function(names, params, versions) {
-  stopifnot(length(names) == length(versions))
-  
-  
-  lock_data <- read.dcf(params$lock_path)
-  expected_data <- data.frame(Package = names, Expected = versions)
-  
-  locked <- lock_data[, c("Package")]
-  pass <- setequal(locked, names)
+expect_that_packages_locked <- function(expects, params) {
+  lock_data <- data.frame(read.dcf(params$lock_path), stringsAsFactors = FALSE)
+  expected_data <- data.frame(Package = names(expects), Expected = expects)
+
+  locked <- lock_data$Package
+  pass <- setequal(locked, expected_data$Package)
   if (pass) {
     msg <- ""
-  } else if (length(setdiff(locked, names)) > 0) {
-    msg <- sprintf("Package(s) %s failed to lock", paste(setdiff(names, locked), collapse = ", "))
-  } else if (length(setdiff(locked, names)) > 0) {
-    msg <- sprintf("Unexpected package(s) %s locked", paste(setdiff(installed, names), collapse = ", "))
+  } else if (length(setdiff(expected_data$Package, locked)) > 0) {
+    msg <- sprintf("Package(s) %s failed to lock", paste(setdiff(expected_data$Package, locked), collapse = ", "))
+  } else if (length(setdiff(locked, expected_data$Package)) > 0) {
+    msg <- sprintf("Unexpected package(s) %s locked", paste(setdiff(locked, expected_data$Package), collapse = ", "))
   } else {
-    stop(sprintf("Unexpected condition occured: %s != %s!!!", paste(names, collapse = ", "), paste(locked, collapse = ", ")))
+    stop(sprintf("Unexpected condition occured: %s != %s!!!", paste(expected_data$Package, collapse = ", "), paste(locked, collapse = ", ")))
   }
-  
+
   if (pass) {
     failed_vers <- merge(x = lock_data, y = expected_data, by.x = "Package", by.y = "Package")
     failed_vers <- failed_vers[!is.na(failed_vers$Expected) & failed_vers$Version != failed_vers$Expected, ]
-    
+
     pass <- nrow(failed_vers) == 0
     msg <- sprintf("Unexpected versions locked ([pkg]ver!=exp): %s",
                    paste(sprintf("[%s]%s!=%s", failed_vers$Package, failed_vers$Version, failed_vers$Expected),
                        collapse = ", "))
   }
-  
+
   expect(pass, msg)
 }

@@ -44,7 +44,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type,
   uninst_deps <- vers.rm(uninst_deps, prj_pkgs)
   assert(vers.is_empty(uninst_deps),
          paste0("Some dependencies are not installed in project env: %s.",
-                " Please, install dependencies(Call RSuite::prj_install_deps)"),
+                " Please, build project environment first."),
          paste(vers.get_names(uninst_deps), collapse = ", "))
 
   build_install_prj_packages(params, build_type, skip_build_steps, rebuild)
