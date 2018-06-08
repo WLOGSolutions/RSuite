@@ -58,10 +58,13 @@ sub_commands <- list(
                   help=paste("If passed will skip checking if packages installed from repositories are",
                              "built for required R version. Useful then using new R versions which have",
                              "not repositories fully updated yet. (default: %default)",
-                             sep = "\n\t\t"))
+                             sep = "\n\t\t")),
+      make_option(c("-r", "--relock"), dest = "relock", action = "store_true",
+                   default = FALSE, help = "Allow local project environment relocking (default: %default)")
     ),
     run = function(opts) {
       RSuite::prj_install_deps(clean = opts$clean,
+                               relock = opts$relock,
                                vanilla_sups = opts$vanilla_sups,
                                check_repos_consistency = !opts$no_built_check)
     }
@@ -146,6 +149,22 @@ sub_commands <- list(
         opts$version <- NULL
       }
       RSuite::prj_pack(path = opts$path, pack_ver = opts$version)
+    }
+  ),
+  lock = list(
+    help = "Locks the project environment",
+    options = list(
+    ),
+    run = function(opts) {
+      RSuite::prj_lock_env()
+    }
+  ),
+  unlock = list(
+    help = "Unlocks the project environment",
+    options = list(
+    ),
+    run = function(opts) {
+      RSuite::prj_unlock_env()
     }
   )
 )
