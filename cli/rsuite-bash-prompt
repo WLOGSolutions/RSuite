@@ -76,7 +76,7 @@ _rsuite() {
 						if [[ $cur == --* ]]; then
 							opts="--clean --vanilla-sups --no-built-check --relock $common_opts_long"
 						else
-							opts="-c $common_opts_short"
+							opts="-c -r $common_opts_short"
 						fi
 						;;
 					test)
