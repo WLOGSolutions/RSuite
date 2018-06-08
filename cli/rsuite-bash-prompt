@@ -41,7 +41,7 @@ _rsuite() {
 			;;
 		proj)
 			if [ $COMP_CWORD == 2 ]; then
-				opts="start pkgadd depsinst build test depsclean zip pack help"
+				opts="start pkgadd depsinst build test depsclean zip pack help lock unlock"
 			else
 				case "${COMP_WORDS[2]}" in
 					build)
@@ -74,7 +74,7 @@ _rsuite() {
 						;;
 					depsinst)
 						if [[ $cur == --* ]]; then
-							opts="--clean --vanilla-sups --no-built-check $common_opts_long"
+							opts="--clean --vanilla-sups --no-built-check --relock $common_opts_long"
 						else
 							opts="-c $common_opts_short"
 						fi
@@ -118,6 +118,13 @@ _rsuite() {
 									opts="-p --version $common_opts_short"
 									;;
 							esac
+						fi
+						;;
+					lock|unlock)
+						if [[ $cur == --*]]; then
+							opts="$common_opts_long"
+						else
+							opts="$common_opts_short"
 						fi
 						;;
 					*)
