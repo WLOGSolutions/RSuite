@@ -362,38 +362,47 @@ lock_prj_deps <- function(avail_vers, params, relock = FALSE) {
 
   avail_pkgs <- vers.get_names(avail_vers)
   env_lock_pkgs <- vers.get_names(env_lock_vers)
+  is_relocking_needed <- FALSE
 
   # look for new dependencies
   new_deps <- avail_pkgs[!avail_pkgs %in% env_lock_pkgs]
-  new_deps_flag <- length(new_deps) != 0
+  if (length(new_deps) != 0) {
+    pkg_loginfo("Following packages will be added to lock requirements: %s",
+                paste(new_deps, collapse = ","))
+    is_relocking_needed <- TRUE
+  }
 
   # look for deleted dependencies
   deleted_deps <- env_lock_pkgs[!env_lock_pkgs %in% avail_pkgs]
-  deleted_deps_flag <- length(deleted_deps) != 0
-  if (deleted_deps_flag) {
+  if (length(deleted_deps) != 0) {
+    assert(any(relock),
+           paste0("Following packages to be removed from lock requirements: %s.",
+                  " Please, relock the project environment"),
+           paste(deleted_deps, collapse = ","))
+
+    pkg_loginfo("Following packages will be removed from lock requirements: %s",
+                paste(deleted_deps, collapse = ","))
     avail_vers_locked <- vers.rm(avail_vers_locked, deleted_deps)
+    is_relocking_needed <- TRUE
   }
 
   # look for updated dependencies
   unfeasibles <- vers.get_unfeasibles(avail_vers_locked)
-  updated_deps_flag <- length(unfeasibles) != 0
-  if (updated_deps_flag) {
-    pkg_logwarn("The following packages will be updated from last lock: %s",
+  if (length(unfeasibles) != 0) {
+    assert(any(relock),
+           paste0("Locked environment requirements cannot be satisfied for: %s.",
+                  " Please, relock the project environment"),
+           paste(unfeasibles, collapse = ","))
+
+    pkg_loginfo("Following packages will be updated in lock requirements: %s",
                 paste(unfeasibles, collapse = ","))
+    is_relocking_needed <- TRUE
   } else {
     # assign locked package requirements
     avail_vers <- vers.add_avails(avail_vers_locked, avail_vers$get_avails())
   }
 
-  is_relocking_needed <- deleted_deps_flag || updated_deps_flag
-
   if (is_relocking_needed) {
-    assert(relock, "Unfeasible/Deleted packages found: %s / %s",
-           paste(unfeasibles, collapse = ","),
-           paste(deleted_deps, collapse = ","))
-  }
-
-  if (new_deps_flag || is_relocking_needed) {
     write.dcf(avail_vers$get_avails()[, c("Package", "Version")], file = params$lock_path)
   }
 

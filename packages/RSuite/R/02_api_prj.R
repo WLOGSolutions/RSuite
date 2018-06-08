@@ -821,16 +821,17 @@ prj_lock_env <- function(prj = NULL) {
 
   # Check if direct dependencies are installed
   missing_deps_vers <- vers.rm_acceptable(prj_dep_vers, env_pkgs)
-  error_msg <- sprintf("Can't lock project environment. Some dependencies are not installed: %s",
-                       paste(vers.get_names(missing_deps_vers), collapse = ","))
-  assert(vers.is_empty(missing_deps_vers), error_msg)
+  assert(vers.is_empty(missing_deps_vers),
+         paste0("Some dependencies are not installed in project env: %s.",
+                " Please, build project environment first."),
+         paste(vers.get_names(missing_deps_vers), collapse = ","))
 
   # Create lock data and save to 'env.lock' file
   lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
   write.dcf(lock_data, file = params$lock_path)
   pkg_loginfo("The project environment was locked successfully")
 
-  return(invisible())
+  pkg_loginfo("Project environment has been locked")
 }
 
 #'
@@ -874,6 +875,5 @@ prj_unlock_env <- function(prj = NULL) {
   }
 
   unlink(params$lock_path, force = TRUE)
-  pkg_loginfo("The project environment was unlocked successfully")
-  invisible()
+  pkg_loginfo("The project environment has been unlocked.")
 }
