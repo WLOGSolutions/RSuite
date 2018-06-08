@@ -828,6 +828,7 @@ prj_lock_env <- function(prj = NULL) {
   # Create lock data and save to 'env.lock' file
   lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
   write.dcf(lock_data, file = params$lock_path)
+  pkg_loginfo("The project environment was locked successfully")
 
   return(invisible())
 }
