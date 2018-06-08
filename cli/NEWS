@@ -1,4 +1,7 @@
-VERSION 0.28 (2018-06-??)
+VERSION 0.29 (2018-06-??)
+  * `proj lock` and `proj unlock` subcommands added.
+
+VERSION 0.28 (2018-06-01)
   * --no-vignettes added to `proj build`
   * --vanilla_sups and --no-built-check added to `proj depsinst`
 
