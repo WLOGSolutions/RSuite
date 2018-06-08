@@ -125,9 +125,28 @@ rsuite proj pkgadd -n MyPackage --skip_rc
 As all other commands proj accepts `-v` (short for `--verbose`) to print lots of messages during project creation 
 and `-h` (short for `--help`) to print all accepted options with some short description.
 
+## Project environment locking
+
+RSuite CLI allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to execute the following function:
+
+```bash
+rsuite proj lock
+```
+
+The lock file is in the 'deployment' directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions.
+
+When dependencies are being installed using ```rsuite proj depsinst``` the 'env.lock' file will be used to detect whether any package will change versions. If that's the case an appropriate warning message will be displayed. The feature allows to safely deploy packages with specific dependencies' versions. It prevent errors caused by newer versions of packages which might work differently than previous ones used in the project. 
+
+To safely unlock the local project environment execute the following command:
+
+```bash
+rsuite proj unlock
+```
+The function deletes an existing 'env.lock' file.
+
 ## Building project local enviroment
 
-Then project is created it already has logging installed as master scripts and all packages are supposed to use logging.
+When the project is created it already has the logging package installed as master scripts and all packages are supposed to use logging.
 
 If you have any other dependencies (required libraries) you have to build internal project environment to have them available. To achieve it call somewhere inside your project folder
 
@@ -135,12 +154,16 @@ If you have any other dependencies (required libraries) you have to build intern
 rsuite proj depsinst 
 ```
 
-Beside standard `-v` and `-h` options depsinst sub-command accepts also `-c` (short for `--clean`) to clean up internal project environment before
-installing all required packages. You call it like this
+Beside standard `-v` and `-h` options depsinst sub-command accepts also `-c` (short for `--clean`) to clean up internal project environment before installing all required packages and `-r` (short for `--relock`) to allow env.lock file updating in case of removed or updated dependencies. You call them like this:
 
 ```bash
 rsuite proj depsinst -c
 ```
+
+```bash
+rsuite proj depsinst -r
+```
+
 
 ## Building project packages
 
@@ -213,6 +236,7 @@ following way:
 ```bash
 rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 ```
+
 
 # System requirements management
 
