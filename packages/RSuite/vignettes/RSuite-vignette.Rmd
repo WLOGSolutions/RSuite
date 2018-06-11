@@ -327,6 +327,28 @@ Lets restore log level to default value:
 logging::setLevel('INFO')
 ```
 
+## Project environment locking
+RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to call the following function:
+
+```{r}
+RSuite::prj_lock_env()
+```
+
+The lock file is in the 'deployment' directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions. A sample record from the 'env.lock' file is presented below:
+
+```{r}
+cat(readLines("deployment/env.lock"), sep = "\n")
+```
+
+When dependencies are being installed using ```RSuite::prj_install_deps()``` the 'env.lock' file will be used to detect whether any package will change versions. If that's the case an appropriate warning message will be displayed. The feature allows to safely deploy packages with specific dependencies' versions. It prevent errors caused by newer versions of packages which might work differently than previous ones used in the project. 
+
+To safely unlock the local project environment we use the following function:
+
+```{r}
+RSuite::prj_unlock_env()
+```
+The function deletes an existing 'env.lock' file.
+
 ## Prepare deployment package
 
 We can now prepare a deployment package to ship our project on a production.
@@ -405,25 +427,3 @@ cat(output, sep = "\n")
 ```
 
 As you can see the output is exactly the same you would expect.
-
-## Project environment locking
-RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to call the following function:
-
-```{r}
-RSuite::prj_lock_env()
-```
-
-The lock file is in the 'deployment' directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions. A sample record from the 'env.lock' file is presented below:
-
-```{r}
-cat(readLines("deployment/env.lock"), sep = "\n")
-```
-
-When dependencies are being installed using ```RSuite::prj_install_deps()``` the 'env.lock' file will be used to detect whether any package will change versions. If that's the case an appropriate warning message will be displayed. The feature allows to safely deploy packages with specific dependencies' versions. It prevent errors caused by newer versions of packages which might work differently than previous ones used in the project. 
-
-To safely unlock the local project environment we use the following function:
-
-```{r}
-RSuite::prj_unlock_env()
-```
-The function deletes an existing 'env.lock' file.

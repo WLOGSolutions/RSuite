@@ -7,6 +7,7 @@ In this document we present a basic R Suite usage. It covers:
 * installing dependencies
 * developing custom package with `devtools`
 * understanding loggers
+* project environment locking
 
 **Important** This tutorial was tested with R Suite version 0.25-234.
 
@@ -32,8 +33,9 @@ If you are stuck fill free to contact us:
   * [Step 8 - install dependencies](#step-8---install-dependencies "Step 8 - install dependencies")
   * [Step 9 - developing custom package using `devtools`](#step-9---developing-custom-package-using-devtools "Step 9 - developing custom package using `devtools`")
   * [Step 11 - loggers in packages](#step-11---loggers-in-packages "Step 11 - loggers in packages")
-  * [Step 12 - prepare deployment package](#step-12---prepare-deployment-package "Step 12 - prepare deployment package")
-  * [Step 13 - running deployment package](#step-13---running-deployment-package "Step 13 - running deployment package")
+  * [Step 12 - Project environment locking](#step-12---project-environment-locking "Step 12 - Project environment locking")
+  * [Step 13 - prepare deployment package](#step-13---prepare-deployment-package "Step 13 - prepare deployment package")
+  * [Step 14 - running deployment package](#step-14---running-deployment-package "Step 14 - running deployment package")
 
 
 # Step 1 - start a new project
@@ -588,7 +590,29 @@ Loading required package: data.table
 As you can see there are messages from your package. They are marked with package name `mypackage`. Please also note that
 as you used `devtools` in your master script you did not have to build package to see the changes.
 
-# Step 12 - prepare deployment package
+# Step 12 - Project environment locking 
+RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to execute the following command:
+
+```bash
+rsuite proj lock
+```
+
+The lock file is in the ```deployment``` directory under the ```env.lock``` name. It is a dcf file that stores information about packages in the local environment together with their versions. In order to see the content of the ```env.lock``` file run the following command:
+
+```bash
+type my_project\deployment\env.lock
+```
+
+When dependencies are being installed using `rsuite proj depsinst` the `env.lock` file will be used to detect whether any package will change versions. If that's the case an appropriate warning message will be displayed. The feature allows to safely deploy packages with specific dependencies' versions. It prevent errors caused by newer versions of packages which might work differently than previous ones used in the project. 
+
+To safely unlock the local project environment we use the following command:
+
+```bash
+rsuite proj unlock
+```
+The command deletes an existing `env.lock` file.
+
+# Step 13 - prepare deployment package
 
 We can now prepare a deployment package to ship our project on a production. To do this you have to first remove `devtools` from `master.R`
 
@@ -662,7 +686,7 @@ The output should be like this
 
 You have crated file `my_project_1.0x.zip` that contains all information necessary to run your solution on a production environment.
 
-# Step 13 - running deployment package
+# Step 14 - running deployment package
 
 To test if the deployment package is working you can extract `my_project_1.0x.zip` created in previous step in a new folder say `prod`.
 Now you can run your solution with the command
