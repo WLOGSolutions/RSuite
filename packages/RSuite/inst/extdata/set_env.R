@@ -25,7 +25,11 @@ log_fpath <- (function() {
   }
   return(fpath)
 })()
-logging::addHandler(logging::writeToFile, level = "FINEST", file = log_fpath)
+
+log_dir <- normalizePath(file.path("..", "logs"))
+if (dir.exists(log_dir)) {
+  logging::addHandler(logging::writeToFile, level = "FINEST", file = log_fpath)
+}
 
 script_path <- getwd()
 
