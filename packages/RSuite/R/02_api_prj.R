@@ -120,7 +120,7 @@ prj_init <- function(path = getwd()) {
 
   prj <- list(
     load_params = function() {
-      assert(dir.exists(prj_path), "Project folder seams to be gone: %s", prj_path)
+      assert(dir.exists(prj_path), "Project folder seems to be gone: %s", prj_path)
       load_prj_parameters(prj_path)
     },
     path = prj_path
@@ -148,7 +148,7 @@ prj_init <- function(path = getwd()) {
 #'   like \\/\"\'<> otherwise project folder could not be created. It can be NULL.
 #'   If so project will be created at path directly with name of the first folder.
 #'   (type: character).
-#' @param path path to folder there project structure should be created.
+#' @param path path to folder where project structure should be created.
 #' @param skip_rc if TRUE skip adding project under revision control.
 #'   (type: logical, default: FALSE)
 #'
@@ -166,7 +166,7 @@ prj_init <- function(path = getwd()) {
 #'
 #' @export
 #'
-prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE) {
+prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, prj_tmpl = "builtin") {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(is.logical(skip_rc), "logical(1) expected for skip_rc")
@@ -187,6 +187,7 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE) {
     assert(created, "Failed to create project directory at %s", path)
   }
 
+  create_prj_structure_from_tmpl(prj_dir, prj_tmpl) # from 58_templates.R
   check_project_structure(prj_dir) # from 14_setup_structure.R
 
   pkg_loginfo("Project %s started.", basename(prj_dir))
@@ -241,7 +242,10 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE) {
 #'
 #' @export
 #'
-prj_start_package <- function(name, prj = NULL, skip_rc = FALSE) {
+prj_start_package <- function(name,
+                              prj = NULL,
+                              skip_rc = FALSE,
+                              pkg_tmpl = "builtin") {
   assert(!is.null(name) && is.character(name) && length(name) == 1 && nchar(name) > 0,
          "Non empty character(1) required for name")
   assert(!grepl("[\\/\"\'<>_]+", name),
@@ -253,7 +257,7 @@ prj_start_package <- function(name, prj = NULL, skip_rc = FALSE) {
 
   assert(!dir.exists(pkg_dir), "Package folder exists already: %s", pkg_dir)
 
-  create_package_structure(pkg_dir) # from 14_setup_structure.R
+  create_package_structure(pkg_dir, pkg_tmpl) # from 14_setup_structure.R
 
   pkg_loginfo("Package %s started in project %s.", name, params$project)
 

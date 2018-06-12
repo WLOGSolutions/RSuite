@@ -9,6 +9,7 @@
      external package is loadable in project environment. If not it gets 
      installed.
   * locking/unlocking of project environment functionality added. 
+  * template based project/package creation added
 
 # RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 

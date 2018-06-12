@@ -50,9 +50,7 @@ check_project_structure <- function(prj_dir) {
   params_file <- file.path(prj_dir, "PARAMETERS")
   params <- force_load_PARAMETERS(params_file, prj_name, rsuite_ver)
 
-  create_struct_dir(file.path(prj_dir, "logs"), "logs")
   create_struct_dir(params$pkgs_path, "packages")
-  create_struct_dir(file.path(prj_dir, "tests"), "tests")
   create_struct_dir(params$script_path, "master scripts")
 
   copy_folder(from = system.file(file.path("extdata", "deployment"), package = "RSuite"),
@@ -64,38 +62,6 @@ check_project_structure <- function(prj_dir) {
   if (!file.exists(conf_templ)) {
     write.dcf(data.frame(LogLevel = "INFO"), file = conf_templ)
   }
-
-  create_rproj(prj_dir, prj_name)
-  create_rprofile(prj_dir, text = "source(file.path('R', 'set_env.R'), chdir = TRUE)")
-
-  # Scripts folder
-  if (length(list.files(path = params$script_path, pattern = "*.R", recursive = FALSE)) == 0) {
-    msc_templ <- file.path(params$script_path, "master.R")
-    success <- file.copy(
-      from = system.file(file.path("extdata", "script_templ.R"), package = "RSuite"),
-      to = msc_templ)
-    if (!success) {
-      pkg_logwarn("Failed to copy master script template: %s", msc_templ)
-    }
-  }
-
-  create_rprofile(params$script_path, text = "source('set_env.R', chdir = TRUE)")
-
-  set_env_r <- file.path(params$script_path, "set_env.R")
-  if (!file.exists(set_env_r)) {
-    success <- file.copy(
-      from = system.file(file.path("extdata", "set_env.R"), package = "RSuite"),
-      to = set_env_r)
-    assert(success,
-           paste0("Failed to copy environment initialization script: %s.",
-                  " Master scripts and deployment packages will probably not work."),
-           set_env_r)
-  }
-
-  # initialize tests folder
-  create_rproj(file.path(prj_dir, "tests"), paste0(prj_name, "_Tests"))
-  create_rprofile(file.path(prj_dir, "tests"),
-                  text = "source(file.path('..', 'R', 'set_env.R'), chdir = TRUE)")
 
   if (params$r_ver == current_rver()) {
     # add logger to libraries folder as it will be required for sure
@@ -110,7 +76,7 @@ check_project_structure <- function(prj_dir) {
 }
 
 #'
-#' Loads parameters file and verified if its registered RSuite version against
+#' Loads parameters file and verifies if it registered RSuite version against
 #' current.
 #'
 #' If PARAMETERS file does not exist creates it with default contents.
@@ -215,13 +181,14 @@ update_PARAMETERS <- function(params_file, rsuite_ver) {
 #' @keywords internal
 #' @noRd
 #'
-create_package_structure <- function(pkg_dir) {
+create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
   stopifnot(!dir.exists(pkg_dir))
 
-  files <- suppressWarnings(
-    utils::unzip(system.file(file.path("extdata", "PackageTemplate.zip"), package = "RSuite"),
-                 exdir = pkg_dir))
-  assert(length(files) > 0, "Failed to create package structure at %s", pkg_dir)
+  assert(check_pkg_tmpl(pkg_tmpl),
+         "%s does not satisfy package template requirements.", pkg_tmpl) # from 58_templates.R
+
+  tmpl_dir <- get_pkg_tmpl_dir(pkg_tmpl)
+  copy_folder(tmpl_dir, pkg_dir)
 
   keywords <- list(
     pkg_name = basename(pkg_dir),
@@ -229,17 +196,17 @@ create_package_structure <- function(pkg_dir) {
     user = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
 
+  files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE)
+  files <- files[!file.info(files)$isdir]
+
   # now replace markers in files
   for (f in files) {
     lines <- readLines(con = f, warn = FALSE)
-    lines <- gsub("<PackageName>", keywords$pkg_name, lines)
-    lines <- gsub("<Date>", keywords$today, lines)
-    lines <- gsub("<User>", keywords$user, lines)
+    lines <- replace_markers(keywords, lines)
     writeLines(lines, con = f)
   }
 
-  create_rproj(pkg_dir, keywords$pkg_name)
-  create_rprofile(pkg_dir, text = "source(file.path('..', '..', 'R', 'set_env.R'), chdir = TRUE)")
+  file.rename(files, replace_markers(keywords, files))
 }
 
 
@@ -302,7 +269,7 @@ create_rprofile <- function(dir, text = "RSuite::prj_load()") {
 }
 
 #'
-#' Copies folder from onto folder to if to not exists.
+#' Copies folder from onto folder to if to does not exists.
 #'
 #' @keywords internal
 #' @noRd

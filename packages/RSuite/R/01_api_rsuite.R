@@ -215,3 +215,51 @@ rsuite_unregister_rc_adapter <- function(name) {
 rsuite_get_rc_adapter_names <- function() {
   reg_rc_adapter_names()
 }
+
+
+
+#'
+#' Returns all names of project/package templates that satisfy
+#' requirements:
+#'
+#' Project templates have to include a PARAMETERS file
+#' Package templated have to include the following files: DESCRIPTION, NAMESPACE, NEWS
+#'
+#' All templates can be found in the cashe directory (see get_cache_base_dir) in 98_shell.R
+#' for more details.
+#'
+#' @return names of registered project and package templates
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' rsuite_get_templates()
+#'
+#' @export
+#'
+rsuite_get_templates <- function() {
+  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+  tmpl_dir <- file.path(cache_base_dir, 'templates')
+  prj_tmpl_dir <- file.path(tmpl_dir, 'projects')
+  pkg_tmpl_dir <- file.path(tmpl_dir, 'packages')
+
+  prj_tmpl <- as.list(list.files(prj_tmpl_dir, full.names = FALSE, recursive = FALSE))
+  pkg_tmpl <- as.list(list.files(pkg_tmpl_dir, full.names = FALSE, recursive = FALSE))
+
+  # remove templates that don't satisfy requirements
+  prj_tmpl <- prj_tmpl[sapply(prj_tmpl, check_prj_tmpl)]
+  pkg_tmpl <- pkg_tmpl[sapply(pkg_tmpl, check_pkg_tmpl)]
+
+  if (length(prj_tmpl) == 0) {
+    prj_tmpl <- NULL
+  }
+
+  if (length(pkg_tmpl) == 0) {
+    pkg_tmpl <- NULL
+  }
+
+  tmpl_list <- list(unlist(prj_tmpl), unlist(pkg_tmpl))
+  names(tmpl_list) <- c("Project Templates", "Package Templates")
+
+  return(tmpl_list)
+}
