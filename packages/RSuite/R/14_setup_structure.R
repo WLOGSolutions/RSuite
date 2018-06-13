@@ -190,23 +190,26 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
   tmpl_dir <- get_pkg_tmpl_dir(pkg_tmpl)
   copy_folder(tmpl_dir, pkg_dir)
 
+
+  files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
+  files <- files[!file.info(files)$isdir]
+
+
+  # now replace markers in files
+  markers <- list("__PackageName__", "__Date__", "__User__")
   keywords <- list(
     pkg_name = basename(pkg_dir),
     today = as.character(Sys.Date()),
     user = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
 
-  files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE)
-  files <- files[!file.info(files)$isdir]
-
-  # now replace markers in files
   for (f in files) {
     lines <- readLines(con = f, warn = FALSE)
-    lines <- replace_markers(keywords, lines)
+    lines <- replace_markers(markers, keywords, lines)
     writeLines(lines, con = f)
   }
 
-  file.rename(files, replace_markers(keywords, files))
+  file.rename(files, replace_markers(markers, keywords, files))
 }
 
 

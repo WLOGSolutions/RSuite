@@ -107,12 +107,6 @@ check_pkg_tmpl <- function(pkg_tmpl) {
 create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
   assert(check_prj_tmpl(prj_tmpl), "%s does not satisfy project template requirements.", prj_tmpl)
 
-  keywords <- list(
-    pkg_name = basename(prj_dir),
-    today = as.character(Sys.Date()),
-    user = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
-  )
-
   # copy template
   tmpl_dir <- get_prj_tmpl_dir(prj_tmpl)
   files <- list.files(tmpl_dir)
@@ -124,13 +118,20 @@ create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
   files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
 
+  markers <- list("__ProjectName__", "__Date__", "__User__")
+  keywords <- list(
+    pkg_name = basename(prj_dir),
+    today = as.character(Sys.Date()),
+    user = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
+  )
+
   for (f in files) {
     lines <- readLines(con = f, warn = FALSE)
-    lines <- replace_markers(keywords, lines)
+    lines <- replace_markers(markers, keywords, lines)
     writeLines(lines, con = f)
   }
 
-  success <- file.rename(files, replace_markers(keywords, files))
+  success <- file.rename(files, replace_markers(markers, keywords, files))
   assert(length(success) > 0, "Failed to rename files in template.")
 }
 
@@ -147,11 +148,13 @@ create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
 #' @keywords internal
 #' @noRd
 #'
-replace_markers <- function(keywords, input) {
-    input <- gsub("__PackageName__", keywords$pkg_name, input)
-    input <- gsub("__ProjectName__", keywords$pkg_name, input)
-    input <- gsub("__Date__", keywords$today, input)
-    input <- gsub("__User__", keywords$user, input)
+replace_markers <- function(markers, keywords, input) {
+  stopifnot(length(markers) == length(keywords))
+  N = length(markers)
 
-    return(input)
+  for (i in 1:N) {
+    input <- gsub(markers[[i]], keywords[[i]], input)
+  }
+
+  return(input)
 }
