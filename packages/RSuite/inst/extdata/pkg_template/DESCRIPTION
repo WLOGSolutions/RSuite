@@ -1,0 +1,10 @@
+Package: __PackageName__
+Type: Package
+Title: What the package does (short line)
+Version: 0.1
+Date: __Date__
+Author: __User__
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Imports: logging
