@@ -103,7 +103,7 @@ check_pkg_tmpl <- function(pkg_tmpl) {
 #'
 #' Creates a project based on the given template.
 #'
-#' @param prj_dir
+#' @param prj_dir project base directory
 #'
 #' @param prj_tmpl name of project template
 #'
@@ -147,6 +147,8 @@ create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
 #'
 #' Replaces markers in the given input using keywords
 #'
+#' @param markers list of data to markers to replace.
+#'
 #' @param keywords list of data to replace markers with.
 #'
 #' @param input lines with markers to replace.
@@ -158,7 +160,7 @@ create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
 #'
 replace_markers <- function(markers, keywords, input) {
   stopifnot(length(markers) == length(keywords))
-  N = length(markers)
+  N <- length(markers)
 
   for (i in 1:N) {
     input <- gsub(markers[[i]], keywords[[i]], input)

@@ -41,13 +41,16 @@ dt_validate <- function(dt, dt_arg, expected_col_class) {
 
   notfound_columns <- setdiff(expected_names, colnames(dt))
   assert(!length(notfound_columns),
-         fail_msg = sprintf("Expected columns not present in the '%s' data.table: %s", dt_arg, paste(notfound_columns, collapse = ", ")))
+         fail_msg = sprintf("Expected columns not present in the '%s' data.table: %s",
+                            dt_arg,
+                            paste(notfound_columns, collapse = ", ")))
 
-  for(cn in expected_names) {
-    col_class <- class(dt[,get(cn)])
+  for (cn in expected_names) {
+    col_class <- class(dt[, get(cn)])
     exp_class <- expected_col_class[[cn]]
     assert(col_class == exp_class,
-           fail_msg = sprintf("Column of type '%s' expected for '%s' in data.table '%s'; '%s' found", exp_class, cn, dt_arg, col_class))
+           fail_msg = sprintf("Column of type '%s' expected for '%s' in data.table '%s'; '%s' found",
+                              exp_class, cn, dt_arg, col_class))
   }
 }
 
@@ -73,7 +76,7 @@ dt_validate_and_groom <- function(dt, dt_arg, expected_col_class) {
   dt_validate(dt, dt_arg, expected_col_class)
 
   expected_names <- names(expected_col_class)
-  res_dt <- dt[, expected_names, with=FALSE] # select only requested colums
+  res_dt <- dt[, expected_names, with = FALSE] # select only requested colums
   setcolorder(res_dt, expected_names) # set proper column ordering
 
   return(res_dt)

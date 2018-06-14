@@ -239,9 +239,9 @@ rsuite_get_rc_adapter_names <- function() {
 #'
 rsuite_get_templates <- function() {
   cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-  tmpl_dir <- file.path(cache_base_dir, 'templates')
-  prj_tmpl_dir <- file.path(tmpl_dir, 'projects')
-  pkg_tmpl_dir <- file.path(tmpl_dir, 'packages')
+  tmpl_dir <- file.path(cache_base_dir, "templates")
+  prj_tmpl_dir <- file.path(tmpl_dir, "projects")
+  pkg_tmpl_dir <- file.path(tmpl_dir, "packages")
 
   prj_tmpl <- as.list(list.files(prj_tmpl_dir, full.names = FALSE, recursive = FALSE))
   pkg_tmpl <- as.list(list.files(pkg_tmpl_dir, full.names = FALSE, recursive = FALSE))
@@ -285,7 +285,7 @@ rsuite_get_templates <- function() {
 #' @export
 #'
 rsuite_start_prj_template <- function(name = NULL,
-                                      path = file.path(get_cache_base_dir(), "templates","projects")) {
+                                      path = file.path(get_cache_base_dir(), "templates", "projects")) {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
@@ -324,7 +324,9 @@ rsuite_start_prj_template <- function(name = NULL,
 #' @export
 #'
 rsuite_start_pkg_template <- function(name = NULL,
-                                      path = file.path(get_cache_base_dir(), "templates","packages")) {
+                                      path = file.path(get_cache_base_dir(),
+                                                       "templates",
+                                                       "packages")) {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
