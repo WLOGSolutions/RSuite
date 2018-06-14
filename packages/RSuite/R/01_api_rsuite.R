@@ -223,7 +223,7 @@ rsuite_get_rc_adapter_names <- function() {
 #' requirements:
 #'
 #' Project templates have to include a PARAMETERS file
-#' Package templated have to include the following files: DESCRIPTION, NAMESPACE, NEWS
+#' Package templates have to include the following files: DESCRIPTION, NAMESPACE, NEWS
 #'
 #' All templates can be found in the cashe directory (see get_cache_base_dir) in 98_shell.R
 #' for more details.
@@ -262,4 +262,81 @@ rsuite_get_templates <- function() {
   names(tmpl_list) <- c("Project Templates", "Package Templates")
 
   return(tmpl_list)
+}
+
+#'
+#' Creates a new project template with the specified name, in the specified path.
+#'
+#'
+#' Project templates have to include a PARAMETERS file
+#' Package templated have to include the following files: DESCRIPTION, NAMESPACE, NEWS
+#'
+#' @param name name of the template being created
+#' (type: character)
+#'
+#' @param path path to the directory where the template should be created
+#' (type: character, default: $TEMP/.rsuite/templates/projects)
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' rsuite_start_prj_template("prjtemplate")
+#'
+#' @export
+#'
+rsuite_start_prj_template <- function(name = NULL,
+                                      path = file.path(get_cache_base_dir(), "templates","projects")) {
+  assert(is.character(path) && length(path) == 1, "character(1) expected for path")
+  assert(dir.exists(path), "Directory %s does not exists", path)
+  assert(!is.null(name), "No template name specified")
+  assert(is.character(name) && length(name) == 1 && nchar(name) > 0,
+         "non empty character(1) expected for name")
+  assert(!grepl("[\\/\"\'<>_]+", name),
+         "Invalid template name %s. It must not contain special characters", name)
+  tmpl_path <- file.path(path, name)
+  tmpl_path <- file.path(path, name)
+  assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
+
+  builtin_template <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
+  copy_folder(builtin_template, tmpl_path)
+
+  pkg_loginfo("%s template was created successfully", name)
+}
+
+#'
+#' Creates a new project template with the specified name, in the specified path.
+#'
+#'
+#' Project templates have to include a PARAMETERS file
+#' Package templated have to include the following files: DESCRIPTION, NAMESPACE, NEWS
+#'
+#' @family miscellaneous
+#'
+#' @param name name of the template being created
+#' (type: character)
+#'
+#' @param path path to the directory where the template should be created
+#' (type: character, default: $TEMP/.rsuite/templates/packages)
+#'
+#' @examples
+#' rsuite_start_pkg_template("pkgtemplate")
+#'
+#' @export
+#'
+rsuite_start_pkg_template <- function(name = NULL,
+                                      path = file.path(get_cache_base_dir(), "templates","packages")) {
+  assert(is.character(path) && length(path) == 1, "character(1) expected for path")
+  assert(dir.exists(path), "Directory %s does not exists", path)
+  assert(!is.null(name), "No template name specified")
+  assert(is.character(name) && length(name) == 1 && nchar(name) > 0,
+         "non empty character(1) expected for name")
+  assert(!grepl("[\\/\"\'<>_]+", name),
+         "Invalid template name %s. It must not contain special characters", name)
+  tmpl_path <- file.path(path, name)
+  assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
+
+  builtin_template <- system.file(file.path("extdata", "pkg_template"), package = "RSuite")
+  copy_folder(builtin_template, tmpl_path)
+
+  pkg_loginfo("%s template was created successfully", name)
 }

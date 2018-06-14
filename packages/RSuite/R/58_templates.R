@@ -16,13 +16,17 @@
 #' @noRd
 #'
 get_prj_tmpl_dir <- function(prj_tmpl) {
-  if (prj_tmpl == "builtin") {
-    return(system.file(file.path("extdata", "prj_template"), package = "RSuite"))
+  prj_tmpl_dir <- prj_tmpl
+  if (!dir.exists(prj_tmpl_dir)) {
+    cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+    prj_tmpl_dir <- file.path(cache_base_dir, "templates", "projects", prj_tmpl)
   }
 
-  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-  prj_tmpl_dir <- file.path(cache_base_dir, "templates", "projects", prj_tmpl)
+  if (prj_tmpl == "builtin" && !dir.exists(prj_tmpl_dir)) {
+    prj_tmpl_dir <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
+  }
 
+  assert(dir.exists(prj_tmpl_dir), "%s template does not exists", prj_tmpl)
   return(prj_tmpl_dir)
 }
 
@@ -38,13 +42,17 @@ get_prj_tmpl_dir <- function(prj_tmpl) {
 #' @noRd
 #'
 get_pkg_tmpl_dir <- function(pkg_tmpl) {
-  if (pkg_tmpl == "builtin") {
-    return(system.file(file.path("extdata", "pkg_template"), package = "RSuite"))
+  pkg_tmpl_dir <- pkg_tmpl
+  if (!dir.exists(pkg_tmpl_dir)) {
+    cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+    pkg_tmpl_dir <- file.path(cache_base_dir, "templates", "packages", pkg_tmpl)
   }
 
-  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-  pkg_tmpl_dir <- file.path(cache_base_dir, "templates", "packages", pkg_tmpl)
+  if (pkg_tmpl == "builtin" && !dir.exists(pkg_tmpl_dir)) {
+    pkg_tmpl_dir <- system.file(file.path("extdata", "pkg_template"), package = "RSuite")
+  }
 
+  assert(dir.exists(pkg_tmpl_dir), "%s template does not exist", pkg_tmpl)
   return(pkg_tmpl_dir)
 }
 
