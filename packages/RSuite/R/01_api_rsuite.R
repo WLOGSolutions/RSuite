@@ -285,7 +285,7 @@ rsuite_get_templates <- function() {
 #' @export
 #'
 rsuite_start_prj_template <- function(name = NULL,
-                                      path = file.path(get_cache_base_dir(), "templates", "projects")) {
+                                      path = get_template_path()) {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
@@ -293,8 +293,8 @@ rsuite_start_prj_template <- function(name = NULL,
          "non empty character(1) expected for name")
   assert(!grepl("[\\/\"\'<>_]+", name),
          "Invalid template name %s. It must not contain special characters", name)
-  tmpl_path <- file.path(path, name)
-  tmpl_path <- file.path(path, name)
+
+  tmpl_path <- file.path(path, name, "project")
   assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
 
   builtin_template <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
@@ -324,9 +324,7 @@ rsuite_start_prj_template <- function(name = NULL,
 #' @export
 #'
 rsuite_start_pkg_template <- function(name = NULL,
-                                      path = file.path(get_cache_base_dir(),
-                                                       "templates",
-                                                       "packages")) {
+                                      path = get_template_dir()) {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
@@ -334,7 +332,8 @@ rsuite_start_pkg_template <- function(name = NULL,
          "non empty character(1) expected for name")
   assert(!grepl("[\\/\"\'<>_]+", name),
          "Invalid template name %s. It must not contain special characters", name)
-  tmpl_path <- file.path(path, name)
+
+  tmpl_path <- file.path(path, name, "package")
   assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
 
   builtin_template <- system.file(file.path("extdata", "pkg_template"), package = "RSuite")

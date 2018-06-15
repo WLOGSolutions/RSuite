@@ -151,8 +151,9 @@ prj_init <- function(path = getwd()) {
 #' @param path path to folder where project structure should be created.
 #' @param skip_rc if TRUE skip adding project under revision control.
 #'   (type: logical, default: FALSE)
-#' @param prj_tmpl name of the projec template available in $TEMP/.rsuite/templates/projects
+#' @param tmpl name of the projec template available in $TEMP/.rsuite/templates/projects
 #' or filepath to the package template
+#'   (type: character).
 #'
 #' @return rsuite_project object for project just created.
 #'
@@ -168,7 +169,7 @@ prj_init <- function(path = getwd()) {
 #'
 #' @export
 #'
-prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, prj_tmpl = "builtin") {
+prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "builtin") {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(is.logical(skip_rc), "logical(1) expected for skip_rc")
@@ -189,7 +190,7 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, prj_tmpl = "
     assert(created, "Failed to create project directory at %s", path)
   }
 
-  create_prj_structure_from_tmpl(prj_dir, prj_tmpl) # from 58_templates.R
+  create_prj_structure_from_tmpl(prj_dir, tmpl) # from 58_templates.R
   check_project_structure(prj_dir) # from 14_setup_structure.R
 
   pkg_loginfo("Project %s started.", basename(prj_dir))
@@ -228,8 +229,9 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, prj_tmpl = "
 #'    project from working directory. (type: rsuite_project, default: NULL)
 #' @param skip_rc if TRUE skip adding package under revision control.
 #'    (type: logical, default: FALSE)
-#' @param pkg_tmpl name of the package template available in $TEMP/.rsuite/templates/packages
+#' @param tmpl name of the package template available in $TEMP/.rsuite/templates/packages
 #' or filepath to the package template
+#'    (type: character).
 #'
 #' @family in project management
 #'
@@ -249,7 +251,7 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, prj_tmpl = "
 prj_start_package <- function(name,
                               prj = NULL,
                               skip_rc = FALSE,
-                              pkg_tmpl = "builtin") {
+                              tmpl = "builtin") {
   assert(!is.null(name) && is.character(name) && length(name) == 1 && nchar(name) > 0,
          "Non empty character(1) required for name")
   assert(!grepl("[\\/\"\'<>_]+", name),
@@ -261,7 +263,7 @@ prj_start_package <- function(name,
 
   assert(!dir.exists(pkg_dir), "Package folder exists already: %s", pkg_dir)
 
-  create_package_structure(pkg_dir, pkg_tmpl) # from 14_setup_structure.R
+  create_package_structure(pkg_dir, tmpl) # from 14_setup_structure.R
 
   pkg_loginfo("Package %s started in project %s.", name, params$project)
 

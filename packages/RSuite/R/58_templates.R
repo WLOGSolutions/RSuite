@@ -8,25 +8,29 @@
 #'
 #' Returns the filepath to the requested project template
 #'
-#' @param prj_tmpl name of the project template
+#' @param tmpl name of the project template
+#'    (type: character).
 #'
 #' @return filepath to the requested project template
 #'
 #' @keywords internal
 #' @noRd
 #'
-get_prj_tmpl_dir <- function(prj_tmpl) {
-  prj_tmpl_dir <- prj_tmpl
-  if (!dir.exists(prj_tmpl_dir)) {
-    cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-    prj_tmpl_dir <- file.path(cache_base_dir, "templates", "projects", prj_tmpl)
-  }
+get_prj_tmpl_dir <- function(tmpl) {
+  assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
+         "Non empty character(1) required for template name")
 
-  if (prj_tmpl == "builtin" && !dir.exists(prj_tmpl_dir)) {
+  prj_tmpl_dir <- tmpl
+
+  if (tmpl == "builtin" && !dir.exists(prj_tmpl_dir)) {
     prj_tmpl_dir <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
   }
 
-  assert(dir.exists(prj_tmpl_dir), "%s template does not exists", prj_tmpl)
+  if (!dir.exists(prj_tmpl_dir)) {
+    prj_tmpl_dir <- file.path(get_tmpl_dir(), tmpl, "project")
+  }
+
+  assert(dir.exists(prj_tmpl_dir), "%s template does not exists", tmpl)
   return(prj_tmpl_dir)
 }
 
@@ -34,25 +38,28 @@ get_prj_tmpl_dir <- function(prj_tmpl) {
 #'
 #' Returns the filepath to the requested package template
 #'
-#' @param pkg_tmpl name of the package template
+#' @param tmpl name of the package template
+#'    (type: character).
 #'
 #' @return filepath to the requested package template
 #'
 #' @keywords internal
 #' @noRd
 #'
-get_pkg_tmpl_dir <- function(pkg_tmpl) {
-  pkg_tmpl_dir <- pkg_tmpl
-  if (!dir.exists(pkg_tmpl_dir)) {
-    cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-    pkg_tmpl_dir <- file.path(cache_base_dir, "templates", "packages", pkg_tmpl)
-  }
+get_pkg_tmpl_dir <- function(tmpl) {
+  assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
+         "Non empty character(1) required for name")
+  pkg_tmpl_dir <- tmpl
 
-  if (pkg_tmpl == "builtin" && !dir.exists(pkg_tmpl_dir)) {
+  if (tmpl == "builtin" && !dir.exists(pkg_tmpl_dir)) {
     pkg_tmpl_dir <- system.file(file.path("extdata", "pkg_template"), package = "RSuite")
   }
 
-  assert(dir.exists(pkg_tmpl_dir), "%s template does not exist", pkg_tmpl)
+  if (!dir.exists(pkg_tmpl_dir)) {
+    pkg_tmpl_dir <- file.path(get_tmpl_dir(), tmpl, "package")
+  }
+
+  assert(dir.exists(pkg_tmpl_dir), "%s template does not exist", tmpl)
   return(pkg_tmpl_dir)
 }
 
@@ -60,6 +67,7 @@ get_pkg_tmpl_dir <- function(pkg_tmpl) {
 #' Checks whether the project template contains required files and directories
 #'
 #' @param prj_tmpl name of project template
+#'    (type: character).
 #'
 #' @return TRUE if the template satisfies requirements.
 #'
@@ -67,9 +75,9 @@ get_pkg_tmpl_dir <- function(pkg_tmpl) {
 #' @noRd
 #'
 
-check_prj_tmpl <- function(prj_tmpl) {
-  tmpl_dir <- get_prj_tmpl_dir(prj_tmpl)
-  assert(dir.exists(tmpl_dir), "%s template does not exists.", tmpl_dir)
+check_prj_tmpl <- function(tmpl) {
+  tmpl_dir <- get_prj_tmpl_dir(tmpl)
+  assert(dir.exists(tmpl_dir), "%s template does not exist.", tmpl_dir)
 
   required_files <- c("PARAMETERS")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
@@ -81,7 +89,8 @@ check_prj_tmpl <- function(prj_tmpl) {
 #'
 #' Checks whether the package template contains required files and directories
 #'
-#' @param pkg_tmpl name of project template
+#' @param tmpl name of project template
+#'    (type: character).
 #'
 #' @return TRUE if the template satisfies requirements.
 #'
@@ -89,9 +98,9 @@ check_prj_tmpl <- function(prj_tmpl) {
 #' @noRd
 #'
 
-check_pkg_tmpl <- function(pkg_tmpl) {
-  tmpl_dir <- get_pkg_tmpl_dir(pkg_tmpl)
-  assert(dir.exists(tmpl_dir), "%s template does not exists.", tmpl_dir)
+check_pkg_tmpl <- function(tmpl) {
+  tmpl_dir <- get_pkg_tmpl_dir(tmpl)
+  assert(dir.exists(tmpl_dir), "%s template does not exist.", tmpl_dir)
 
   required_files <- c("DESCRIPTION", "NAMESPACE", "NEWS")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
@@ -104,19 +113,21 @@ check_pkg_tmpl <- function(pkg_tmpl) {
 #' Creates a project based on the given template.
 #'
 #' @param prj_dir project base directory
+#'    (type: character).
 #'
-#' @param prj_tmpl name of project template
+#' @param tmpl name of project template
+#'    (type: character).
 #'
 #' @return TRUE if the template satisfies requirements.
 #'
 #' @keywords internal
 #' @noRd
 #'
-create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
-  assert(check_prj_tmpl(prj_tmpl), "%s does not satisfy project template requirements.", prj_tmpl)
+create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
+  assert(check_prj_tmpl(tmpl), "%s does not satisfy project template requirements.", tmpl)
 
   # copy template
-  tmpl_dir <- get_prj_tmpl_dir(prj_tmpl)
+  tmpl_dir <- get_prj_tmpl_dir(tmpl)
   files <- list.files(tmpl_dir, all.files = TRUE, no.. = TRUE)
 
   success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE)
@@ -166,4 +177,16 @@ replace_markers <- function(keywords, input) {
   }
 
   return(input)
+}
+
+
+get_tmpl_dir <- function() {
+   cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+    tmpl_dir <- file.path(cache_base_dir, "templates")
+
+    if (!dir.exists(tmpl_dir)) {
+      dir.create(tmpl_dir, recursive = TRUE)
+    }
+
+    return(tmpl_dir)
 }
