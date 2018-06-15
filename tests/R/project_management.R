@@ -5,10 +5,11 @@
 # Tools for project management during testing.
 #----------------------------------------------------------------------------
 
-init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject") {
+init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject",
+                              tmpl = "builtin") {
   RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
 
-  prj <- RSuite::prj_start(name, skip_rc = T, path = get_wspace_dir())
+  prj <- RSuite::prj_start(name, skip_rc = T, path = get_wspace_dir(), prj_tmpl = tmpl)
   RSuite::prj_config_set_repo_adapters(repos = repo_adapters, prj = prj)
 
   unlink(file.path(prj$path, "deployment", "libs", "logging"), recursive = T, force = T) # remove precreated logger
@@ -37,8 +38,8 @@ remove_package_from_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
   RSuite:::rsuite_write_PACKAGES(loc_repo, type = type)
 }
 
-create_test_package <- function(name, prj, ver = "1.0", deps = "", imps = "") {
-  RSuite::prj_start_package(name, prj = prj, skip_rc = T)
+create_test_package <- function(name, prj, ver = "1.0", deps = "", imps = "", tmpl = "builtin") {
+  RSuite::prj_start_package(name, prj = prj, skip_rc = T, pkg_tmpl = tmpl)
   pkg_path <- file.path(prj$path, "packages", name)
 
   pkg_desc_fname <- file.path(pkg_path, "DESCRIPTION")
