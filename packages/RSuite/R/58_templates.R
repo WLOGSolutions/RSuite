@@ -126,28 +126,27 @@ create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
   files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
 
-  markers <- list("__ProjectName__", "__Date__", "__User__")
-  keywords <- list(
-    pkg_name = basename(prj_dir),
-    today = as.character(Sys.Date()),
+  keywords <- c(
+    ProjectName = basename(prj_dir),
+    RSuiteVersion = as.character(utils::packageVersion("RSuite")),
+    RVersion = current_rver(), # from 97_rversion.R
+    User = as.character(Sys.Date()),
     user = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
 
   for (f in files) {
     lines <- readLines(con = f, warn = FALSE)
-    lines <- replace_markers(markers, keywords, lines)
+    lines <- replace_markers(keywords, lines)
     writeLines(lines, con = f)
   }
 
-  success <- file.rename(files, replace_markers(markers, keywords, files))
+  success <- file.rename(files, replace_markers(keywords, files))
   assert(length(success) > 0, "Failed to rename files in template.")
 }
 
 
 #'
 #' Replaces markers in the given input using keywords
-#'
-#' @param markers list of data to markers to replace.
 #'
 #' @param keywords list of data to replace markers with.
 #'
@@ -158,12 +157,12 @@ create_prj_structure_from_tmpl <- function(prj_dir, prj_tmpl) {
 #' @keywords internal
 #' @noRd
 #'
-replace_markers <- function(markers, keywords, input) {
-  stopifnot(length(markers) == length(keywords))
-  N <- length(markers)
+replace_markers <- function(keywords, input) {
+  keyword_data <- data.frame(Marker = names(keywords), Keyword = keywords)
+  keyword_data$Marker <- sprintf("__%s__", keyword_data$Marker)
 
-  for (i in 1:N) {
-    input <- gsub(markers[[i]], keywords[[i]], input)
+  for (i in seq_len(nrow(keyword_data))) {
+    input <- gsub(keyword_data$Marker[i], keyword_data$Keyword[i], input)
   }
 
   return(input)

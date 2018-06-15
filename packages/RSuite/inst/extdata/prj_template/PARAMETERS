@@ -1,5 +1,5 @@
-RSuiteVersion: 0.28
-RVersion: 3.5
+RSuiteVersion: __RSuiteVersion__
+RVersion: __RVersion__
 Project: __ProjectName__
 Repositories: MRAN[__Date__]
 Artifacts: config_templ.txt
