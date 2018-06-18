@@ -181,12 +181,12 @@ replace_markers <- function(keywords, input) {
 
 
 get_tmpl_dir <- function() {
-   cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-    tmpl_dir <- file.path(cache_base_dir, "templates")
+  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
+  tmpl_dir <- file.path(cache_base_dir, "templates")
 
-    if (!dir.exists(tmpl_dir)) {
-      dir.create(tmpl_dir, recursive = TRUE)
-    }
+  if (!dir.exists(tmpl_dir)) {
+    dir.create(tmpl_dir, recursive = TRUE)
+  }
 
-    return(tmpl_dir)
+  return(tmpl_dir)
 }

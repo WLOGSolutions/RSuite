@@ -52,6 +52,7 @@ on_test_exit <- function(cup) {
 
 get_wspace_dir <- function() { .get_create_dir("wspace") }
 get_data_dir <- function() { .get_create_dir("data") }
+get_wspace_template_dir <- function() { .get_create_dir("wspace/templates")}
 
 
 .get_create_dir <- function(name) {

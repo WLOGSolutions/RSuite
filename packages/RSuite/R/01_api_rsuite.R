@@ -285,7 +285,7 @@ rsuite_get_templates <- function() {
 #' @export
 #'
 rsuite_start_prj_template <- function(name = NULL,
-                                      path = get_template_path()) {
+                                      path = get_tmpl_path()) {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
@@ -324,7 +324,7 @@ rsuite_start_prj_template <- function(name = NULL,
 #' @export
 #'
 rsuite_start_pkg_template <- function(name = NULL,
-                                      path = get_template_dir()) {
+                                      path = get_tmpl_dir()) {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
