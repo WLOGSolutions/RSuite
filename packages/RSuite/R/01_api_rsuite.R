@@ -318,7 +318,7 @@ rsuite_start_prj_template <- function(name = NULL,
 #'
 #'
 #' Project templates have to include a PARAMETERS file
-#' Package templated have to include the following files: DESCRIPTION, NAMESPACE, NEWS
+#' Package templates have to include the following files: DESCRIPTION, NAMESPACE, NEWS
 #'
 #' If there is no path argument provided. The function will look for the
 #' template in the default template folder:
@@ -345,7 +345,7 @@ rsuite_start_pkg_template <- function(name = NULL,
   }
 
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
-  assert(dir.exists(path), "Directory %s does not exists", path)
+  assert(dir.exists(path), "Directory %s does not exist", path)
   assert(!is.null(name), "No template name specified")
   assert(is.character(name) && length(name) == 1 && nchar(name) > 0,
          "non empty character(1) expected for name")

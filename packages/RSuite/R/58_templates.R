@@ -75,7 +75,7 @@ get_pkg_tmpl_dir <- function(tmpl) {
 #'
 #' Checks whether the project template contains required files and directories
 #'
-#' @param prj_tmpl name of project template
+#' @param tmpl name of project template
 #'    (type: character).
 #'
 #' @return TRUE if the template satisfies requirements.
@@ -87,14 +87,22 @@ get_pkg_tmpl_dir <- function(tmpl) {
 check_prj_tmpl <- function(tmpl) {
   tmpl_dir <- get_prj_tmpl_dir(tmpl)
   if (!dir.exists(tmpl_dir)) {
-    pkg_logdebug("%s template does not exist", tmpl_dir)
+    pkg_logerror("%s template does not exist", tmpl_dir)
     return(FALSE)
   }
 
   required_files <- c("PARAMETERS")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
 
-  return(all(required_files %in% files))
+  requirements_check <- required_files %in% files
+  result <- all(requirements_check)
+
+  if (!result) {
+    pkg_logerror("%s, template does not contain all required files: %s",
+                 tmpl, required_files[!requirements_check])
+  }
+
+  return(result)
 }
 
 
@@ -113,12 +121,20 @@ check_prj_tmpl <- function(tmpl) {
 check_pkg_tmpl <- function(tmpl) {
   tmpl_dir <- get_pkg_tmpl_dir(tmpl)
   if (!dir.exists(tmpl_dir)) {
-    pkg_logdebug("%s template does not exist.", tmpl_dir)
+    pkg_logerror("%s template does not exist.", tmpl_dir)
     return(FALSE)
   }
 
   required_files <- c("DESCRIPTION", "NAMESPACE", "NEWS")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
+
+  requirements_check <- required_files %in% files
+  result <- all(requirements_check)
+
+  if (!result) {
+    pkg_logerror("%s, template does not contain all required files: %s",
+                 tmpl, required_files[!requirements_check])
+  }
 
   return(all(required_files %in% files))
 }

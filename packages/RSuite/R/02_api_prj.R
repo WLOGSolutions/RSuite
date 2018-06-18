@@ -144,6 +144,8 @@ prj_init <- function(path = getwd()) {
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
 #'
+#' Project templates have to include a PARAMETERS file
+#'
 #' @param name name of project to create. It must not contain special characters
 #'   like \\/\"\'<> otherwise project folder could not be created. It can be NULL.
 #'   If so project will be created at path directly with name of the first folder.
@@ -219,6 +221,8 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
 #'
 #' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
 #' to control logs verbosity. DEBUG level turns on build and download messages.
+#'
+#' Package templates have to include the following files: DESCRIPTION, NAMESPACE, NEWS
 #'
 #' @param name name of package to create. It must not contain special characters
 #'    like \\/\"\'<> otherwise package folder could not be created. It must not
