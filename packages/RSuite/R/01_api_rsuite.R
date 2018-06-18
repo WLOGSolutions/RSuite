@@ -238,13 +238,16 @@ rsuite_get_rc_adapter_names <- function() {
 #' @export
 #'
 rsuite_get_templates <- function() {
-  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-  tmpl_dir <- file.path(cache_base_dir, "templates")
-  prj_tmpl_dir <- file.path(tmpl_dir, "projects")
-  pkg_tmpl_dir <- file.path(tmpl_dir, "packages")
+  tmpl_dirs <- list.dirs(get_tmpl_dir(),
+                         recursive = FALSE, full.names = FALSE)
 
-  prj_tmpl <- as.list(list.files(prj_tmpl_dir, full.names = FALSE, recursive = FALSE))
-  pkg_tmpl <- as.list(list.files(pkg_tmpl_dir, full.names = FALSE, recursive = FALSE))
+  if (length(tmpl_dirs) == 0) {
+    pkg_loginfo("No templates available")
+    return(invisible())
+  }
+
+  prj_tmpl <- tmpl_dirs
+  pkg_tmpl <- tmpl_dirs
 
   # remove templates that don't satisfy requirements
   prj_tmpl <- prj_tmpl[sapply(prj_tmpl, check_prj_tmpl)]
@@ -267,15 +270,18 @@ rsuite_get_templates <- function() {
 #'
 #' Creates a new project template with the specified name, in the specified path.
 #'
-#'
 #' Project templates have to include a PARAMETERS file
-#' Package templated have to include the following files: DESCRIPTION, NAMESPACE, NEWS
+#'
+#' If there is no path argument provided. The function will look for the
+#' template in the default template folder:
+#'     Unix: 'etc/.rsuite/templates'
+#'     Windows: '$TEMP/.rsuite/templates
 #'
 #' @param name name of the template being created
 #' (type: character)
 #'
 #' @param path path to the directory where the template should be created
-#' (type: character, default: $TEMP/.rsuite/templates/projects)
+#' (type: character, default: NA)
 #'
 #' @family miscellaneous
 #'
@@ -285,7 +291,11 @@ rsuite_get_templates <- function() {
 #' @export
 #'
 rsuite_start_prj_template <- function(name = NULL,
-                                      path = get_tmpl_path()) {
+                                      path = NA) {
+  if (is.na(path)) {
+    path <- get_tmpl_dir()
+  }
+
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
@@ -310,13 +320,18 @@ rsuite_start_prj_template <- function(name = NULL,
 #' Project templates have to include a PARAMETERS file
 #' Package templated have to include the following files: DESCRIPTION, NAMESPACE, NEWS
 #'
+#' If there is no path argument provided. The function will look for the
+#' template in the default template folder:
+#'     Unix: 'etc/.rsuite/templates'
+#'     Windows: '$TEMP/.rsuite/templates
+#'
 #' @family miscellaneous
 #'
 #' @param name name of the template being created
 #' (type: character)
 #'
 #' @param path path to the directory where the template should be created
-#' (type: character, default: $TEMP/.rsuite/templates/packages)
+#' (type: character, default: NA)
 #'
 #' @examples
 #' rsuite_start_pkg_template("pkgtemplate")
@@ -324,7 +339,11 @@ rsuite_start_prj_template <- function(name = NULL,
 #' @export
 #'
 rsuite_start_pkg_template <- function(name = NULL,
-                                      path = get_tmpl_dir()) {
+                                      path = NA) {
+  if (is.na(path)) {
+    path <- get_tmpl_dir()
+  }
+
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(!is.null(name), "No template name specified")
