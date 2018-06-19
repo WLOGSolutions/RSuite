@@ -53,6 +53,10 @@ sub_commands <- list(
       if (is.na(opts$name)) {
         stop("Package name is required. Provide --name argument.")
       }
+
+      if (is.null(opts$tmpl) || is.na(opts$tmpl)) {
+        opts$tmpl <- "builtin"
+      }
       RSuite::prj_start_package(name = opts$name, skip_rc = opts$skip_rc, tmpl = opts$tmpl)
     }
   ),
