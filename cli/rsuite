@@ -31,6 +31,9 @@ case "$cmd" in
 	proj)
                 "$rscript_path" --no-init-file "$basedir/R/cmd_proj.R" $* || exit 2
 		;;
+	template)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_template.R" $* || exit 2
+    		;;
 	sysreqs)
                 "$rscript_path" --no-init-file "$basedir/R/cmd_sysreqs.R" $* || exit 2
 		;;
@@ -65,6 +68,9 @@ case "$cmd" in
 		echo "       proj"
 		echo "           Use it to manage project, its dependencies, and build"
 		echo "           project packages."
+		echo ""
+		echo "       template"
+		echo "	         Use it to manage  project and package templates"	 
 		echo ""
 		echo "       sysreqs"
 		echo "          The command helps you manage R projects system requirements"

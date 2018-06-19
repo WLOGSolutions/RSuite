@@ -16,13 +16,23 @@ sub_commands <- list(
       make_option(c("-n", "--name"), dest = "name",
                   help="Name of the project to create. New project will be created in current directory. (required)"),
       make_option(c("--skip_rc"), dest = "skip_rc", action="store_true", default=FALSE,
-                  help="Do not put newly created project under RC (default: %default)")
+                  help="Do not put newly created project under RC (default: %default)"),
+
+      make_option(c("-t", "--template"), dest = "tmpl",
+                  help = paste("Name of the project template from the default template directory",
+                               "(use rsuite template get to list all available templates in the",
+                               "default template directory) or path to package template.",
+                               sep = "\n\t\t"))
     ),
     run = function(opts) {
       if (is.null(opts$name) || is.na(opts$name)) {
         stop("Project name is required. Provide --name argument.")
       }
-      RSuite::prj_start(name = opts$name, skip_rc = opts$skip_rc)
+
+      if (is.null(opts$tmpl) || is.na(opts$tmpl)) {
+        opts$tmpl <- "builtin"
+      }
+      RSuite::prj_start(name = opts$name, skip_rc = opts$skip_rc, tmpl = opts$tmpl)
     }
   ),
   pkgadd = list(
@@ -31,13 +41,19 @@ sub_commands <- list(
       make_option(c("-n", "--name"), dest = "name",
                   help="Name of the package to create. New package will be created in current R project. (required)"),
       make_option(c("--skip_rc"), dest = "skip_rc", action="store_true", default=FALSE,
-                  help="Do not put newly created package under RC (default: %default)")
+                  help="Do not put newly created package under RC (default: %default)"),
+
+      make_option(c("-t", "--template"), dest = "tmpl",
+                  help = paste("Name of the package template from the default template directory",
+                               "(use rsuite template get to list all available templates in the",
+                               "default template directory) or path to package template.",
+                               sep = "\n\t\t"))
     ),
     run = function(opts) {
       if (is.na(opts$name)) {
         stop("Package name is required. Provide --name argument.")
       }
-      RSuite::prj_start_package(name = opts$name, skip_rc = opts$skip_rc)
+      RSuite::prj_start_package(name = opts$name, skip_rc = opts$skip_rc, tmpl = opts$tmpl)
     }
   ),
   depsinst = list(
