@@ -60,14 +60,14 @@ _rsuite() {
 						;;
 					start|pkgadd)
 						if [[ $cur == --* ]]; then
-							opts="--name --skip-rc $common_opts_long"
+							opts="--name --template --skip-rc $common_opts_long"
 						else
 							case "${prev}" in
 								--name|-n)
 									return 0
 									;;
 								*)
-									opts="-n --skip-rc $common_opts_short"
+									opts="-n -t --skip-rc $common_opts_short"
 									;;
 							esac
 						fi
@@ -129,6 +129,32 @@ _rsuite() {
 						;;
 					*)
 						return 0
+						;;
+				esac
+			fi
+			;;
+		template)
+			if [ $COMP_CWORD == 2 ]; then
+				opts="get prjadd pkgadd help"
+			else
+				case "${COMP_WORDS[2]}" in
+					prjadd|pkgadd)
+						if [[ $cur == --* ]]; then
+							opts="--name --path $common_opts_long"
+						else
+							case "${prev}" in
+								--name|-n)
+									return 0
+									;;
+								--path|-p)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="-n --skip-rc $common_opts_short"
+									;;
+							esac
+						fi
 						;;
 				esac
 			fi
