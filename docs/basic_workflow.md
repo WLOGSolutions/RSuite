@@ -1,5 +1,5 @@
 # Basic R Suite usage
-In this document we present a basic R Suite usage. It covers:
+In this document basic R Suite usage is presented. It covers:
 
 * creating project
 * adding custom packages
@@ -13,12 +13,12 @@ In this document we present a basic R Suite usage. It covers:
 
 ## **Got stuck?**
 
-If you are stuck fill free to contact us:
+If you are stuck feel free to contact us:
 
-* through RSuite website (http://rsuite.io#contact) or 
+* through the RSuite website (http://rsuite.io#contact) or 
 * using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
   "Gitter RSuite room")
-* directly by sending email with your problem description to
+* directly by sending an email with the description of your problem to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
   
 ## Table of contents
@@ -47,21 +47,21 @@ To create a new project (called `my_project`) we have to issue the following com
 rsuite proj start -n my_project
 ```
 
-If the folder you working in is not under git/svn control the output should look like this:
+If the folder you are working in is not under git/svn control the output should look like this:
 ```
 2017-09-23 16:39:40 INFO:rsuite:Will create project my_project structure for RSuite v0.9.211.
 2017-09-23 16:39:40 INFO:rsuite:Project my_project started.
 2017-09-23 16:39:40 WARNING:rsuite:Failed to detect RC manager for my_project
 ```
 
-To avoid warning message you can add `--skip-rc` when calling `rsuite`.
+To avoid warning messages you can add `--skip-rc` when calling `rsuite`.
 
 ## Step 1.1 - run master file
 
 ![Run master file](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_1_1.png "Run master file")
 
-Every project has a special structure. Lets change path to the project
-we just created to check it.
+Every project has a specific structure. Let's change the directory to the project directory
+we just created in order to check it.
 
 ```bash
 cd my_project
@@ -87,7 +87,7 @@ You should see the following output
                4 File(s)            528 bytes         
 ```
 
-In folder `R` there are master scripts - that are execution scripts in our project. R Suite by default creates exemplary script `R\master.R`
+In the `R` directory there are master scripts - these are execution scripts in our project. R Suite by default creates an exemplary script `R\master.R`
 
 ```R
 # Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
@@ -154,7 +154,7 @@ You should see the following output
 
 ![Editing master.r in R Studio](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_3a.png "Editing master.R in R Studio")
 
-Open in any editor `R\master.R` and change it to look like this:
+Open `R\master.R` in any editor and change it to look like this:
 
 ```R
 # Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
@@ -210,7 +210,7 @@ On my computer this command gave the following output
 2017-09-23 16:56:00 INFO:rsuite:Successfuly build 1 packages
 ```
 
-Now you can check if your master script have access to the package `mypackage`
+Now you can check if your master script has access to the package `mypackage`
 
 ```bash
 Rscript R\master.R
@@ -222,7 +222,7 @@ If everything worked properly you should not see any error messages.
 
 ![Adding function to a custom package](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_4.png "Adding function to a custom package")
 
-Lets add a function `hello_world` to our pacakge `mypackage`. To do
+Let's add a function `hello_world` to our package `mypackage`. To do
 this you have to create a new file in folder
 `packages/mypackage/R/hello_world.R`. Edit `hello_world.R` to have the following content
 
@@ -233,9 +233,9 @@ hello_world <- function(name) {
 }
 ```
 
-Please remember to add `#'@export` if you want to see this function in global namespace.
+Please remember to add `#'@export` if you want to see this function in the global namespace.
 
-Now you can change master script by adding one line to it
+Now you can change the master script by adding one line to it
 
 ```R
 # Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
@@ -259,7 +259,7 @@ hello_world("John")
 
 ![Running master.R](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_5b.png "Running master.R")
 
-Lets check if everything works
+Let's check if everything works
 
 ```bash
 Rscript R\master.R
@@ -278,8 +278,8 @@ Execution halted
 
 ![Rebuilding custom packages](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_6.png "Rebuilding custom packages")
 
-You have to rebuild packages to have all the functionality available
-to master scripts. You do it with a following command.
+You have to rebuild packages to have all the functionalities available
+to master scripts. You do it with the following command.
 
 ```bash
 rsuite proj build
@@ -291,7 +291,7 @@ And check if `master.R` works
 Rscript R\master.R
 ```
 
-You should see output with the following line
+You should see the output with the following line
 
 ```
 [1] "Hello John!"
@@ -306,8 +306,8 @@ You can add dependencies to external packages in two ways:
 
 ![Editing DESCRIPTION file](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_7a.png "Editing DESCRIPTION file")
 
-To add dependency to external package we will edit file
-`packages\mypackage\DESCRIPTION` like below:
+To add dependencies to external packages we will edit the
+`packages\mypackage\DESCRIPTION` file like below:
 
 ```
 Package: mypackage
@@ -326,13 +326,13 @@ RoxygenNote: 6.0.1
 ```
 
 
-I have added line `data.table (>= 1.10.1)` to Depends section. This
+I have added the line `data.table (>= 1.10.1)` to the Depends section. This
 means I declared that `mypackage` depends on `data.table` package in
 version `1.10.1` or newer.
 
 ![Rebuilding packages](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_7b.png "Rebuilding packages")
 
-Lets rebuild package to have master scripts see the changes
+Let's rebuild the package to have master scripts see the changes
 
 ```bash
 rsuite proj build
@@ -345,7 +345,7 @@ The output is
 ERROR: Some dependencies are not installed in project env: data.table. Please, install dependencies(Call RSuite::prj_install_deps)
 ```
 
-You can conclude that you have to install dependencies to build your package.
+You can conclude that you have to install dependencies in order to build your package.
 
 # Step 8 - install dependencies
 
@@ -353,7 +353,7 @@ You can conclude that you have to install dependencies to build your package.
 dependencies](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/basic_workflow_step_8.png "Installing R Suite
 project dependencies")
 
-To install dependecies you have to issue the following command:
+To install dependencies you have to issue the following command:
 
 ```bash
 rsuite proj depsinst
@@ -374,7 +374,7 @@ You should see the following output
 From this output you can see that we use `MRAN` as package
 repository. Moreover R Suite detected 1 dependency to be installed. 
 
-You can check if installation succedded by issuing the following command
+You can check if the installation was successful by issuing the following command
 
 ```bash
 rsuite proj build
@@ -387,18 +387,18 @@ The output you should see if everything worked
 2017-09-23 17:18:28 INFO:rsuite:Successfuly build 1 packages
 ```
 
-Lets check what happens if you run our master script
+Let's check what happens if you run our master script
 
 ```bash
 Rscript R\master.R
 ```
 
-The output says that `data.table` was loaded. This is exactly what we wanted to be.
+The output says that `data.table` was loaded. This is exactly what we wanted.
 
 # Step 9 - developing custom package using `devtools`
 
-If you want to develop a package the cycle dev-build can take too long. This is especially important if the packages are bigger.
-You can use `devtools` to speedup this process.
+If you want to develop a package the dev-build cycle can take too long. This is especially important if the packages are bigger.
+You can use `devtools` to speed up this process.
 
 To do this edit `R\master.R` like this
 
@@ -423,19 +423,19 @@ devtools::load_all(file.path(script_path, "../packages/mypackage"))
 hello_world("John")
 ```
 
-We commented line `library(mypackage)` and added a new line
+We commented the line `library(mypackage)` and added a new line
 ```R
 devtools::load_all(file.path(script_path, "../packages/mypackage"))
 ```
 
-This line uses devtools to dynamically load your package. We are using variable `script_path` which is
+This line uses devtools to dynamically load your package. We are using the variable `script_path` which is
 auto-initialized by R Suite and is a path pointing to `master.R`.
 
 # Step 10 - loggers in master scripts
 
-R Suite promotes good programming practices and using loggers is one of them. R Suite is based on `logging` package.
+R Suite promotes good programming practices and using loggers is one of them. R Suite is based on  the `logging` package.
 
-Lets update `R/master.R` as follows
+Let's update `R/master.R` as follows
 
 ```R
 # Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
@@ -463,7 +463,7 @@ logerror("Master error")
 hello_world("John")
 ```
 
-Lets check how it works
+Let's check how it works
 
 ```bash
 Rscript R\master.R
@@ -480,18 +480,18 @@ Loading required package: data.table
 [1] "Hello John!"
 ```
 
-As you can see there are logging messages. You can see that debug message is missing. 
+As you can see there are logging messages. You can see that the debug message is missing. 
 
 ## Step 10.1 - controlling loggers level
 
-To see debug logging message you have to edit file `config.txt` in project root folder to 
+To see the debug logging message you have to edit the `config.txt` file in the project root folder to 
 look like this
 
 ```
 LogLevel: DEBUG
 ```
 
-Lets check how it works
+Let's check how it works
 
 ```bash
 Rscript R\master.R
@@ -509,12 +509,12 @@ Loading required package: data.table
 [1] "Hello John!"
 ```
 
-As you can see now debug logging message is printed.
+As you can see now the debug logging message is printed.
 
 ## Step 10.2 - `logs` folder
 
-Logging messages are stored in `logs` folder in files named with current date.
-You can check this by issuing a command
+Logging messages are stored in the `logs` folder in files named with the current date.
+You can check this by issuing the following command
 
 ```bash
 dir logs
@@ -528,7 +528,7 @@ The output on my laptop looks like this
 2017-09-23  17:31               541 2017_09_23.log
 ```
 
-When you open this log in an editor you should see content similar to this
+When you open this log file in an editor you should see content similar to this
 
 ```
 2017-09-23 17:27:14 INFO::Master info
@@ -546,12 +546,12 @@ When you open this log in an editor you should see content similar to this
 2017-09-23 17:31:22 ERROR::Master error
 ```
 
-As you can see this is very similar to output you saw in console.
+As you can see this is very similar to the output you saw in console.
 
 
 # Step 11 - loggers in packages
 
-R Suite allows you to use loggers in your custom packages. Lets open `hello_world.R` and change its content to the following one
+R Suite allows you to use loggers in your custom packages. Let's open `hello_world.R` and change its content to the following one
 
 ```R
 #'@export
@@ -587,11 +587,11 @@ Loading required package: data.table
 [1] "Hello John!"
 ```
 
-As you can see there are messages from your package. They are marked with package name `mypackage`. Please also note that
-as you used `devtools` in your master script you did not have to build package to see the changes.
+As you can see there are messages from your package. They are marked with the package name `mypackage`. Please also note that
+as you used `devtools` in your master script you did not have to build the package to see the changes.
 
 # Step 12 - Project environment locking 
-RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to execute the following command:
+RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment you have to execute the following command:
 
 ```bash
 rsuite proj lock
@@ -605,7 +605,7 @@ type my_project\deployment\env.lock
 
 When dependencies are being installed using `rsuite proj depsinst` the `env.lock` file will be used to detect whether any package will change versions. If that's the case an appropriate warning message will be displayed. The feature allows to safely deploy packages with specific dependencies' versions. It prevent errors caused by newer versions of packages which might work differently than previous ones used in the project. 
 
-To safely unlock the local project environment we use the following command:
+To safely unlock the local project environment use the following command:
 
 ```bash
 rsuite proj unlock
@@ -647,9 +647,9 @@ Now you have to install dependecies
 rsuite proj depsinst
 ```
 
-As you did not add any new dependencies R Suite smartly understands it and do not repeat lengthy dependencies installation phase.
+As you did not add any new dependencies R Suite smartly understands it and the lengthy dependencies installation phase is not repeated.
 
-Lets build our custom packages
+Let's build our custom packages
 
 ```bash
 rsuite proj build
@@ -662,13 +662,13 @@ You should see the following output
 2017-09-23 17:44:25 INFO:rsuite:Successfuly build 1 packages
 ```
 
-To build a deployment package you use command
+To build a deployment package you use the following command
 
 ```bash
 rsuite proj zip
 ```
 
-You can see that if the project is not under version controll the command returns error. You have to explicitly give version number for your deployment package
+You can see that if the project is not under version control the command returns an error. You have to explicitly give a version number for your deployment package
 
 ```bash
 rsuite proj zip --version=1.0
@@ -684,11 +684,11 @@ The output should be like this
 2017-09-23 17:49:08 INFO:rsuite:Zip file created: C:/Workplace/Projects/my_project/my_project_1.0x.zip
 ```
 
-You have crated file `my_project_1.0x.zip` that contains all information necessary to run your solution on a production environment.
+You have created the `my_project_1.0x.zip` file that contains all information necessary to run your solution on a production environment.
 
 # Step 14 - running deployment package
 
-To test if the deployment package is working you can extract `my_project_1.0x.zip` created in previous step in a new folder say `prod`.
+To test if the deployment package is working you can extract `my_project_1.0x.zip` created in the previous step in a new folder say `prod`.
 Now you can run your solution with the command
 
 ```bash
@@ -707,4 +707,4 @@ The output you should see
 [1] "Hello John!"
 ```
 
-As you can see the output is exactly the same you would expect.
+As you can see the output is exactly the same as you would expect.

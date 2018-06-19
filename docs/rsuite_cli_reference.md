@@ -1,6 +1,6 @@
 # R Suite CLI reference manual
 
-RSuite CLI is command line utility to manage you R projects.
+RSuite CLI is a command line utility to manage you R projects.
 
 It helps you with number of tasks like
 
@@ -10,18 +10,18 @@ It helps you with number of tasks like
 * managing you own local (Dir) or S3 package repositories
 * building PKGZIP to transfer packages and build repositories in connection less environment.
 
-RSuite supports you in developing you R projects in standardized way and help with dependencies control and project consistency management while preparing to deploy on production.
+RSuite supports you in developing you R projects in a standardized way and helps with dependencies control and project consistency management while preparing to deploy on production.
 
 # Requirements
 
 RSuite CLI requires R being available on your machine. Any version will do, but we tested it mostly on v3.2+.
-While running RSuite CLI checks if R is available in PATH environment variable. If it's not it will try 
-to detect R base folder from standard locations. On Windows it will also look in registry to find 
+While running RSuite CLI checks if R is available in the PATH environment variable. If it's not it will try 
+to detect the R base folder from standard locations. On Windows it will also look in the registry to find 
 installed R version.
 
 For working with Subversion and/or Git revision control command line clients respectively svn and git are required.
 
-To manage S3 repositories you will need aws command line client and aws credentials (.aws folder in you home directory).
+To manage S3 repositories you will need the aws command line client and aws credentials (.aws folder in you home directory).
 
 # Installing RSuite
 
@@ -37,7 +37,7 @@ It accepts some advanced options. If you call
 rsuite install -v
 ```
 
-It will log lots of messages on console which can be used to detect reason if any problem with installing RSuite will occur.
+It will log lots of messages to the console which can be used to detect the reason if any problem with installing RSuite will occur.
 
 If you would like to use some specific repository to look for RSuite package instead of default (`http://wlog-rsuite.s3.amazonaws.com`) you can call it like this
 

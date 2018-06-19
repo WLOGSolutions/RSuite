@@ -2,22 +2,22 @@
 
 RSuite is an R package so it is platform independent. We **strongly
 recommend** using R Suite CLI to install R Suite package. But there
-are other options that could fit better your needs.
+are other options that could fit your needs better.
 
 ## **Got stuck?**
 
-If you are stuck fill free to contact us:
+If you are stuck feel free to contact us:
 
 * through RSuite website (http://rsuite.io#contact) or 
 * using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite "RSuite room")
-* directly by sending email with your problem description to [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
+* directly by sending an email with your problem description to [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
 # Requirements
 
 RSuite depends on number of other R packages. On Linux systems they require
 libxml2-devel, libssl-devel, libcurl-devel and zlib-devel system packages.
 
-On RedHat like systems (RedHat/Fedora/CentOS) executing you can install them 
+On RedHat like systems (RedHat/Fedora/CentOS) you can install them 
 with following command:
 
 ```bash
@@ -43,15 +43,15 @@ On Windows it is necessary to have Rtools installed. Rtools contains number of u
 If you have RSuite CLI installed (check [RSuite CLI installation
 reference](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
 "RSuite CLI installation reference.")) already you can use it to
-install latest compatible version of RSuite. Just execute following
-command in you shell:
+install latest compatible version of RSuite. Just execute the following
+command in your shell:
 
 ```bash
 $ rsuite install
 ```
 
 If any problems occur try to run this command in verbose mode. It will probably
-give you hint on why the problem occurred:
+give you hints on why the problem occurred:
 
 ```bash
 $ rsuite install -v
@@ -59,14 +59,14 @@ $ rsuite install -v
 
 # Basic installation
 
-You can simply install RSuite from WLOG S3 repository executing following command
+You can simply install RSuite from WLOG S3 repository executing the following command
 in your R environment:
 
 ```bash
 > install.packages('RSuite', repo = c(options('repos'), 'http://wlog-rsuite.s3.amazonaws.com'))
 ```
 
-It will install latest released version of RSuite in first folder mentioned in 
+It will install the latest released version of RSuite in the first folder mentioned in 
 .libPaths().
 
 The complicated parameter repo instructs install.packages to use beside standard repositories
@@ -74,8 +74,8 @@ also RSuite repository located in S3 bundle.
 
 # Development version installation
 
-RSuite sources are publicly available. You can install development version of 
-RSuite from GitHub execute following code in your R environment:
+RSuite sources are publicly available. You can install the development version of 
+RSuite from GitHub by executing the following code in your R environment:
 
 ```bash
 > devtools::install_github('WLOGSolutions/RSuite/packages/RSuite')
@@ -84,30 +84,29 @@ RSuite from GitHub execute following code in your R environment:
 # Updating RSuite
 
 You can check which version of RSuite is currently installed in your R environment
-with following code:
+with the following code:
 
 ```bash
 > packageVersion("RSuite")
 ```
 
-You can check which version of RSuite is latest released with following code:
+You can check what is the latest released version of RSuite using the following code:
 
 ```bash
 > RSuite::rsuite_check_version()
 ```
 
-You can upgrade RSuite any time executing following code:
+You can upgrade RSuite any time by executing the following code:
 
 ```bash
 > RSuite::rsuite_update()
 ```
 
-It will check if currently installed version of RSuite is up to date and if it's
-not will install latest released version from WLOG repository.
+It will check if the currently installed version of RSuite is up to date and if it's
+not, the latest released version will be installed from the WLOG repository.
 
 **ATTENTION:** RSuite CLI requires compatible version of RSuite to work properly.
-Version of RSuite and RSuite CLI has form <Maj>.<Min>-<Rel>. Compatibility is 
-detected comparing if <Maj>.<Min> match for RSuite and RSuite CLI. Then upgrading
-to latest released version of RSuite compatibility with RSuite CLI can be broken.
+Version of RSuite and RSuite CLI has form \<Maj\>.\<Min\>-\<Rel\>. Compatibility is 
+detected comparing if \<Maj\>.\<Min\> matches for RSuite and RSuite CLI. Then upgrading
+to the latest released version of RSuite compatibility with RSuite CLI can be broken.
 In that case you will need to upgrade RSuite CLI also.
-
