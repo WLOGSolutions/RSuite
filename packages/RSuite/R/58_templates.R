@@ -6,21 +6,45 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Returns the filepath to the requested project template. The function
-#' looks for the template according to the following rules:
-#'     - at first the tmpl parameter is treated as a direct filepath to the template
-#'     - if there is no directory under the filepath, the function assumes that template
-#'       can be found in the default template directory
+#' Retrieves base folder for template.
 #'
-#' Additionaly if the function is looking is searching for the 'builtin template' it will
-#' look for it in the extdata directory in the RSuite package
+#' @param tmpl name of the template in user space. (type: character)
 #'
+#' @return path to the requested template or NULL if template is unknown. (type: character)
 #'
-#' @param tmpl name of the project template
-#'    (type: character).
+#' @keywords internal
+#' @noRd
 #'
-#' @return filepath to the requested project template
-#'    (type: character).
+.get_base_tmpl_dir <- function(tmpl) {
+  assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
+         "Non empty character(1) required for template name")
+
+  base_tmpl_dir <- NULL
+
+  # look for templates in the user templates directory
+  if (tmpl == "builtin") {
+    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
+  } else {
+    user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
+    if (!is.null(user_templ_base_dir)) {
+      base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
+    }
+  }
+
+  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
+    return(NULL)
+  }
+
+  return(base_tmpl_dir)
+
+}
+
+#'
+#' Retrieves path to project template.
+#'
+#' @param tmpl name of the project template or it's path. (type: character)
+#'
+#' @return path to the requested project template or NULL if not found. (type: character)
 #'
 #' @keywords internal
 #' @noRd
@@ -29,31 +53,33 @@ get_prj_tmpl_dir <- function(tmpl) {
   assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
          "Non empty character(1) required for template name")
 
-  # treat the argument as the filepath to the template
-  prj_tmpl_dir <- tmpl
-
-  # look for templates in the default template directory
-  if (!dir.exists(prj_tmpl_dir)) {
-    prj_tmpl_dir <- file.path(get_tmpl_dir(), tmpl, "project")
+  # treat tmpl as the path to the template
+  if (dir.exists(tmpl)) {
+    return(tmpl)
   }
 
-  # look for the builtin template in the extdata directory
-  if (tmpl == "builtin" && !dir.exists(prj_tmpl_dir)) {
-    prj_tmpl_dir <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
+  base_templ_dir <- .get_base_tmpl_dir(tmpl)
+  if (is.null(base_templ_dir)) {
+    return(NULL)
   }
 
-  return(prj_tmpl_dir)
+  prj_templ_dir <- file.path(base_templ_dir, "project")
+  if (!dir.exists(prj_templ_dir)) {
+    return(NULL)
+  }
+
+  return(prj_templ_dir)
 }
 
 
 #'
-#' Returns the filepath to the requested package template
+#' Retrieves path to package template.
 #'
+#' @param tmpl name of the project template or it's path. (type: character)
 #' @param tmpl name of the package template
 #'    (type: character).
 #'
-#' @return filepath to the requested package template
-#'    (type: character).
+#' @return path to the requested package template or NULL if not found. (type: character)
 #'
 #' @keywords internal
 #' @noRd
@@ -62,26 +88,26 @@ get_pkg_tmpl_dir <- function(tmpl) {
   assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
          "Non empty character(1) required for name")
 
-  # treat the argument as the filepath to the template
-  pkg_tmpl_dir <- tmpl
-
-  # look for templates in the base cache directory
-  if (!dir.exists(pkg_tmpl_dir)) {
-    pkg_tmpl_dir <- file.path(get_tmpl_dir(), tmpl, "package")
+  # treat tmpl as the path to the template
+  if (dir.exists(tmpl)) {
+    return(tmpl)
   }
 
-  # look for the builtin template in the extdata directory
-  if (tmpl == "builtin" && !dir.exists(pkg_tmpl_dir)) {
-    pkg_tmpl_dir <- system.file(file.path("extdata", "pkg_template"), package = "RSuite")
+  base_templ_dir <- .get_base_tmpl_dir(tmpl)
+  if (is.null(base_templ_dir)) {
+    return(NULL)
   }
 
+  pkg_templ_dir <- file.path(base_templ_dir, "package")
+  if (!dir.exists(pkg_templ_dir)) {
+    return(NULL)
+  }
 
-  return(pkg_tmpl_dir)
+  return(pkg_templ_dir)
 }
 
 #'
-#' Checks whether the project template contains required files and directories.
-#' All project templates are required to contain a PARAMETERS file
+#' Checks whether the project template contains required files and directories
 #'
 #' @param tmpl name of project template
 #'    (type: character).
@@ -94,10 +120,6 @@ get_pkg_tmpl_dir <- function(tmpl) {
 
 check_prj_tmpl <- function(tmpl) {
   tmpl_dir <- get_prj_tmpl_dir(tmpl)
-  if (!dir.exists(tmpl_dir)) {
-    pkg_logerror("%s template does not exist", tmpl_dir)
-    return(FALSE)
-  }
 
   required_files <- c("PARAMETERS")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
@@ -116,9 +138,8 @@ check_prj_tmpl <- function(tmpl) {
 
 #'
 #' Checks whether the package template contains required files and directories
-#' All package templates are required to contain a DESCRIPTION files:
 #'
-#' @param tmpl name of the package template
+#' @param tmpl name of project template
 #'    (type: character).
 #'
 #' @return TRUE if the template satisfies requirements.
@@ -134,7 +155,7 @@ check_pkg_tmpl <- function(tmpl) {
     return(FALSE)
   }
 
-  required_files <- c("NAMESPACE")
+  required_files <- c("DESCRIPTION", "NAMESPACE", "NEWS")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
 
   requirements_check <- required_files %in% files
@@ -142,10 +163,57 @@ check_pkg_tmpl <- function(tmpl) {
 
   if (!result) {
     pkg_logerror("%s, template does not contain all required files: %s",
-                 tmpl_dir, required_files[!requirements_check])
+                 tmpl, required_files[!requirements_check])
   }
 
   return(all(required_files %in% files))
+}
+
+
+#'
+#' Creates a project based on the given template.
+#'
+#' @param prj_dir project base directory
+#'    (type: character).
+#'
+#' @param tmpl name of project template
+#'    (type: character).
+#'
+#' @return TRUE if the template satisfies requirements.
+#'
+#' @keywords internal
+#' @noRd
+#'
+create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
+  assert(check_prj_tmpl(tmpl), "%s does not satisfy project template requirements.", tmpl)
+
+  # copy template
+  tmpl_dir <- get_prj_tmpl_dir(tmpl)
+  files <- list.files(tmpl_dir, all.files = TRUE, no.. = TRUE)
+
+  success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE)
+  assert(length(success) > 0, "Failed to copy template files.")
+
+  # now replace markers in files
+  files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
+  files <- files[!file.info(files)$isdir]
+
+  keywords <- c(
+    ProjectName = basename(prj_dir),
+    RSuiteVersion = as.character(utils::packageVersion("RSuite")),
+    RVersion = current_rver(), # from 97_rversion.R
+    Date = as.character(Sys.Date()),
+    User = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
+  )
+
+  for (f in files) {
+    lines <- readLines(con = f, warn = FALSE)
+    lines <- replace_markers(keywords, lines)
+    writeLines(lines, con = f)
+  }
+
+  success <- file.rename(files, replace_markers(keywords, files))
+  assert(length(success) > 0, "Failed to rename files in template.")
 }
 
 
@@ -178,9 +246,7 @@ replace_markers <- function(keywords, input) {
 
 
 #'
-#' Returns the default template directory:
-#'     - Windows systems: $TEMP/.rsuite/templates
-#'     - UNIX systems: /etc/.rsuite/templates
+#' Returns the default template directory: 'cache_folder'/templates
 #'
 #' @return filepath to default template directory.
 #'    (type: character)
@@ -189,43 +255,15 @@ replace_markers <- function(keywords, input) {
 #' @noRd
 #'
 get_tmpl_dir <- function() {
-  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-  tmpl_dir <- file.path(cache_base_dir, "templates")
+  tmpl_dir <- get_cache_dir("templates") # from 98_shell.R
+
+  if (.Platform$OS.type == "unix") {
+    tmpl_dir <- file.path("/etc/.rsuite/templates")
+  }
 
   if (!dir.exists(tmpl_dir)) {
     dir.create(tmpl_dir, recursive = TRUE)
   }
 
   return(tmpl_dir)
-}
-
-
-get_global_tmpl_dir <- function() {
-  tmpl_dir <- NULL
-
-  if (.Platform$OS.type == "unix") {
-    tmpl_dir <- file.path("/etc/.rsuite/templates")
-  }
-
-  return(tmpl_dir)
-}
-
-
-get_templates <- function() {
-
-}
-
-
-start_prj_template <- function(name, path) {
-  # check permission
-  assert(file.access(path, -1), "User has no write permissions to %s", path)
-
-  # check if an existing template won't be overwritten
-  tmpl_path <- file.path(path, name, "project")
-  assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
-
-  builtin_template <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
-  copy_folder(builtin_template, tmpl_path) # from 14_setup_structure.R
-
-  pkg_loginfo("%s template was created successfully", name)
 }

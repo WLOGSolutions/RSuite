@@ -225,8 +225,7 @@ rsuite_get_rc_adapter_names <- function() {
 #' Project templates have to include a PARAMETERS file
 #' Package templates have to include the following files: DESCRIPTION
 #'
-#' All templates are stored in the user's local template directory (rsuite.user_templ_path)
-#' .
+#' All templates can be found in folder pointed by rsuite.user_templ_path option.
 #'
 #' @return names of registered project and package templates
 #'

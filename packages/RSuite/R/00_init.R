@@ -5,7 +5,16 @@
 # Package initialization.
 #----------------------------------------------------------------------------
 
+rsuite_default_options <- list(
+  rsuite.cache_path = "", # if unset prevents caching repository content and downloaded packages
+  rsuite.user_templ_path = "" # if unset will prevent using user templates
+)
+
 .onLoad <- function(libpath, pkgname) {
+  op <- options()
+  toset <- !(names(rsuite_default_options) %in% names(op))
+  if(any(toset)) options(rsuite_default_options[toset])
+
   if (length(logging::getLogger()[["handlers"]]) == 0) {
     logging::addHandler(logging::writeToConsole, level = "FINEST")
   }

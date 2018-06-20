@@ -57,8 +57,13 @@ pkg_download <- function(avail_pkgs, dest_dir) {
       return(data.frame(Package = character(0), Version = character(0), stringsAsFactors = FALSE))
     }
 
+    remote_paths <- NULL # just to prevent warning: set in load below
     load(ou_file)
     # TODO: check if packages indeed download. Remove if not
+
+    remote_paths <- as.data.frame(remote_paths, stringsAsFactors = FALSE)
+    colnames(remote_paths) <- c("Package", "Path")
+
     return(remote_paths)
   }
 
@@ -66,34 +71,40 @@ pkg_download <- function(avail_pkgs, dest_dir) {
   local_pkgs <- data.frame()
   if (nrow(remote_pkgs)) {
     # check/build download cache
-    cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-    cache_files <- file.path(cache_base_dir, "dload_cache",
-                             vapply(X = remote_pkgs$Repository,
-                                    FUN = function(repo) utils::URLencode(repo, TRUE),
-                                    FUN.VALUE = ""),
-                             remote_pkgs$File)
-    cache_exists <- file.exists(cache_files)
-    if (!all(cache_exists)) {
-      remote_paths <- do_dload(remote_pkgs[!cache_exists, ])
-      remote_paths <- as.data.frame(remote_paths, stringsAsFactors = FALSE)
-      colnames(remote_paths) <- c("Package", "Path")
+    dload_cache_dir <- get_cache_dir("dload_cache") # from 98_shell.R
+    if (!is.null(dload_cache_dir)) {
+      cache_files <- file.path(dload_cache_dir,
+                               vapply(X = remote_pkgs$Repository,
+                                      FUN = function(repo) utils::URLencode(repo, TRUE),
+                                      FUN.VALUE = ""),
+                               remote_pkgs$File)
+      cache_exists <- file.exists(cache_files)
 
-      try({
-        # cache them
-        suppressWarnings({
-          dir.create(unique(dirname(cache_files[!cache_exists])), recursive = TRUE, showWarnings = FALSE)
-          file.copy(from = remote_paths$Path, to = cache_files[!cache_exists], overwrite = TRUE)
-        })
-      },
-      silent = TRUE)
+      if (!all(cache_exists)) {
+        # Cache files which are not present in cache
+        remote_paths <- do_dload(remote_pkgs[!cache_exists, ])
+
+        try({
+          # cache them
+          suppressWarnings({
+            dir.create(unique(dirname(cache_files[!cache_exists])), recursive = TRUE, showWarnings = FALSE)
+            file.copy(from = remote_paths$Path, to = cache_files[!cache_exists], overwrite = TRUE)
+          })
+        },
+        silent = TRUE)
+      } else {
+        # All files are cached: available locally
+        remote_paths <- data.frame()
+      }
+
+      if (any(cache_exists)) {
+        local_pkgs <- remote_pkgs[cache_exists, ]
+        local_pkgs$Repository <- sprintf("file:///%s", dirname(cache_files[cache_exists]))
+        pkg_logdebug(sprintf("Will install '%s' from cached %s", local_pkgs$Package, local_pkgs$File))
+      }
     } else {
-      remote_paths <- data.frame()
-    }
-
-    if (any(cache_exists)) {
-      local_pkgs <- remote_pkgs[cache_exists, ]
-      local_pkgs$Repository <- sprintf("file:///%s", dirname(cache_files[cache_exists]))
-      pkg_logdebug(sprintf("Will install '%s' from cached %s", local_pkgs$Package, local_pkgs$File))
+      # Caching is off: just download them
+      remote_paths <- do_dload(remote_pkgs)
     }
 
     dloaded <- rbind(dloaded, remote_paths)

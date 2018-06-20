@@ -275,10 +275,9 @@ get_available_packages <- function(path, type, rver) {
 get_curl_available_packages <- function(contrib_url) {
   stopifnot(all(regexpr("^(https?|ftp|file)(://.*)", contrib_url) != -1)) # url expected
 
-  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-  cache_dir <- file.path(cache_base_dir, "repos_cache")
+  repos_cache_dir <- get_cache_dir("repos_cache") # from 98_shell.R
 
-  if (!dir.exists(cache_dir) && !dir.create(cache_dir, recursive = TRUE)) {
+  if (is.null(repos_cache_dir)) {
     curl2cfile <- as.list(rep("", length(contrib_url)))
     names(curl2cfile) <- contrib_url
   } else {
@@ -289,7 +288,7 @@ get_curl_available_packages <- function(contrib_url) {
     cache_curl <- setdiff(contrib_url, noncache_curl)
     if (length(cache_curl)) {
       curl2cfile <- c(curl2cfile,
-                      file.path(cache_dir, paste0(utils::URLencode(cache_curl, TRUE), ".rds")))
+                      file.path(repos_cache_dir, paste0(utils::URLencode(cache_curl, TRUE), ".rds")))
     }
     names(curl2cfile) <- c(noncache_curl, cache_curl)
   }
@@ -375,12 +374,11 @@ clear_available_packages_cache <- function(path, type, rver) {
   r_cache_file <- file.path(tempdir(), paste0("repos_", utils::URLencode(contrib_url, TRUE), ".rds"))
   unlink(r_cache_file, force = TRUE)
 
-  cache_base_dir <- get_cache_base_dir() # from 98_shell.R
-  cache_dir <- file.path(cache_base_dir, "repos_cache")
-  if (dir.exists(cache_dir)
+  repos_cache_dir <- get_cache_dir("repos_cache") # from 98_shell.R
+  if (!is.null(repos_cache_dir)
       && !grepl("^file://", # repository is not local
                 path)) {
-    cache_file <- file.path(cache_dir, paste0(utils::URLencode(contrib_url, TRUE), ".rds"))
+    cache_file <- file.path(repos_cache_dir, paste0(utils::URLencode(contrib_url, TRUE), ".rds"))
     unlink(cache_file, force = TRUE)
   }
 }

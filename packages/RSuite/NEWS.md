@@ -10,6 +10,10 @@
      installed.
   * locking/unlocking of project environment functionality added. 
   * template based project/package creation added
+  * cache (for repository contents and downloaded packages) is stored in location
+     specified by rsuite.cache_path option. If unset caching is totally off.
+  * user templates are detected in folder specified by rsuite.user_templ_path
+     option. If unset no user templates are in use.
 
 # RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 

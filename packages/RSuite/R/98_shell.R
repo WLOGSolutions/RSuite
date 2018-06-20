@@ -218,21 +218,89 @@ rscript_arg <- function(name, val) {
 
 
 #'
-#' Retrieves RSuite cache base directory.
+#' Retrieves path of RSuite cache folder with specified name.
 #'
-#' Usually  it is $TEMP/.rsuite .
+#' Cache folder base path is taken from rsuite.cache_path option. If not specified
+#' repositories contents and downloaded packages will not be cached.
+#'
+#' If folder base is specified and it does not exist or subfolder does not exist,
+#' tries to create it.
+#'
+#' Logs messages (on DEBUG level) if rsuite.cache_path is not set or fails to create
+#'  cache folder.
+#'
+#' @param subname name of subfolder inside cache base folder to retrieve path of.
+#'   If NULL cache base folder will be retrieved. (type: character, default: NULL)
+#'
+#' @return path to cache folder retrieved or NULL if caching is off or
+#'   failed to create cache folder.
 #'
 #' @keywords internal
 #' @noRd
 #'
-get_cache_base_dir <- function() {
-  user_name <- iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
-  cache_base_dir <- file.path(dirname(tempdir()), paste0(".rsuite-", user_name))
+get_cache_dir <- function(subname = NULL) {
+  cache_dir <- options("rsuite.cache_path")
+  if (nchar(cache_dir) == 0) {
+    pkg_logdebug("rsuite.cache_path option is not set; Caching is off.")
+    return()
+  }
+
+  if (!is.null(subname)) {
+    cache_dir <- file.path(cache_dir, subname)
+  }
+
   if (.Platform$OS.type == "windows") {
-    cache_base_dir <- utils::shortPathName(cache_base_dir)
+    cache_dir <- utils::shortPathName(cache_dir)
   }
-  if (!dir.exists(cache_base_dir)) {
-    dir.create(cache_base_dir, recursive = TRUE)
+
+  if (!dir.exists(cache_dir)) {
+    created <- dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+    if (!created) {
+      pkg_logdebug("Failed to create folder for caching (%s); Caching is off.", cache_dir)
+      return()
+    }
   }
-  return(cache_base_dir)
+
+  return(cache_dir)
+}
+
+#'
+#' Retrieves folder there user package and project templates are located.
+#'
+#' Folder path is taken from rsuite.user_templ_path option. If not specified
+#' user templates will not be used.
+#'
+#' @param create if TRUE will create user templates folder (if specified).
+#'   (type: logical(1), default: FALSE)
+#'
+#' @return path to user templates folder retrieved or NULL if not specified or
+#'   failed to create.
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_user_templ_base_dir <- function(create = FALSE) {
+  user_templ_base_dir <- options("rsuite.user_templ_path")
+  if (nchar(user_templ_base_dir) == 0) {
+    return()
+  }
+
+  if (.Platform$OS.type == "windows") {
+    user_templ_base_dir <- utils::shortPathName(user_templ_base_dir)
+  }
+
+  if (dir.exists(user_templ_base_dir)) {
+    return(user_templ_base_dir)
+  }
+
+  if (!any(create)) {
+    return()
+  }
+
+  if (dir.create(user_templ_base_dir, recursive = TRUE, showWarnings = FALSE)) {
+    return(user_templ_base_dir)
+  }
+
+  pkg_logwarn("Failed to create folder for user project and package templates (%s)", user_templ_base_dir)
+  return()
 }
