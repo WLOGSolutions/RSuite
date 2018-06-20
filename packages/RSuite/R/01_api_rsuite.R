@@ -351,10 +351,12 @@ rsuite_register_template <- function(path = NULL, global = FALSE) {
   assert(!is.null(path), "No template path specified.")
   assert(dir.exists(path), "Directory does not exist.")
 
-  tmpl_dir <- get_user_templ_base_dir(create = TRUE)
   if (global) {
     tmpl_dir <- get_global_tmpl_dir()
     assert(!is.null(tmpl_dir), "Global template directory error.")
+  } else{
+    tmpl_dir <- get_user_templ_base_dir(create = TRUE)
+    assert(!is.null(tmpl_dir), "Local templates directory is not defined(rsuite.user_templ_path)")
   }
 
   tmpl_dir <- file.path(tmpl_dir, basename(path))
