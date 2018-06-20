@@ -233,7 +233,7 @@ create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
   tmpl_dir <- get_prj_tmpl_dir(tmpl) # from 58_templates.R
   files <- list.files(tmpl_dir, all.files = TRUE, no.. = TRUE)
 
-  success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE)
+  success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE, overwrite = FALSE)
   assert(length(success) > 0, "Failed to copy template files.")
 
   # now replace markers in files
