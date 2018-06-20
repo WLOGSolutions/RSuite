@@ -317,6 +317,7 @@ get_user_templ_base_dir <- function(create = FALSE) {
 #' @noRd
 get_global_tmpl_dir <- function() {
   if (.Platform$OS.type != "unix") {
+    pkg_logerror("The global template directory does not concern non-linux users!")
     return(NULL)
   }
 

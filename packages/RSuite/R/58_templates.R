@@ -198,6 +198,14 @@ replace_markers <- function(keywords, input) {
 }
 
 
+#' Returns all available of project/package templates
+#'
+#' @return names of registered project and package templates together with their
+#' filepath
+#'
+#' @keywords internal
+#' @noRd
+#'
 get_templates <- function() {
   # look for builtin templates
   builtin_tmpl_dir <- .get_base_tmpl_dir("builtin")
@@ -242,6 +250,17 @@ get_templates <- function() {
   return(templates)
 }
 
+#' Creates a new project template with the specified name, in the specified path.
+#'
+#' @param name name of the template being created
+#' (type: character)
+#'
+#' @param path path to the directory where the template should be created
+#' (type: character, default: NA)
+#'
+#' @keywords internal
+#' @noRd
+#'
 start_prj_template <- function(name, path) {
   # check permissions
   assert(file.access(path, mode = 2) == 0, "User has no write permission to %s", path)
@@ -260,12 +279,22 @@ start_prj_template <- function(name, path) {
   builtin_prj_template <- system.file(file.path("extdata", "builtin_templates", "project"), package = "RSuite")
   success <- file.copy(from = builtin_prj_template, to = dirname(prj_tmpl_path), recursive = TRUE, copy.mode = TRUE)
   assert(success, "Failed to copy default builtin template to %s", prj_tmpl_path)
-
   pkg_loginfo("%s template was created successfully", name)
 }
 
 
 
+#' Creates a new package template with the specified name, in the specified path.
+#'
+#' @param name name of the template being created
+#' (type: character)
+#'
+#' @param path path to the directory where the template should be created
+#' (type: character, default: NA)
+#'
+#' @keywords internal
+#' @noRd
+#'
 start_pkg_template <- function(name, path) {
   # check permissions
   assert(file.access(path, mode = 2) == 0, "User has no write permission to %s", path)
@@ -282,6 +311,5 @@ start_pkg_template <- function(name, path) {
 
   builtin_template <- system.file(file.path("extdata", "builtin_templates", "package"), package = "RSuite")
   copy_folder(builtin_template, pkg_tmpl_path)
-
   pkg_loginfo("%s template was created successfully", name)
 }

@@ -219,7 +219,7 @@ rsuite_get_rc_adapter_names <- function() {
 
 
 #'
-#' Returns all names of project/package templates from the default template directory
+#' Returns all available of project/package templates
 #'
 #' @details
 #' Project templates have to include a PARAMETERS file
@@ -227,7 +227,8 @@ rsuite_get_rc_adapter_names <- function() {
 #'
 #' All templates can be found in folder pointed by rsuite.user_templ_path option.
 #'
-#' @return names of registered project and package templates
+#' @return names of registered project and package templates together with their
+#' filepath
 #'
 #' @family miscellaneous
 #'
@@ -317,4 +318,49 @@ rsuite_start_pkg_template <- function(name = NULL,
          "Invalid template name %s. It must not contain special characters", name)
 
   start_pkg_template(name, path)
+}
+
+
+#'
+#' Registers the template specified with the path argument.
+#'
+#' @details
+#' All templates have specific requirements:
+#'     Project templates have to contain a PARAMETERS file.
+#'     Package templates have to contain a DESCRIPTION file.
+#'
+#' The user's local template directory is taken from the
+#' rsuite.user_templ_path option. The global template is specified
+#' as '/etc/.rsuite/templates' and only concerns linux platforms
+#'
+#' @family miscellaneous
+#'
+#' @param path path to the directory where the template should be created
+#' (type: character, default: NA)
+#'
+#' @param global flag specifying if the template will be registerd in the user's
+#' local template directory (taken from rsuite.user_templ_path) or in the global
+#' template directory (/etc/.rsuite/templates on Linxu platforms)
+#'
+#' @examples
+#' rsuite_register_template("../MyExistingTemplate")
+#'
+#' @export
+#'
+rsuite_register_template <- function(path = NULL, global = FALSE) {
+  assert(!is.null(path), "No template path specified.")
+  assert(dir.exists(path), "Directory does not exist.")
+
+  tmpl_dir <- get_user_templ_base_dir(create = TRUE)
+  if (global) {
+    tmpl_dir <- get_global_tmpl_dir()
+    assert(!is.null(tmpl_dir), "Global template directory error.")
+  }
+
+  tmpl_dir <- file.path(tmpl_dir, basename(path))
+  assert(!dir.exists(tmpl_dir), "There is already a template named %s registered.", basename(tmpl_dir))
+
+  success <- copy_folder(from = path, to = tmpl_dir) # from 14_setup_structure.R
+  assert(success, "Faile to copy %s to %s", path, tmpl_dir)
+  pkg_loginfo("%s template was registered successfully", path)
 }
