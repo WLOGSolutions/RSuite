@@ -155,7 +155,7 @@ check_pkg_tmpl <- function(tmpl) {
     return(FALSE)
   }
 
-  required_files <- c("DESCRIPTION", "NAMESPACE", "NEWS")
+  required_files <- c("DESCRIPTION")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
 
   requirements_check <- required_files %in% files
@@ -167,53 +167,6 @@ check_pkg_tmpl <- function(tmpl) {
   }
 
   return(all(required_files %in% files))
-}
-
-
-#'
-#' Creates a project based on the given template.
-#'
-#' @param prj_dir project base directory
-#'    (type: character).
-#'
-#' @param tmpl name of project template
-#'    (type: character).
-#'
-#' @return TRUE if the template satisfies requirements.
-#'
-#' @keywords internal
-#' @noRd
-#'
-create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
-  assert(check_prj_tmpl(tmpl), "%s does not satisfy project template requirements.", tmpl)
-
-  # copy template
-  tmpl_dir <- get_prj_tmpl_dir(tmpl)
-  files <- list.files(tmpl_dir, all.files = TRUE, no.. = TRUE)
-
-  success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE)
-  assert(length(success) > 0, "Failed to copy template files.")
-
-  # now replace markers in files
-  files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
-  files <- files[!file.info(files)$isdir]
-
-  keywords <- c(
-    ProjectName = basename(prj_dir),
-    RSuiteVersion = as.character(utils::packageVersion("RSuite")),
-    RVersion = current_rver(), # from 97_rversion.R
-    Date = as.character(Sys.Date()),
-    User = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
-  )
-
-  for (f in files) {
-    lines <- readLines(con = f, warn = FALSE)
-    lines <- replace_markers(keywords, lines)
-    writeLines(lines, con = f)
-  }
-
-  success <- file.rename(files, replace_markers(keywords, files))
-  assert(length(success) > 0, "Failed to rename files in template.")
 }
 
 
@@ -245,25 +198,46 @@ replace_markers <- function(keywords, input) {
 }
 
 
-#'
-#' Returns the default template directory: 'cache_folder'/templates
-#'
-#' @return filepath to default template directory.
-#'    (type: character)
-#'
-#' @keywords internal
-#' @noRd
-#'
-get_tmpl_dir <- function() {
-  tmpl_dir <- get_cache_dir("templates") # from 98_shell.R
+start_prj_template <- function(name, path) {
+  # check permissions
+  assert(file.access(path, mode = 2) == 0, "User has no write permission to %s", path)
 
-  if (.Platform$OS.type == "unix") {
-    tmpl_dir <- file.path("/etc/.rsuite/templates")
+  # create template directory
+  tmpl_path <- file.path(path, name)
+  if (!dir.exists(tmpl_path)) {
+    success <- dir.create(tmpl_path, recursive = TRUE)
+    assert(success, "Failed to create directory %s", normalizePath(tmpl_path))
   }
 
-  if (!dir.exists(tmpl_dir)) {
-    dir.create(tmpl_dir, recursive = TRUE)
+  # finally create project template
+  prj_tmpl_path <- file.path(path, name, "project")
+  assert(!dir.exists(prj_tmpl_path), "%s template already exists.", normalizePath(prj_tmpl_path))
+
+  builtin_prj_template <- system.file(file.path("extdata", "builtin_templates", "project"), package = "RSuite")
+  success <- file.copy(from = builtin_prj_template, to = dirname(prj_tmpl_path), recursive = TRUE, copy.mode = TRUE)
+  assert(success, "Failed to copy default builtin template to %s", prj_tmpl_path)
+
+  pkg_loginfo("%s template was created successfully", name)
+}
+
+
+
+start_pkg_template <- function(name, path) {
+  # check permissions
+  assert(file.access(path, mode = 2) == 0, "User has no write permission to %s", path)
+
+  # create template directory
+  tmpl_path <- file.path(path, name)
+  if (!dir.exists(tmpl_path)) {
+    success <- dir.create(tmpl_path, recursive = TRUE)
+    assert(success, "Failed to create directory %s", normalizePath(tmpl_path))
   }
 
-  return(tmpl_dir)
+  pkg_tmpl_path <- file.path(path, name, "package")
+  assert(!dir.exists(pkg_tmpl_path), "%s folder already exists.", normalizePath(pkg_tmpl_path))
+
+  builtin_template <- system.file(file.path("extdata", "builtin_templates", "package"), package = "RSuite")
+  copy_folder(builtin_template, pkg_tmpl_path)
+
+  pkg_loginfo("%s template was created successfully", name)
 }

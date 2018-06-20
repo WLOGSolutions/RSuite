@@ -280,7 +280,7 @@ get_cache_dir <- function(subname = NULL) {
 #' @noRd
 #'
 get_user_templ_base_dir <- function(create = FALSE) {
-  user_templ_base_dir <- options("rsuite.user_templ_path")
+  user_templ_base_dir <- file.path(options("rsuite.user_templ_path"))
   if (nchar(user_templ_base_dir) == 0) {
     return()
   }

@@ -302,7 +302,7 @@ rsuite_get_templates <- function() {
 rsuite_start_prj_template <- function(name = NULL,
                                       path = NA) {
   if (is.na(path)) {
-    path <- get_tmpl_dir() # create template in local user's environment template directory
+    path <- get_user_templ_base_dir(create = TRUE) # from 98_shell.R
   }
 
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
@@ -341,7 +341,7 @@ rsuite_start_prj_template <- function(name = NULL,
 rsuite_start_pkg_template <- function(name = NULL,
                                       path = NA) {
   if (is.na(path)) {
-    path <- get_tmpl_dir()
+    path <- get_user_templ_base_dir(create = TRUE) # from 98_shell.R
   }
 
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
@@ -352,11 +352,5 @@ rsuite_start_pkg_template <- function(name = NULL,
   assert(!grepl("[\\/\"\'<>_]+", name),
          "Invalid template name %s. It must not contain special characters", name)
 
-  tmpl_path <- file.path(path, name, "package")
-  assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
-
-  builtin_template <- system.file(file.path("extdata", "pkg_template"), package = "RSuite")
-  copy_folder(builtin_template, tmpl_path)
-
-  pkg_loginfo("%s template was created successfully", name)
+  start_pkg_template(name, path)
 }

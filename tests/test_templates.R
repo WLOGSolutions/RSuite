@@ -56,14 +56,10 @@ test_that_managed("Package creation from builtin template", {
     "DESCRIPTION",
     "NAMESPACE",
     "NEWS",
-    "data",
-    "inst",
-    "man",
     "R",
     "R/package_logger.R",
     "R/package_validation.R",
-    "R/packages_import.R",
-    "tests"
+    "R/packages_import.R"
   )
 
   # retrieve all files from the created package
@@ -74,8 +70,7 @@ test_that_managed("Package creation from builtin template", {
   expect_true(all(expected_files %in% pkg_files))
 })
 
-
-test_that_managed("Project template creation", {
+test_that_managed("Project template creation in user local path", {
   # create project template
   create_prj_test_template(name = "TestTemplate")
 
@@ -89,9 +84,31 @@ test_that_managed("Project template creation", {
   expected_files <- c(
     ".Rprofile",
     "config_templ.txt",
-    "logs",
     "__ProjectName__.Rproj",
-    "packages",
+    "PARAMETERS",
+    "R/.Rprofile",
+    "R/master.R",
+    "R/set_env.R",
+    "tests/__ProjectName___Tests.Rproj",
+    "tests/.Rprofile"
+  )
+})
+
+test_that_managed("Project template creation in specified path", {
+  # create project template
+  create_prj_test_template(name = "TestTemplate", path = get_wspace_dir())
+
+  # check if template was created
+  tmpl_path <- file.path(get_wspace_dir(), "TestTemplate", "project")
+  expect_true(dir.exists(tmpl_path))
+
+  # check if template contains files from default template
+  tmpl_files <- list.files(tmpl_path, all.files = TRUE, recursive = TRUE,
+                           include.dirs = TRUE, no.. = TRUE)
+  expected_files <- c(
+    ".Rprofile",
+    "config_templ.txt",
+    "__ProjectName__.Rproj",
     "PARAMETERS",
     "R/.Rprofile",
     "R/master.R",
@@ -104,7 +121,8 @@ test_that_managed("Project template creation", {
 })
 
 
-test_that_managed("Package template creation", {
+
+test_that_managed("Package template creation in local user default path", {
   # create project template
   create_pkg_test_template(name = "TestTemplate")
 
@@ -121,21 +139,76 @@ test_that_managed("Package template creation", {
     "DESCRIPTION",
     "NAMESPACE",
     "NEWS",
-    "data",
-    "inst",
-    "man",
     "R",
     "R/package_logger.R",
     "R/package_validation.R",
-    "R/packages_import.R",
-    "tests"
+    "R/packages_import.R"
+  )
+
+  expect_true(all(expected_files %in% tmpl_files))
+})
+
+test_that_managed("Package template creation in specified path", {
+  # create project template
+  create_pkg_test_template(name = "TestTemplate", path = get_wspace_dir())
+
+  # check if template was created
+  tmpl_path <- file.path(get_wspace_dir(), "TestTemplate", "package")
+  expect_true(dir.exists(tmpl_path))
+
+  # check if template contains files from default template
+  tmpl_files <- list.files(tmpl_path, all.files = TRUE, recursive = TRUE,
+                           include.dirs = TRUE, no.. = TRUE)
+  expected_files <- c(
+    "__PackageName__.Rproj",
+    ".Rprofile",
+    "DESCRIPTION",
+    "NAMESPACE",
+    "NEWS",
+    "R",
+    "R/package_logger.R",
+    "R/package_validation.R",
+    "R/packages_import.R"
   )
 
   expect_true(all(expected_files %in% tmpl_files))
 })
 
 
-test_that_managed("Project creation using custom template", {
+
+test_that_managed("Project creation using custom template defined in user's local path", {
+  # create project template not
+  create_prj_test_template(name = "TestTemplate")
+
+  # create project using custom template
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "TestTemplate")
+
+  params <- prj$load_params()
+
+  expected_files <- c(
+    ".Rprofile",
+    "config_templ.txt",
+    "deployment/libs",
+    "deployment/sbox",
+    "logs",
+    "TestProject.Rproj",
+    "packages",
+    "PARAMETERS",
+    "R/.Rprofile",
+    "R/master.R",
+    "R/set_env.R",
+    "tests/TestProject_Tests.Rproj",
+    "tests/.Rprofile"
+  )
+
+  prj_files <- list.files(params$prj_path, all.files = TRUE,
+                          recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
+
+  expect_true(all(expected_files %in% prj_files))
+})
+
+
+test_that_managed("Project creation using custom template (path as argument)", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
@@ -172,7 +245,39 @@ test_that_managed("Project creation using custom template", {
 })
 
 
-test_that_managed("Package creation using custom template", {
+
+test_that_managed("Package creation using custom template defined in user's local directory", {
+  # create project template not
+  create_pkg_test_template(name = "TestTemplate")
+  
+  # create package using custom template
+  prj <- init_test_project(repo_adapters = c("Dir"))
+  create_test_package("TestPackage", prj = prj, tmpl = "TestTemplate")
+
+
+  expected_files <- c(
+    "TestPackage.Rproj",
+    ".Rprofile",
+    "DESCRIPTION",
+    "NAMESPACE",
+    "NEWS",
+    "R",
+    "R/package_logger.R",
+    "R/package_validation.R",
+    "R/packages_import.R"
+  )
+
+  # retrieve all files from the created package
+  params <- prj$load_params()
+  pkg_files <- list.files(file.path(params$pkgs_path, "TestPackage"),
+                          all.files = TRUE, recursive = TRUE,
+                          include.dirs = TRUE, no.. = TRUE)
+
+  expect_true(all(expected_files %in% pkg_files))
+})
+
+
+test_that_managed("Package creation using custom template (path as argument)", {
   # create project template not
   create_pkg_test_template(name = "TestTemplate")
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
@@ -192,14 +297,10 @@ test_that_managed("Package creation using custom template", {
     "DESCRIPTION",
     "NAMESPACE",
     "NEWS",
-    "data",
-    "inst",
-    "man",
     "R",
     "R/package_logger.R",
     "R/package_validation.R",
     "R/packages_import.R",
-    "tests",
     "TestPackage.txt"
   )
 
@@ -212,10 +313,7 @@ test_that_managed("Package creation using custom template", {
   expect_true(all(expected_files %in% pkg_files))
 })
 
-
-
-test_that_managed("Project creation using template
-                  not containing the PARAMETERS file", {
+test_that_managed("Project creation using template not containing the PARAMETERS file", {
   # create project template
   create_prj_test_template(name = "TestTemplate")
 
@@ -228,14 +326,13 @@ test_that_managed("Project creation using template
 })
 
 
-test_that_managed("Package creation using template
-                  not containing the NAMESPACE file", {
+test_that_managed("Package creation using template not containing the DESCRIPTION file", {
   # create package template
   create_pkg_test_template(name = "TestTemplate")
 
   # remove required PARAMETERS file
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
-  unlink(file.path(tmpl_path, "NAMESPACE"))
+  unlink(file.path(tmpl_path, "DESCRIPTION"))
 
   prj <- init_test_project(name = "TestProject")
 
