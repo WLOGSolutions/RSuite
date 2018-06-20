@@ -237,43 +237,7 @@ rsuite_get_rc_adapter_names <- function() {
 #' @export
 #'
 rsuite_get_templates <- function() {
-  # look for templates in the local user's environment
-  tmpls <- c()
-  local_tmpl_dir <- get_tmpl_dir() # from 58_templates.R
-  if (!is.null(local_tmpl_dir)) {
-    tmpls <- list.dirs(get_tmpl_dir(), recursive = FALSE,
-                            full.names = TRUE)
-  } else {
-    pkg_logwarn("User template folder is not specified. Please set the rsuite.user_templ_path option to point to the folder containing user templates")
-  }
-  # look for templates in the global environment
-  global_tmpl_dir <- get_global_tmpl_dir() # from 58_templates.R
-  if (!is.null(global_tmpl_dir)) {
-    tmpls <- c(tmpls, list.dirs(get_global_tmpl_dir(),
-                                          recursive = FALSE, full.names = TRUE))
-  }
-
-  # case if there is no template and if both directories do not exist
-  if (length(tmpls) == 0) {
-    pkg_loginfo("No templates available")
-    return(invisible())
-  }
-
-  # look for project/package templates
-  prj_tmpl <- tmpls[dir.exists(file.path(tmpls, 'project'))]
-  pkg_tmpl <- tmpls[dir.exists(file.path(tmpls, 'package'))]
-
-  # prepare results
-  tmpl_names <- basename(c(prj_tmpl, pkg_tmpl))
-  tmpl_types <- c(rep("project", length(prj_tmpl)), rep("package", length(pkg_tmpl)))
-  tmpl_paths <- c(prj_tmpl, pkg_tmpl)
-
-  result = data.frame(
-    Name = tmpl_names,
-    Type = tmpl_types,
-    Path = tmpl_paths
-  )
-
+  result <- get_templates()
   return(result[order(result$Name),])
 }
 

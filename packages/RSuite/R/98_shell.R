@@ -265,7 +265,7 @@ get_cache_dir <- function(subname = NULL) {
 }
 
 #'
-#' Retrieves folder there user package and project templates are located.
+#' Retrieves folder where user package and project templates are located.
 #'
 #' Folder path is taken from rsuite.user_templ_path option. If not specified
 #' user templates will not be used.
@@ -280,7 +280,7 @@ get_cache_dir <- function(subname = NULL) {
 #' @noRd
 #'
 get_user_templ_base_dir <- function(create = FALSE) {
-  user_templ_base_dir <- file.path(options("rsuite.user_templ_path"))
+  user_templ_base_dir <- file.path(options("rsuite.user_templ_path")) # hack? will look for prettier way to do it
   if (nchar(user_templ_base_dir) == 0) {
     return()
   }
@@ -303,4 +303,25 @@ get_user_templ_base_dir <- function(create = FALSE) {
 
   pkg_logwarn("Failed to create folder for user project and package templates (%s)", user_templ_base_dir)
   return()
+}
+
+#'
+#' Retrieves the folder where global package and project templates are located.
+#'
+#' This path only concerns Linux users as it returns the '/etc/.rsuite/templates' path
+#'
+#' @return path to global templates folder retrieved or NULL (if does not exist or
+#' working on Windows platform)
+#'
+#' @keywords internal
+#' @noRd
+get_global_tmpl_dir <- function() {
+  if (.Platform$OS.type != "unix") {
+    return(NULL)
+  }
+
+  global_tmpl_dir <- '/etc/.rsuite/templates'
+
+  result <- ifelse(dir.exists(global_tmpl_dir), global_tmpl_dir, NULL)
+  return(result)
 }
