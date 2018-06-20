@@ -22,23 +22,16 @@
   base_tmpl_dir <- NULL
 
   # look for templates in the user templates directory
-  if (tmpl == "builtin") {
-    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
-  } else {
-    # look for template in user's local default template directory
-    user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
-    if (!is.null(user_templ_base_dir)) {
-      base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
-    }
+  user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
+  if (!is.null(user_templ_base_dir)) {
+    base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
+  }
 
-    # the template wasn't found in the local default template directory
-    # look for it in the global template directory
-    if (!dir.exists(base_tmpl_dir)) {
-      global_tmpl_dir <- get_global_tmpl_dir()
-      if (!is.null(global_tmpl_dir)) {
-        base_tmpl_dir <- file.path(global_tmpl_dir, tmpl)
-      }
+  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
+    if (tmpl != "builtin") {
+      return()
     }
+    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
   }
 
   if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
@@ -46,7 +39,6 @@
   }
 
   return(base_tmpl_dir)
-
 }
 
 #'
@@ -329,4 +321,36 @@ start_pkg_template <- function(name, path) {
   builtin_template <- system.file(file.path("extdata", "builtin_templates", "package"), package = "RSuite")
   copy_folder(builtin_template, pkg_tmpl_path)
   pkg_loginfo("%s template was created successfully", name)
+}
+#'
+#' @return path to the requested template or NULL if template is unknown. (type: character)
+#'
+#' @keywords internal
+#' @noRd
+#'
+.get_base_tmpl_dir <- function(tmpl) {
+  assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
+         "Non empty character(1) required for template name")
+
+  base_tmpl_dir <- NULL
+
+  # look for templates in the user templates directory
+  user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
+  if (!is.null(user_templ_base_dir)) {
+    base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
+  }
+
+  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
+    if (tmpl != "builtin") {
+      return()
+    }
+    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
+  }
+
+  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
+    return(NULL)
+  }
+
+  return(base_tmpl_dir)
+
 }
