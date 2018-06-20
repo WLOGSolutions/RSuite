@@ -243,37 +243,3 @@ test_that_managed("Package creation using template
                                    prj = prj, tmpl = tmpl_path),
                regexp = "does not satisfy package template requirements")
 })
-
-
-test_that_managed("Package creation using template
-                  not containing the DESCRIPTION file", {
-  # create package template
-  create_pkg_test_template(name = "TestTemplate")
-
-  # remove required PARAMETERS file
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
-  unlink(file.path(tmpl_path, "DESCRIPTION"))
-
-  prj <- init_test_project(name = "TestProject")
-
-  expect_error(create_test_package(name = "TestPackage",
-                                   prj = prj, tmpl = tmpl_path),
-               regexp = "does not satisfy package template requirements")
-})
-
-
-test_that_managed("Package creation using template
-                  not containing the NEWS file", {
-  # create package template
-  create_pkg_test_template(name = "TestTemplate")
-
-  # remove required PARAMETERS file
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
-  unlink(file.path(tmpl_path, "NEWS"))
-
-  prj <- init_test_project(name = "TestProject")
-
-  expect_error(create_test_package(name = "TestPackage",
-                                   prj = prj, tmpl = tmpl_path),
-               regexp = "does not satisfy package template requirements")
-})

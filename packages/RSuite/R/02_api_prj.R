@@ -233,8 +233,8 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
 #'    project from working directory. (type: rsuite_project, default: NULL)
 #' @param skip_rc if TRUE skip adding package under revision control.
 #'    (type: logical, default: FALSE)
-#' @param tmpl name of the package template available in $TEMP/.rsuite/templates/packages
-#' or filepath to the package template
+#' @param tmpl name of the package template available in the default template
+#' directory in the local user's environment
 #'    (type: character).
 #'
 #' @family in project management

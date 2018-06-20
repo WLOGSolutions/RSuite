@@ -219,14 +219,14 @@ rsuite_get_rc_adapter_names <- function() {
 
 
 #'
-#' Returns all names of project/package templates that satisfy
-#' requirements:
+#' Returns all names of project/package templates from the default template directory
 #'
+#' @details
 #' Project templates have to include a PARAMETERS file
-#' Package templates have to include the following files: DESCRIPTION, NAMESPACE, NEWS
+#' Package templates have to include the following files: DESCRIPTION
 #'
-#' All templates can be found in the cashe directory (see get_cache_base_dir) in 98_shell.R
-#' for more details.
+#' All templates are stored in the user's local template directory (rsuite.user_templ_path)
+#' .
 #'
 #' @return names of registered project and package templates
 #'
@@ -238,44 +238,54 @@ rsuite_get_rc_adapter_names <- function() {
 #' @export
 #'
 rsuite_get_templates <- function() {
-  tmpl_dirs <- list.dirs(get_tmpl_dir(),
-                         recursive = FALSE, full.names = FALSE)
+  # look for templates in the local user's environment
+  tmpls <- c()
+  local_tmpl_dir <- get_tmpl_dir() # from 58_templates.R
+  if (!is.null(local_tmpl_dir)) {
+    tmpls <- list.dirs(get_tmpl_dir(), recursive = FALSE,
+                            full.names = TRUE)
+  } else {
+    pkg_logwarn("User template folder is not specified. Please set the rsuite.user_templ_path option to point to the folder containing user templates")
+  }
+  # look for templates in the global environment
+  global_tmpl_dir <- get_global_tmpl_dir() # from 58_templates.R
+  if (!is.null(global_tmpl_dir)) {
+    tmpls <- c(tmpls, list.dirs(get_global_tmpl_dir(),
+                                          recursive = FALSE, full.names = TRUE))
+  }
 
-  if (length(tmpl_dirs) == 0) {
+  # case if there is no template and if both directories do not exist
+  if (length(tmpls) == 0) {
     pkg_loginfo("No templates available")
     return(invisible())
   }
 
-  prj_tmpl <- tmpl_dirs
-  pkg_tmpl <- tmpl_dirs
+  # look for project/package templates
+  prj_tmpl <- tmpls[dir.exists(file.path(tmpls, 'project'))]
+  pkg_tmpl <- tmpls[dir.exists(file.path(tmpls, 'package'))]
 
-  # remove templates that don't satisfy requirements
-  prj_tmpl <- prj_tmpl[sapply(prj_tmpl, check_prj_tmpl)]
-  pkg_tmpl <- pkg_tmpl[sapply(pkg_tmpl, check_pkg_tmpl)]
+  # prepare results
+  tmpl_names <- basename(c(prj_tmpl, pkg_tmpl))
+  tmpl_types <- c(rep("project", length(prj_tmpl)), rep("package", length(pkg_tmpl)))
+  tmpl_paths <- c(prj_tmpl, pkg_tmpl)
 
-  if (length(prj_tmpl) == 0) {
-    prj_tmpl <- NULL
-  }
+  result = data.frame(
+    Name = tmpl_names,
+    Type = tmpl_types,
+    Path = tmpl_paths
+  )
 
-  if (length(pkg_tmpl) == 0) {
-    pkg_tmpl <- NULL
-  }
-
-  tmpl_list <- list(unlist(prj_tmpl), unlist(pkg_tmpl))
-  names(tmpl_list) <- c("Project Templates", "Package Templates")
-
-  return(tmpl_list)
+  return(result[order(result$Name),])
 }
 
 #'
 #' Creates a new project template with the specified name, in the specified path.
 #'
-#' Project templates have to include a PARAMETERS file
+#' @details
+#' Project templates are required to include a PARAMETERS file
 #'
-#' If there is no path argument provided. The function will look for the
-#' template in the default template folder:
-#'     Unix: 'etc/.rsuite/templates'
-#'     Windows: '$TEMP/.rsuite/templates
+#' If there is no path argument provided. The function will create the
+#' template in the default template folder in the user's local environment
 #'
 #' @param name name of the template being created
 #' (type: character)
@@ -293,7 +303,7 @@ rsuite_get_templates <- function() {
 rsuite_start_prj_template <- function(name = NULL,
                                       path = NA) {
   if (is.na(path)) {
-    path <- get_tmpl_dir()
+    path <- get_tmpl_dir() # create template in local user's environment template directory
   }
 
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
@@ -304,26 +314,17 @@ rsuite_start_prj_template <- function(name = NULL,
   assert(!grepl("[\\/\"\'<>_]+", name),
          "Invalid template name %s. It must not contain special characters", name)
 
-  tmpl_path <- file.path(path, name, "project")
-  assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
-
-  builtin_template <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
-  copy_folder(builtin_template, tmpl_path)
-
-  pkg_loginfo("%s template was created successfully", name)
+  start_prj_template(name, path) # from 58_templates
 }
 
 #'
-#' Creates a new project template with the specified name, in the specified path.
+#' Creates a new package template with the specified name, in the specified path.
 #'
+#' @details
+#' Package templates are required to include a DESCRIPTION file
 #'
-#' Project templates have to include a PARAMETERS file
-#' Package templates have to include the following files: DESCRIPTION, NAMESPACE, NEWS
-#'
-#' If there is no path argument provided. The function will look for the
-#' template in the default template folder:
-#'     Unix: 'etc/.rsuite/templates'
-#'     Windows: '$TEMP/.rsuite/templates
+#' If there is no path argument provided. The function will create the
+#' template in the default template folder in the user's local environment
 #'
 #' @family miscellaneous
 #'
