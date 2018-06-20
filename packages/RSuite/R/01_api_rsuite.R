@@ -225,8 +225,7 @@ rsuite_get_rc_adapter_names <- function() {
 #' Project templates have to include a PARAMETERS file
 #' Package templates have to include the following files: DESCRIPTION, NAMESPACE, NEWS
 #'
-#' All templates can be found in the cashe directory (see get_cache_base_dir) in 98_shell.R
-#' for more details.
+#' All templates can be found in folder pointed by rsuite.user_templ_path option.
 #'
 #' @return names of registered project and package templates
 #'
@@ -307,7 +306,7 @@ rsuite_start_prj_template <- function(name = NULL,
   tmpl_path <- file.path(path, name, "project")
   assert(!dir.exists(tmpl_path), "%s folder already exists.", normalizePath(tmpl_path))
 
-  builtin_template <- system.file(file.path("extdata", "prj_template"), package = "RSuite")
+  builtin_template <- get_prj_tmpl_dir("builtin") # from 58_templates.R
   copy_folder(builtin_template, tmpl_path)
 
   pkg_loginfo("%s template was created successfully", name)
