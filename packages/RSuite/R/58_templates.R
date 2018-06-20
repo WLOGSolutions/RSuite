@@ -22,13 +22,16 @@
   base_tmpl_dir <- NULL
 
   # look for templates in the user templates directory
-  if (tmpl == "builtin") {
-    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
-  } else {
-    user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
-    if (!is.null(user_templ_base_dir)) {
-      base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
+  user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
+  if (!is.null(user_templ_base_dir)) {
+    base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
+  }
+
+  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
+    if (tmpl != "builtin") {
+      return()
     }
+    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
   }
 
   if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {

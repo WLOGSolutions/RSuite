@@ -239,7 +239,7 @@ rscript_arg <- function(name, val) {
 #' @noRd
 #'
 get_cache_dir <- function(subname = NULL) {
-  cache_dir <- options("rsuite.cache_path")
+  cache_dir <- getOption("rsuite.cache_path", "")
   if (nchar(cache_dir) == 0) {
     pkg_logdebug("rsuite.cache_path option is not set; Caching is off.")
     return()
@@ -280,7 +280,7 @@ get_cache_dir <- function(subname = NULL) {
 #' @noRd
 #'
 get_user_templ_base_dir <- function(create = FALSE) {
-  user_templ_base_dir <- options("rsuite.user_templ_path")
+  user_templ_base_dir <- getOption("rsuite.user_templ_path", "")
   if (nchar(user_templ_base_dir) == 0) {
     return()
   }
