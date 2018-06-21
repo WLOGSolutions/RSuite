@@ -392,7 +392,8 @@ rsuite_start_pkg_template <- function(name, path = NULL) {
   pkg_tmpl_path <- file.path(path, name, "package")
   assert(!dir.exists(pkg_tmpl_path), "%s folder already exists.", pkg_tmpl_path)
 
-  builtin_template <- get_builtin_templ_dir() # from 58_templates.R
+  builtin_template <- file.path(get_builtin_templ_dir(), # from 58_templates.R
+                                "package")
   success <- copy_folder(builtin_template, pkg_tmpl_path) # from 98_shell.R
   assert(success, "Failed to create template at %s", pkg_tmpl_path)
 
