@@ -60,7 +60,7 @@ _rsuite() {
 						;;
 					start|pkgadd)
 						if [[ $cur == --* ]]; then
-							opts="--name --template --skip-rc $common_opts_long"
+							opts="--name --tmpl --skip-rc $common_opts_long"
 						else
 							case "${prev}" in
 								--name|-n)
@@ -133,9 +133,9 @@ _rsuite() {
 				esac
 			fi
 			;;
-		template)
+		temp)
 			if [ $COMP_CWORD == 2 ]; then
-				opts="get prjadd pkgadd help"
+				opts="get prjadd pkgadd register help"
 			else
 				case "${COMP_WORDS[2]}" in
 					prjadd|pkgadd)
@@ -151,11 +151,33 @@ _rsuite() {
 									return 0
 									;;
 								*)
-									opts="-n --skip-rc $common_opts_short"
+									opts="$common_opts_short"
 									;;
 							esac
 						fi
 						;;
+					register)
+						if [[ $cur == --* ]]; then
+							opts="--path $common_opts_long"
+						else
+							case "${prev}" in
+								--path|-p)
+									_filedir
+									return 0
+									;;
+								*)
+									opts="$common_opts_short"
+									;;
+							esac
+
+						fi
+						;;
+					get)
+						if [[ $cur == --* ]]; then
+							opts="$common_opts_long"
+						else
+							opts="$common_opts_short"
+						fi
 				esac
 			fi
 			;;
@@ -547,7 +569,7 @@ _rsuite() {
 			return 0
 			;;
 		*)
-			opts="update install proj sysreqs repo pkgzip docker version help"
+			opts="update install proj sysreqs repo pkgzip docker version tmpl help"
 			;;
 
 	esac

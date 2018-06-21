@@ -32,6 +32,10 @@
   # look for templates in the global templates directory
   base_tmpl_dirs <- c(base_tmpl_dirs, get_global_templ_dir())
 
+  if (length(base_tmpl_dirs) == 0) {
+    return(NULL)
+  }
+
   base_tmpl_dirs <- base_tmpl_dirs[dir.exists(base_tmpl_dirs)]
   return(base_tmpl_dirs)
 }
@@ -56,8 +60,11 @@ get_prj_tmpl_dir <- function(tmpl) {
   }
 
   prj_templ_dirs <- file.path(.get_base_tmpl_dirs(tmpl), "project")
-  prj_templ_dirs <- prj_templ_dirs[dir.exists(prj_templ_dirs)]
+  if (length(prj_templ_dirs) == 0){
+    return(NULL)
+  }
 
+  prj_templ_dirs <- prj_templ_dirs[dir.exists(prj_templ_dirs)]
   if (length(prj_templ_dirs) == 0) {
     return(NULL)
   }
@@ -86,8 +93,11 @@ get_pkg_tmpl_dir <- function(tmpl) {
   }
 
   pkg_templ_dirs <- file.path(.get_base_tmpl_dirs(tmpl), "package")
-  pkg_templ_dirs <- pkg_templ_dirs[dir.exists(pkg_templ_dirs)]
+  if (length(pkg_templ_dirs) == 0){
+    return(NULL)
+  }
 
+  pkg_templ_dirs <- pkg_templ_dirs[dir.exists(pkg_templ_dirs)]
   if (length(pkg_templ_dirs) == 0) {
     return(NULL)
   }

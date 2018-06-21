@@ -143,8 +143,8 @@ test_that_managed("Template registering", {
   create_pkg_test_template(name = "TestTemplateOnlyPackage", path = wspace_dir)
   create_prj_test_template(name = "TestTemplateOnlyProject", path = wspace_dir)
   
-  RSuite::template_register(path = file.path(wspace_dir, "TestTemplateOnlyPackage"))
-  RSuite::template_register(path = file.path(wspace_dir, "TestTemplateOnlyProject"))
+  RSuite::tmpl_register(path = file.path(wspace_dir, "TestTemplateOnlyPackage"))
+  RSuite::tmpl_register(path = file.path(wspace_dir, "TestTemplateOnlyProject"))
   
   expected_templates <- data.frame(
     Name = c("TestTemplateOnlyPackage",

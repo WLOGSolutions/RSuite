@@ -218,8 +218,8 @@ test_that_managed("Project creation using template not containing the PARAMETERS
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
   unlink(file.path(tmpl_path, "PARAMETERS"))
 
-  expect_error(init_test_project(name = "TestProject", tmpl = tmpl_path),
-               regexp = "does not satisfy project template requirements")
+  expect_log_message(init_test_project(name = "TestProject", tmpl = tmpl_path),
+               regexp = "does not contain required files: PARAMETERS")
 })
 
 
@@ -233,9 +233,9 @@ test_that_managed("Package creation using template not containing the DESCRIPTIO
 
   prj <- init_test_project(name = "TestProject")
 
-  expect_error(create_test_package(name = "TestPackage",
+  expect_log_message(create_test_package(name = "TestPackage",
                                    prj = prj, tmpl = tmpl_path),
-               regexp = "does not satisfy package template requirements")
+               regexp = "does not contain required files: DESCRIPTION")
 })
 
 
@@ -252,7 +252,7 @@ test_that_managed("Template priority during project/package creation", {
   assert(success, "%s failed to create file in project template")
   
   # register created custom builtin template
-  RSuite::template_register(path = file.path(wspace_dir, "builtin"))
+  RSuite::tmpl_register(path = file.path(wspace_dir, "builtin"))
   
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "builtin")
