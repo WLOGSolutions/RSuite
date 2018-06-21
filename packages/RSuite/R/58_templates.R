@@ -74,8 +74,6 @@ get_prj_tmpl_dir <- function(tmpl) {
 #' Retrieves path to package template.
 #'
 #' @param tmpl name of the project template or it's path. (type: character)
-#' @param tmpl name of the package template
-#'    (type: character).
 #'
 #' @return path to the requested package template or NULL if not found. (type: character)
 #'
@@ -112,7 +110,6 @@ get_pkg_tmpl_dir <- function(tmpl) {
 #' @keywords internal
 #' @noRd
 #'
-
 check_prj_tmpl <- function(tmpl) {
   tmpl_dir <- get_prj_tmpl_dir(tmpl)
   if (!dir.exists(tmpl_dir)) {
@@ -177,7 +174,6 @@ check_pkg_tmpl <- function(tmpl) {
 #'
 #' @param input lines with markers to replace.
 #'    (type: character(N))
-#'
 #'
 #' @return input with markers replaced.
 #'    (type: character(N))
@@ -272,3 +268,4 @@ get_global_templ_dir <- function() {
 get_builtin_templ_dir <- function() {
   return(system.file(file.path("extdata", "builtin_templates", "package"), package = "RSuite"))
 }
+
