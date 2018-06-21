@@ -187,11 +187,6 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
     prj_dir <- file.path(path, name)
   }
 
-  if (!dir.exists(prj_dir)) {
-    created <- dir.create(prj_dir)
-    assert(created, "Failed to create project directory at %s", path)
-  }
-
   create_project_structure(prj_dir, tmpl) # from 14_setup_structure.R
   check_project_structure(prj_dir) # from 14_setup_structure.R
 

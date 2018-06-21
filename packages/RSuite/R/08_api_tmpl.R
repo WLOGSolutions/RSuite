@@ -217,8 +217,10 @@ tmpl_start_pkg <- function(name, path = NULL) {
 #' template directory (/etc/.rsuite/templates on Linxu platforms)
 #'
 #' @examples
-#' # TODO: this example does not work!!!
-#' tmpl_register("../MyExistingTemplate")
+#'
+#' tmpl_dir <- tempdir()
+#' tmpl_start_prj("prjtemplate", path = tmpl_dir)
+#' tmpl_register(file.path(tmpl_dir, "prjtemplate"))
 #'
 #' @export
 #'
