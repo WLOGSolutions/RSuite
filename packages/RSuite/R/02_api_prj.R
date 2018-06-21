@@ -153,8 +153,8 @@ prj_init <- function(path = getwd()) {
 #' @param path path to folder where project structure should be created.
 #' @param skip_rc if TRUE skip adding project under revision control.
 #'   (type: logical, default: FALSE)
-#' @param tmpl name of the projec template available in $TEMP/.rsuite/templates/projects
-#' or filepath to the package template
+#' @param tmpl name of the project template (or path to it) to use for project
+#'   structure  creation.
 #'   (type: character).
 #'
 #' @return rsuite_project object for project just created.
@@ -192,7 +192,7 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
     assert(created, "Failed to create project directory at %s", path)
   }
 
-  create_prj_structure_from_tmpl(prj_dir, tmpl) # from 58_templates.R
+  create_project_structure(prj_dir, tmpl) # from 14_setup_structure.R
   check_project_structure(prj_dir) # from 14_setup_structure.R
 
   pkg_loginfo("Project %s started.", basename(prj_dir))
@@ -233,8 +233,8 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
 #'    project from working directory. (type: rsuite_project, default: NULL)
 #' @param skip_rc if TRUE skip adding package under revision control.
 #'    (type: logical, default: FALSE)
-#' @param tmpl name of the package template available in the default template
-#' directory in the local user's environment
+#' @param tmpl name of the package template (or path to it) to use for package
+#'    structure  creation.
 #'    (type: character).
 #'
 #' @family in project management

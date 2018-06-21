@@ -181,11 +181,26 @@ update_PARAMETERS <- function(params_file, rsuite_ver) {
 create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
   stopifnot(!dir.exists(pkg_dir))
 
-  assert(check_pkg_tmpl(pkg_tmpl),
-         "%s does not satisfy package template requirements.", pkg_tmpl) # from 58_templates.R
+  tmpl_dir <- get_pkg_tmpl_dir(pkg_tmpl) # from 58_templates.R
+  assert(!is.null(tmpl_dir) || pkg_tmpl == "builtin",
+         "Requested to start package from unknown template '%s'.", pkg_tmpl)
 
-  tmpl_dir <- get_pkg_tmpl_dir(pkg_tmpl)
-  copy_folder(tmpl_dir, pkg_dir) # from 98_shell.R
+  if (is.null(tmpl_dir)) {
+    stopifnot(pkg_tmpl == "builtin")
+
+    builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
+    on.exit({
+      unlink(builtin_temp, recursive = TRUE, force = TRUE)
+    },
+    add = TRUE)
+    tmpl_dir <- file.path(builtin_temp, "package")
+  } else {
+    validate_pkg_tmpl_struct(tmpl_dir) # from 58_templates.R
+  }
+
+  # copy template
+  success <- copy_folder(tmpl_dir, pkg_dir) # from 98_shell.R
+  assert(length(success) > 0, "Failed to copy template files.")
 
   files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
@@ -215,21 +230,32 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
 #' @param prj_dir project base directory
 #'    (type: character).
 #'
-#' @param tmpl name of the project template
+#' @param prj_tmpl name of (or path to) the project template
 #'    (type: character).
 #'
 #' @keywords internal
 #' @noRd
 #'
-create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
-  assert(check_prj_tmpl(tmpl),
-         "%s does not satisfy project template requirements.", tmpl) # from 58_templates.R
+create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
+  tmpl_dir <- get_prj_tmpl_dir(prj_tmpl) # from 58_templates.R
+  assert(!is.null(tmpl_dir) || prj_tmpl == "builtin",
+         "Requested to start project from unknown template '%s'.", prj_tmpl)
+
+  if (is.null(tmpl_dir)) {
+    stopifnot(prj_tmpl == "builtin")
+
+    builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
+    on.exit({
+      unlink(builtin_temp, recursive = TRUE, force = TRUE)
+    },
+    add = TRUE)
+    tmpl_dir <- file.path(builtin_temp, "project")
+  } else {
+    validate_prj_tmpl_struct(tmpl_dir) # from 58_templates.R
+  }
 
   # copy template
-  tmpl_dir <- get_prj_tmpl_dir(tmpl) # from 58_templates.R
-
-  files <- list.files(tmpl_dir, all.files = TRUE, no.. = TRUE)
-  success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE, overwrite = FALSE)
+  success <- copy_folder(tmpl_dir, prj_dir) # from 98_shell.R
   assert(length(success) > 0, "Failed to copy template files.")
 
   # now replace markers in files

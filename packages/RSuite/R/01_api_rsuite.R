@@ -265,16 +265,11 @@ rsuite_get_templates <- function() {
     templ_names <- c()
   }
 
-  # look for builtin templates
-  builtin_templ_dir <- get_builtin_templ_dir() # from 58_templates.R
-  templ_dirs <- c(templ_dirs, builtin_templ_dir)
-  templ_names <- c(templ_names, "builtin")
-
   templates <- data.frame(
-    Name = templ_names,
-    HasProjectTemplate = dir.exists(file.path(templ_dirs, "project")),
-    HasPackageTemplate = dir.exists(file.path(templ_dirs, "package")),
-    Path = templ_dirs,
+    Name = c(templ_names, "builtin"),
+    HasProjectTemplate = c(dir.exists(file.path(templ_dirs, "project")), TRUE),
+    HasPackageTemplate = c(dir.exists(file.path(templ_dirs, "package")), TRUE),
+    Path = c(templ_dirs, get_builtin_templs_zip()),  # from 58_templates.R
     stringsAsFactors = FALSE
   )
   templates <- templates[order(rownames(templates)), ] # enforce same ordering as in templ_dirs
@@ -333,10 +328,15 @@ rsuite_start_prj_template <- function(name, path = NULL) {
   prj_tmpl_path <- file.path(path, name, "project")
   assert(!dir.exists(prj_tmpl_path), "%s template already exists.", prj_tmpl_path)
 
-  builtin_prj_template <- file.path(get_builtin_templ_dir(), # from 58_templates.R
-                                    "project")
-  success <- file.copy(from = builtin_prj_template, to = dirname(prj_tmpl_path), recursive = TRUE, copy.mode = TRUE)
-  assert(success, "Failed to copy default builtin template to %s", prj_tmpl_path)
+  builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
+  on.exit({
+    unlink(builtin_temp, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
+
+  builtin_prj_template <- file.path(builtin_temp, "project")
+  success <- copy_folder(builtin_prj_template, prj_tmpl_path) # from 98_shell.R
+  assert(success, "Failed to create template at %s", prj_tmpl_path)
 
   pkg_loginfo("%s template was created successfully", name)
 }
@@ -392,9 +392,14 @@ rsuite_start_pkg_template <- function(name, path = NULL) {
   pkg_tmpl_path <- file.path(path, name, "package")
   assert(!dir.exists(pkg_tmpl_path), "%s folder already exists.", pkg_tmpl_path)
 
-  builtin_template <- file.path(get_builtin_templ_dir(), # from 58_templates.R
-                                "package")
-  success <- copy_folder(builtin_template, pkg_tmpl_path) # from 98_shell.R
+  builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
+  on.exit({
+    unlink(builtin_temp, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
+
+  builtin_pkg_template <- file.path(builtin_temp, "package")
+  success <- copy_folder(builtin_pkg_template, pkg_tmpl_path) # from 98_shell.R
   assert(success, "Failed to create template at %s", pkg_tmpl_path)
 
   pkg_loginfo("%s template was created successfully", name)

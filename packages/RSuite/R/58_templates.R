@@ -6,7 +6,7 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Retrieves base folder(s) for template.
+#' Retrieves base folder(s) for template in user or global space.
 #'
 #' @param tmpl name of the template in user space. (type: character)
 #'
@@ -32,16 +32,12 @@
   # look for templates in the global templates directory
   base_tmpl_dirs <- c(base_tmpl_dirs, get_global_templ_dir())
 
-  if (tmpl == "builtin") {
-    base_tmpl_dirs <- c(base_tmpl_dirs, get_builtin_templ_dir())
-  }
-
   base_tmpl_dirs <- base_tmpl_dirs[dir.exists(base_tmpl_dirs)]
   return(base_tmpl_dirs)
 }
 
 #'
-#' Retrieves path to project template.
+#' Retrieves path to project template in user space or global (no builtin is considered).
 #'
 #' @param tmpl name of the project template or it's path. (type: character)
 #'
@@ -100,22 +96,20 @@ get_pkg_tmpl_dir <- function(tmpl) {
 }
 
 #'
-#' Checks whether the project template contains required files and directories
+#' Checks whether folder has proper structure for project template.
 #'
-#' @param tmpl name of project template
+#' Logs warning if some requirements are not met.
+#'
+#' @param tmpl_dir path to project template. Must exist.
 #'    (type: character).
 #'
-#' @return TRUE if the template satisfies requirements.
+#' @return invisible TRUE if the folder structure satisfies requirements.
 #'
 #' @keywords internal
 #' @noRd
 #'
-check_prj_tmpl <- function(tmpl) {
-  tmpl_dir <- get_prj_tmpl_dir(tmpl)
-  if (!dir.exists(tmpl_dir)) {
-    pkg_logerror("%s template does not exist.", tmpl_dir)
-    return(FALSE)
-  }
+validate_prj_tmpl_struct <- function(tmpl_dir) {
+  stopifnot(dir.exists(tmpl_dir))
 
   required_files <- c("PARAMETERS")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
@@ -124,32 +118,28 @@ check_prj_tmpl <- function(tmpl) {
   result <- all(requirements_check)
 
   if (!result) {
-    pkg_logerror("%s, template does not contain all required files: %s",
-                 tmpl, required_files[!requirements_check])
+    pkg_logwarn("Template under %s does not contain required files: %s",
+                tmpl_dir, required_files[!requirements_check])
   }
-
-  return(result)
+  return(invisible(result))
 }
 
 
 #'
-#' Checks whether the package template contains required files and directories
+#' Checks whether folder has proper structure for package template.
 #'
-#' @param tmpl name of project template
+#' Logs warning if some requirements are not met.
+#'
+#' @param tmpl_dir path to package template. Must exist.
 #'    (type: character).
 #'
-#' @return TRUE if the template satisfies requirements.
+#' @return invisible TRUE if the folder structure satisfies requirements.
 #'
 #' @keywords internal
 #' @noRd
 #'
-
-check_pkg_tmpl <- function(tmpl) {
-  tmpl_dir <- get_pkg_tmpl_dir(tmpl)
-  if (!dir.exists(tmpl_dir)) {
-    pkg_logerror("%s template does not exist.", tmpl_dir)
-    return(FALSE)
-  }
+validate_pkg_tmpl_struct <- function(tmpl) {
+  stopifnot(dir.exists(tmpl_dir))
 
   required_files <- c("DESCRIPTION")
   files <- list.files(tmpl_dir, include.dirs = TRUE, recursive = FALSE)
@@ -158,11 +148,11 @@ check_pkg_tmpl <- function(tmpl) {
   result <- all(requirements_check)
 
   if (!result) {
-    pkg_logerror("%s, template does not contain all required files: %s",
-                 tmpl, required_files[!requirements_check])
+    pkg_logwarn("Template under %s does not contain required files: %s",
+                tmpl_dir, required_files[!requirements_check])
   }
 
-  return(all(required_files %in% files))
+  return(invisible(result))
 }
 
 
@@ -258,14 +248,33 @@ get_global_templ_dir <- function() {
 }
 
 #'
-#' Retrieves builtin template folder.
+#' Retrieves builtin template zip path.
 #'
-#' @return path to builtin templates folder. (type: character)
+#' @return path to builtin templates zip package. (type: character(1))
 #'
 #' @keywords internal
 #' @noRd
 #'
-get_builtin_templ_dir <- function() {
-  return(system.file(file.path("extdata", "builtin_templates"), package = "RSuite"))
+get_builtin_templs_zip <- function() {
+  return(system.file(file.path("extdata", "builtin_templates.zip"), package = "RSuite"))
 }
 
+#'
+#' Extracts builtin templates into tempdir() and returns path to the folder.
+#'
+#' Will assert if fails to extract builtin templates.
+#'
+#' @return path to builtin templates extracted temp folder. (type: character(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_builtin_templs_temp_base <- function() {
+  temp_dir <- tempfile(pattern = "builtin_templs_")
+  extracted_files <- suppressWarnings({
+    utils::unzip(zipfile = get_builtin_templs_zip(), exdir = temp_dir)
+  })
+  assert(length(extracted_files) > 0,
+         "Failed to extract builtin templates. Check RSuite installation.")
+  return(temp_dir)
+}
