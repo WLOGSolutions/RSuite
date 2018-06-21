@@ -16,7 +16,7 @@ sub_commands <- list(
     options = list(
     ),
     run = function(opts) {
-      RSuite::rsuite_get_templates()
+      RSuite::template_get()
     }
   ),
   pkgadd = list(
@@ -38,7 +38,7 @@ sub_commands <- list(
         opts$version <- NA
       }
 
-      RSuite::rsuite_start_pkg_template(opts$name, opts$path)
+      RSuite::template_pkgadd(opts$name, opts$path)
     }
   ),
   prjadd = list(
@@ -61,7 +61,7 @@ sub_commands <- list(
         opts$version <- NA
       }
 
-      RSuite::rsuite_start_prj_template(opts$name, opts$path)
+      RSuite::template_prjadd(opts$name, opts$path)
     }
   )
 )

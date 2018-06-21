@@ -252,7 +252,7 @@ test_that_managed("Template priority during project/package creation", {
   assert(success, "%s failed to create file in project template")
   
   # register created custom builtin template
-  RSuite::rsuite_register_template(path = file.path(wspace_dir, "builtin"))
+  RSuite::template_register(path = file.path(wspace_dir, "builtin"))
   
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "builtin")
