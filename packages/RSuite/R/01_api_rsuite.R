@@ -357,7 +357,7 @@ rsuite_start_pkg_template <- function(name = NULL,
 #'
 rsuite_register_template <- function(path = NULL, global = FALSE) {
   assert(!is.null(path), "No template path specified.")
-  assert(dir.exists(path), "Directory does not exist.")
+  assert(dir.exists(path), "Directory %s does not exist.", path)
 
   if (global) {
     tmpl_dir <- get_global_tmpl_dir()
