@@ -239,7 +239,7 @@ get_templates <- function() {
   }
   # look for templates in the global environment
   global_tmpl_dir <- get_global_tmpl_dir() # from 58_templates.R
-  if (!is.null(global_tmpl_dir)) {
+  if (!is.null(global_tmpl_dir) && file.access(global_tmpl_dir, 4) == 0) {
     tmpls <- c(tmpls, list.dirs(get_global_tmpl_dir(),
                                           recursive = FALSE, full.names = TRUE))
   }
@@ -265,7 +265,7 @@ get_templates <- function() {
     Path = tmpl_paths
   )
 
-  return(templates)
+  return(templates[order(templates$Name), ])
 }
 
 

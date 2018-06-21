@@ -239,7 +239,7 @@ rsuite_get_rc_adapter_names <- function() {
 #'
 rsuite_get_templates <- function() {
   result <- get_templates()
-  return(result[order(result$Name), ])
+  return(result)
 }
 
 #'
