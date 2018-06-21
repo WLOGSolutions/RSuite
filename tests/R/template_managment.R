@@ -8,7 +8,7 @@
 create_prj_test_template <- function(name = NULL, path = NULL) {
   assert(!is.null(name), "Template name was not provided")
   
-  RSuite::template_prjadd(name, path)
+  RSuite::tmpl_start_prj(name, path)
 
   on_test_exit(function() {
     if (!is.null(path)) {
@@ -21,7 +21,7 @@ create_prj_test_template <- function(name = NULL, path = NULL) {
 create_pkg_test_template <- function(name = NULL, path = NULL) {
   assert(!is.null(name), "Template name was not provided")
 
-  RSuite::template_pkgadd(name, path)
+  RSuite::tmpl_start_pkg(name, path)
 
   on_test_exit(function() {
     if (!is.null(path)) {
@@ -32,7 +32,7 @@ create_pkg_test_template <- function(name = NULL, path = NULL) {
 
 
 expect_templates <- function(expected_data) {
-  template_data <- RSuite::template_get()
+  template_data <- RSuite::tmpl_get_registered()
   template_data <- template_data[, c("Name", "HasProjectTemplate", "HasPackageTemplate")]
   result <- do.call(paste0, expected_data) %in% do.call(paste0, template_data)
   pass <- all(result)

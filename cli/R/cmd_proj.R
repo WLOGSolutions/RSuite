@@ -18,7 +18,7 @@ sub_commands <- list(
       make_option(c("--skip_rc"), dest = "skip_rc", action="store_true", default=FALSE,
                   help="Do not put newly created project under RC (default: %default)"),
 
-      make_option(c("-t", "--template"), dest = "tmpl",
+      make_option(c("-t", "--tmpl"), dest = "tmpl",
                   help = paste("Name of the project template from the default template directory",
                                "(use rsuite template get to list all available templates in the",
                                "default template directory) or path to package template.",
@@ -43,7 +43,7 @@ sub_commands <- list(
       make_option(c("--skip_rc"), dest = "skip_rc", action="store_true", default=FALSE,
                   help="Do not put newly created package under RC (default: %default)"),
 
-      make_option(c("-t", "--template"), dest = "tmpl",
+      make_option(c("-t", "--tmpl"), dest = "tmpl",
                   help = paste("Name of the package template from the default template directory",
                                "(use rsuite template get to list all available templates in the",
                                "default template directory) or path to package template.",

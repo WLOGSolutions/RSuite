@@ -61,8 +61,8 @@ if %cmd%=="proj" (
     exit /b 0
 )
 
-if %cmd%=="template" (
-    Rscript.exe --no-init-file "%base_dir%/R/cmd_template.R" %*
+if %cmd%=="temp" (
+    Rscript.exe --no-init-file "%base_dir%/R/cmd_temp.R" %*
     if ERRORLEVEL 1 exit /B 2
     exit /b 0
 )
@@ -119,7 +119,7 @@ exit /B 3
     echo            Use it to manage project, its dependencies, and build
     echo            project packages.
     echo.
-    echo        template
+    echo        tmpl
     echo            Use it to manage project and package templates.
     echo.
     echo        sysreqs

@@ -16,7 +16,7 @@ sub_commands <- list(
     options = list(
     ),
     run = function(opts) {
-      RSuite::template_get()
+      RSuite::tmpl_get_registered()
     }
   ),
   pkgadd = list(
@@ -38,7 +38,7 @@ sub_commands <- list(
         opts$version <- NA
       }
 
-      RSuite::template_pkgadd(opts$name, opts$path)
+      RSuite::tmpl_start_pkg(opts$name, opts$path)
     }
   ),
   prjadd = list(
@@ -61,7 +61,22 @@ sub_commands <- list(
         opts$version <- NA
       }
 
-      RSuite::template_prjadd(opts$name, opts$path)
+      RSuite::tmpl_start_prj(opts$name, opts$path)
+    }
+  ),
+  register = list(
+    help = "Register template.",
+    options = list(
+      make_option(c("-p", "--path"), dest = "path",
+                  help = paste("Path to the directory contaning the  template to register.",
+                               "(default: NULL)",
+                               sep = "\n\t\t")),
+      make_option(c("-g", "--global"), dest = "global", action = "store_true", default = FALSE,
+                  help = paste("Register template in the global template directory", "
+                               (default: %default"))
+    ),
+    run = function(opts) {
+      RSuite::tmpl_register(opts$path, opts$global)
     }
   )
 )
