@@ -43,7 +43,7 @@ test_that_managed <- function(desc, ...) {
 
 fire_cleanups <- function() {
   cleanups <- get("cleanup", envir = .test_env)
-  for(cup in get("cleanup", envir = .test_env)) {
+  for(cup in cleanups) {
     cup()
   }
   assign("cleanup", c(), envir = .test_env)

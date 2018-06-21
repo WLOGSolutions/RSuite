@@ -171,6 +171,7 @@ test_that_managed("Package creation using custom template defined in user's loca
 })
 
 
+
 test_that_managed("Package creation using custom template (path as argument)", {
   # create project template not
   create_pkg_test_template(name = "TestTemplate")
@@ -239,3 +240,61 @@ test_that_managed("Package creation using template not containing the DESCRIPTIO
 
 
 
+test_that_managed("Template priority during project/package creation", {
+  # create custom builtin template
+  wspace_dir <- get_wspace_dir()
+  create_prj_test_template(name = "builtin", path = wspace_dir)
+  success <- file.create(file.path(wspace_dir, "builtin", "project", "prj_builtin.txt"))
+  assert(success, "%s failed to create file in project template")
+  
+  create_pkg_test_template(name = "builtin", path = wspace_dir)
+  success <- file.create(file.path(wspace_dir, "builtin", "package", "pkg_builtin.txt"))
+  assert(success, "%s failed to create file in project template")
+  
+  # register created custom builtin template
+  RSuite::rsuite_register_template(path = file.path(wspace_dir, "builtin"))
+  
+  # create project using custom template
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "builtin")
+  create_test_package("TestPackage", prj = prj, tmpl = "builtin")
+  params <- prj$load_params()
+
+  # create vector containing all files from the builtin project template
+  expected_prj_files <- c(
+    ".Rprofile",
+    "config_templ.txt",
+    "deployment/libs",
+    "deployment/sbox",
+    "logs",
+    "TestProject.Rproj",
+    "packages",
+    "PARAMETERS",
+    "R/.Rprofile",
+    "R/master.R",
+    "R/set_env.R",
+    "tests/TestProject_Tests.Rproj",
+    "tests/.Rprofile",
+    "prj_builtin.txt"
+  )
+  
+  prj_files <- list.files(params$prj_path, all.files = TRUE,
+                          recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
+  pkg_files <- list.files(file.path(params$pkgs_path, "TestPackage"),
+                          all.files = TRUE, recursive = TRUE,
+                          include.dirs = TRUE, no.. = TRUE)
+  expected_pkg_files <- c(
+    "TestPackage.Rproj",
+    ".Rprofile",
+    "DESCRIPTION",
+    "NAMESPACE",
+    "NEWS",
+    "R",
+    "R/package_logger.R",
+    "R/package_validation.R",
+    "R/packages_import.R",
+    "pkg_builtin.txt"
+  )
+  
+  expect_true(all(expected_prj_files %in% prj_files))
+  expect_true(all(expected_pkg_files %in% pkg_files))
+})

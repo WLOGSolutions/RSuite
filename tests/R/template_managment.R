@@ -5,26 +5,26 @@
 # Tools for template managment during testing
 #----------------------------------------------------------------------------
 
-create_prj_test_template <- function(name = NULL, path = NA) {
+create_prj_test_template <- function(name = NULL, path = NULL) {
   assert(!is.null(name), "Template name was not provided")
   
-  RSuite::rsuite_start_prj_template(name = name, path = path)
+  RSuite::rsuite_start_prj_template(name, path)
 
   on_test_exit(function() {
-    if (!is.na(path)) {
+    if (!is.null(path)) {
       unlink(path, recursive = T, force = T)
     }
   })
 }
 
 
-create_pkg_test_template <- function(name = NULL, path = NA) {
+create_pkg_test_template <- function(name = NULL, path = NULL) {
   assert(!is.null(name), "Template name was not provided")
 
-  RSuite::rsuite_start_pkg_template(name = name, path = path)
+  RSuite::rsuite_start_pkg_template(name, path)
 
   on_test_exit(function() {
-    if (!is.na(path)) {
+    if (!is.null(path)) {
       unlink(path, recursive = T, force = T)
     }
   })
@@ -33,7 +33,7 @@ create_pkg_test_template <- function(name = NULL, path = NA) {
 
 expect_templates <- function(expected_data) {
   template_data <- RSuite::rsuite_get_templates()
-  template_data <- template_data[, c("Name", "Type")]
+  template_data <- template_data[, c("Name", "HasProjectTemplate", "HasPackageTemplate")]
   result <- do.call(paste0, expected_data) %in% do.call(paste0, template_data)
   pass <- all(result)
   msg <- ifelse(pass, "", sprintf("%s templates were not found", expected_data[!result, ]))
