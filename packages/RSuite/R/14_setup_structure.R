@@ -50,12 +50,9 @@ check_project_structure <- function(prj_dir) {
   params_file <- file.path(prj_dir, "PARAMETERS")
   params <- force_load_PARAMETERS(params_file, prj_name, rsuite_ver)
 
-  create_struct_dir(params$pkgs_path, "packages")
   create_struct_dir(params$script_path, "master scripts")
-
-  copy_folder(from = system.file(file.path("extdata", "deployment"), package = "RSuite"), # from 98_shell.R
-              to = file.path(prj_dir, "deployment"))
   create_struct_dir(params$lib_path, "libraries")
+  create_struct_dir(params$sbox_path, "sandbox")
 
   # Root project folder
   conf_templ <- file.path(prj_dir, "config_templ.txt")
@@ -193,7 +190,6 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
   files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
 
-
   # now replace markers in files
   keywords <- c(
     PackageName = basename(pkg_dir),
@@ -231,7 +227,6 @@ create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
 
   # copy template
   tmpl_dir <- get_prj_tmpl_dir(tmpl) # from 58_templates.R
-
 
   files <- list.files(tmpl_dir, all.files = TRUE, no.. = TRUE)
   success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE, overwrite = FALSE)
@@ -273,50 +268,6 @@ create_struct_dir <- function(dir, desc) {
   if (!dir.exists(dir)) {
     created <- dir.create(dir, recursive = TRUE)
     assert(created, "Failed to create %s directory: %s.", desc, dir)
-  }
-}
-
-#'
-#' Copy template Rproj into specified folder under specified name.
-#' Does not copy if any Rproj exists already in the folder.
-#' Logs warning if failed to copy.
-#'
-#' @keywords internal
-#' @noRd
-#'
-create_rproj <- function(dir, name) {
-  if (length(list.files(path = dir, pattern = "*.Rproj", recursive = FALSE)) > 0) {
-    return()
-  }
-
-  tryCatch({
-    con <- unz(system.file(file.path("extdata", "RStudio_proj_templ.zip"), package = "RSuite"),
-               filename = "RStudio_proj_templ.Rproj")
-    lines <- readLines(con)
-  },
-  error = function(e) {
-    pkg_logwarn("Failed to copy RStudio project: %s", rproj_file)
-    return(FALSE)
-  },
-  finally = {
-    close(con)
-  })
-
-  rproj_file <- file.path(dir, paste0(name, ".Rproj"))
-  writeLines(lines, con = rproj_file)
-  return(TRUE)
-}
-
-#'
-#' Creates .Rprofile at specified location with specified contents if not exists.
-#'
-#' @keywords internal
-#' @noRd
-#'
-create_rprofile <- function(dir, text = "RSuite::prj_load()") {
-  rprof_file <- file.path(dir, ".Rprofile")
-  if (!file.exists(rprof_file)) {
-    writeLines(text = text, con = rprof_file)
   }
 }
 

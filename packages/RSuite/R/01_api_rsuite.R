@@ -215,5 +215,3 @@ rsuite_unregister_rc_adapter <- function(name) {
 rsuite_get_rc_adapter_names <- function() {
   reg_rc_adapter_names()
 }
-
-

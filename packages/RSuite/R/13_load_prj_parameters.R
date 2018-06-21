@@ -62,6 +62,10 @@ load_prj_parameters <- function(prj_path) {
     bin_pkgs_type = ifelse(.Platform$OS.type == "windows", "win.binary", "binary")
   )
 
+  if (!dir.exists(params$lib_path)) {
+    dir.create(params$lib_path, recursive = TRUE, showWarnings = FALSE)
+  }
+
   if (!dir.exists(params$sbox_path)) {
     dir.create(params$sbox_path, recursive = TRUE, showWarnings = FALSE)
   }
