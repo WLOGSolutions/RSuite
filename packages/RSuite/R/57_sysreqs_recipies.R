@@ -143,6 +143,7 @@ add_recipe.sysreqs_install_recipe <- function(recipe, req_name, sysreq, pkg_name
     inst_spec <- recipe$install_specs[[req_name]]
     inst_spec$packages <- c(inst_spec$packages, pkg_name)
     inst_spec$syslibs <- c(inst_spec$syslibs, sysreq$plat_spec)
+    inst_spec$info <- sysreq$info
     recipe$install_specs[[req_name]] <- inst_spec
   }
 
@@ -161,6 +162,7 @@ add_recipe.sysreqs_install_recipe <- function(recipe, req_name, sysreq, pkg_name
     build_spec <- recipe$build_specs[[req_name]]
     build_spec$params <- paste(build_spec$params, sysreq$params)
     build_spec$packages <- c(build_spec$packages, pkg_name)
+    build_spec$info <- sysreq$info
     recipe$build_specs[[req_name]] <- build_spec
   }
 
@@ -173,8 +175,8 @@ add_recipe.sysreqs_install_recipe <- function(recipe, req_name, sysreq, pkg_name
 rm_satisfied.sysreqs_install_recipe <- function(recipe) {
   for (req_satisfied in names(recipe$satisfied)) {
     who_satisfied <- recipe$satisfied[[req_satisfied]]
-    pkg_loginfo("Requirement for %s will be satisfied by %s; not building",
-                req_satisfied, paste(who_satisfied, collapse = ", "))
+    pkg_loginfo("Requirement for %s will be satisfied by %s; Skipping the requirement",
+                req_satisfied, paste(unique(who_satisfied), collapse = ", "), req_satisfied)
     if (req_satisfied %in% names(recipe$build_specs)) {
       recipe$build_specs[[req_satisfied]] <- NULL
     }
@@ -216,6 +218,11 @@ perform.sysreqs_install_recipe <- function(recipe) {
                     cmd_retcode)
       } else {
         pkg_loginfo("... done")
+        lapply(names(required_syslibs),
+               function(req_name) {
+                 lapply(required_syslibs[[req_name]]$info,
+                        function(msg) pkg_loginfo("[%s]: %s", req_name, msg))
+               })
       }
     }
   }
@@ -248,6 +255,7 @@ perform.sysreqs_install_recipe <- function(recipe) {
                   req_name, cmd_retcode)
     } else {
       pkg_loginfo("... done")
+      lapply(build_spec$info, function(msg) pkg_loginfo("[%s]: %s", req_name, msg))
     }
   }
 

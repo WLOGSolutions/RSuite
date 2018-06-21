@@ -53,7 +53,7 @@ check_project_structure <- function(prj_dir) {
   create_struct_dir(params$pkgs_path, "packages")
   create_struct_dir(params$script_path, "master scripts")
 
-  copy_folder(from = system.file(file.path("extdata", "deployment"), package = "RSuite"),
+  copy_folder(from = system.file(file.path("extdata", "deployment"), package = "RSuite"), # from 98_shell.R
               to = file.path(prj_dir, "deployment"))
   create_struct_dir(params$lib_path, "libraries")
 
@@ -65,7 +65,7 @@ check_project_structure <- function(prj_dir) {
 
   if (params$r_ver == current_rver()) {
     # add logger to libraries folder as it will be required for sure
-    copy_folder(from = system.file(package = "logging"),
+    copy_folder(from = system.file(package = "logging"), # from 98_shell.R
                 to = file.path(params$lib_path, "logging"))
   }
 
@@ -188,8 +188,7 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
          "%s does not satisfy package template requirements.", pkg_tmpl) # from 58_templates.R
 
   tmpl_dir <- get_pkg_tmpl_dir(pkg_tmpl)
-  copy_folder(tmpl_dir, pkg_dir)
-
+  copy_folder(tmpl_dir, pkg_dir) # from 98_shell.R
 
   files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
@@ -320,31 +319,6 @@ create_rprofile <- function(dir, text = "RSuite::prj_load()") {
     writeLines(text = text, con = rprof_file)
   }
 }
-
-#'
-#' Copies folder from onto folder to if to does not exists.
-#'
-#' @keywords internal
-#' @noRd
-#'
-copy_folder <- function(from, to) {
-  if (dir.exists(to)) {
-    return(invisible(TRUE))
-  }
-  if (basename(from) == basename(to)) {
-    success <- file.copy(from = from, to = dirname(to), recursive = TRUE, copy.mode = TRUE)
-    return(invisible(success))
-  }
-
-  success <- dir.create(to, recursive = TRUE)
-  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
-    success <- (file.copy(from = file.path(from, ent), to = to, recursive = TRUE, copy.mode = TRUE)
-                && success)
-  }
-
-  invisible(success)
-}
-
 
 #'
 #' Detects which RC system project is beeing managed with.
