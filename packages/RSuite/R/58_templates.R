@@ -6,39 +6,41 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Retrieves base folder for template.
+#' Retrieves base folder(s) for template.
 #'
 #' @param tmpl name of the template in user space. (type: character)
 #'
-#' @return path to the requested template or NULL if template is unknown. (type: character)
+#' @return list of paths in search order there template should be searched for.
+#'   (type: character)
 #'
 #' @keywords internal
 #' @noRd
 #'
-.get_base_tmpl_dir <- function(tmpl) {
+.get_base_tmpl_dirs <- function(tmpl) {
   assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
          "Non empty character(1) required for template name")
 
-  base_tmpl_dir <- NULL
+  base_tmpl_dirs <- c()
 
   # look for templates in the user templates directory
   user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
   if (!is.null(user_templ_base_dir)) {
-    base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
+    user_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
+    base_tmpl_dirs <- c(base_tmpl_dirs, user_tmpl_dir)
   }
 
-  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
-    if (tmpl != "builtin") {
-      return()
-    }
-    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
+  if (.Platform$OS.type == "linux") {
+    glob_tmpl_dir <- file.path("etc", ".rsuite", "templates")
+    base_tmpl_dirs <- c(base_tmpl_dirs, glob_tmpl_dir)
   }
 
-  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
-    return(NULL)
+  if (tmpl == "builtin") {
+    builtin_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
+    base_tmpl_dirs <- c(base_tmpl_dirs, builtin_tmpl_dir)
   }
 
-  return(base_tmpl_dir)
+  base_tmpl_dirs <- base_tmpl_dirs[dir.exists(base_tmpl_dirs)]
+  return(base_tmpl_dirs)
 
 }
 
@@ -61,17 +63,14 @@ get_prj_tmpl_dir <- function(tmpl) {
     return(tmpl)
   }
 
-  base_templ_dir <- .get_base_tmpl_dir(tmpl)
-  if (is.null(base_templ_dir)) {
+  prj_templ_dirs <- file.path(.get_base_tmpl_dirs(tmpl), "project")
+  prj_templ_dirs <- prj_templ_dirs[dir.exists(prj_templ_dirs)]
+
+  if (length(prj_templ_dirs) == 0) {
     return(NULL)
   }
 
-  prj_templ_dir <- file.path(base_templ_dir, "project")
-  if (!dir.exists(prj_templ_dir)) {
-    return(NULL)
-  }
-
-  return(prj_templ_dir)
+  return(prj_templ_dirs[[1]]) # take first available in search path
 }
 
 
@@ -96,17 +95,14 @@ get_pkg_tmpl_dir <- function(tmpl) {
     return(tmpl)
   }
 
-  base_templ_dir <- .get_base_tmpl_dir(tmpl)
-  if (is.null(base_templ_dir)) {
+  pkg_templ_dirs <- file.path(.get_base_tmpl_dirs(tmpl), "package")
+  pkg_templ_dirs <- pkg_templ_dirs[dir.exists(pkg_templ_dirs)]
+
+  if (length(pkg_templ_dirs) == 0) {
     return(NULL)
   }
 
-  pkg_templ_dir <- file.path(base_templ_dir, "package")
-  if (!dir.exists(pkg_templ_dir)) {
-    return(NULL)
-  }
-
-  return(pkg_templ_dir)
+  return(pkg_templ_dirs[[1]])
 }
 
 #'

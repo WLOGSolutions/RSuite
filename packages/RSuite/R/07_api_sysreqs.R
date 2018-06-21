@@ -131,7 +131,6 @@ sysreqs_check <- function(prj = NULL) {
 
   recipe <- build_sysreqs_check_recipe() # from 57_sysreqs_recipies.R
   recipe <- sysreqs_recipe_collect_all(recipe, sysreqs) # from 57_sysreqs_recipies.R
-  recipe <- rm_satisfied(recipe) # from 57_sysreqs_recipies.R
   result <- perform(recipe)
 
   assert(length(result$notools) + length(result$nolibs) == 0,
@@ -185,7 +184,6 @@ sysreqs_install <- function(prj = NULL) {
 
   recipe <- build_sysreqs_install_recipe(params$prj_path) # from 57_sysreqs_recipies.R
   recipe <- sysreqs_recipe_collect_all(recipe, sysreqs) # from 57_sysreqs_recipies.R
-  recipe <- rm_satisfied(recipe) # from 57_sysreqs_recipies.R
   perform(recipe)
 }
 
@@ -238,7 +236,6 @@ sysreqs_script <- function(prj = NULL) {
 
   recipe <- build_sysreqs_script_recipe(params$prj_path) # from 57_sysreqs_recipies.R
   recipe <- sysreqs_recipe_collect_all(recipe, sysreqs) # from 57_sysreqs_recipies.R
-  recipe <- rm_satisfied(recipe) # from 57_sysreqs_recipies.R
   script <- perform(recipe)
 
   pkg_loginfo("Building script created at %s.", script)

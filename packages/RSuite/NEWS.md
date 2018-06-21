@@ -14,6 +14,9 @@
      specified by rsuite.cache_path option. If unset caching is totally off.
   * user templates are detected in folder specified by rsuite.user_templ_path
      option. If unset no user templates are in use.
+  * minor fixes in sysreqs functionality: removed duplicated logs, support for
+     additional tool information added, conda build fixed to install and reinstall
+     properly.
 
 # RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 

@@ -296,7 +296,8 @@ try_build_sysreq <- function(pkg_name, field, db_ent_name, db_ent_val, plat_desc
   result <- list(plat_spec = plat_spec,
                  handlers = db_ent_val$handlers,
                  satisfies = trimws(unlist(strsplit(trimws(db_ent_val$satisfies), "\\s+"))),
-                 params = params)
+                 params = params,
+                 info = db_ent_val$info)
   class(result) <- "sysreq"
   return(result)
 }

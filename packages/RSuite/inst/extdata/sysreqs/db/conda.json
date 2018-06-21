@@ -1,7 +1,7 @@
 {
 	"conda": {
 		"sysreqs": "/conda\\s*\\(([^)]+)\\)/i",
-		"satisfies": "python-2.7",
+		"satisfies": "python",
 		"platforms": {
 			"Windows": "conda.exe",
 			"DEB": "conda",
@@ -10,7 +10,12 @@
 		"handlers": {
 		  "install": "[skip]",
 			"check": "[tool]",
-			"build": "[shell] :tool create -y -p :path :params"
-		}
+			"build": "[shell] :tool install -y -m -p :path :params"
+		},
+		"info": [
+		  "Do not forget to add conda folder to Artifacts in project PARAMETERS",
+		  "Remember to force using local python environment in your master script:",
+		  "   e.g. reticulate::use_python(python = file.path(script_path, '..', 'conda'), require = TRUE)"
+	  ]
 	}
 }
