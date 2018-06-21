@@ -200,7 +200,7 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
 
   # copy template
   success <- copy_folder(tmpl_dir, pkg_dir) # from 98_shell.R
-  assert(length(success) > 0, "Failed to copy template files.")
+  assert(success, "Failed to copy template files.")
 
   files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
@@ -256,7 +256,7 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
 
   # copy template
   success <- copy_folder(tmpl_dir, prj_dir) # from 98_shell.R
-  assert(length(success) > 0, "Failed to copy template files.")
+  assert(success, "Failed to copy template files.")
 
   # now replace markers in files
   files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)

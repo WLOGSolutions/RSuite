@@ -214,40 +214,8 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) 
     unlink(.svn_dirs, recursive = TRUE, force = TRUE)
   }
 
-  svn$prop_set(params$prj_path, "svn:ignore", c(".Rproj.user", ".Rhistory", ".Rdata", "config.txt"))
-  svn$add_files(params$prj_path, c("PARAMETERS", "config_templ.txt", ".Rprofile", "*.Rproj"))
-
-  svn$add_dir(file.path(params$prj_path, "deployment"))
-  svn$add_files(file.path(params$prj_path, "deployment"), c("*.R", "*.r", "*.Rproj"))
-  svn$prop_set(file.path(params$prj_path, "deployment"),
-               "svn:ignore", c(".Rproj.user", ".Rhistory", ".Rdata", "intrepo"))
-
-  svn$add_dir(file.path(params$prj_path, "deployment", "libs"))
-  svn$prop_set(file.path(params$prj_path, "deployment", "libs"), "svn:ignore", c("*.*", "*"))
-
-  svn$add_dir(file.path(params$prj_path, "deployment", "sbox"))
-  svn$prop_set(file.path(params$prj_path, "deployment", "sbox"), "svn:ignore", c("*.*", "*"))
-
-  svn$add_dir(file.path(params$prj_path, "logs"))
-  svn$prop_set(file.path(params$prj_path, "logs"), "svn:ignore", c("*.*", "*"))
-
-  svn$add_dir(file.path(params$prj_path, "packages"))
-
-  svn$add_dir(file.path(params$prj_path, "R"))
-  svn$add_files(file.path(params$prj_path, "R"), c("*.R", "*.r", "*.Rproj"))
-  svn$prop_set(file.path(params$prj_path, "R"), "svn:ignore", c(".Rproj.user", ".Rhistory", ".Rdata"))
-
-  if (dir.exists(file.path(params$prj_path, "tests"))) {
-    svn$add_dir(file.path(params$prj_path, "tests"))
-    svn$add_files(file.path(params$prj_path, "tests"), c("*.R", "*.r", "*.Rproj"))
-    svn$prop_set(file.path(params$prj_path, "tests"), "svn:ignore", c(".Rproj.user", ".Rhistory", ".Rdata"))
-  }
-
-  if (dir.exists(file.path(params$prj_path, "repository"))) {
-    svn$add_dir_rec(file.path(params$prj_path, "repository"))
-  }
+  svn_add_folder(svn, params$prj_path)
 }
-
 
 #'
 #' Implementation of rc_adapter_pkg_struct_add for SVN rc adapted.
@@ -256,29 +224,63 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params) 
 #' @noRd
 #'
 rc_adapter_pkg_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params, name) {
-  pkg_dir <- file.path(params$pkgs_path, name)
-
   svn <- .svn_manager()
+  svn$add_dir(params$pkgs_path)
 
-  svn$add_dir(pkg_dir)
-  svn$prop_set(pkg_dir, "svn:ignore", c(".Rproj.user", ".Rhistory", ".Rdata"))
-  svn$add_files(pkg_dir, c("DESCRIPTION", "NAMESPACE", "NEWS", "*.Rproj", ".Rprofile"))
-
-  svn$add_dir(file.path(pkg_dir, "data"))
-  svn$add_dir(file.path(pkg_dir, "inst"))
-  svn$add_dir(file.path(pkg_dir, "man"))
-  svn$prop_set(file.path(pkg_dir, "man"), "svn:ignore", "*.*")
-
-  svn$add_dir(file.path(pkg_dir, "R"))
-  svn$add_files(file.path(pkg_dir, "R"), c("*.R", "*.r"))
-
-  if (dir.exists(file.path(pkg_dir, "tests"))) {
-    svn$add_dir(file.path(pkg_dir, "tests"))
-    svn$add_files(file.path(pkg_dir, "tests"), c("*.R", "*.r"))
-    svn$prop_set(file.path(pkg_dir, "tests"), "svn:ignore", c(".Rproj.user", ".Rhistory", ".Rdata"))
-  }
+  pkg_dir <- file.path(params$pkgs_path, name)
+  svn_add_folder(svn, pkg_dir)
 }
 
+
+#'
+#' Iterates recursively over folder structure and adds its content under
+#'  version control.
+#'
+#' Detects files/folders to be ignored specified in rc_ignore files. Sets
+#'  appropriate svn:ignore properties.
+#'
+#' @param svn svn_manager object
+#' @param fld_path path to folder to be processed.
+#'
+#' @keywords internal
+#' @noRd
+#'
+svn_add_folder <- function(svn, fld_path) {
+  svn$add_dir(fld_path)
+
+  ignores <- c()
+
+  ignores_file <- file.path(fld_path, "rc_ignore")
+  if (file.exists(ignores_file)) {
+    ignores <- readLines(ignores_file)
+    svn$prop_set(fld_path, "svn:ignore", ignores)
+    unlink(ignores_file, force = TRUE)
+  }
+
+  toadd <- list.files(fld_path, all.files = TRUE, no.. = TRUE)
+  if (length(ignores) > 0) {
+    ignores_rx <- glob2rx(ignores)
+    toadd <- lapply(X = toadd,
+                    FUN = function(fn) {
+                      matched_rx <- lapply(ignores_rx, function(rx) grepl(rx, fn))
+                      if (any(unlist(matched_rx))) {
+                        return()
+                      }
+                      return(fn)
+                    })
+    toadd <- unlist(toadd)
+  }
+
+  files_toadd <- toadd[!dir.exists(file.path(fld_path, toadd))]
+  if (length(files_toadd) > 0) {
+    svn$add_files(fld_path, files_toadd)
+  }
+
+  fldrs_toadd <- toadd[dir.exists(file.path(fld_path, toadd))]
+  for(subfld in fldrs_toadd) {
+    svn_add_folder(svn, file.path(fld_path, subfld))
+  }
+}
 
 #'
 #' Implementation of rc_adapter_get_version for SVN rc adapted.

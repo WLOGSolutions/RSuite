@@ -224,19 +224,28 @@ rscript_arg <- function(name, val) {
 #' @noRd
 #'
 copy_folder <- function(from, to) {
-  if (dir.exists(to)) {
-    return(invisible(TRUE))
-  }
   if (basename(from) == basename(to)) {
-    success <- file.copy(from = from, to = dirname(to), recursive = TRUE, copy.mode = TRUE)
+    success <- file.copy(from = from, to = dirname(to),
+                         recursive = TRUE, copy.mode = TRUE, overwrite = FALSE)
     return(invisible(success))
   }
 
-  success <- dir.create(to, recursive = TRUE)
-  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
-    success <- (file.copy(from = file.path(from, ent), to = to, recursive = TRUE, copy.mode = TRUE)
+  success <- TRUE
+
+  if (!dir.exists(to)) {
+    success <- (dir.create(to, recursive = TRUE, showWarnings = FALSE)
                 && success)
   }
+
+  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
+    file.copy(from = file.path(from, ent), to = to,
+              recursive = TRUE, copy.mode = TRUE, overwrite = FALSE)
+  }
+
+  expected <- list.files(from, all.files = TRUE, recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
+  copied <- list.files(to, all.files = TRUE, recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
+  success <- (length(setdiff(expected, copied)) == 0
+              && success)
 
   invisible(success)
 }

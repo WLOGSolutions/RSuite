@@ -138,7 +138,7 @@ validate_prj_tmpl_struct <- function(tmpl_dir) {
 #' @keywords internal
 #' @noRd
 #'
-validate_pkg_tmpl_struct <- function(tmpl) {
+validate_pkg_tmpl_struct <- function(tmpl_dir) {
   stopifnot(dir.exists(tmpl_dir))
 
   required_files <- c("DESCRIPTION")
