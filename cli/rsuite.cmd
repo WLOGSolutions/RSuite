@@ -61,8 +61,8 @@ if %cmd%=="proj" (
     exit /b 0
 )
 
-if %cmd%=="temp" (
-    Rscript.exe --no-init-file "%base_dir%/R/cmd_temp.R" %*
+if %cmd%=="tmpl" (
+    Rscript.exe --no-init-file "%base_dir%/R/cmd_tmpl.R" %*
     if ERRORLEVEL 1 exit /B 2
     exit /b 0
 )

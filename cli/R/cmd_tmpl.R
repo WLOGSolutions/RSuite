@@ -3,7 +3,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #
-# Handles 'template' command of CLI utility.
+# Handles 'tmpl' command of CLI utility.
 #----------------------------------------------------------------------------
 
 args <- commandArgs()
