@@ -218,10 +218,14 @@ tmpl_start_pkg <- function(name, path = NULL) {
 #'
 #' @examples
 #'
+#' old_user_templ_path <- getOption("rsuite.user_templ_path)
+#' options(rsuite.user_templ_path = file.path(tmpl_dir, templates))
+#'
 #' tmpl_dir <- tempdir()
 #' tmpl_start_prj("prjtemplate", path = tmpl_dir)
 #' tmpl_register(file.path(tmpl_dir, "prjtemplate"))
 #'
+#' options(rsuite.user_templ_path = old_user_templ_path[[1]])
 #' @export
 #'
 tmpl_register <- function(path = NULL, global = FALSE) {
