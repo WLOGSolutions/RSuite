@@ -53,7 +53,7 @@ check_project_structure <- function(prj_dir) {
   create_struct_dir(params$pkgs_path, "packages")
   create_struct_dir(params$script_path, "master scripts")
 
-  copy_folder(from = system.file(file.path("extdata", "deployment"), package = "RSuite"),
+  copy_folder(from = system.file(file.path("extdata", "deployment"), package = "RSuite"), # from 98_shell.R
               to = file.path(prj_dir, "deployment"))
   create_struct_dir(params$lib_path, "libraries")
 
@@ -65,7 +65,7 @@ check_project_structure <- function(prj_dir) {
 
   if (params$r_ver == current_rver()) {
     # add logger to libraries folder as it will be required for sure
-    copy_folder(from = system.file(package = "logging"),
+    copy_folder(from = system.file(package = "logging"), # from 98_shell.R
                 to = file.path(params$lib_path, "logging"))
   }
 
@@ -188,8 +188,7 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
          "%s does not satisfy package template requirements.", pkg_tmpl) # from 58_templates.R
 
   tmpl_dir <- get_pkg_tmpl_dir(pkg_tmpl)
-  copy_folder(tmpl_dir, pkg_dir)
-
+  copy_folder(tmpl_dir, pkg_dir) # from 98_shell.R
 
   files <- list.files(pkg_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
@@ -198,6 +197,8 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
   # now replace markers in files
   keywords <- c(
     PackageName = basename(pkg_dir),
+    RSuiteVersion = as.character(utils::packageVersion("RSuite")),
+    RVersion = current_rver(), # from 97_rversion.R
     Date = as.character(Sys.Date()),
     User = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
@@ -211,6 +212,54 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
   file.rename(files, replace_markers(keywords, files))
 }
 
+
+#'
+#' Creates a project based on the given template.
+#'
+#' @param prj_dir project base directory
+#'    (type: character).
+#'
+#' @param tmpl name of the project template
+#'    (type: character).
+#'
+#' @keywords internal
+#' @noRd
+#'
+create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
+  assert(check_prj_tmpl(tmpl),
+         "%s does not satisfy project template requirements.", tmpl) # from 58_templates.R
+
+  # copy template
+  tmpl_dir <- get_prj_tmpl_dir(tmpl) # from 58_templates.R
+  files <- list.files(tmpl_dir, all.files = TRUE, no.. = TRUE)
+
+  success <- file.copy(file.path(tmpl_dir, files), prj_dir, copy.mode = TRUE, recursive = TRUE, overwrite = FALSE)
+  assert(length(success) > 0, "Failed to copy template files.")
+
+  # now replace markers in files
+  files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
+  files <- files[!file.info(files)$isdir]
+
+  keywords <- c(
+    ProjectName = basename(prj_dir),
+    RSuiteVersion = as.character(utils::packageVersion("RSuite")),
+    RVersion = current_rver(), # from 97_rversion.R
+    Date = as.character(Sys.Date()),
+    User = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
+  )
+
+  # replace all markers in the file content
+  for (f in files) {
+    lines <- readLines(con = f, warn = FALSE)
+    lines <- replace_markers(keywords, lines) # from 58_templates.R
+    writeLines(lines, con = f)
+  }
+
+  # replace all markers in file names
+  files_renamed <- replace_markers(keywords, files) # from 58_templates.R
+  success <- file.rename(files, files_renamed)
+  assert(length(success) > 0, "Failed to rename files in template.")
+}
 
 #'
 #' Creates folder if does not exists.
@@ -269,31 +318,6 @@ create_rprofile <- function(dir, text = "RSuite::prj_load()") {
     writeLines(text = text, con = rprof_file)
   }
 }
-
-#'
-#' Copies folder from onto folder to if to does not exists.
-#'
-#' @keywords internal
-#' @noRd
-#'
-copy_folder <- function(from, to) {
-  if (dir.exists(to)) {
-    return(invisible(TRUE))
-  }
-  if (basename(from) == basename(to)) {
-    success <- file.copy(from = from, to = dirname(to), recursive = TRUE, copy.mode = TRUE)
-    return(invisible(success))
-  }
-
-  success <- dir.create(to, recursive = TRUE)
-  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
-    success <- (file.copy(from = file.path(from, ent), to = to, recursive = TRUE, copy.mode = TRUE)
-                && success)
-  }
-
-  invisible(success)
-}
-
 
 #'
 #' Detects which RC system project is beeing managed with.

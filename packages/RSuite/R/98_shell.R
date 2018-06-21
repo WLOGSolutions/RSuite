@@ -218,6 +218,30 @@ rscript_arg <- function(name, val) {
 
 
 #'
+#' Copies folder from onto folder to if to does not exists.
+#'
+#' @keywords internal
+#' @noRd
+#'
+copy_folder <- function(from, to) {
+  if (dir.exists(to)) {
+    return(invisible(TRUE))
+  }
+  if (basename(from) == basename(to)) {
+    success <- file.copy(from = from, to = dirname(to), recursive = TRUE, copy.mode = TRUE)
+    return(invisible(success))
+  }
+
+  success <- dir.create(to, recursive = TRUE)
+  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
+    success <- (file.copy(from = file.path(from, ent), to = to, recursive = TRUE, copy.mode = TRUE)
+                && success)
+  }
+
+  invisible(success)
+}
+
+#'
 #' Retrieves path of RSuite cache folder with specified name.
 #'
 #' Cache folder base path is taken from rsuite.cache_path option. If not specified
@@ -262,45 +286,4 @@ get_cache_dir <- function(subname = NULL) {
   }
 
   return(cache_dir)
-}
-
-#'
-#' Retrieves folder there user package and project templates are located.
-#'
-#' Folder path is taken from rsuite.user_templ_path option. If not specified
-#' user templates will not be used.
-#'
-#' @param create if TRUE will create user templates folder (if specified).
-#'   (type: logical(1), default: FALSE)
-#'
-#' @return path to user templates folder retrieved or NULL if not specified or
-#'   failed to create.
-#'
-#' @keywords internal
-#' @noRd
-#'
-get_user_templ_base_dir <- function(create = FALSE) {
-  user_templ_base_dir <- getOption("rsuite.user_templ_path", "")
-  if (nchar(user_templ_base_dir) == 0) {
-    return()
-  }
-
-  if (.Platform$OS.type == "windows") {
-    user_templ_base_dir <- utils::shortPathName(user_templ_base_dir)
-  }
-
-  if (dir.exists(user_templ_base_dir)) {
-    return(user_templ_base_dir)
-  }
-
-  if (!any(create)) {
-    return()
-  }
-
-  if (dir.create(user_templ_base_dir, recursive = TRUE, showWarnings = FALSE)) {
-    return(user_templ_base_dir)
-  }
-
-  pkg_logwarn("Failed to create folder for user project and package templates (%s)", user_templ_base_dir)
-  return()
 }

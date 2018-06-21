@@ -13,9 +13,13 @@ test_that_managed <- function(desc, ...) {
     # setup logging
     root_level <- logging::getLogger()$level
     rsuite_level <- RSuite::rsuite_getLogger()$level
+    old_option <- options("rsuite.user_templ_path")
+    options(rsuite.user_templ_path = get_wspace_template_dir())
     on_test_exit(function() {
       logging::setLevel(root_level)
       logging::setLevel(rsuite_level, RSuite::rsuite_getLogger())
+      unlink(get_wspace_template_dir(), recursive = T, force = T)
+      options(rsuite.user_templ_path = unlist(old_option))
     })
 
     log_file <- file.path(.get_create_dir("logs"), sprintf("test_%s.log", Sys.Date()))
@@ -58,7 +62,7 @@ get_wspace_template_dir <- function() { .get_create_dir("wspace/templates")}
 .get_create_dir <- function(name) {
   dpath <- file.path(RSuite::prj_init()$path, "tests", name)
   if (!dir.exists(dpath)) {
-    dir.create(dpath, recursive = T)
+    dir.create(dpath, recursive = T,)
   }
   return(dpath)
 }
