@@ -266,6 +266,6 @@ get_global_templ_dir <- function() {
 #' @noRd
 #'
 get_builtin_templ_dir <- function() {
-  return(system.file(file.path("extdata", "builtin_templates", "package"), package = "RSuite"))
+  return(system.file(file.path("extdata", "builtin_templates"), package = "RSuite"))
 }
 

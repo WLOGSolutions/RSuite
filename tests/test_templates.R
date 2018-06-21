@@ -129,8 +129,8 @@ test_that_managed("Template getting",{
   expected_templates <- data.frame(
     Name = c("TestTemplateOnlyPackage",
              "TestTemplateOnlyProject"),
-    Type = c("package",
-             "project")
+    HasProjectTemplate = c(FALSE , TRUE),
+    HasPackageTemplate = c(TRUE , FALSE)
   )
   
   expect_templates(expected_templates)
@@ -149,8 +149,8 @@ test_that_managed("Template registering", {
   expected_templates <- data.frame(
     Name = c("TestTemplateOnlyPackage",
              "TestTemplateOnlyProject"),
-    Type = c("package",
-             "project")
+    HasProjectTemplate = c(FALSE , TRUE),
+    HasPackageTemplate = c(TRUE , FALSE)
   )
   
   expect_templates(expected_templates)

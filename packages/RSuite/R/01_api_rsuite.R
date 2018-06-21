@@ -272,7 +272,7 @@ rsuite_get_templates <- function() {
 
   templates <- data.frame(
     Name = templ_names,
-    HasParojectTemplate = dir.exists(file.path(templ_dirs, "project")),
+    HasProjectTemplate = dir.exists(file.path(templ_dirs, "project")),
     HasPackageTemplate = dir.exists(file.path(templ_dirs, "package")),
     Path = templ_dirs,
     stringsAsFactors = FALSE
@@ -302,7 +302,7 @@ rsuite_get_templates <- function() {
 #'
 #' @export
 #'
-rsuite_start_prj_template <- function(nameL, path = NULL) {
+rsuite_start_prj_template <- function(name, path = NULL) {
   if (is.null(path)) {
     path <- get_user_templ_base_dir(create = TRUE) # from 58_templates.R
     assert(!is.null(path),
@@ -314,7 +314,7 @@ rsuite_start_prj_template <- function(nameL, path = NULL) {
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(file.access(path, mode = 2) == 0, "User has no write permission to %s", path)
 
-  assert(missing(name), "Template name is required")
+  assert(!missing(name), "Template name is required")
   assert(is.character(name) && length(name) == 1 && nchar(name) > 0,
          "non empty character(1) expected for name")
   assert(!grepl("[\\/\"\'<>_]+ ", name),
@@ -374,7 +374,7 @@ rsuite_start_pkg_template <- function(name, path = NULL) {
   assert(dir.exists(path), "Directory %s does not exist", path)
   assert(file.access(path, mode = 2) == 0, "User has no write permission to %s.", path)
 
-  assert(missing(name), "Template name is required")
+  assert(!missing(name), "Template name is required")
   assert(is.character(name) && length(name) == 1 && nchar(name) > 0,
          "Non empty character(1) expected for name")
   assert(!grepl("[\\/\"\'<>_ ]+", name),
@@ -392,7 +392,7 @@ rsuite_start_pkg_template <- function(name, path = NULL) {
   pkg_tmpl_path <- file.path(path, name, "package")
   assert(!dir.exists(pkg_tmpl_path), "%s folder already exists.", pkg_tmpl_path)
 
-  builtin_template <- get_builtin_templ_dir() # from 58_templates.R
+  builtin_template <- file.path(get_builtin_templ_dir(), "package") # from 58_templates.R
   success <- copy_folder(builtin_template, pkg_tmpl_path) # from 98_shell.R
   assert(success, "Failed to create template at %s", pkg_tmpl_path)
 
