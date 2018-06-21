@@ -239,7 +239,7 @@ rsuite_get_rc_adapter_names <- function() {
 #'
 rsuite_get_templates <- function() {
   result <- get_templates()
-  return(result[order(result$Name),])
+  return(result[order(result$Name), ])
 }
 
 #'
@@ -268,6 +268,10 @@ rsuite_start_prj_template <- function(name = NULL,
                                       path = NA) {
   if (is.na(path)) {
     path <- get_user_templ_base_dir(create = TRUE) # from 98_shell.R
+    assert(!is.null(path),
+           paste("User template folder is not specified.",
+                  "Please set the rsuite.user_templ_path option to point to the folder containing user templates",
+                  sep = " "))
   }
 
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
@@ -307,6 +311,10 @@ rsuite_start_pkg_template <- function(name = NULL,
                                       path = NA) {
   if (is.na(path)) {
     path <- get_user_templ_base_dir(create = TRUE) # from 98_shell.R
+    assert(!is.null(path), paste0(
+      "User template folder is not specified.",
+      "Please set the rsuite.user_templ_path option to point to the folder containing user templates",
+      sep = " "))
   }
 
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
@@ -359,10 +367,7 @@ rsuite_register_template <- function(path = NULL, global = FALSE) {
     assert(!is.null(tmpl_dir), "Local templates directory is not defined(rsuite.user_templ_path)")
   }
 
-  tmpl_dir <- file.path(tmpl_dir, basename(path))
-  assert(!dir.exists(tmpl_dir), "There is already a template named %s registered.", basename(tmpl_dir))
-
-  success <- copy_folder(from = path, to = tmpl_dir) # from 14_setup_structure.R
-  assert(success, "Faile to copy %s to %s", path, tmpl_dir)
+  success <- file.copy(from = path, to = tmpl_dir, recursive = TRUE) # from 14_setup_structure.R
+  assert(all(success), "Faile to copy %s to %s", path, tmpl_dir)
   pkg_loginfo("%s template was registered successfully", path)
 }

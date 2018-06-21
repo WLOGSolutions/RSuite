@@ -27,6 +27,14 @@
     base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
   }
 
+  # look for templates in the global templates directory
+  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
+    global_templ_base_dir <- get_global_tmpl_dir()
+    if (!is.null(global_templ_base_dir)) {
+      base_tmpl_dir <- filepath(global_templ_base_dir, tmpl)
+    }
+  }
+
   if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
     if (tmpl != "builtin") {
       return()
@@ -215,7 +223,7 @@ replace_markers <- function(keywords, input) {
 #'
 get_templates <- function() {
   # look for builtin templates
-  builtin_tmpl_dir <- .get_base_tmpl_dir("builtin")
+  builtin_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
   tmpls <- builtin_tmpl_dir
 
   # look for templates in the local user's environment
@@ -224,7 +232,10 @@ get_templates <- function() {
     tmpls <- c(tmpls, list.dirs(local_tmpl_dir, recursive = FALSE,
                             full.names = TRUE))
   } else {
-    pkg_logwarn("User template folder is not specified. Please set the rsuite.user_templ_path option to point to the folder containing user templates")
+    pkg_logwarn(paste("User template folder is not specified.",
+                       "Please set the rsuite.user_templ_path option",
+                       "to point to the folder containing user templates",
+                       sep = " "))
   }
   # look for templates in the global environment
   global_tmpl_dir <- get_global_tmpl_dir() # from 58_templates.R
@@ -240,8 +251,8 @@ get_templates <- function() {
   }
 
   # look for project/package templates
-  prj_tmpl <- tmpls[dir.exists(file.path(tmpls, 'project'))]
-  pkg_tmpl <- tmpls[dir.exists(file.path(tmpls, 'package'))]
+  prj_tmpl <- tmpls[dir.exists(file.path(tmpls, "project"))]
+  pkg_tmpl <- tmpls[dir.exists(file.path(tmpls, "package"))]
 
   # prepare results
   tmpl_names <- basename(c(prj_tmpl, pkg_tmpl))
@@ -321,36 +332,4 @@ start_pkg_template <- function(name, path) {
   builtin_template <- system.file(file.path("extdata", "builtin_templates", "package"), package = "RSuite")
   copy_folder(builtin_template, pkg_tmpl_path)
   pkg_loginfo("%s template was created successfully", name)
-}
-#'
-#' @return path to the requested template or NULL if template is unknown. (type: character)
-#'
-#' @keywords internal
-#' @noRd
-#'
-.get_base_tmpl_dir <- function(tmpl) {
-  assert(!is.null(tmpl) && is.character(tmpl) && length(tmpl) == 1 && nchar(tmpl) > 0,
-         "Non empty character(1) required for template name")
-
-  base_tmpl_dir <- NULL
-
-  # look for templates in the user templates directory
-  user_templ_base_dir <- get_user_templ_base_dir(create = FALSE)
-  if (!is.null(user_templ_base_dir)) {
-    base_tmpl_dir <- file.path(user_templ_base_dir, tmpl)
-  }
-
-  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
-    if (tmpl != "builtin") {
-      return()
-    }
-    base_tmpl_dir <- system.file(file.path("extdata", "builtin_templates"), package = "RSuite")
-  }
-
-  if (is.null(base_tmpl_dir) || !dir.exists(base_tmpl_dir)) {
-    return(NULL)
-  }
-
-  return(base_tmpl_dir)
-
 }

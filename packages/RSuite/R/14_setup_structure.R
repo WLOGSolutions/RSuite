@@ -227,7 +227,8 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
 #' @noRd
 #'
 create_prj_structure_from_tmpl <- function(prj_dir, tmpl) {
-  assert(check_prj_tmpl(tmpl),"%s does not satisfy project template requirements.", tmpl) # from 58_templates.R
+  assert(check_prj_tmpl(tmpl),
+         "%s does not satisfy project template requirements.", tmpl) # from 58_templates.R
 
   # copy template
   tmpl_dir <- get_prj_tmpl_dir(tmpl) # from 58_templates.R

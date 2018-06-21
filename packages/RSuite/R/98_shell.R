@@ -317,11 +317,10 @@ get_user_templ_base_dir <- function(create = FALSE) {
 #' @noRd
 get_global_tmpl_dir <- function() {
   if (.Platform$OS.type != "unix") {
-    pkg_logerror("The global template directory does not concern non-linux users!")
     return(NULL)
   }
 
-  global_tmpl_dir <- '/etc/.rsuite/templates'
+  global_tmpl_dir <- "/etc/.rsuite/templates"
 
   result <- ifelse(dir.exists(global_tmpl_dir), global_tmpl_dir, NULL)
   return(result)
