@@ -248,6 +248,7 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params, 
 #'
 #' @param svn svn_manager object
 #' @param fld_path path to folder to be processed.
+#' @param up_ignores ignores collected from upper folders.
 #'
 #' @keywords internal
 #' @noRd
@@ -259,7 +260,7 @@ svn_add_folder <- function(svn, fld_path, up_ignores = c()) {
   ignores <- ignores[ignores != ""]
 
   new_ignores <- up_ignores
-  ignores_file <- file.path(fld_path, "rc_ignore")
+  ignores_file <- file.path(fld_path, "__rc_ignore")
   if (file.exists(ignores_file)) {
     new_ignores <- c(new_ignores, readLines(ignores_file))
     new_ignores <- new_ignores[new_ignores != ""]

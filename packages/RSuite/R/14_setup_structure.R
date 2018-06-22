@@ -281,6 +281,23 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
 }
 
 #'
+#' Cleans up __rc_ignores from project/package folder created.
+#'
+#' Use then package/project just created from template not under RC control.
+#'
+#' @keywords internal
+#' @noRd
+#'
+clear_rc_adapter_infos <- function(dir_path) {
+  to_remove <- list.files(dir_path, pattern = "__rc_ignore",
+                          recursive = TRUE, full.names = TRUE)
+  if (length(to_remove)) {
+    unlink(to_remove, force = TRUE, recursive = TRUE)
+  }
+}
+
+
+#'
 #' Creates folder if does not exists.
 #' Asserts that folder is created.
 #'

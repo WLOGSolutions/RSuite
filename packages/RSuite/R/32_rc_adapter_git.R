@@ -87,8 +87,10 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, 
 #' Detects files/folders to be ignored specified in rc_ignore files. Sets
 #'  appropriate .gitignore.
 #'
-#' @param svn svn_manager object
+#' @param repo git repository object.
 #' @param fld_path path to folder to be processed.
+#' @param git_path_f function building git reference path.
+#' @param up_ignores ignores collected from upper folders.
 #'
 #' @keywords internal
 #' @noRd
@@ -103,7 +105,7 @@ git_add_folder <- function(repo, fld_path, git_path_f, up_ignores = c()) {
   }
 
   new_ignores <- up_ignores
-  new_ignore_file <- file.path(fld_path, "rc_ignore")
+  new_ignore_file <- file.path(fld_path, "__rc_ignore")
   if (file.exists(new_ignore_file)) {
     new_ignores <- c(new_ignores, readLines(new_ignore_file))
     new_ignores <- new_ignores[new_ignores != ""]
@@ -142,7 +144,6 @@ git_add_folder <- function(repo, fld_path, git_path_f, up_ignores = c()) {
 
   files_toadd <- toadd[!dir.exists(file.path(fld_path, toadd))]
   if (length(files_toadd) > 0) {
-    svn$add_files(fld_path, files_toadd)
     git2r::add(repo, git_path_f(files_toadd))
   }
 

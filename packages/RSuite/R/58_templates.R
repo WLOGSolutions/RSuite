@@ -212,7 +212,7 @@ rename_files_with_markers <- function(keywords, files) {
   if (length(files_renamed) > 0) {
     success <- file.rename(files, files_renamed)
     assert(length(success) > 0, "Failed to rename files.")
-  } else {
+  } else if (length(files_with_markers) > 0) {
     # delete files that would overwrite changes
     success <- file.remove(files_with_markers)
     assert(length(success) > 0, "Failed to delete unnecessary files")

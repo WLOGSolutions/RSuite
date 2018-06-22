@@ -202,6 +202,7 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
       pkg_loginfo("... done")
     } else {
       pkg_logwarn("Failed to detect RC manager for %s", basename(prj_dir))
+      clear_rc_adapter_infos(prj_dir) # from 14_setup_structure.R
     }
   }
 
@@ -274,6 +275,7 @@ prj_start_package <- function(name,
       pkg_loginfo("... done")
     } else {
       pkg_logwarn("Failed to detect RC manager for %s", name)
+      clear_rc_adapter_infos(pkg_dir) # from 14_setup_structure.R
     }
   }
 }
