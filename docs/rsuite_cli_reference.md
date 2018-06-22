@@ -221,7 +221,7 @@ It also accepts standard options `-v` and `-h`.
 
 ## Testing project
 
-RSuite CLI can run testthat tests for you. Just execute following command:
+RSuite CLI can run testthat tests for you. Just execute following command
 
 ```bash
 rsuite proj test 
@@ -229,12 +229,110 @@ rsuite proj test
 
 It will look for tests in 'tests' folder under project base folder. If your tests
 are located elsewhere in project folder you can inform the command on that 
-following way:
+following way
 
 ```bash
 rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 ```
 
+# Template managment
+RSuite CLI allows you to create your own custom project nad package templates. For example the default RSuite project template uses MRAN as the default package repository, if your projects make use of a different repository you can define your own project template with the adequate settings (in this case the Repositories option in the PARAMETERS file).
+
+## Starting custom project/package templates
+To start a project template execute the following command
+
+```bash
+rsuite tmpl prjadd -n MyTemplate
+```
+
+similarly package templates are created
+
+```bash
+rsuite tmpl pkgadd -n MyTemplate
+```
+
+The above-mentioned commands register a project/package template called "MyTemplate" in the user's local default template directory. The default template directory is defined by the `rsuite.user_templ_path` option (`~/.rsuite/templates` by default). All registered templates have a specific structure
+
+```bash
+2018-06-22  07:37    <DIR>          .
+2018-06-22  07:37    <DIR>          ..
+2018-06-21  07:43    <DIR>          package
+2018-06-22  07:38    <DIR>          project
+               0 File(s)              0 bytes
+               4 Dir(s)  260 126 388 224 bytes free
+```
+
+Templates contain directories named `project` and `package`, they are created by the `rsuite tmpl prjadd` and `rsuite tmpl pkgadd` commands accordingly. These directories contain the default RSuite project/package files. You can add/delete files according to your preference.
+
+**Important**: Templates have specific requiremens in case of projects they have to contain a PARAMETERS file as for packages they have to contain a DESCRIPTION file.
+
+RSuite templates support the usage of markers - special keywords which will be replaced while creating a project/package from a custom template. All markers have the following form: `__<word>__` for example `__ProjectName__`. The following markers are supported:
+
+- `__ProjectName__` - will be replaced with the name of the project
+- `__PackageName__` - will be replaced with the name of the package
+- `__RSuiteVersion__` - will be replaced with the used RSuite version
+- `__RVersion__` - will be replaced with the used R version
+- `__Date__` - will be replaced with the current data
+- `__User__` - will be replaced with username
+
+## Registering custom templates
+Templates can be developed outside of the default template folder, to create a template in a specific directory use the `-t` (short for `--tmpl`) while creating templates
+
+```bash
+rsuite tmpl prjadd -n MyTemplate -p /path/to/create/template
+```
+
+```bash
+rsuite tmpl pkgadd -n MyTemplate -p /path/to/create/template
+```
+
+To register a template created outside of the default template directory use the following command
+
+```bash
+rsuite tmpl register -p /path/to/created/template
+```
+
+Linux users can also register templates in the global template directory (`/etc/.rsuite/templates`) using the `-g` (short for `--global`) option
+
+```bash
+rsuite tmpl register -p /path/to/created/template -g
+```
+
+**Important**: to register a template in the global template directory extended permissions are required
+
+
+All registered templates can be listed using the following command
+
+```bash
+rsuite tmpl get
+```
+
+additional information whether the registered templates have a defined project/package template will be displayed. 
+
+## Starting projects/packages using created templates
+To start a project using a custom template the `-t` (short for `--tmpl`) option can be used. If `MyTemplate` is a registered template simply the name of the registerd template to the `-t` option
+
+```bash
+  rsuite proj start -n MyProject -t MyTemplate
+```
+
+Unregistered templates can also be provided to the `-t` option. You simply have to provide the path to the template. **Important**: the path has to point to the directory containg the template files e.g. `<path>/MyTemplate/project`
+
+```bash
+  rsuite proj start -n MyProject -t <path to template>/project
+```
+
+Similarly package templates can be used
+
+```bash
+  rsuite proj pkgadd -n MyPackage -t MyTemplate
+```
+
+```bash
+  rsuite proj pkgadd -n MyPackage -t <path to template>/package
+```
+
+**Important**: The default RSuite template is called `builtin` and can also be provided to the `-t` option. 
 
 # System requirements management
 

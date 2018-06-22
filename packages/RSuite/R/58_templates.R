@@ -192,6 +192,21 @@ replace_markers <- function(keywords, input) {
   return(input)
 }
 
+#'
+#' Renames files containg markers.
+#'
+#' @param keywords list of data to replace markers with.
+#'    (type: list).
+#'
+#' @param input lines with filenames with markers to replace.
+#'    (type: character(N))
+#'
+#' @return input with markers replaced.
+#'    (type: character(N))
+#'
+#' @keywords internal
+#' @noRd
+#'
 rename_files_with_markers <- function(keywords, files) {
   if (length(files) == 0) {
     return()

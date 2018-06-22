@@ -88,6 +88,18 @@ NULL
 #'   \item{\code{\link{rsuite_registers_template}}}{Registers a template.}
 #' }
 #'
+#' @section Template managment:
+#' These functions will help you to manage RSuite templates. They allow
+#' you to create project and package templates, register them in the
+#' local or global template directory and list all registered templates.
+#'
+#' \describe{
+#'   \item{\code{\link{tmpl_get_registered}}}{Lists all registered templates}
+#'   \item{\code{\link{tmpl_start_prj}}}{Creates a project template.}
+#'   \item{\code{\link{tmpl_start_pkg}}}{Creates a package template.}
+#'   \item{\code{\link{tmpl_register}}}{Registers a template.}
+#' }
+#'
 #' @section System requirements:
 #' Some packages have special system requirements declared. E.g. XML package on
 #' Linuxes require libxml2 system library to be installed. Such requirements

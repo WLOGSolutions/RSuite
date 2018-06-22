@@ -218,7 +218,7 @@ tmpl_start_pkg <- function(name, path = NULL) {
 #'
 #' @examples
 #'
-#' old_user_templ_path <- getOption("rsuite.user_templ_path)
+#' old_user_templ_path <- getOption("rsuite.user_templ_path")
 #' options(rsuite.user_templ_path = file.path(tmpl_dir, templates))
 #'
 #' tmpl_dir <- tempdir()
