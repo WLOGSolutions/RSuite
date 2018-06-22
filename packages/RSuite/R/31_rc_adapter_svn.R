@@ -182,6 +182,13 @@ rc_adapter_is_under_control.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
     pkg_loginfo("Property '%s' set on %s", prop, dir)
   }
+  result$prop_get <- function(dir, prop) {
+    lns <- .get_output_with_eng_lang("svn propget", "%s propget %s %s", svn_cmd, prop, dir)
+    if (any(grepl(sprintf("Property '%s' not found on", prop), lns))) {
+      return()
+    }
+    return(lns)
+  }
 
   result$get_root_path <- function(dir) {
     info_lines <- .get_output_with_eng_lang("svn info", "%s info %s", svn_cmd, dir)
@@ -245,16 +252,23 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_svn <- function(rc_adapter, params, 
 #' @keywords internal
 #' @noRd
 #'
-svn_add_folder <- function(svn, fld_path) {
+svn_add_folder <- function(svn, fld_path, up_ignores = c()) {
   svn$add_dir(fld_path)
 
-  ignores <- c()
+  ignores <- svn$prop_get(fld_path, "svn:ignore")
+  ignores <- ignores[ignores != ""]
 
+  new_ignores <- up_ignores
   ignores_file <- file.path(fld_path, "rc_ignore")
   if (file.exists(ignores_file)) {
-    ignores <- readLines(ignores_file)
-    svn$prop_set(fld_path, "svn:ignore", ignores)
+    new_ignores <- c(new_ignores, readLines(ignores_file))
+    new_ignores <- new_ignores[new_ignores != ""]
     unlink(ignores_file, force = TRUE)
+  }
+
+  if (length(setdiff(new_ignores, ignores)) > 0) {
+    ignores <- unique(c(new_ignores, ignores))
+    svn$prop_set(fld_path, "svn:ignore", ignores)
   }
 
   toadd <- list.files(fld_path, all.files = TRUE, no.. = TRUE)
@@ -276,9 +290,20 @@ svn_add_folder <- function(svn, fld_path) {
     svn$add_files(fld_path, files_toadd)
   }
 
+  # ignores on subsequent folders
+  down_path_ignores <- lapply(ignores, function(ig) unlist(strsplit(ig, "\\\\|/")))
+
   fldrs_toadd <- toadd[dir.exists(file.path(fld_path, toadd))]
   for(subfld in fldrs_toadd) {
-    svn_add_folder(svn, file.path(fld_path, subfld))
+    sub_ignores <- lapply(down_path_ignores,
+                          function(ig_path) {
+                            if (ig_path[[1]] == subfld) {
+                              paste(ig_path[-1], collapse = .Platform$file.sep)
+                            }
+                          })
+    sub_ignores <- unlist(sub_ignores)
+
+    svn_add_folder(svn, file.path(fld_path, subfld), sub_ignores)
   }
 }
 
