@@ -50,6 +50,7 @@ install -m 755 rsuite-bash-prompt %{buildroot}/etc/bash_completion.d/rsuite-bash
 /usr/share/rsuitecli/R/docker_utils.R
 /usr/share/rsuitecli/R/cmd_repo.R
 /usr/share/rsuitecli/R/cmd_proj.R
+/usr/share/rsuitecli/R/cmd_tmpl.R
 /usr/share/rsuitecli/R/cmd_pkgzip.R
 /usr/share/rsuitecli/R/cmd_install.R
 /usr/share/rsuitecli/R/cmd_update.R

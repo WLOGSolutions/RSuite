@@ -264,7 +264,7 @@ The above-mentioned commands register a project/package template called "MyTempl
 
 Templates contain directories named `project` and `package`, they are created by the `rsuite tmpl prjadd` and `rsuite tmpl pkgadd` commands accordingly. These directories contain the default RSuite project/package files. You can add/delete files according to your preference.
 
-**Important**: Templates have specific requiremens in case of projects they have to contain a PARAMETERS file as for packages they have to contain a DESCRIPTION file.
+**Important**: Templates have specific requirements in case of projects they have to contain a PARAMETERS file as for packages they have to contain a DESCRIPTION file.
 
 RSuite templates support the usage of markers - special keywords which will be replaced while creating a project/package from a custom template. All markers have the following form: `__<word>__` for example `__ProjectName__`. The following markers are supported:
 

@@ -64,6 +64,7 @@
                     <File Id='cmd_update.R' Name='cmd_update.R' DiskId='1' Source='../R/cmd_update.R' />
                     <File Id='cmd_install.R' Name='cmd_install.R' DiskId='1' Source='../R/cmd_install.R' />
                     <File Id='cmd_proj.R' Name='cmd_proj.R' DiskId='1' Source='../R/cmd_proj.R' />
+                    <File Id='cmd_tmpl.R' Name='cmd_tmpl.R' DiskId='1' Source='../R/cmd_tmpl.R' />
                     <File Id='cmd_repo.R' Name='cmd_repo.R' DiskId='1' Source='../R/cmd_repo.R' />
                     <File Id='cmd_pkgzip.R' Name='cmd_pkgzip.R' DiskId='1' Source='../R/cmd_pkgzip.R' />
                     <File Id='cmd_docker.R' Name='cmd_docker.R' DiskId='1' Source='../R/cmd_docker.R' />
