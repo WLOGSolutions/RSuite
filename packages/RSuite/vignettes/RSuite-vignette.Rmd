@@ -32,10 +32,11 @@ In this document we present a basic R Suite usage. It covers:
 - project environment locking
 
 ## Package options
-RSuite uses the following options to configure behaviour:
+RSuite uses the following options to configure behavior:
 
-  * rsuite.user_templ_path: path to user's local default template folder
-  * rsuite.cache_path: path to RSuite's cache folder
+  * rsuite.user_templ_path: path to folder containing user customized templates
+  * rsuite.cache_path: path to RSuite's cache folder to store downloaded packages for
+    later usage and content index of used repositories.     
   
 ## Start a new project
 To create a new project (called ```my_project```) we have to call the following function:

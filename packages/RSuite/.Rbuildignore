@@ -1,3 +1,5 @@
 RSuite.Rproj
 cran-comments.md
 .lintr
+^.*\.Rproj$
+^\.Rproj\.user$

@@ -16,12 +16,21 @@ NULL
 
 #' Supports Developing, Building and Deploying R Solution.
 #'
-#' The main package purpose is to support safe and supportable
-#' solutions development in R.\cr
+#' Support safe and supportable solutions development in R.\cr
 #' \cr
 #' It will help you with environment separation per project, dependency
 #' management, local packages creation and preparing deployment packs
 #' for you solutions.
+#'
+#' @section Package options:
+#' RSuite uses the following \code{\link{options}} to configure behaviour:
+#' \itemize{
+#'    \item \code{rsuite.user_templ_path}: path to folder containing user customized templates. If not set
+#'       (which is default) no user custom templates can be used.
+#'    \item \code{rsuite.cache_path}: path to RSuite's cache folder to store downloaded packages for
+#'       later usage and content index of used repositories. If not set (which is default) no caching
+#'       will be performed.
+#' }
 #'
 #' @section Project management:
 #' These functions will help you start new RSuite project or package inside
