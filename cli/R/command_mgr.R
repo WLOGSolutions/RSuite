@@ -9,7 +9,7 @@ source('command_utils.R')
 
 handle_subcommands <- function(sub_commands, cmd_help) {
   options(rsuite.user_templ_path = "~/.rsuite/templates")
-  options(rsuite.cache_path = "~/.rsuite/cache")
+  options(rsuite.cache_path = "~/.rsuite")
   args <- commandArgs(trailingOnly = T)
 
   cmd <- args[1]

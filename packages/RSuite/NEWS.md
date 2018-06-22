@@ -38,8 +38,6 @@
   * RSuite processed with goodpractices and most of detected issues fixed. 
      goodpractices unfortunatly does not use .lintr in package file, so 
      default lintr configuration (inproper for RSuite) is in use while checked.
-  * RSuite cache is stored in dirname(tempdir()) as writing to user workspace is 
-     forbidden by CRAN policies.
   * Vignettes are also checked if changed while detecting package changes.
   * While building package its installation folder (in libs) is not removed. The
      folder is cleared only during package removal. Warning that DESCRIPTION is

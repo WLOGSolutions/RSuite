@@ -65,8 +65,9 @@ sub_commands <- list(
                                "(default: %default)",
                                sep = "\n\t\t")),
       make_option(c("-g", "--global"), dest = "global", action = "store_true", default = FALSE,
-                  help = paste("Register template in the global template directory", "
-                               (default: %default"))
+                  help = paste("If passed will register template in the global template",
+                               "directory. (default: %default)",
+                               sep = "\n\t\t"))
     ),
     run = function(opts) {
       RSuite::tmpl_register(opts$path, opts$global)

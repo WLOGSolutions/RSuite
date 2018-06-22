@@ -296,7 +296,7 @@ svn_add_folder <- function(svn, fld_path, up_ignores = c()) {
   down_path_ignores <- lapply(ignores, function(ig) unlist(strsplit(ig, "\\\\|/")))
 
   fldrs_toadd <- toadd[dir.exists(file.path(fld_path, toadd))]
-  for(subfld in fldrs_toadd) {
+  for (subfld in fldrs_toadd) {
     sub_ignores <- lapply(down_path_ignores,
                           function(ig_path) {
                             if (ig_path[[1]] == subfld) {

@@ -13,7 +13,7 @@ rsuite_default_options <- list(
 .onLoad <- function(libpath, pkgname) {
   op <- options()
   toset <- !(names(rsuite_default_options) %in% names(op))
-  if(any(toset)) options(rsuite_default_options[toset])
+  if (any(toset)) options(rsuite_default_options[toset])
 
   if (length(logging::getLogger()[["handlers"]]) == 0) {
     logging::addHandler(logging::writeToConsole, level = "FINEST")

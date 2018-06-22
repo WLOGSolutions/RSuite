@@ -151,7 +151,7 @@ git_add_folder <- function(repo, fld_path, git_path_f, up_ignores = c()) {
   down_path_ignores <- lapply(ignores, function(ig) unlist(strsplit(ig, "\\\\|/")))
 
   fldrs_toadd <- toadd[dir.exists(file.path(fld_path, toadd))]
-  for(subfld in fldrs_toadd) {
+  for (subfld in fldrs_toadd) {
     sub_ignores <- lapply(down_path_ignores,
                           function(ig_path) {
                             if (gsub("^!", "", ig_path[[1]]) != subfld) {
@@ -167,7 +167,7 @@ git_add_folder <- function(repo, fld_path, git_path_f, up_ignores = c()) {
 
     git_add_folder(repo,
                    fld_path = file.path(fld_path, subfld),
-                   git_path_f = function(...) { git_path_f(subfld, ...) },
+                   git_path_f = function(...) git_path_f(subfld, ...),
                    up_ignores = sub_ignores)
   }
 }

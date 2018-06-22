@@ -81,7 +81,8 @@ tmpl_get_registered <- function() {
 #' @family in templates management
 #'
 #' @examples
-#' tmpl_start_prj("prjtemplate", path = tempdir())
+#' tmpl_dir <- tempfile("prjtempl_")
+#' tmpl_start_prj(basename(tmpl_dir), path = tempdir())
 #'
 #' @export
 #'
@@ -100,7 +101,7 @@ tmpl_start_prj <- function(name, path = NULL) {
   assert(!missing(name), "Template name is required")
   assert(is.character(name) && length(name) == 1 && nchar(name) > 0,
          "non empty character(1) expected for name")
-  assert(!grepl("[\\/\"\'<>_]+ ", name),
+  assert(!grepl("[\\/\"\'<> ]+", name),
          "Invalid template name '%s'. It must not contain special characters", name)
 
   path <- normalizePath(path, winslash = "/")
@@ -147,7 +148,8 @@ tmpl_start_prj <- function(name, path = NULL) {
 #'   NULL will use folder with user template. (type: character(1), default: NULL)
 #'
 #' @examples
-#' tmpl_start_pkg("pkgtemplate", path = tempdir())
+#' tmpl_dir <- tempfile("pkgtempl_")
+#' tmpl_start_pkg(basename(tmpl_dir), path = tempdir())
 #'
 #' @export
 #'
@@ -166,7 +168,7 @@ tmpl_start_pkg <- function(name, path = NULL) {
   assert(!missing(name), "Template name is required")
   assert(is.character(name) && length(name) == 1 && nchar(name) > 0,
          "Non empty character(1) expected for name")
-  assert(!grepl("[\\/\"\'<>_ ]+", name),
+  assert(!grepl("[\\/\"\'<> ]+", name),
          "Invalid template name '%s'. It must not contain special characters", name)
 
   path <- normalizePath(path, winslash = "/")
@@ -219,7 +221,7 @@ tmpl_start_pkg <- function(name, path = NULL) {
 #' @examples
 #'
 #' old_option_value <- getOption("rsuite.user_templ_path")
-#' tmpl_dir <- tempfile("user_tmplates_")
+#' tmpl_dir <- tempfile("user_templates_")
 #' dir.create(tmpl_dir, recursive = TRUE, showWarnings = FALSE)
 #'
 #' options(rsuite.user_templ_path = tmpl_dir)
@@ -232,6 +234,7 @@ tmpl_start_pkg <- function(name, path = NULL) {
 #' }, add = TRUE)
 #'
 #' tmpl_start_prj(basename(user_templ), path = tempdir())
+#' tmpl_start_pkg(basename(user_templ), path = tempdir())
 #' tmpl_register(user_templ)
 #'
 #' @export
