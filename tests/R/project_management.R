@@ -46,17 +46,20 @@ create_test_package <- function(name, prj, ver = "1.0", deps = "",
   pkg_path <- file.path(prj$path, "packages", name)
 
   pkg_desc_fname <- file.path(pkg_path, "DESCRIPTION")
-  pkg_desc <- data.frame(read.dcf(file = pkg_desc_fname))
-  pkg_desc$Version <- ver
-  deps <- trimws(deps)
-  if (nchar(deps)) {
-    pkg_desc$Depends <- deps
+  
+  if (file.exists(pkg_desc_fname)) {
+    pkg_desc <- data.frame(read.dcf(file = pkg_desc_fname))
+    pkg_desc$Version <- ver
+    deps <- trimws(deps)
+    if (nchar(deps)) {
+      pkg_desc$Depends <- deps
+    }
+    imps <- trimws(imps)
+    if (nchar(imps)) {
+      pkg_desc$Imports <- imps
+    }
+    write.dcf(pkg_desc, file = pkg_desc_fname)
   }
-  imps <- trimws(imps)
-  if (nchar(imps)) {
-    pkg_desc$Imports <- imps
-  }
-  write.dcf(pkg_desc, file = pkg_desc_fname)
 
   invisible(pkg_path)
 }
