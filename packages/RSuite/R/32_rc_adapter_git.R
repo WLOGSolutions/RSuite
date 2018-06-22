@@ -55,45 +55,7 @@ rc_adapter_prj_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params) 
     git_path <- function(...) file.path(prj_gitbase, ...)
   }
 
-  writeLines(c(".Rproj.user", ".Rhistory", ".Rdata", ".Rbuildignore", ".Ruserdata", "config.txt"),
-             con = file.path(params$prj_path, ".gitignore"))
-  git2r::add(repo, git_path(".gitignore"))
-
-  writeLines(c("intrepo"),
-             con = file.path(params$prj_path, "deployment", ".gitignore"))
-  git2r::add(repo, git_path("deployment", ".gitignore"))
-
-  writeLines(c("*", "!.gitignore"),
-             con = file.path(params$prj_path, "deployment", "libs", ".gitignore"))
-  git2r::add(repo, git_path("deployment", "libs", ".gitignore"))
-
-  writeLines(c("*", "!.gitignore"),
-             con = file.path(params$prj_path, "deployment", "sbox", ".gitignore"))
-  git2r::add(repo, git_path("deployment", "sbox", ".gitignore"))
-
-  writeLines(c("*", "!.gitignore"),
-             con = file.path(params$prj_path, "logs", ".gitignore"))
-  git2r::add(repo, git_path("logs", ".gitignore"))
-
-  writeLines("",
-             con = file.path(params$prj_path, "packages", ".gitignore"))
-  git2r::add(repo, git_path("packages", ".gitignore"))
-
-  writeLines("",
-             con = file.path(params$prj_path, "R", ".gitignore"))
-  git2r::add(repo, git_path("R", ".gitignore"))
-
-  git2r::add(repo, git_path(c("PARAMETERS", "config_templ.txt")))
-  git2r::add(repo, git_path(c(".Rprofile", "*.Rproj")))
-  git2r::add(repo, git_path("deployment", c("*.r", "*.R")))
-  git2r::add(repo, git_path("R", c("*.r", "*.R", ".Rprofile")))
-
-  if (dir.exists(file.path(params$prj_path, "tests"))) {
-    writeLines("", con = file.path(params$prj_path, "tests", ".gitignore"))
-    git2r::add(repo,
-               git_path("tests",
-                        c("*.R", "*.r", "*.Rproj", ".Rprofile", ".gitignore")))
-  }
+  git_add_folder(repo, params$prj_path, git_path)
 }
 
 
@@ -114,28 +76,100 @@ rc_adapter_pkg_struct_add.rsuite_rc_adapter_git <- function(rc_adapter, params, 
     git_path <- function(...) file.path(pkg_gitbase, ...)
   }
 
-  writeLines("", con = file.path(pkg_dir, ".gitignore"))
-  git2r::add(repo, git_path(".gitignore"))
-
-  writeLines("", con = file.path(pkg_dir, "data", ".gitignore"))
-  git2r::add(repo, git_path("data", ".gitignore"))
-
-  writeLines("", con = file.path(pkg_dir, "inst", ".gitignore"))
-  git2r::add(repo, git_path("inst", ".gitignore"))
-
-  writeLines(c("*", "!.gitignore"),
-             con = file.path(pkg_dir, "man", ".gitignore"))
-  git2r::add(repo, git_path("man", ".gitignore"))
-
-  git2r::add(repo, git_path(c("DESCRIPTION", "NAMESPACE", "NEWS", "*.Rproj", ".Rprofile")))
-  git2r::add(repo, git_path("R", c("*.R", "*.r")))
-
-  if (dir.exists(file.path(pkg_dir, "tests"))) {
-    writeLines("", con = file.path(pkg_dir, "tests", ".gitignore"))
-    git2r::add(repo, git_path("tests", c("*.R", "*.r", ".gitignore")))
-  }
+  git_add_folder(repo, pkg_dir, git_path)
 }
 
+
+#'
+#' Iterates recursively over folder structure and adds its content under
+#'  version control.
+#'
+#' Detects files/folders to be ignored specified in rc_ignore files. Sets
+#'  appropriate .gitignore.
+#'
+#' @param svn svn_manager object
+#' @param fld_path path to folder to be processed.
+#'
+#' @keywords internal
+#' @noRd
+#'
+git_add_folder <- function(repo, fld_path, git_path_f, up_ignores = c()) {
+  ignores <- character(0)
+
+  git_ignore_file <- file.path(fld_path, ".gitignore")
+  if (file.exists(git_ignore_file)) {
+    ignores <- readLines(git_ignore_file)
+    ignores <- ignores[ignores != ""]
+  }
+
+  new_ignores <- up_ignores
+  new_ignore_file <- file.path(fld_path, "rc_ignore")
+  if (file.exists(new_ignore_file)) {
+    new_ignores <- c(new_ignores, readLines(new_ignore_file))
+    new_ignores <- new_ignores[new_ignores != ""]
+    unlink(new_ignore_file, force = TRUE)
+  }
+
+  if (length(ignores) == 0 || length(setdiff(new_ignores, ignores)) > 0) {
+    ignores <- unique(c(new_ignores, ignores))
+    writeLines(ignores, con = git_ignore_file) # it will be added later
+  }
+  ignores <- c(".git", ignores)
+
+  toadd <- list.files(fld_path, all.files = TRUE, no.. = TRUE)
+  if (length(ignores) > 0) {
+    inc_ignores <- ignores[grepl("^[^!]", ignores)]
+    inc_ignores_rx <- glob2rx(inc_ignores)
+
+    exc_ignores <- ignores[grepl("^!", ignores)]
+    exc_ignores <- gsub("^!", "", exc_ignores)
+    exc_ignores_rx <- glob2rx(exc_ignores)
+
+    toadd <- lapply(X = toadd,
+                    FUN = function(fn) {
+                      matched_rx <- lapply(exc_ignores_rx, function(rx) grepl(rx, fn))
+                      if (any(unlist(matched_rx))) {
+                        return(fn)
+                      }
+                      matched_rx <- lapply(inc_ignores_rx, function(rx) grepl(rx, fn))
+                      if (any(unlist(matched_rx))) {
+                        return()
+                      }
+                      return(fn)
+                    })
+    toadd <- unlist(toadd)
+  }
+
+  files_toadd <- toadd[!dir.exists(file.path(fld_path, toadd))]
+  if (length(files_toadd) > 0) {
+    svn$add_files(fld_path, files_toadd)
+    git2r::add(repo, git_path_f(files_toadd))
+  }
+
+  # ignores on subsequent folders
+  down_path_ignores <- lapply(ignores, function(ig) unlist(strsplit(ig, "\\\\|/")))
+
+  fldrs_toadd <- toadd[dir.exists(file.path(fld_path, toadd))]
+  for(subfld in fldrs_toadd) {
+    sub_ignores <- lapply(down_path_ignores,
+                          function(ig_path) {
+                            if (gsub("^!", "", ig_path[[1]]) != subfld) {
+                              return()
+                            }
+
+                            ig <- paste(ig_path[-1], collapse = .Platform$file.sep)
+                            if (grepl(ig_path[[1]], "^!")) {
+                              ig <- paste0("!", ig)
+                            }
+                          })
+    sub_ignores <- unlist(sub_ignores)
+
+    git_add_folder(repo,
+                   fld_path = file.path(fld_path, subfld),
+                   git_path_f = function(...) { git_path_f(subfld, ...) },
+                   up_ignores = sub_ignores)
+  }
+}
 
 #'
 #' Implementation of rc_adapter_get_version for GIT rc adapted.

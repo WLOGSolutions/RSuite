@@ -270,6 +270,7 @@ svn_add_folder <- function(svn, fld_path, up_ignores = c()) {
     ignores <- unique(c(new_ignores, ignores))
     svn$prop_set(fld_path, "svn:ignore", ignores)
   }
+  ignores <- c(".svn", ignores)
 
   toadd <- list.files(fld_path, all.files = TRUE, no.. = TRUE)
   if (length(ignores) > 0) {
