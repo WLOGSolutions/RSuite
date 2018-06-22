@@ -87,7 +87,8 @@ pkg_download <- function(avail_pkgs, dest_dir) {
         try({
           # cache them
           suppressWarnings({
-            dir.create(unique(dirname(cache_files[!cache_exists])), recursive = TRUE, showWarnings = FALSE)
+            lapply(X = unique(dirname(cache_files[!cache_exists])),
+                   FUN = function(dir_path) dir.create(dir_path, recursive = TRUE, showWarnings = FALSE))
             file.copy(from = remote_paths$Path, to = cache_files[!cache_exists], overwrite = TRUE)
           })
         },
