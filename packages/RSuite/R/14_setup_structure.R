@@ -220,7 +220,7 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
     writeLines(lines, con = f)
   }
 
-  file.rename(files, replace_markers(keywords, files))
+  rename_files_with_markers(keywords, files)
 }
 
 
@@ -277,10 +277,7 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
     writeLines(lines, con = f)
   }
 
-  # replace all markers in file names
-  files_renamed <- replace_markers(keywords, files) # from 58_templates.R
-  success <- file.rename(files, files_renamed)
-  assert(length(success) > 0, "Failed to rename files in template.")
+  rename_files_with_markers(keywords, files)
 }
 
 #'

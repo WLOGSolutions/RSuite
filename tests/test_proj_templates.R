@@ -298,3 +298,62 @@ test_that_managed("Template priority during project/package creation", {
   expect_true(all(expected_prj_files %in% prj_files))
   expect_true(all(expected_pkg_files %in% pkg_files))
 })
+
+
+
+test_that_managed("Overwriting existing project files", {
+  # create project template not
+  create_prj_test_template(name = "TestTemplate")
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
+
+  # check if template contains files from default template
+  file.create(file.path(tmpl_path, "TestProjectInfo.txt"))
+
+  # create project using custom template
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
+  params <- prj$load_params()
+  
+  # add changes to TestProjectInfo.txt file in the created project
+  changed_file_path <- file.path(params$prj_path, "TestProjectInfo.txt")
+  file_connection <- file(changed_file_path)
+  new_file_content <- "My very important changes."
+  writeLines(new_file_content, file_connection)
+  close(file_connection)
+  
+  # create project again and check if files got overwritten
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
+  file_connection <- file(changed_file_path)
+  line <- readLines(file_connection, n = 1)
+  close(file_connection)
+  
+  expect_equal(line, new_file_content)
+})
+
+test_that_managed("Overwriting existing project files while renaming", {
+  # create project template not
+  create_prj_test_template(name = "TestTemplate")
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
+
+  # check if template contains files from default template
+  file.create(file.path(tmpl_path, "__ProjectName__Info.txt"))
+
+  # create project using custom template
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
+  params <- prj$load_params()
+  
+  # add changes to TestProjectInfo.txt file in the created project
+  changed_file_path <- file.path(params$prj_path, "TestProjectInfo.txt")
+  file_connection <- file(changed_file_path)
+  new_file_content <- "My very important changes."
+  writeLines(new_file_content, file_connection)
+  close(file_connection)
+  
+  # create project again and check if files got overwritten
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
+  file_connection <- file(changed_file_path)
+  line <- readLines(file_connection, n = 1)
+  close(file_connection)
+  
+  expect_equal(line, new_file_content)
+})
+

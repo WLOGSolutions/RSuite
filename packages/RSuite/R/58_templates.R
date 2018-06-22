@@ -192,6 +192,32 @@ replace_markers <- function(keywords, input) {
   return(input)
 }
 
+rename_files_with_markers <- function(keywords, files) {
+  # replace all markers in file names
+  files_renamed <- replace_markers(keywords, files) # from 58_templates.R
+
+  # retrieve files that had markerks in their names
+  files_renamed_indexes <- files_renamed != files
+  files_renamed <- files_renamed[files_renamed_indexes]
+  files <- files[files_renamed_indexes]
+  files_with_markers <- files
+
+  # check if any files will be overwritten while renaming and exclude them
+  # to prevent losing any saved changes
+  new_files <- !file.exists(files_renamed)
+  files <- files[new_files]
+  files_renamed <- files_renamed[new_files]
+
+
+  if (length(files_renamed) > 0) {
+    success <- file.rename(files, files_renamed)
+    assert(length(success) > 0, "Failed to rename files.")
+  } else {
+    # delete files that would overwrite changes
+    success <- file.remove(files_with_markers)
+    assert(length(success) > 0, "Failed to delete unnecessary files")
+  }
+}
 
 #'
 #' Retrieves folder where user package and project templates are located.
