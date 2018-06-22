@@ -233,7 +233,7 @@ tmpl_register <- function(path = NULL, global = FALSE) {
   assert(dir.exists(path), "Directory %s does not exist.", path)
 
   if (global) {
-    tmpl_dir <- get_global_tmpl_dir()
+    tmpl_dir <- get_global_templ_dir()
     assert(!is.null(tmpl_dir), "Global template directory error.")
   } else{
     tmpl_dir <- get_user_templ_base_dir(create = TRUE) # from 58_templates.R

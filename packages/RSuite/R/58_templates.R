@@ -193,10 +193,13 @@ replace_markers <- function(keywords, input) {
 }
 
 rename_files_with_markers <- function(keywords, files) {
+  if (length(files) == 0) {
+    return()
+  }
   # replace all markers in file names
   files_renamed <- replace_markers(keywords, files) # from 58_templates.R
 
-  # retrieve files that had markerks in their names
+  # retrieve files that had markers in their names
   files_renamed_indexes <- files_renamed != files
   files_renamed <- files_renamed[files_renamed_indexes]
   files <- files[files_renamed_indexes]
@@ -211,11 +214,15 @@ rename_files_with_markers <- function(keywords, files) {
 
   if (length(files_renamed) > 0) {
     success <- file.rename(files, files_renamed)
-    assert(length(success) > 0, "Failed to rename files.")
+    if (length(success) <= 0) {
+      pkg_logwarn("Failed to rename files containg markers in their names: %s", files)
+    }
   } else if (length(files_with_markers) > 0) {
     # delete files that would overwrite changes
     success <- file.remove(files_with_markers)
-    assert(length(success) > 0, "Failed to delete files %s", files_with_markers)
+    if (length(success) <= 0) {
+      pkg_logwarn("Failed to delete unnecessary files that already exist in the project %s", files_with_markers)
+    }
   }
 }
 
