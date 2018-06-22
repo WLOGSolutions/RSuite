@@ -275,7 +275,7 @@ svn_add_folder <- function(svn, fld_path, up_ignores = c()) {
 
   toadd <- list.files(fld_path, all.files = TRUE, no.. = TRUE)
   if (length(ignores) > 0) {
-    ignores_rx <- glob2rx(ignores)
+    ignores_rx <- utils::glob2rx(ignores)
     toadd <- lapply(X = toadd,
                     FUN = function(fn) {
                       matched_rx <- lapply(ignores_rx, function(rx) grepl(rx, fn))

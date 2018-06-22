@@ -83,9 +83,6 @@ NULL
 #'   \item{\code{\link{rsuite_unregister_rc_adapter}}}{Unregisters RC (revision control) adapter.}
 #'   \item{\code{\link{rsuite_get_rc_adapter_names}}}{Gets all names of known RC (revision control) adapters.}
 #'   \item{\code{\link{rsuite_getLogger}}}{Retrieves RSuite logger.}
-#'   \item{\code{\link{rsuite_start_prj_template}}}{Creates a project template.}
-#'   \item{\code{\link{rsuite_start_pkg_template}}}{Creates a package template.}
-#'   \item{\code{\link{rsuite_registers_template}}}{Registers a template.}
 #' }
 #'
 #' @section Template managment:

@@ -218,14 +218,22 @@ tmpl_start_pkg <- function(name, path = NULL) {
 #'
 #' @examples
 #'
-#' old_user_templ_path <- getOption("rsuite.user_templ_path")
-#' options(rsuite.user_templ_path = file.path(tmpl_dir, templates))
+#' old_option_value <- getOption("rsuite.user_templ_path")
+#' tmpl_dir <- tempfile("user_tmplates_")
+#' dir.create(tmpl_dir, recursive = TRUE, showWarnings = FALSE)
 #'
-#' tmpl_dir <- tempdir()
-#' tmpl_start_prj("prjtemplate", path = tmpl_dir)
-#' tmpl_register(file.path(tmpl_dir, "prjtemplate"))
+#' options(rsuite.user_templ_path = tmpl_dir)
+#' user_templ <- tempfile("usr_templ_")
 #'
-#' options(rsuite.user_templ_path = old_user_templ_path[[1]])
+#' on.exit({
+#'   options(rsuite.user_templ_path = old_option_value)
+#'   unlink(tmpl_dir, recursive = TRUE, force = TRUE)
+#'   unlink(user_templ, recursive = TRUE, force = TRUE)
+#' }, add = TRUE)
+#'
+#' tmpl_start_prj(basename(user_templ), path = tempdir())
+#' tmpl_register(user_templ)
+#'
 #' @export
 #'
 tmpl_register <- function(path = NULL, global = FALSE) {

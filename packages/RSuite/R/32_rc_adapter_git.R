@@ -121,11 +121,11 @@ git_add_folder <- function(repo, fld_path, git_path_f, up_ignores = c()) {
   toadd <- list.files(fld_path, all.files = TRUE, no.. = TRUE)
   if (length(ignores) > 0) {
     inc_ignores <- ignores[grepl("^[^!]", ignores)]
-    inc_ignores_rx <- glob2rx(inc_ignores)
+    inc_ignores_rx <- utils::glob2rx(inc_ignores)
 
     exc_ignores <- ignores[grepl("^!", ignores)]
     exc_ignores <- gsub("^!", "", exc_ignores)
-    exc_ignores_rx <- glob2rx(exc_ignores)
+    exc_ignores_rx <- utils::glob2rx(exc_ignores)
 
     toadd <- lapply(X = toadd,
                     FUN = function(fn) {
