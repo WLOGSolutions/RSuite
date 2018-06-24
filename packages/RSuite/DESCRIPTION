@@ -13,7 +13,7 @@ Authors@R: c(
       comment = "Definitions of system requerements are taken from sysreqsdb project.")
     )
 Maintainer: Walerian Sokolowski <rsuite@wlogsolutions.com>
-Description: Support safe and supportable solutions development in R. It will help you with 
+Description: Supports safe and reproducible solutions development in R. It will help you with 
   environment separation per project, dependency management, local packages creation and preparing 
   deployment packs for you solutions.
 URL: http://rsuite.io

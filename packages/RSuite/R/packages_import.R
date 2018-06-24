@@ -16,7 +16,7 @@ NULL
 
 #' Supports Developing, Building and Deploying R Solution.
 #'
-#' Support safe and supportable solutions development in R.\cr
+#' Supports safe and reproducible solutions development in R.\cr
 #' \cr
 #' It will help you with environment separation per project, dependency
 #' management, local packages creation and preparing deployment packs
