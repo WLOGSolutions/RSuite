@@ -6,13 +6,7 @@
 * win-builder (devel and release)
 
 ## R CMD check results
-There were no ERRORs, WARNINGs.
-
-Single NOTE generates by win-builder:
-Missing or unexported object: 'git2r::diff'
-
-Which seems to be misreporting as RSuite imports the whole
-git2r namespace.
+There were no ERRORs, WARNINGs or NOTEs.
 
 ## Downstream dependencies
 No issues detected

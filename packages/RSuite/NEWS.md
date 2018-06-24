@@ -1,4 +1,4 @@
-# RSuite 0.29 (2018-06-??)
+# RSuite 0.29 (2018-06-24)
   * #169: if project package depends on some dependents of devtools and devtools
      is installed into sbox as supportive package not available in the 
      environment (e.g. for R without RSuite) devtools could not be loaded for 

@@ -1,5 +1,6 @@
-VERSION 0.29 (2018-06-??)
+VERSION 0.29 (2018-06-24)
   * `proj lock` and `proj unlock` subcommands added.
+  * `tmpl` subcommand added.
 
 VERSION 0.28 (2018-06-01)
   * --no-vignettes added to `proj build`
