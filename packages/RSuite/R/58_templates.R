@@ -336,3 +336,38 @@ get_builtin_templs_temp_base <- function() {
          "Failed to extract builtin templates. Check RSuite installation.")
   return(temp_dir)
 }
+
+
+
+#'
+#' Checks whether a file is a binary file.
+#'
+#' @param file path to the file to check (type: character(1))
+#'
+#' @param blocksize size of the block based on which the file will be identified
+#' as binary or not (type: numeric)
+#'
+#' @return TRUE if a file is a binary file
+#'
+#' @keywords internal
+#' @noRd
+#'
+is_binary <- function(file, blocksize = 512) {
+  block <- readBin(file, "raw", n = blocksize)
+  null_byte <- as.raw(00)
+
+  special_chars <- sapply(c('\n', '\r', '\t', '\f', '\b'), charToRaw)
+  names(special_chars) <- NULL
+  text_chars <- c(as.raw(32:127), special_chars)
+
+  if (null_byte %in% block) {
+    return(TRUE)
+  } else if (length(block) == 0) {
+    return(FALSE)
+  }
+
+  nontext_chars <- block[!block %in% text_chars]
+
+  return(length(nontext_chars) / length(block) > 0.3)
+}
+
