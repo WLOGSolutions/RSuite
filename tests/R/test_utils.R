@@ -61,7 +61,7 @@ get_wspace_template_dir <- function() { .get_create_dir("wspace/templates")}
 .get_create_dir <- function(name) {
   dpath <- file.path(RSuite::prj_init()$path, "tests", name)
   if (!dir.exists(dpath)) {
-    dir.create(dpath, recursive = T,)
+    dir.create(dpath, recursive = T)
   }
   return(dpath)
 }
@@ -111,4 +111,17 @@ expect_log_message <- function(object, regexp) {
     expect(length(matched) != 0,
            sprintf("%s produced no output matching '%s'", call, regexp))
   }
+}
+
+
+test_that_template <- function(desc, ...) {
+  # setup test environment options
+  old_option <- options("rsuite.user_templ_path")
+  options(rsuite.user_templ_path = get_wspace_template_dir())
+  
+  on_test_exit(function() {
+    # clean up, set options back to normal
+    options(rsuite.user_templ_path = unlist(old_option))
+  })
+  test_that_managed(desc, ...) 
 }

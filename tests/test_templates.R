@@ -12,9 +12,7 @@ source("R/project_management.R")
 
 context("Testing if project/package templates API functions work properly")
 
-test_that_managed("Project template creation in user local path", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Project template creation in user local path", {
   # create project template
   create_prj_test_template(name = "TestTemplate")
 
@@ -36,14 +34,11 @@ test_that_managed("Project template creation in user local path", {
     "tests/__ProjectName___Tests.Rproj",
     "tests/.Rprofile"
   )
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Project template creation in specified path", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Project template creation in specified path", {
   # create project template
   create_prj_test_template(name = "TestTemplate", path = get_wspace_dir())
 
@@ -67,14 +62,11 @@ test_that_managed("Project template creation in specified path", {
   )
 
   expect_true(all(expected_files %in% tmpl_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Package template creation in local user default path", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Package template creation in local user default path", {
   # create package template
   create_pkg_test_template(name = "TestTemplate")
 
@@ -98,14 +90,11 @@ test_that_managed("Package template creation in local user default path", {
   )
 
   expect_true(all(expected_files %in% tmpl_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Package template creation in specified path", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Package template creation in specified path", {
   # create package template
   create_pkg_test_template(name = "TestTemplate", path = get_wspace_dir())
 
@@ -129,13 +118,10 @@ test_that_managed("Package template creation in specified path", {
   )
 
   expect_true(all(expected_files %in% tmpl_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
-test_that_managed("Template getting",{
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Template getting",{
   # create templates
   create_pkg_test_template(name = "TestTemplateOnlyPackage")
   create_prj_test_template(name = "TestTemplateOnlyProject")
@@ -148,13 +134,10 @@ test_that_managed("Template getting",{
   )
   
   expect_templates(expected_templates)
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
-test_that_managed("Template registering", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Template registering", {
   # create templates
   wspace_dir <- get_wspace_dir()
   create_pkg_test_template(name = "TestTemplateOnlyPackage", path = wspace_dir)
@@ -171,5 +154,4 @@ test_that_managed("Template registering", {
   )
   
   expect_templates(expected_templates)
-  options(rsuite.user_templ_path = unlist(old_option))
 })
