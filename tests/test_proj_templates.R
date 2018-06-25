@@ -245,11 +245,11 @@ test_that_template("Template priority during project/package creation", {
   wspace_dir <- get_wspace_dir()
   create_prj_test_template(name = "builtin", path = wspace_dir)
   success <- file.create(file.path(wspace_dir, "builtin", "project", "prj_builtin.txt"))
-  assert(success, "%s failed to create file in project template")
+  stopifnot(success)
   
   create_pkg_test_template(name = "builtin", path = wspace_dir)
   success <- file.create(file.path(wspace_dir, "builtin", "package", "pkg_builtin.txt"))
-  assert(success, "%s failed to create file in project template")
+  stopifnot(success)
   
   # register created custom builtin template
   RSuite::tmpl_register(path = file.path(wspace_dir, "builtin"))
