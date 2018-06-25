@@ -356,7 +356,7 @@ is_binary <- function(file, blocksize = 512) {
   block <- readBin(file, "raw", n = blocksize)
   null_byte <- as.raw(00)
 
-  special_chars <- sapply(c('\n', '\r', '\t', '\f', '\b'), charToRaw)
+  special_chars <- sapply(c("\n", "\r", "\t", "\f", "\b"), charToRaw)
   names(special_chars) <- NULL
   text_chars <- c(as.raw(32:127), special_chars)
 
@@ -370,4 +370,3 @@ is_binary <- function(file, blocksize = 512) {
 
   return(length(nontext_chars) / length(block) > 0.3)
 }
-
