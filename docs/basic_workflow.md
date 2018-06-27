@@ -54,7 +54,7 @@ If the folder you are working in is not under git/svn control the output should 
 2017-09-23 16:39:40 WARNING:rsuite:Failed to detect RC manager for my_project
 ```
 
-To avoid warning messages you can add `--skip-rc` when calling `rsuite`.
+To avoid warning messages you can add `--skip_rc` when calling `rsuite`.
 
 ## Step 1.1 - run master file
 
