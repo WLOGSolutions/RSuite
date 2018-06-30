@@ -1,3 +1,6 @@
+VERSION 0.30 (2018-07-??)
+  * Fixes related to MacOS support (realpath behaves differently)
+
 VERSION 0.29 (2018-06-24)
   * `proj lock` and `proj unlock` subcommands added.
   * `tmpl` subcommand added.
@@ -7,7 +10,7 @@ VERSION 0.28 (2018-06-01)
   * --vanilla_sups and --no-built-check added to `proj depsinst`
 
 VERSION 0.27 (2018-05-29)
-  * just adopted for new version of RSuite
+  * just adopted for new version of R Suite
 
 VERSION 0.26 (2018-05-23)
   * support for vignettes in skip-build-step option for 'pkgzip github' and
@@ -22,7 +25,7 @@ VERSION 0.25 (2018-04-23)
 VERSION 0.24 (2018-04-18)
   * docker command has new parameter -i (--image) which makes it possible
      to build solution on specific(non default) image.
-  * On Windows path to tar is removed before any RSuite script is called as
+  * On Windows path to tar is removed before any R Suite script is called as
      it breaks any built of package.
 
 VERSION 0.23 (2018-03-09)
@@ -31,7 +34,7 @@ VERSION 0.23 (2018-03-09)
 
 VERSION 0.22 (2018-01-19)
   * R version can be enforced then building docker zip/image
-  * For linux bash_completions added.
+  * For Linux bash_completions added.
 
 VERSION 0.21 (2018-01-17)
   * MSI does not prompt for reboot any more
@@ -47,7 +50,7 @@ VERSION 0.20 (2017-12-08)
 VERSION 0.19 (2017-11-23)
   * repo command fixed to create local repository folder if does not exist.
   * 'proj build' has option to build binary project packages.
-  * 'repo addgithub' andd 'pkgzip github' have options to skip some building
+  * 'repo addgithub' and 'pkgzip github' have options to skip some building
      steps (like documentation generation). It makes sens for some faulty packages
      like Microsoft/LightGBM with invalid rogyxen declarations but proper NAMESPACE.
   * 'repo list' for empty repositories fixed not to raise error.

@@ -68,10 +68,11 @@ repo_manager_init.rsuite_repo_manager_dir <- function(repo_manager, types) {
   was_inited <- TRUE
   for (tp in types) {
     tp_path <- rsuite_contrib_url(repo_path, type = tp, rver = repo_manager$rver)
-    if (!file.exists(file.path(tp_path, "PACKAGES"))) {
+    if (!dir.exists(tp_path)) {
       success <- dir.create(tp_path, recursive = TRUE)
       assert(success, "Failed to initialize repository for %s at %s", tp, repo_path)
-
+    }
+    if (!file.exists(file.path(tp_path, "PACKAGES"))) {
       rsuite_write_PACKAGES(tp_path, tp)
       was_inited <- FALSE
     }

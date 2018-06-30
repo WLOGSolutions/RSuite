@@ -176,7 +176,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
     pkg_loginfo("Skipping specifics application")
   } else {
     makevars <- file.path(pkg_path, "src",
-                          ifelse(.Platform$OS.type == "windows", "Makevars.win", "Makevars.in"))
+                          ifelse(get_os_type() == "windows", "Makevars.win", "Makevars.in"))
     if (file.exists(makevars)) {
       spec_desc <- get_pkg_specifics(pkg_name, for_source = TRUE, load_specifics())
       if (!is.null(spec_desc$Makefile)) {
@@ -399,11 +399,11 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver, check_repos_consistenc
 #'
 load_specifics <- function() {
   spec_files <- c(
-    system.file(file.path("extdata", "pkg_specifics", sprintf("%s.dcf", .Platform$OS.type)),
+    system.file(file.path("extdata", "pkg_specifics", sprintf("%s.dcf", get_os_type())),
                 package = "RSuite"),
     file.path(Sys.getenv("HOME"), ".rsuite", "pkg_specifics.dcf")
   )
-  if (.Platform$OS.type == "unix") {
+  if (get_os_type() %in% c("macos", "unix")) {
     spec_files <- c(spec_files, "/etc/.rsuite/pkg_specifics.dcf")
   }
 

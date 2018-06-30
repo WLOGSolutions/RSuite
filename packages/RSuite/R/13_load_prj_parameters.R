@@ -57,9 +57,18 @@ load_prj_parameters <- function(prj_path) {
 
     # This defines which type of packages are expected on the platform
     #   and how to build project packages.
-    pkgs_type = ifelse(.Platform$OS.type == "windows", "win.binary", "source"),
-    aux_pkgs_type = ifelse(.Platform$OS.type == "windows", "source", "binary"),
-    bin_pkgs_type = ifelse(.Platform$OS.type == "windows", "win.binary", "binary")
+    pkgs_type = switch(get_os_type(),
+                       windows = "win.binary",
+                       macos = .Platform$pkgType, # e.g. mac.binary.el-capitan
+                       "source"),
+    aux_pkgs_type = switch(get_os_type(),
+                           windows = "source",
+                           macos = "source",
+                           "binary"),
+    bin_pkgs_type = switch(get_os_type(),
+                           windows = "win.binary",
+                           macos = .Platform$pkgType, # e.g. mac.binary.el-capitan
+                           "binary")
   )
 
   if (!dir.exists(params$lib_path)) {

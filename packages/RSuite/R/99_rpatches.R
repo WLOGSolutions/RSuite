@@ -14,7 +14,7 @@
 rsuite_contrib_url <- function(repos, type, rver = NA) {
   rver <- ifelse(is.na(rver), current_rver(), majmin_rver(rver))
 
-  if (.Platform$pkgType != "source" || type != "binary" || .Platform$OS.type != "unix") {
+  if (.Platform$pkgType != "source" || type != "binary" || get_os_type() != "unix") {
     url <- utils::contrib.url(repos, type = type)
     if (type == "source") {
       return(url)
@@ -83,6 +83,8 @@ rsuite_write_PACKAGES <- function(url, type) {
 
   if (type %in% c("win.binary", "source", "mac.binary")) {
     nr <- tools::write_PACKAGES(url, type = type, latestOnly = FALSE, addFiles = TRUE)
+  } else if (grepl("^mac[.]binary[.]", type)) { # mac.binary.el-capitan is not accepted by write_PACKAGES
+    nr <- tools::write_PACKAGES(url, type = "mac.binary", latestOnly = FALSE, addFiles = TRUE)
   } else {
     nr <- tools::write_PACKAGES(url, latestOnly = FALSE, addFiles = TRUE)
   }
@@ -116,7 +118,7 @@ rsuite_fullUnifiedPath <- function(path) {
     return(c())
   }
   path <- suppressWarnings(normalizePath(path))
-  if (.Platform$OS.type == "windows") {
+  if (get_os_type() == "windows") {
     path <- suppressWarnings(utils::shortPathName(path))
   }
   return(sub("[/\\]*$", "", path))

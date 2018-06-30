@@ -262,7 +262,7 @@ get_user_templ_base_dir <- function(create = FALSE) {
     return()
   }
 
-  if (.Platform$OS.type == "windows") {
+  if (get_os_type() == "windows") {
     user_templ_base_dir <- utils::shortPathName(user_templ_base_dir)
   }
 
@@ -294,7 +294,7 @@ get_user_templ_base_dir <- function(create = FALSE) {
 #' @noRd
 #'
 get_global_templ_dir <- function() {
-  if (.Platform$OS.type != "unix") {
+  if (!(get_os_type() %in% c("macos", "unix"))) {
     return(NULL)
   }
 
