@@ -11,9 +11,7 @@ source("R/project_management.R")
 
 context("Testing if creation of project/package using templates works properly")
 
-test_that_managed("Project creation from builtin template", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Project creation from builtin template", {
   # create test project using the builtin template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "builtin")
   params <- prj$load_params()
@@ -39,12 +37,9 @@ test_that_managed("Project creation from builtin template", {
                           recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
 
   expect_true(all(expected_files %in% prj_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
-test_that_managed("Package creation from builtin template", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Package creation from builtin template", {
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "builtin")
   params <- prj$load_params()
 
@@ -70,14 +65,11 @@ test_that_managed("Package creation from builtin template", {
                           include.dirs = TRUE, no.. = TRUE)
 
   expect_true(all(expected_files %in% pkg_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Project creation using custom template defined in user's local path", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Project creation using custom template defined in user's local path", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
 
@@ -104,16 +96,13 @@ test_that_managed("Project creation using custom template defined in user's loca
 
   prj_files <- list.files(params$prj_path, all.files = TRUE,
                           recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
-
+  
   expect_true(all(expected_files %in% prj_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Project creation using custom template (path as argument)", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Project creation using custom template (path as argument)", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
@@ -147,14 +136,11 @@ test_that_managed("Project creation using custom template (path as argument)", {
                           recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
 
   expect_true(all(expected_files %in% prj_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Package creation using custom template defined in user's local directory", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Package creation using custom template defined in user's local directory", {
   # create project template not
   create_pkg_test_template(name = "TestTemplate")
   
@@ -182,14 +168,11 @@ test_that_managed("Package creation using custom template defined in user's loca
                           include.dirs = TRUE, no.. = TRUE)
 
   expect_true(all(expected_files %in% pkg_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Package creation using custom template (path as argument)", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Package creation using custom template (path as argument)", {
   # create project template not
   create_pkg_test_template(name = "TestTemplate")
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
@@ -223,14 +206,11 @@ test_that_managed("Package creation using custom template (path as argument)", {
                           include.dirs = TRUE, no.. = TRUE)
 
   expect_true(all(expected_files %in% pkg_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Project creation using template not containing the PARAMETERS file", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Project creation using template not containing the PARAMETERS file", {
   # create project template
   create_prj_test_template(name = "TestTemplate")
 
@@ -240,13 +220,10 @@ test_that_managed("Project creation using template not containing the PARAMETERS
 
   expect_log_message(init_test_project(name = "TestProject", tmpl = tmpl_path),
                regexp = "does not contain required files: PARAMETERS")
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
-test_that_managed("Package creation using template not containing the DESCRIPTION file", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Package creation using template not containing the DESCRIPTION file", {
   # create package template
   create_pkg_test_template(name = "TestTemplate")
 
@@ -259,23 +236,20 @@ test_that_managed("Package creation using template not containing the DESCRIPTIO
   expect_log_message(create_test_package(name = "TestPackage",
                                    prj = prj, tmpl = tmpl_path),
                regexp = "does not contain required files: DESCRIPTION")
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Template priority during project/package creation", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Template priority during project/package creation", {
   # create custom builtin template
   wspace_dir <- get_wspace_dir()
   create_prj_test_template(name = "builtin", path = wspace_dir)
   success <- file.create(file.path(wspace_dir, "builtin", "project", "prj_builtin.txt"))
-  assert(success, "%s failed to create file in project template")
+  stopifnot(success)
   
   create_pkg_test_template(name = "builtin", path = wspace_dir)
   success <- file.create(file.path(wspace_dir, "builtin", "package", "pkg_builtin.txt"))
-  assert(success, "%s failed to create file in project template")
+  stopifnot(success)
   
   # register created custom builtin template
   RSuite::tmpl_register(path = file.path(wspace_dir, "builtin"))
@@ -323,14 +297,11 @@ test_that_managed("Template priority during project/package creation", {
   
   expect_true(all(expected_prj_files %in% prj_files))
   expect_true(all(expected_pkg_files %in% pkg_files))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
 
-test_that_managed("Overwriting existing project files", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Overwriting existing project files", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
@@ -356,12 +327,9 @@ test_that_managed("Overwriting existing project files", {
   close(file_connection)
   
   expect_equal(line, new_file_content)
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
-test_that_managed("Overwriting existing project files while renaming", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Overwriting existing project files while renaming", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
@@ -387,13 +355,10 @@ test_that_managed("Overwriting existing project files while renaming", {
   close(file_connection)
   
   expect_equal(line, new_file_content)
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
-test_that_managed("Project creation from empty template", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Project creation from empty template", {
   wspace_dir <- get_wspace_dir()
   minimal_tmpl_path <- file.path(wspace_dir, "minimal")
   
@@ -401,13 +366,10 @@ test_that_managed("Project creation from empty template", {
   dir.create(minimal_tmpl_path)
   
   expect_silent(init_test_project(tmpl = minimal_tmpl_path))
-  options(rsuite.user_templ_path = unlist(old_option))
 })
 
 
-test_that_managed("Package creation from empty template", {
-  old_option <- options("rsuite.user_templ_path")
-  options(rsuite.user_templ_path = get_wspace_template_dir())
+test_that_template("Package creation from empty template", {
   wspace_dir <- get_wspace_dir()
   minimal_tmpl_path <- file.path(wspace_dir, "minimal")
   
@@ -416,5 +378,4 @@ test_that_managed("Package creation from empty template", {
   
   prj <- init_test_project()
   expect_silent(create_test_package("TestPackage", prj = prj, tmpl = minimal_tmpl_path))
-  options(rsuite.user_templ_path = unlist(old_option))
 })

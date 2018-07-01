@@ -215,6 +215,7 @@ create_package_structure <- function(pkg_dir, pkg_tmpl = "builtin") {
   )
 
   for (f in files) {
+    if (is_binary(f)) next
     lines <- readLines(con = f, warn = FALSE)
     lines <- replace_markers(keywords, lines)
     writeLines(lines, con = f)
@@ -272,6 +273,7 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
 
   # replace all markers in the file content
   for (f in files) {
+    if (is_binary(f)) next
     lines <- readLines(con = f, warn = FALSE)
     lines <- replace_markers(keywords, lines) # from 58_templates.R
     writeLines(lines, con = f)

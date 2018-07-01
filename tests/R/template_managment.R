@@ -6,7 +6,7 @@
 #----------------------------------------------------------------------------
 
 create_prj_test_template <- function(name = NULL, path = NULL) {
-  assert(!is.null(name), "Template name was not provided")
+  stopifnot(!is.null(name))
   
   RSuite::tmpl_start_prj(name, path)
 
@@ -19,7 +19,7 @@ create_prj_test_template <- function(name = NULL, path = NULL) {
 
 
 create_pkg_test_template <- function(name = NULL, path = NULL) {
-  assert(!is.null(name), "Template name was not provided")
+  stopifnot(!is.null(name))
 
   RSuite::tmpl_start_pkg(name, path)
 

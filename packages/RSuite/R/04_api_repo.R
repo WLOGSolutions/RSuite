@@ -689,7 +689,7 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
   success <- unzip_folder(dest_dir = tmp_path, zip_file_path = pkgzip)
   assert(success, "Failed to unzip file (unzip returned non 0 return status).")
 
-  types <- c("source", "win.binary", "mac.binary", "binary")
+  types <- c("source", "win.binary", "mac.binary", "binary", .Platform$pkgType)
   types <- Filter(x = types,
                   f = function(tp) {
                     dir.exists(rsuite_contrib_url(tmp_path, tp, mgr_info$rver))

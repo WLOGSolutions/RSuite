@@ -128,8 +128,11 @@ repo_adapter_create_manager.rsuite_repo_adapter_dir <- function(repo_adapter, ..
     if ("types" %in% names(dots)) {
       types <- dots$types
       assert(is.character(types) & length(types) > 0, "Non empty character(N) expected for types")
-      assert(all(types %in% c("win.binary", "mac.binary", "binary", "source")),
-             "Invalid types management requested. Supported types are win.binary, mac.binary, binary, source")
+
+      exp_types <- unique(c("win.binary", "mac.binary", "binary", "source", .Platform$pkgType))
+      assert(all(types %in% exp_types),
+             "Invalid types management requested. Supported types are %s",
+             paste(exp_types, collapse = ", "))
     } else {
       types <- .Platform$pkgType
     }

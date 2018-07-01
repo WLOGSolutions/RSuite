@@ -47,7 +47,7 @@ majmin_rver <- function(rver) {
 get_rscript_path <- function(rver) {
   stopifnot(is_nonempty_char1(rver))
 
-  rscript_cmd <- ifelse(.Platform$OS.type == "windows", "Rscript.exe", "Rscript")
+  rscript_cmd <- ifelse(get_os_type() == "windows", "Rscript.exe", "Rscript")
   if (majmin_rver(rver) == current_rver()) {
     return(file.path(R.home("bin"), rscript_cmd))
   }
@@ -101,7 +101,7 @@ get_rscript_path <- function(rver) {
 get_rscript_search_paths <- function(rscript_cmd) {
   paths <- unlist(strsplit(Sys.getenv("PATH"), split = .Platform$path.sep, fixed = TRUE))
 
-  if (.Platform$OS.type == "windows") {
+  if (get_os_type() == "windows") {
     machine_regs <- tryCatch({
       reg_ents <- unlist(utils::readRegistry("SOFTWARE\\R-core\\R", hive = "HLM", maxdepth = 2))
       unique(file.path(reg_ents[grepl("InstallPath$", names(reg_ents))], "bin"))
