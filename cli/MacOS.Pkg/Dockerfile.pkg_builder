@@ -1,0 +1,23 @@
+FROM ubuntu
+
+RUN apt-get update \
+    && apt-get install -y \
+		git supervisor \
+		cpio make g++ \
+		wget libxml2-dev libssl1.0-dev
+    
+# install bomutils
+RUN git clone https://github.com/hogliux/bomutils /tmp/bomutils \
+	&& cd /tmp/bomutils && make && make install \
+	&& rm -rf /tmp/bomutils
+	
+#install xar
+RUN cd /tmp \
+	&& wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/xar/xar-1.5.2.tar.gz \
+	&& tar xzf xar-1.5.2.tar.gz && cd /tmp/xar-1.5.2 \
+	&& ./configure && make && make install \
+	&& rm -rf /tmp/xar-1.5.2*
+
+WORKDIR /opt
+
+CMD [ "supervisord", "-n" ]
