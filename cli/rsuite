@@ -8,7 +8,7 @@ if [ -z "$rscript_path" ]; then
 fi
 
 basedir=$(dirname "$0")
-basedir=$(readlink -f "$basedir")
+basedir=$("$rscript_path" -e "cat(normalizePath('$basedir'))")
 
 cmd="$1"
 if [ -z "$cmd" ]; then
@@ -51,7 +51,7 @@ case "$cmd" in
                 echo $ver
 		;;
 	help)
-		ver=`cat "${basedir}/version.txt"`
+	  ver=`cat "${basedir}/version.txt" | tr -d "\\\r"`
 		echo "Command line utility for R project management with RSuite (v$ver)"
 		echo "Usage: rsuite [command] [args]"
 		echo ""
@@ -70,7 +70,7 @@ case "$cmd" in
 		echo "           project packages."
 		echo ""
 		echo "       tmpl"
-		echo "	         Use it to manage  project and package templates"	 
+		echo "	         Use it to manage  project and package templates"
 		echo ""
 		echo "       sysreqs"
 		echo "          The command helps you manage R projects system requirements"

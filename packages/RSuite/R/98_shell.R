@@ -162,6 +162,10 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
                            "  cat(sprintf('~ error:%%s\\n', e))",
                            "})"),
                     rscript_arg("new", rsuite_fullUnifiedPath(ex_libpath)), full_code)
+  if (get_os_type() == "macos") {
+    # On MacOS special characters are interpreted by process, so they have to be twice escaped
+    script <- gsub("\\\\([tn])", "\\\\\\\\\\1", script)
+  }
 
   rscript_cmd <- paste(cmd0, "--no-init-file", "--no-site-file", "-e", shQuote(script), "2>&1")
   log_fun <- if (log_debug) pkg_logdebug else pkg_logfinest
@@ -282,7 +286,7 @@ get_cache_dir <- function(subname = NULL) {
     cache_dir <- file.path(cache_dir, subname)
   }
 
-  if (.Platform$OS.type == "windows") {
+  if (get_os_type() == "windows") {
     cache_dir <- utils::shortPathName(cache_dir)
   }
 
@@ -295,4 +299,28 @@ get_cache_dir <- function(subname = NULL) {
   }
 
   return(cache_dir)
+}
+
+#'
+#' Retrieves current OS type.
+#'
+#' @return one of windows, macos, unix or unknown (if failes to detect)
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_os_type <- function() {
+  if (.Platform$OS.type == "windows") {
+    return("windows")
+  }
+
+  if (grepl("darwin", R.version$os)) {
+    return("macos")
+  }
+
+  if (.Platform$OS.type == "unix") {
+    return("unix")
+  }
+
+  return("unknown")
 }

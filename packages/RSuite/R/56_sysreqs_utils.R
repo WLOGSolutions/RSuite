@@ -73,10 +73,14 @@ get_platform_desc <- function() {
 #' @noRd
 #'
 .get_platform <- function() {
-  if (.Platform$OS.type == "windows") {
+  os_type <- get_os_type()
+  if (os_type == "windows") {
     return("Windows")
   }
-  if (.Platform$OS.type == "unix") {
+  if (os_type == "macos") {
+    return("Pkg")
+  }
+  if (os_type == "unix") {
     if (file.exists("/etc/redhat-release") || file.exists("/etc/fedora-release")) {
       return("RPM")
     }

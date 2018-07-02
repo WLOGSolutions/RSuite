@@ -99,16 +99,16 @@ collect_prj_support_pkgs <- function(params, vanilla = FALSE) {
                                 }
                               }
 
+                              if (devtools::uses_testthat(pkg = pkg_path)) {
+                                sup_pkgs <- c(sup_pkgs, "testthat")
+                              }
+
                               if (any(vanilla)) {
                                 return(sup_pkgs)
                               }
 
                               if ("VignetteBuilder" %in% colnames(desc)) {
                                 sup_pkgs <- c(sup_pkgs, desc[1, "VignetteBuilder"])
-                              }
-
-                              if (devtools::uses_testthat(pkg = pkg_path)) {
-                                sup_pkgs <- c(sup_pkgs, "testthat")
                               }
 
                               tests_path <- file.path(pkg_path, "tests")

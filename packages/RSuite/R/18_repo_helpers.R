@@ -140,10 +140,14 @@ temp_repo_prepare <- function(vers, tmp_path, pkg_type, params, rver = NULL) {
     return()
   }
 
-  avail_pkgs <- deduce_package_files(vers.pick_available_pkgs(vers))
-  pkgs_infos <- get_package_url_infos(sprintf("%s/%s", avail_pkgs$Repository, avail_pkgs$File))
+  avail_pkgs <- deduce_package_files(vers.pick_available_pkgs(vers)) # from 51_pkg_info.R
+  pkgs_infos <- get_package_url_infos(sprintf("%s/%s", avail_pkgs$Repository, avail_pkgs$File)) # from 51_pkg_info.R
 
-  pkg_download(avail_pkgs[pkgs_infos$Type == pkg_type, ],
+  exp_pkg_type <- pkg_type
+  if (grepl("^mac[.]binary[.]", pkg_type)) {
+    exp_pkg_type <- "mac.binary"
+  }
+  pkg_download(avail_pkgs[pkgs_infos$Type == exp_pkg_type, ],
                dest_dir = rsuite_contrib_url(tmp_path, pkg_type, rver))
   if (pkg_type != "source" && any(pkgs_infos$Type == "source")) {
     src_avail_pkgs <- avail_pkgs[pkgs_infos$Type == "source", ]

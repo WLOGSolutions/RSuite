@@ -373,7 +373,7 @@ deduce_package_files <- function(avail_pkgs) {
     avail_pkgs[is.na(avail_pkgs$File), ]$File <- paste0(
       no_file$Package, "_", no_file$Version,
       ifelse(grepl("[\\/]bin[\\/]windows[\\/]contrib[\\/]", no_file$Repository), ".zip",
-             ifelse(grepl("[\\/]bin[\\/]macosx[\\/]contrib[\\/]", no_file$Repository), ".tgz",
+             ifelse(grepl("[\\/]bin[\\/]macosx[\\/]([^\\/]+[\\/])?contrib[\\/]", no_file$Repository), ".tgz",
                     ".tar.gz")))
   }
   return(avail_pkgs)
@@ -402,10 +402,10 @@ get_package_url_infos <- function(urls) {
   files <- sub("^.+/((src|bin)/.+)$", "\\1", urls)
   types <- ifelse(grepl("^src/contrib/[^/]+[.]tar[.]gz$", files), "source",
                   ifelse(grepl("^bin/windows/contrib/.+[.]zip$", files), "win.binary",
-                         ifelse(grepl("^bin/macosx/contrib/.+$", files), "mac.binary",
+                         ifelse(grepl("^bin/macosx/([^/]+/)?contrib/.+$", files), "mac.binary",
                                 "binary")))
   rvers <- ifelse(grepl("^src/.+$", files), NA,
-                  gsub("bin/[^/]+/contrib/([^/]+)/.+$", "\\1", files))
+                  gsub("bin/[^/]+/([^/]+/)?contrib/([^/]+)/.+$", "\\2", files))
   return(data.frame(
     Package = gsub("^.+/([^_]+)_[^/]+$", "\\1", files),
     Version = gsub("^.+/[^_]+_([^/]+)[.](zip|t(ar[.])?gz)$", "\\1", files),

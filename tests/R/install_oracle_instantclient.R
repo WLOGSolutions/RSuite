@@ -8,6 +8,8 @@
 installOracleInstantClient <- function() {
   if (.Platform$OS.type == "windows") {
     .win.installOracleInstantClient()
+  } else if (grepl("darwin", R.version$os)) {
+    .xos.installOracleInstantClient()
   } else {
     .unx.installOracleInstantClient()
   }
@@ -114,6 +116,60 @@ installOracleInstantClient <- function() {
              OCI_LIB = file.path(base_dir, "instantclient-basic-linux.x64", "instantclient_12_2"),
              OCI_INC = file.path(base_dir, "instantclient-sdk-linux.x64", "instantclient_12_2", "sdk", "include"))
 
+
+  message("Preparing ROracle environment ... done")
+  invisible(base_dir)
+}
+
+.xos.installOracleInstantClient <- function() {
+  if (all(c("OCI_INC", "OCI_LIB") %in% names(Sys.getenv()))) {
+    message("ROracle initialized already")
+    return(invisible())
+  }
+
+  base_dir <- file.path(get_data_dir(), "instantclient")
+  if (!dir.exists(base_dir)) {
+    dir.create(base_dir, recursive = T, showWarnings = F)
+    base_dir <- normalizePath(base_dir)
+
+    message(sprintf("Installing Oracle instant client from S3 into %s ...", base_dir))
+
+    void <- lapply(
+      X = c("instantclient-basiclite-macos.x64-12.2.0.1.0-2.zip",
+            "instantclient-sdk-macos.x64-12.2.0.1.0-2.zip"),
+      FUN = function(fname) {
+        loc_fpath <- file.path(base_dir, fname)
+        if (!file.exists(loc_fpath)) {
+          dload_res <- RSuite:::run_rscript("download.file('http://wlog-testdata.s3.amazonaws.com/RSuite/%s', %s)",
+                                            fname, RSuite:::rscript_arg("destfile", loc_fpath))
+          stopifnot(is.null(dload_res))
+        }
+        exdir <- file.path(base_dir, sub("^(.+)-[0-9\\.]+zip$", replacement = "\\1", x = fname))
+        unzip_res <- RSuite:::run_rscript("unzip(%s, %s)",
+                                          RSuite:::rscript_arg("zipfile", loc_fpath),
+                                          RSuite:::rscript_arg("exdir", exdir))
+        stopifnot(is.null(unzip_res))
+      })
+
+    # install libclntsh.dylib.12.1 properly
+    ora_lib_dir <- file.path(base_dir, "instantclient-basiclite-macos.x64-12.2.0.1.0", "instantclient_12_2")
+    unlink(file.path(ora_lib_dir, "libclntsh.dylib"), force = TRUE)
+    file.link(from = file.path(ora_lib_dir, "libclntsh.dylib.12.1"), to = file.path(ora_lib_dir, "libclntsh.dylib"))
+    system2("install_name_tool",
+            args = c("-id", file.path(ora_lib_dir, "libclntsh.dylib.12.1"),
+                     file.path(ora_lib_dir, "libclntsh.dylib.12.1")))
+
+    message(sprintf("Installing Oracle instant client from S3 into %s ... done", base_dir))
+  } else {
+    base_dir <- normalizePath(base_dir)
+    message(sprintf("Oracle instant client found at %s", base_dir))
+  }
+
+  message("Preparing ROracle environment ...")
+
+  Sys.setenv(
+    OCI_LIB = file.path(base_dir, "instantclient-basiclite-macos.x64-12.2.0.1.0", "instantclient_12_2"),
+    OCI_INC = file.path(base_dir, "instantclient-sdk-macos.x64-12.2.0.1.0", "instantclient_12_2", "sdk", "include"))
 
   message("Preparing ROracle environment ... done")
   invisible(base_dir)
