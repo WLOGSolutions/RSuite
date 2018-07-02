@@ -122,6 +122,7 @@ get_package_nspace_imports <- function(pkg_path) {
   ns_imports <- ns_lines[grepl("^\\s*import[(]\\s*.+\\s*[)]\\s*$", ns_lines)]
   ns_imports <- gsub("^\\s*import[()]\\s*(.+)\\s*[)]\\s*$", "\\1", ns_imports)
   ns_imports <- trimws(unlist(strsplit(ns_imports, ",")))
+  ns_imports <- ns_imports[!grepl("^except\\s*=\\s*.*", ns_imports)] # remove except parts
   ns_imports <- unique(gsub('["\']', "", ns_imports))
   return(ns_imports)
 }
