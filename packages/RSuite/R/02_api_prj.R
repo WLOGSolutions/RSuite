@@ -292,7 +292,7 @@ prj_start_package <- function(name,
 #' for R. Use \code{\link{prj_unload}} to restore your environment.
 #'
 #' @param prj project to load or NULL to use path for new project
-#'   initialization. If not path passed project will be inited from working
+#'   initialization. If not path passed project will be initialized from working
 #'   folder. (type: rsuite_project, default: NULL)
 #' @param path if prj is NULL, path will be used to init new project to load.
 #'   If passed must be existing folder path. (type: character)

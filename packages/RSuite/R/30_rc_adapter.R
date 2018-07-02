@@ -233,7 +233,7 @@ rc_adapter_get_version.default <- function(rc_adapter, dir) {
 #' put into project zip package.
 #'
 #' @param rc_adapter rc adapter object
-#' @param dir path to directory to remove administratives from. Folder must
+#' @param dir path to directory to remove administrators from. Folder must
 #'   exist (type: character)
 #'
 #' @family in extending RSuite with RC adapter

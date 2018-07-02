@@ -23,7 +23,7 @@ NULL
 #' for you solutions.
 #'
 #' @section Package options:
-#' RSuite uses the following \code{\link{options}} to configure behaviour:
+#' RSuite uses the following \code{\link{options}} to configure behavior:
 #' \itemize{
 #'    \item \code{rsuite.user_templ_path}: path to folder containing user customized templates. If not set
 #'       (which is default) no user custom templates can be used.
@@ -94,7 +94,7 @@ NULL
 #'   \item{\code{\link{rsuite_getLogger}}}{Retrieves RSuite logger.}
 #' }
 #'
-#' @section Template managment:
+#' @section Template management:
 #' These functions will help you to manage RSuite templates. They allow
 #' you to create project and package templates, register them in the
 #' local or global template directory and list all registered templates.
@@ -139,14 +139,14 @@ NULL
 #'   \item{\code{\link{rc_adapter_create_base}}}{
 #'      Creates base presentation for RC adapter to use by concrete implementations.
 #'   }
-#'   \item{\code{\link{rc_adapter_is_under_control}}}{Detects if dir is under adapter's managed version control.}
+#'   \item{\code{\link{rc_adapter_is_under_control}}}{Detects if directory is under adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_prj_struct_add}}}{Puts project structure under RC adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_pkg_struct_add}}}{Puts package structure under RC adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_get_version}}}{
 #'      Retrieves current RC version number for working copy at directory passed.
 #'   }
 #'   \item{\code{\link{rc_adapter_remove_admins}}}{
-#'      Remove all RC related administrative entries from folder tree at dir.
+#'      Remove all RC related administrative entries from folder tree at directory.
 #'   }
 #' }
 #'
@@ -182,7 +182,7 @@ NULL
 #'   \item{\code{\link{repo_manager_destroy}}}{Releases resources allocated to manage the repository.}
 #' }
 #'
-#' @section Project access/loading/unloding:
+#' @section Project access/loading/unloading:
 #' You normally will not need to use these functions unless you want perform some scripting
 #' with use of RSuite.
 #'

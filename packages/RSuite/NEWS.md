@@ -7,7 +7,7 @@
   * #169: if project package depends on some dependents of devtools and devtools
      is installed into sbox as supportive package not available in the 
      environment (e.g. for R without RSuite) devtools could not be loaded for 
-     project package building beacause only packages from sbox there visible 
+     project package building because only packages from sbox there visible 
      while loading devtools. Now devtools are loaded with sbox & libs 
      visibility.
   * #168: while detecting supportive packages to install checking if available
@@ -26,7 +26,7 @@
 # RSuite 0.28 (2018-06-01)
   * Documentation changes: package main documentation added, sections added, 
      documentation reviewed for API functions.
-  * vignettes argument added to prj_build. Passing FALSE skips vuilding vignettes.
+  * vignettes argument added to prj_build. Passing FALSE skips building vignettes.
   * vanilla_sups flag added to prj_install_deps. It causes check/install only 
      basic supportive dependencies required for project package building.
   * check_repos_consistency flag added to prj_install_deps. For R-devel CRAN has 
@@ -38,11 +38,11 @@
 
 # RSuite 0.27 (2018-05-29)
   * Handling downloaded packages cache have had error: then multiple packages
-     were checks inproper repository cache folder was selected. Due to that
-     binary packages there installed for inproper R version.
+     were checks improper repository cache folder was selected. Due to that
+     binary packages there installed for improper R version.
   * RSuite processed with goodpractices and most of detected issues fixed. 
-     goodpractices unfortunatly does not use .lintr in package file, so 
-     default lintr configuration (inproper for RSuite) is in use while checked.
+     goodpractices unfortunately does not use .lintr in package file, so 
+     default lintr configuration (improper for RSuite) is in use while checked.
   * Vignettes are also checked if changed while detecting package changes.
   * While building package its installation folder (in libs) is not removed. The
      folder is cleared only during package removal. Warning that DESCRIPTION is
@@ -62,10 +62,10 @@
     package requires testthat for testing and it gets installed into sbox.
     Also other packages required to run tets are detected and installed into
     sbox. All packages from Suggests field are also installed into sbox as 
-    they are requied to propely check package.
+    they are required to properly check package.
   
 # RSuite 0.25 (2018-04-23)
-  * Functionality related to integration with RStutio moved to separate AddIn
+  * Functionality related to integration with RStudio moved to separate AddIn
      package. Got rid of dependency to rstudioapi.
   * Removed dependency to knitr and rmarkdown. They should be installed as
      supportive packages.
@@ -74,11 +74,11 @@
   * Default MRAN date is Today - 7days.
 
 # RSuite 0.24 (2018-04-18)
-  * .Rprofile loads environment throu set_env.R not to load RSuite before
+  * .Rprofile loads environment through set_env.R not to load RSuite before
      environment is configured properly.
   * set_env.R default script_path set to R (relative to base project dir).
   * Removing previously build version from intrepo before rebuilding package.
-     On windows non removing caused updating package instead of overwritting
+     On windows non removing caused updating package instead of overwriting
      due to that if something was removed it not got removed from build packaged.
   * Fixed zipping of project not to remove data files.
 
@@ -116,13 +116,13 @@
 
 # RSuite 0.19 (2017-11-23)
   * Detection imports in package NAMESPACE fixed to support comma separated lists.
-  * Defaut set_env.R fixed to create user specific log file if has no access to default.
+  * Default set_env.R fixed to create user specific log file if has no access to default.
   * Version restriction handling fixed, tests created.
   * GitHub package building fixed to support Git repositories requiring all Git
      repository structure to build properly (e.g. Microsoft/LightGBM).
   * There is not requirement for package to have same name as package folder.
   * It is possible to skip some preliminary steps while building project packages
-     or packages from github (to put into PIGZIP or to add to repository).
+     or packages from github (to put into PKGZIP or to add to repository).
   * While building package from github it is possible to keep its sources after
      build finished.
   * fixing package index in repository for R3.4 fixed for case of removing last
@@ -131,7 +131,7 @@
 # RSuite 0.18 (2017-11-13)
   * #150: checking if R version is available early while installing deps, building,
      zipping and packing.
-  * for R3.4 it does not creates PACAKGES.rds (and removes it if found in repo) as
+  * for R3.4 it does not creates PACKAGES.rds (and removes it if found in repo) as
      it does not support multiple package versions.
 
 # RSuite 0.17 (2017-11-11)
@@ -142,10 +142,10 @@
   * fixed error with handling imports with dot in name.
   * debian & redhat OS version detection corrected
   * if NAMESPACE file of source package is built with roxygen, before building
-     documentation non present imports from DESCRIPTIO are appended. Previously
+     documentation non present imports from DESCRIPTION are appended. Previously
      they replaced content.
   * while building source packages to binary form neither documentation is
-     rebuilded nor imports validity testing is performed.
+     rebuilt nor imports validity testing is performed.
      e.g. withr source package does not have all requirements to build documentation.
   * while building source packages to binary form Rcpp:compileAttributes is skipped.
      It does not not work properly with newest Rcpp (e.g. for plyr).
@@ -153,7 +153,7 @@
 
 # RSuite 0.16 (2017-11-08)
   * Project zip can be created for projects without master scripts.
-  * prj_pack function added to export project sources. It is usefull for building
+  * prj_pack function added to export project sources. It is useful for building
      project in docker and for giving project sources your peers to play with it.
 
 # RSuite 0.15 (2017-11-04)
@@ -178,10 +178,10 @@
 # RSuite 0.12 (2017-10-16)
   * RStudio basic integration implemented. Dependency to rstudioapi added.
   * sbox folder added beside deployment/libs for libraries installed by the user.
-  * #147: Building package documentation for unpriviledged user fixed.
+  * #147: Building package documentation for unprivileged user fixed.
   * #141: prj_zip does not require project to be under version control. Version
-     is detected out of PARAMETERS/ZipVersion and packages version if formet not
-     exists.
+     is detected out of PARAMETERS/ZipVersion and packages version if format does
+     not exist.
   * #143: Clean dependencies RSuite addin added.
 
 # RSuite 0.11 (2017-10-12)
@@ -197,8 +197,8 @@
   * Minor fixes related to installation of RSuite
 
 # RSuite 0.8 (2017-09-13)
-  * Dependencies are checked both binary and source iteratively until they are
-       all satisfied (deep dependency search).
+  * Dependencies are checked both binary and source in an iterative
+       manner until they are all satisfied (deep dependency search).
   * Repository order is important: former repositories are checked for
        dependencies before later ones. If proper version is found latter
        repositories will not be checked to satisfy it.
@@ -210,24 +210,24 @@
   * Packages from github can be uploaded into a repository or packed into PKGZIP.
   * Setting RVersion for package added into API.
   * License changed to MIT + LICENSE
-  * Listing and removing packges from repositories added.
+  * Listing and removing packages from repositories added.
   * It does not require optparse any more
   * While building pkg zip from external packages it can include binary versions
        build out of sources.
-  * Installing binary packages from repository on linux fixed.
+  * Installing binary packages from repository on Linux fixed.
 
 # RSuite 0.6 (2017-08-10)
   * R version consistency check and enforcement on project level
   * Issues in upgrade of old deployment structure fixed
 
 # RSuite 0.5 (2017-07-22)
-  * Added cleaninig non required packages from project local environment.
+  * Added cleaning non required packages from project local environment.
   * PKGZIP creation and upload implemented
-  * Proper checking for SNV if update is required
+  * Proper checking for SVN if update is required
 
 # RSuite 0.4 (2017-07-18)
   * Got rid of checkpoint dependency
-  * Support for specific package installing requirements adde like configure.args
+  * Support for specific package installing requirements added like configure.args
       and configure.vars and checking for environment variables.
 
 # RSuite 0.3 (2017-07-14)
@@ -237,7 +237,7 @@
   * Documentation fixed not to contain internals
   * Dependencies consistency detection while building project implemented
   * Project packages are built before building zip package. If RC revision is
-      detected it is added to versions of project backages before building.
+      detected it is added to versions of project back ups before building.
   * Repository adapters added for CRAN and MRAN. Detection if repository is
       reliable realized. Warning is logged if any of repositories is not.
   * Got rid of miniCRAN dependency.
@@ -247,10 +247,10 @@
   * RSuite version check and update implemented.
 
 # RSuite 0.2 (2017-07-05)
-  * Adapter mechanizm implemented: RC adapters for Git and Svn, Local and S3
+  * Adapter mechanism implemented: RC adapters for Git and Svn, Local and S3
     repository adapters.
-  * Tests revieved and adapted to Rsuite.
-  * Logginig is consistent: all messages are logged into rsuite logger
+  * Tests reviewed and adapted to RSuite.
+  * Logging is consistent: all messages are logged into rsuite logger
 
 # RSuite 0.1 (2017-06-23)
   * Initial version

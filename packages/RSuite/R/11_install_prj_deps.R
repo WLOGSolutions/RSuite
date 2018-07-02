@@ -437,7 +437,7 @@ resolve_packages <- function(vers, repo_infos, pkg_types) {
 #'
 #' Detects order of installation of packages as permutation of input vector
 #'
-#' @param pkgs vector of package names to permutate
+#' @param pkgs vector of package names to permute
 #' @param db data frame of available packages as returned by available.packages
 #'
 #' @return numeric vector which is defining permutation of packages ta align
@@ -472,9 +472,9 @@ pkg_inst_order <- function(pkgs, db) {
 }
 
 #'
-#' Cleans unrequired installed packages from project local environment.
+#' Cleans installed packages that are not required from project local environment.
 #'
-#' @param params prject parameters(type: rsuite_project_params)
+#' @param params project parameters(type: rsuite_project_params)
 #'
 #' @keywords internal
 #'

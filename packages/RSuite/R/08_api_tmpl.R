@@ -15,7 +15,7 @@
 #' All templates can be found in folder pointed by rsuite.user_templ_path option.
 #'
 #' @return names of registered project and package templates together with their
-#' filepath
+#' file path
 #'
 #' @family in templates management
 #'
@@ -207,16 +207,16 @@ tmpl_start_pkg <- function(name, path = NULL) {
 #'
 #' The user's local template directory is taken from the
 #' rsuite.user_templ_path option. The global template is specified
-#' as '/etc/.rsuite/templates' and only concerns linux platforms
+#' as '/etc/.rsuite/templates' and only concerns Linux platforms
 #'
 #' @family miscellaneous
 #'
 #' @param path path to the directory where the template should be created
 #' (type: character, default: NA)
 #'
-#' @param global flag specifying if the template will be registerd in the user's
+#' @param global flag specifying if the template will be registered in the user's
 #' local template directory (taken from rsuite.user_templ_path) or in the global
-#' template directory (/etc/.rsuite/templates on Linxu platforms)
+#' template directory (/etc/.rsuite/templates on Linux platforms)
 #'
 #' @examples
 #'

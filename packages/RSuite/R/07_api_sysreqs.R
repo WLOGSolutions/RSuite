@@ -192,7 +192,7 @@ sysreqs_install <- function(prj = NULL) {
 #'
 #' Collects system requirements with \code{\link{sysreqs_collect}} and creates
 #' script to builds/install them. It creates .cmd script for Windows and bash
-#' script for linuxes.
+#' script for Linuxes.
 #'
 #' @param prj project object to process sys requirements for. If not passed will
 #'    use loaded project or default whichever exists. Will init default project
