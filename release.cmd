@@ -110,7 +110,6 @@ echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ...
 aws s3 cp "%pkg_index%" s3://wlog-rsuite/cli/ --acl public-read
 IF ERRORLEVEL 1 goto error
 echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ... done
-del "%pkg_index%" 2> nul
 
 
 echo Building/uploading RSuite CLI tag %gitver% MacOS Pkg package onto S3 repository ...

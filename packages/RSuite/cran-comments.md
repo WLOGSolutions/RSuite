@@ -3,6 +3,7 @@
 * ubuntu 14.04, R 3.2.5
 * debian 8.9, R 3.3.3
 * centos 7.4, R 3.4.2
+* MacOS Sierra 10.12, R 3.5.0
 * win-builder (devel and release)
 
 ## R CMD check results
@@ -21,3 +22,4 @@ No issues detected
 	is in use) unless user specifies to put cache (or project/package
 	templates) there by means of setting option rsuite.cache_path.
 * fixed wording in package DESCRIPTION.
+* spell checked DESCRIPTION, NEWS and documentation files.
