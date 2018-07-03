@@ -47,7 +47,7 @@ some commonly used functionalities added for your convenience:
 
 As usual edit package DESCRIPTION file and add some functionalities to your package.
 
-Now you are rady to build you project isolated environment. First you have to collect dependencies of your project:
+Now you are ready to build you project isolated environment. First you have to collect dependencies of your project:
 
 ``` bash
 RSuite::prj_install_deps()
@@ -67,7 +67,7 @@ RSuite::prj_build()
 It will build each package in your R Suite project and install it into deployment/libs. If it succeeds your isolated project environment is
 ready. 
 
-Now work on your master scripts. We are convinced that buisness logic of your solution should be enclosed into packages provided by solution.
+Now work on your master scripts. We are convinced that business logic of your solution should be enclosed into packages provided by solution.
 Master scripts are required for "glue logic" like read configuration parameters, setup connections and realize data flow between levels of
 solution functionality stack.
 

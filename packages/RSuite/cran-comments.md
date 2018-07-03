@@ -15,7 +15,7 @@ No issues detected
 * examples added to all API functions and none of them runs 
 	longer than 5secs. Examples which cannot take less time
 	(as their main purpose is to present functionality of
-	downloading/instaling/building packages) are marked with
+	downloading/installing/building packages) are marked with
 	\donttest{}. But all of them checked with devtools::run_examples.
 * package functionalities do not modify user space (only tempdir()
 	is in use) unless user specifies to put cache (or project/package
