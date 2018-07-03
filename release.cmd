@@ -12,6 +12,7 @@ IF "%gitver%" == "" (
 set pkg_index=%~dp0\PKG_INDEX
 del "%pkg_index%" 2> nul
 
+
 echo Building/uploading RSuite tag %gitver% onto S3 repository ...
 call rsuite proj depsinst -v
 if ERRORLEVEL 1 goto error
@@ -110,6 +111,35 @@ aws s3 cp "%pkg_index%" s3://wlog-rsuite/cli/ --acl public-read
 IF ERRORLEVEL 1 goto error
 echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ... done
 del "%pkg_index%" 2> nul
+
+
+echo Building/uploading RSuite CLI tag %gitver% MacOS Pkg package onto S3 repository ...
+pushd cli\MacOS.Pkg
+
+rmdir /s/q pkgs 2> nul
+call create_pkg.cmd
+
+FOR /R %%F IN (pkgs\RSuiteCLI*%gitver%*.pkg) DO set pkg=%%~nxF
+IF "%pkg%" == "" (
+	echo ERROR: failed to build MacOS Pkg package for RSuite CLI tag %gitver%.
+	goto popd_error
+)
+aws s3 cp "pkgs\%pkg%" s3://wlog-rsuite/cli/macos/ --acl public-read
+IF ERRORLEVEL 1 goto popd_error
+echo pkg: macos/%pkg% >> "%pkg_index%"
+
+popd
+echo Building/uploading RSuite CLI tag %gitver% MacOS Pkg package onto S3 repository ... done
+
+
+
+echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ...
+aws s3 cp "%pkg_index%" s3://wlog-rsuite/cli/ --acl public-read
+IF ERRORLEVEL 1 goto error
+echo Uploading RSuite CLI %gitver% PKG_INDEX onto S3 repository ... done
+del "%pkg_index%" 2> nul
+
+
 
 set zip=
 echo All done.
