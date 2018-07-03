@@ -60,7 +60,7 @@
   * Handling vignettes building while building package.
   * testthat moved to Suggested. While building package it is detected that 
     package requires testthat for testing and it gets installed into sbox.
-    Also other packages required to run tets are detected and installed into
+    Also other packages required to run tests are detected and installed into
     sbox. All packages from Suggests field are also installed into sbox as 
     they are required to properly check package.
   
