@@ -109,22 +109,32 @@ tryCatch({
   pkgs <- c("RSuite")
 
   if (opts$rstudio_addin || length(argv$args) != 0) {
-    rstudio_pkgs <- unique(c("RSuiteRStudio", argv$args))
+    rstudio_pkgs <- c()
+    if (opts$rstudio_addin) {
+      rstudio_pkgs <- c(rstudio_pkgs, "RSuiteRStudio")
+    }
+    rstudio_pkgs <- unique(c(rstudio_pkgs, argv$args))
 
+    # returns only latest versions accorind to docs
     rstudio_avails <- data.frame(utils::available.packages(contriburl = rsuite_curl),
                                  row.names = NULL, stringsAsFactors = F)
     rstudio_avails <- rstudio_avails[rstudio_avails$Package %in% rstudio_pkgs, ]
+
     if (nrow(rstudio_avails) != length(rstudio_pkgs)) {
-      .fatal_error(sprintf("Failed to detect the following packages: %s at %s",
-                           rstudio_pkgs[!rstudio_pkgs %in% rstudio_avails$Package],
-                           opts$url))
+      write(sprintf("Failed to detect the following packages: %s at %s",
+                    rstudio_pkgs[!rstudio_pkgs %in% rstudio_avails$Package],
+                    opts$url),
+            stderr())
+
+      # remove undetected packages
+      rstudio_pkgs <- rstudio_pkgs[rstudio_pkgs %in% rstudio_avails$Package]
     }
-    rstudio_avails <- rstudio_avails[1, ]
+
     message(sprintf("... installing also %s(v%s) packages ...", rstudio_pkgs, rstudio_avails$Version))
 
     dloaded <- utils::download.packages(rstudio_pkgs, destdir = src_dir, available = rstudio_avails, repos = NULL,
                                         quiet = !opts$verbose)
-    if (nrow(dloaded) != 1) {
+    if (nrow(dloaded) != length(rstudio_pkgs)) {
       pkg_url <- sprintf("%s/%s", rstudio_avails$Repository, paste(rstudio_avails$File, collapse = " "))
       .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
     }
@@ -139,7 +149,7 @@ tryCatch({
                           repos = c(CRAN = cran_path, Local = paste0("file:///", tmp_dir)),
                           quiet = !opts$verbose,
                           verbose = opts$verbose)
-}, finally = { setwd(wd) })
+}, finally = {setwd(wd)})
 
 if (!(rsuite_pkg %in% installed.packages()[, "Package"])) {
   .fatal_error(sprintf("Failed to install %s", rsuite_pkg))
