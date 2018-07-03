@@ -10,12 +10,12 @@ Authors@R: c(
     person("Ryszard", "Szymanski", email = "rszymanski@wlogsolutions.com", role = "aut"),
     person("WLOG Solutions", role = "cph"),
     person("R Consortium", role = "ctb",
-      comment = "Definitions of system requerements are taken from sysreqsdb project.")
+      comment = "Definitions of system requirements are taken from sysreqsdb project.")
     )
 Maintainer: Walerian Sokolowski <rsuite@wlogsolutions.com>
 Description: Supports safe and reproducible solutions development in R. It will help you with 
   environment separation per project, dependency management, local packages creation and preparing 
-  deployment packs for you solutions.
+  deployment packs for your solutions.
 URL: http://rsuite.io
 BugReports: https://github.com/WLOGSolutions/RSuite/issues
 License: MIT + file LICENSE
