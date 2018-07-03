@@ -51,6 +51,19 @@ You can also see all supported options 'rsuite install' supports please call
 rsuite install -h
 ```
 
+There is also the `--rstudio-addin` option which will install the `RSuiteRStudio` package. The RSuiteRStudio package is an RSuite addin which provides menu items for RSuite functionalities. Currently the following features are supported:
+
+* project starting
+* package starting
+* dependencies installation
+* packages building
+* dependency cleaning
+* deployment package building
+
+```bash
+rsuite install --rstudio-addin
+```
+
 ## Updating RSuite CLI
 
 RSuite CLI works with compatible version of RSuite. Compatibility is determined by
