@@ -6,7 +6,7 @@ screencast](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuit
 
 ## **Got stuck?**
 
-If you are stuck fill free to contact us:
+If you are stuck feel free to contact us:
 
 * through RSuite website (http://rsuite.io#contact) or 
 * using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
@@ -14,7 +14,7 @@ If you are stuck fill free to contact us:
 * directly by sending email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
-# Instalation
+# Installation
 
 Currently installation is supported only via manual. It is planned to
 add this package to [MELPA

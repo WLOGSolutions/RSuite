@@ -641,7 +641,7 @@ logerror("Master error")
 hello_world("John")
 ```
 
-Now you have to install dependecies
+Now you have to install dependencies
 
 ```bash
 rsuite proj depsinst

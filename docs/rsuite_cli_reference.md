@@ -55,7 +55,7 @@ rsuite install -h
 
 RSuite CLI works with compatible version of RSuite. Compatibility is determined by
 two higher numbers in versions of both: they should match. While installing RSuite
-RSuite CLI picks the lastes available but still compatible version of RSuite to 
+RSuite CLI picks the latest available but still compatible version of RSuite to 
 install.
 
 You can update RSuite CLI with following command:
@@ -69,7 +69,7 @@ available. If so it will download installer and commit installation process. You
 will probably need elevated privileges to upgrade RSuite CLI properly.
 
 Pay attention that new version of RSuite CLI will need newer version of RSuite
-to work. You will need to issue RSuite insllation (update to compatible version)
+to work. You will need to issue RSuite installation (update to compatible version)
 just after RSuite CLI gets updated.
 
 # Project management
@@ -235,8 +235,8 @@ following way
 rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 ```
 
-# Template managment
-RSuite CLI allows you to create your own custom project nad package templates. For example the default RSuite project template uses MRAN as the default package repository, if your projects make use of a different repository you can define your own project template with the adequate settings (in this case the Repositories option in the PARAMETERS file).
+# Template management
+RSuite CLI allows you to create your own custom project and package templates. For example the default RSuite project template uses MRAN as the default package repository, if your projects make use of a different repository you can define your own project template with the adequate settings (in this case the Repositories option in the PARAMETERS file).
 
 ## Starting custom project/package templates
 To start a project template execute the following command
@@ -310,13 +310,13 @@ rsuite tmpl get
 additional information whether the registered templates have a defined project/package template will be displayed. 
 
 ## Starting projects/packages using created templates
-To start a project using a custom template the `-t` (short for `--tmpl`) option can be used. If `MyTemplate` is a registered template simply the name of the registerd template to the `-t` option
+To start a project using a custom template the `-t` (short for `--tmpl`) option can be used. If `MyTemplate` is a registered template simply the name of the registered template to the `-t` option
 
 ```bash
   rsuite proj start -n MyProject -t MyTemplate
 ```
 
-Unregistered templates can also be provided to the `-t` option. You simply have to provide the path to the template. **Important**: the path has to point to the directory containg the template files e.g. `<path>/MyTemplate/project`
+Unregistered templates can also be provided to the `-t` option. You simply have to provide the path to the template. **Important**: the path has to point to the directory containing the template files e.g. `<path>/MyTemplate/project`
 
 ```bash
   rsuite proj start -n MyProject -t <path to template>/project
@@ -338,7 +338,7 @@ Similarly package templates can be used
 
 Project environment can contain packages which have system requirements declared (in SystemRequirements field in their 
 DESCRIPTION file). RSuite tries to interpret them and can help you to update your system for packages to build/work properly.
-For example xml package on linuxes requires libxml2 system library on Lunuxes. Depending on platform (RedHat like or Debian like)
+For example xml package on Linuxes requires libxml2 system library on Linuxes. Depending on platform (RedHat like or Debian like)
 appropriate package should be installed using appropriate package management utility. RSuite can check your system against these 
 system requirements, try to install them (if running as privileged user) and generate script to to check/install them.
 
@@ -350,7 +350,7 @@ To find out which system requirements are needed for your solution to run proper
 rsuite sysreqs collect
 ```
 
-It collects and presents all SystemRequiremets fields declared for all project packages and packages the project depends on. 
+It collects and presents all SystemRequirements fields declared for all project packages and packages the project depends on. 
 
 ## Checking system against requirements
 
@@ -366,7 +366,7 @@ database. Matched requirements will enforce platform dependent checks of the sys
 ## Installing system requirements
 
 RSuite not only checks system against dependency requirements but also can update your system. Pay attention that to install 
-system libraries priviledge access is usually required. To update your system use following command:
+system libraries privilege access is usually required. To update your system use following command:
 
 ```bash
 rsuite sysreqs install
@@ -510,7 +510,7 @@ You can also specify following options to addgithub:
   for example, 'github.hostname.com/api/v3'.
 * `-b` (short for `--binary`) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what 
   kind of package will be added to the repository: system specific binary of source.
-* `--rver` wich takes R version number to target built package for (important for binary packages).
+* `--rver` which takes R version number to target built package for (important for binary packages).
 * `--with-deps` If passed will upload also dependencies which are not currently present in the repository.
 
 ## List contents of repository
@@ -637,16 +637,16 @@ You can also specify following options to github:
 * `-b` (short for `--binary`) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will 
   be included in PKGZIP: system specific binary of source.
 * `--with-deps` If passed will include dependencies into PKGZIP.
-* `--filter-repo` which takas as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
+* `--filter-repo` which takes as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
   versions are present in the repository. The parameter should be used together with --with-deps.
 
 
 # Docker integration
 
-RSuite CLI can help you with building your solution on some diffrent platform than the one you are working on or build docker images containing solutions
+RSuite CLI can help you with building your solution on some different platform than the one you are working on or build docker images containing solutions
 you developed.
 
-All commands described below assume thar you have docker command useable/available.
+All commands described below assume that you have docker command usable/available.
 
 ## Building project under different platform in docker container
 
@@ -673,14 +673,14 @@ You can provide following options to rsuite docker zip:
 rsuite docker zip --sh "apt-get install -y libglpk-dev"
 ```
 * `--dont-rm` If passed, container used to build the project will not be removed after command finished. If not passed container used to build project 
-   will be removed even if project building fails. Option is usefull if you want to detect reasons for failure.
+   will be removed even if project building fails. Option is useful if you want to detect reasons for failure.
 * `--packages` Accepts comma separated list of project packages to include in project build. If not passed all project packages will be included. Option 
-   is usefull if your solution consists of number of images and only some packages must be present on some of them.
-* `--exc-master` If passed, generated deployment zip will not contain any master scripts. It is usefull if master scripts depend on some glue packages 
+   is useful if your solution consists of number of images and only some packages must be present on some of them.
+* `--exc-master` If passed, generated deployment zip will not contain any master scripts. It is useful if master scripts depend on some glue packages 
    which you do not want to be present in deployment zip package.
 * `--version` Accepts version number to tag deployment zip package with. Version number should be in form DD.DD. If not passed standard algorithm for 
    tag selection is applied (ZipVersion from project PARAMETERS + revision from RC). If version is not enforced R Suite will check for source codes 
-   consistency agains RC.
+   consistency against RC.
 * `-i` (short for `--image`) takes name of docker image to use for building zip instead of default rsuite image.
 
 It also accepts standard options `-v` and `-h`.
