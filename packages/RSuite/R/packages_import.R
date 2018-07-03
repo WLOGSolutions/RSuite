@@ -14,13 +14,13 @@
 #' @importFrom stats aggregate
 NULL
 
-#' Supports Developing, Building and Deploying R Solution.
+#' Supports Developing, Building and Deploying R Solutions.
 #'
 #' Supports safe and reproducible solutions development in R.\cr
 #' \cr
 #' It will help you with environment separation per project, dependency
 #' management, local packages creation and preparing deployment packs
-#' for you solutions.
+#' for your solutions.
 #'
 #' @section Package options:
 #' RSuite uses the following \code{\link{options}} to configure behavior:
@@ -33,9 +33,9 @@ NULL
 #' }
 #'
 #' @section Project management:
-#' These functions will help you start new RSuite project or package inside
-#' it, detect and install dependencies into local environment, build you
-#' project packages and prepare deployment zip then you are done with development.
+#' These functions will help you start a new RSuite project or package inside
+#' it, detect and install dependencies into the local environment, build your
+#' project packages and prepare deployment zip when you are done with the development.
 #'
 #' \describe{
 #'   \item{\code{\link{prj_start}}}{Creates project structure at specified path.}
@@ -51,41 +51,40 @@ NULL
 #'
 #' @section Repository management:
 #' These functions make you able to manage package repositories. This RSuite
-#' built-in repository managers you can manage S3 based and local (in folder)
+#' built-in repository manager allows you to manage S3 based and local (in folder)
 #' repositories.
 #'
 #' \describe{
-#'   \item{\code{\link{repo_mng_start}}}{Starts management over repository.}
-#'   \item{\code{\link{repo_mng_init}}}{Initializes repository (creates its structure).}
-#'   \item{\code{\link{repo_mng_stop}}}{Stops management over repository.}
-#'   \item{\code{\link{repo_mng_list}}}{Retrieve list of packages available in repository.}
-#'   \item{\code{\link{repo_mng_remove}}}{Removes packages from repository.}
-#'   \item{\code{\link{repo_upload_prj_packages}}}{Builds and uploads project package(s) into repository.}
-#'   \item{\code{\link{repo_upload_package_files}}}{Uploads package file(s) into managed repository.}
-#'   \item{\code{\link{repo_upload_ext_packages}}}{Uploads external packages into managed repository.}
-#'   \item{\code{\link{repo_upload_pkgzip}}}{Uploads PKGZIP into managed repository.}
-#'   \item{\code{\link{repo_upload_github_package}}}{Loads package from github repository.}
+#'   \item{\code{\link{repo_mng_start}}}{Starts management over the repository.}
+#'   \item{\code{\link{repo_mng_init}}}{Initializes a repository (creates its structure).}
+#'   \item{\code{\link{repo_mng_stop}}}{Stops management over the repository.}
+#'   \item{\code{\link{repo_mng_list}}}{Retrieves list of packages available in the repository.}
+#'   \item{\code{\link{repo_mng_remove}}}{Removes packages from the repository.}
+#'   \item{\code{\link{repo_upload_prj_packages}}}{Builds and uploads project package(s) into the repository.}
+#'   \item{\code{\link{repo_upload_package_files}}}{Uploads package file(s) into a managed repository.}
+#'   \item{\code{\link{repo_upload_ext_packages}}}{Uploads external packages into a managed repository.}
+#'   \item{\code{\link{repo_upload_pkgzip}}}{Uploads PKGZIP into a managed repository.}
+#'   \item{\code{\link{repo_upload_github_package}}}{Loads package from a github repository.}
 #' }
 #'
 #' @section PKGZIP building:
-#' PKGZIPs are for management of repositories in internet-less environment.
-#' On corporate servers often you do not have access to internet. In that
-#' case you can prepare PKGZIP with required packages somewhere with internet
-#' connection and use it to update internal CRAN-like repository which has no
-#' access to internet.
+#' PKGZIPs are for management of repositories in an internet-less environment.
+#' There is often no internet access on corporate servers. In that case you
+#' can prepare a PKGZIP with required packages somewhere with internet connection
+#' and use it to update an internal CRAN-like repository which has no access to internet.
 #'
 #' \describe{
 #'   \item{\code{\link{pkgzip_build_prj_packages}}}{Builds PKGZIP out of project packages.}
 #'   \item{\code{\link{pkgzip_build_package_files}}}{Builds PKGZIP out of passed package files.}
 #'   \item{\code{\link{pkgzip_build_ext_packages}}}{Builds PKGZIP out of passed external packages.}
-#'   \item{\code{\link{pkgzip_build_github_package}}}{Builds PKGZIP out of package on GitHub.}
+#'   \item{\code{\link{pkgzip_build_github_package}}}{Builds PKGZIP out of a package on GitHub.}
 #' }
 #'
 #' @section RSuite miscellaneous:
 #'
 #' \describe{
-#'   \item{\code{\link{rsuite_check_version}}}{Checks if newer version of RSuite is available.}
-#'   \item{\code{\link{rsuite_update}}}{Updates RSuite to newest available version}
+#'   \item{\code{\link{rsuite_check_version}}}{Checks if a newer version of RSuite is available.}
+#'   \item{\code{\link{rsuite_update}}}{Updates RSuite to the newest available version}
 #'   \item{\code{\link{rsuite_register_repo_adapter}}}{Registers repository adapter to use for projects.}
 #'   \item{\code{\link{rsuite_get_repo_adapter_names}}}{Gets all names of known repository adapters.}
 #'   \item{\code{\link{rsuite_register_rc_adapter}}}{Registers RC (revision control) adapter to use for projects.}
@@ -108,67 +107,67 @@ NULL
 #'
 #' @section System requirements:
 #' Some packages have special system requirements declared. E.g. XML package on
-#' Linuxes require libxml2 system library to be installed. Such requirements
-#' are specified in free form in SystemRequirements field in package
+#' Linuxes requires the libxml2 system library to be installed. Such requirements
+#' are specified in free form in the SystemRequirements field in the package
 #' DESCRIPTION. Team from R Consortium (\url{https://www.r-consortium.org/})
 #' performed a great job with collecting sysreqs database. As RSuite is supposed
-#' to work also in connection-less environments database they created is
-#' included into RSuite.
+#' to work also in a connection-less environments the database they created is
+#' included in RSuite.
 #'
 #' These functions extract system requirements for the whole project environment
-#' and makes it possible to prepare installation script or update your system
+#' and makes it possible to prepare installation scripts or update your system
 #' if you have privileged access.
 #'
 #' \describe{
 #'   \item{\code{\link{sysreqs_collect}}}{Prints out all system requirements from dependencies and project packages.}
 #'   \item{\code{\link{sysreqs_check}}}{Checks for system requirements availability.}
-#'   \item{\code{\link{sysreqs_install}}}{Updates system to satisfy detected requirements.}
-#'   \item{\code{\link{sysreqs_script}}}{Creates script to update system to satisfy project requirements.}
+#'   \item{\code{\link{sysreqs_install}}}{Updates the system to satisfy detected requirements.}
+#'   \item{\code{\link{sysreqs_script}}}{Creates a script to update a system to satisfy project requirements.}
 #' }
 #'
 #' @section Extending RSuite - RC adapter:
 #' This API allows you to implement your own RC (revision control) adapter for
 #' RSuite.
 #'
-#' RSuite has SVN and Git adapters in-build for you.
+#' RSuite has SVN and Git adapters built-in for you.
 #'
 #' After you developed your very own RC adapter you can register it in RSuite
-#' with \code{\link{rsuite_register_rc_adapter}} function.
+#' with the \code{\link{rsuite_register_rc_adapter}} function.
 #'
 #' \describe{
 #'   \item{\code{\link{rc_adapter_create_base}}}{
-#'      Creates base presentation for RC adapter to use by concrete implementations.
+#'      Creates a base presentation for RC adapter to use by concrete implementations.
 #'   }
 #'   \item{\code{\link{rc_adapter_is_under_control}}}{Detects if directory is under adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_prj_struct_add}}}{Puts project structure under RC adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_pkg_struct_add}}}{Puts package structure under RC adapter's managed version control.}
 #'   \item{\code{\link{rc_adapter_get_version}}}{
-#'      Retrieves current RC version number for working copy at directory passed.
+#'      Retrieves current RC version number for working copy at the passed directory.
 #'   }
 #'   \item{\code{\link{rc_adapter_remove_admins}}}{
-#'      Remove all RC related administrative entries from folder tree at directory.
+#'      Removes all RC related administrative entries from folder tree at directory.
 #'   }
 #' }
 #'
 #' @section Extending RSuite - Repository adapter and manager:
 #' This API allows you to implement your own repository adapter for RSuite.
 #' If the repository can be managed (you can add/remove/update packages in it)
-#' you can provide repo manager object creation ability to manage it with
+#' you can provide a repo manager object creation ability to manage it with
 #' RSuite.
 #'
 #' RSuite has CRAN, MRAN, S3(Amazon S3 bucket base repository), Url(repository
 #' under Url) and Dir(local CRAN-like folder) repo adapters and Dir and S3 repo
-#' managers in-build for you.
+#' managers built-in for you.
 #'
-#' After you developed your very own repository adapter you can register it in
-#' RSuite with \code{\link{rsuite_register_repo_adapter}} function.
+#' After you develop your very own repository adapter you can register it in
+#' RSuite with the \code{\link{rsuite_register_repo_adapter}} function.
 #'
 #' \describe{
 #'   \item{\code{\link{repo_adapter_create_base}}}{
 #'      Creates base presentation for repo adapter to use by concrete implementations.
 #'   }
-#'   \item{\code{\link{repo_adapter_get_info}}}{Returns informations about repository the adapter is working on.}
-#'   \item{\code{\link{rc_adapter_prj_struct_add}}}{Puts project structure under RC adapter's managed version control.}
+#'   \item{\code{\link{repo_adapter_get_info}}}{Returns informations about the repository the adapter is working on.}
+#'   \item{\code{\link{rc_adapter_prj_struct_add}}}{Puts the project structure under RC adapter's managed version control.}
 #'   \item{\code{\link{repo_adapter_get_path}}}{
 #'      Returns adapter path related to project to use for dependencies resolution.
 #'   }
@@ -177,13 +176,13 @@ NULL
 #'   }
 #'   \item{\code{\link{repo_manager_get_info}}}{Returns informations on repo manager.}
 #'   \item{\code{\link{repo_manager_init}}}{Initializes managed repository structure.}
-#'   \item{\code{\link{repo_manager_upload}}}{Adds packages to managed repository.}
+#'   \item{\code{\link{repo_manager_upload}}}{Adds packages to the managed repository.}
 #'   \item{\code{\link{repo_manager_remove}}}{Removes specified packages from the repository.}
 #'   \item{\code{\link{repo_manager_destroy}}}{Releases resources allocated to manage the repository.}
 #' }
 #'
 #' @section Project access/loading/unloading:
-#' You normally will not need to use these functions unless you want perform some scripting
+#' You normally will not need to use these functions unless you want to perform some scripting
 #' with use of RSuite.
 #'
 #' \describe{
@@ -193,16 +192,16 @@ NULL
 #' }
 #'
 #' @section Project configuration:
-#' These functions are convenient way to change project global configuration.
+#' These functions are a convenient way to change the project global configuration.
 #'
 #' You normally will not need to use these functions unless you want perform some scripting
 #' with use of RSuite.
 #'
 #' \describe{
 #'   \item{\code{\link{prj_config_set_repo_adapters}}}{
-#'      Updates project configuration to use only specified repository adapters.
+#'      Updates the project configuration to use only specified repository adapters.
 #'   }
-#'   \item{\code{\link{prj_config_set_rversion}}}{Updates project configuration to use specified R Version.}
+#'   \item{\code{\link{prj_config_set_rversion}}}{Updates the project configuration to use specified R Version.}
 #' }
 #'
 #' @docType package
