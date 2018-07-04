@@ -7,6 +7,9 @@
 
 args <- commandArgs()
 base <- dirname(gsub("--file=", "", args[grepl("^--file=", args)]))[1]
+if (grepl("darwin", R.version$os)) {
+  base <- gsub("~\\+~", " ", base) # on MacOS ~+~ in path denotes whitespace
+}
 source(file.path(base, "command_utils.R"), chdir = T)
 
 options <- c(
