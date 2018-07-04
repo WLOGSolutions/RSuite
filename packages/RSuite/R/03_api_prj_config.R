@@ -10,7 +10,7 @@
 #'
 #' @details
 #' Project configuration (together with repositories to be used) is stored in
-#' PARAMETERS file in project folder.
+#' PARAMETERS file in the project folder.
 #'
 #' After project configuration have been changed repository adapters are
 #' initialized on the project.
@@ -21,9 +21,9 @@
 #' @param repos vector of repository adapters configuration to use by the project.
 #'    Each should be in form <repo_adapter_name>[<arg>]. They should be all
 #'    registered. (type: character)
-#' @param prj project object to update configuration for. If not passed will use loaded
-#'    project or default whichever exists. Will init default project from working
-#'    directory if no default project exists. (type: rsuite_project, default: NULL)
+#' @param prj project object to update configuration for. If not passed the loaded
+#'    project will be used or the default whichever exists. Will init the default project
+#'    from the working directory if no default project exists. (type: rsuite_project, default: NULL)
 #'
 #' @family in project configuration
 #'
@@ -88,12 +88,13 @@ prj_config_set_repo_adapters <- function(repos, prj = NULL) {
 #' Updates project configuration to use specified R Version.
 #'
 #' Project configuration (together with R version to be used) is stored in
-#' PARAMETERS file in project folder.
+#' PARAMETERS file in the project folder.
 #'
 #' @param rver R version to be used by the project. (type: character)
-#' @param prj project object to update configuration for. If not passed will use loaded
-#'    project or default whichever exists. Will init default project from working
-#'    directory if no default project exists. (type: rsuite_project, default: NULL)
+#' @param prj project object to update configuration for. If not passed the loaded
+#'    project will used or the default whichever exists. Will init default project
+#'    from the working directory if no default project exists.
+#'    (type: rsuite_project, default: NULL)
 #' @param validate If TRUE will check if R version is valid for the platform.
 #'    (type: logical, default: TRUE)
 #'

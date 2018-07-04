@@ -7,9 +7,9 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Checks if newer version of RSuite is available.
+#' Checks if a newer version of RSuite is available.
 #'
-#' @return NULL if newer version is not available or newest available version number.
+#' @return NULL if a newer version is not available or newest available version number.
 #'
 #' @family miscellaneous
 #'

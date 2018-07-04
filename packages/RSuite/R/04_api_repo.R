@@ -6,13 +6,13 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Starts management over repository.
+#' Starts management over the repository.
 #'
-#' Created object to manage the repository.
+#' Creates object to manage the repository.
 #'
-#' @param ra_name name of repository to re-initialize adapter. (type: character)
+#' @param ra_name name of the repository to whose adapter will be re-initialized. (type: character)
 #' @param ... repository specific parameters. See repo_adapter_create_manager
-#'   for concrete implementation of repo adapter for more details.
+#'   for the concrete implementation of repo adapter for more details.
 #' @return repo manager object.
 #'
 #' @family in repository management
@@ -84,7 +84,7 @@ repo_mng_init <- function(repo_manager) {
 }
 
 #'
-#' Stops management over repository.
+#' Stops management over the repository.
 #'
 #' @param repo_manager repo manager object retrieved with repo_mgr_start.
 #'   (type: rsuite_repo_manager)
@@ -118,7 +118,7 @@ repo_mng_stop <- function(repo_manager) {
 }
 
 #'
-#' Retrieve list of packages available in repository.
+#' Retrieve the list of available packages in the repository.
 #'
 #' @param repo_manager repo manager to retrieve package list from.
 #'   (type: rsuite_repo_manager)
@@ -179,7 +179,7 @@ repo_mng_list <- function(repo_manager, pkg_type = .Platform$pkgType, no.cache =
 }
 
 #'
-#' Removes packages from repository.
+#' Removes packages from the repository.
 #'
 #' @param repo_manager repo manager to remove packages from.
 #'   (type: rsuite_repo_manager)
@@ -262,26 +262,26 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 }
 
 #'
-#' Builds and uploads project package(s) into repository.
+#' Builds and uploads project package(s) into the repository.
 #'
 #' @details
 #' If not specified to skip RC it will detect revision version and tag packages
-#' before uploading. In that case check for changes in project sources is
+#' before uploading. In that case, a check for changes in the project sources is
 #' performed for consistency and project packages will be rebuilt with version
-#' altered: revision will be added as least number to package version.
+#' altered: revision will be added as the least number to package version.
 #'
-#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
+#' Logs all messages onto the rsuite logger. Use \code{logging::setLevel} to
 #' control logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
-#' @param pkgs vector of project packages which should be uploaded into repository
+#' @param pkgs vector of project packages which should be uploaded into the repository
 #'   or NULL to upload all project packages (type: character, default: NULL)
-#' @param prj project object to use.If not passed will init project from
+#' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param skip_rc if TRUE skip detection of package revision and package tagging.
 #'    (type: logical, default: FALSE)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
-#' @param with_deps If TRUE will include pkgs dependencies while uploading into
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into the
 #'    repository. Packages in repository satisfying pkgs requirements will not be
 #'    included. (type: logical, default: FALSE)
 #' @param skip_build_steps character vector with steps to skip while building
@@ -291,7 +291,7 @@ repo_mng_remove <- function(repo_manager, toremove, pkg_type = .Platform$pkgType
 #'   \item{docs}{Try build documentation with roxygen}
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
-#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
 #'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
@@ -423,10 +423,10 @@ repo_upload_prj_packages <- function(repo_manager,
 }
 
 #'
-#' Uploads package file(s) into managed repository.
+#' Uploads package file(s) into the managed repository.
 #'
 #' @details
-#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control
+#' Logs all messages onto the rsuite logger. Use \code{logging::setLevel} to control
 #' logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
@@ -528,9 +528,9 @@ repo_upload_package_files <- function(repo_manager, files) {
 
 
 #'
-#' Uploads external packages into managed repository.
+#' Uploads external packages into the managed repository.
 #'
-#' It uses project to detect repositories to look for external packages in.
+#' It uses the project to detect repositories to look for external packages in.
 #'
 #' @details
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
@@ -542,7 +542,7 @@ repo_upload_package_files <- function(repo_manager, files) {
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
-#' @param with_deps If TRUE will include pkgs dependencies while uploading into
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into the
 #'    repository. Packages in repository satisfying pkgs requirements will not be
 #'    included. (type: logical, default: FALSE)
 #'
@@ -628,10 +628,10 @@ repo_upload_ext_packages <- function(repo_manager,
 
 
 #'
-#' Uploads PKGZIP into managed repository.
+#' Uploads PKGZIP into the managed repository.
 #'
 #' @details
-#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
+#' Logs all messages onto the rsuite logger. Use \code{logging::setLevel} to
 #' control logs verbosity.
 #'
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
@@ -706,9 +706,9 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 
 
 #'
-#' Loads package from github repository.
+#' Loads package from the GitHub repository.
 #'
-#' It will download github repository, build package into package file and will
+#' It will download GitHub repository, build package into package file and will
 #' upload it into the repository. It will search dependencies in provided
 #' project's repositories.
 #'
@@ -719,11 +719,11 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
 #' @param repo repository address in format username/repo[/subdir][\@ref|#pull]. See
 #'   \code{devtools::install_github} for more information.
-#' @param ... github specific parameters passed to \code{devtools::install_github}.
+#' @param ... GitHub specific parameters passed to \code{devtools::install_github}.
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to upload (type: character, default: platform default)
-#' @param with_deps If TRUE will include pkgs dependencies while uploading into
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into the
 #'    repository. Packages in repository satisfying pkgs requirements will not be
 #'    included. (type: logical, default: FALSE)
 #' @param skip_build_steps character vector with steps to skip while building
@@ -733,12 +733,12 @@ repo_upload_pkgzip <- function(repo_manager, pkgzip) {
 #'   \item{docs}{Try build documentation with roxygen}
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
-#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
 #'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
 #' @param keep_sources if TRUE downloaded package sources will not be removed
-#'   after build. (type: logical, default: FALSE)
+#'   after building. (type: logical, default: FALSE)
 #'
 #' @family in repository management
 #'

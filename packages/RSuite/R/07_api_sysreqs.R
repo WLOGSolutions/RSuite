@@ -8,9 +8,9 @@
 #'
 #' Prints out all system requirements from dependencies and project packages.
 #'
-#' @param prj project object to collect sys requirements for. If not passed will
-#'    use loaded project or default whichever exists. Will init default project
-#'    from working directory if no default project exists.
+#' @param prj project object to collect sys requirements for. If not passed the
+#'    loaded project will be used or the default whichever exists. Will init the
+#'    default project from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
 #' @return named list with named with package names and containing system
 #'    requirements as value.
@@ -95,9 +95,9 @@ sysreqs_collect <- function(prj = NULL) {
 #' and performs checks for their existence. Fill fail if some system
 #' requirements are not satisfied.
 #'
-#' @param prj project object to check sys requirements for. If not passed will
-#'    use loaded project or default whichever exists. Will init default project
-#'    from working directory if no default project exists.
+#' @param prj project object to check sys requirements for. If not passed the loaded
+#'    project will be used or the default whichever exists. Will init default project
+#'    from the working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
 #'
 #' @family in SYSREQS
@@ -146,9 +146,9 @@ sysreqs_check <- function(prj = NULL) {
 #' Collects system requirements with \code{\link{sysreqs_collect}}
 #' and builds/installs them.
 #'
-#' @param prj project object to handle sys requirements for. If not passed will
-#'    use loaded project or default whichever exists. Will init default project
-#'    from working directory if no default project exists.
+#' @param prj project object to handle sys requirements for. If not passed the
+#'    loaded project will be used  or the default whichever exists. Will init
+#'    default project from the working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
 #'
 #' @family in SYSREQS
@@ -188,15 +188,15 @@ sysreqs_install <- function(prj = NULL) {
 }
 
 #'
-#' Creates script to update system to satisfy project requirements.
+#' Creates a script to update the system to satisfy project requirements.
 #'
 #' Collects system requirements with \code{\link{sysreqs_collect}} and creates
-#' script to builds/install them. It creates .cmd script for Windows and bash
+#' a script to build/install them. It creates a .cmd script for Windows and a bash
 #' script for Linuxes.
 #'
-#' @param prj project object to process sys requirements for. If not passed will
-#'    use loaded project or default whichever exists. Will init default project
-#'    from working directory if no default project exists.
+#' @param prj project object to process sys requirements for. If not passed the
+#'    loaded project will be used or the default whichever exists. Will init default
+#'    project from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
 #'
 #' @return invisible path to script file created or NULL if no system

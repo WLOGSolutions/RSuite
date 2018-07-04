@@ -8,7 +8,7 @@
 #'
 #' Creates base presentation for repo adapter to use by concrete implementations.
 #'
-#' @param name name under which repository adapter will registered in RSuite. It
+#' @param name name under which repository adapter will be registered in RSuite. It
 #'   cannot contain whitespaces or comma. (type: character)
 #'
 #' @return object of type rsuite_repo_adapter
@@ -37,7 +37,7 @@ repo_adapter_create_base <- function(name) {
 }
 
 #'
-#' Returns informations about repository the adapter is working on.
+#' Returns information about repository the adapter is working on.
 #'
 #' @param repo_adapter repo adapter object
 #' @param params rsuite_project_params object
@@ -45,8 +45,8 @@ repo_adapter_create_base <- function(name) {
 #' @return named list with following entries:
 #' \describe{
 #'   \item{readonly}{TRUE if the repository is for reading only (type:logical)}
-#'   \item{reliable}{TRUE if content of the repository does not change over time
-#'     unless repository changes enforce change of project itself (like project
+#'   \item{reliable}{TRUE if the content of the repository does not change over time
+#'     unless repository changes enforce changes of the project itself (like project
 #'     local repository) (type: logical).}
 #' }
 #'
@@ -90,14 +90,14 @@ repo_adapter_get_info.default <- function(repo_adapter, params) {
 }
 
 #'
-#' Returns adapter path related to project to use for dependencies resolution.
+#' Returns the adapter path related to the project to use for dependencies resolution.
 #'
 #' @param repo_adapter repo adapter object
 #' @param params rsuite_project_params object
 #' @param ix repo adapter index in project repositories or NA to retrieve all
 #'  paths for the adapter. (type: integer, default: NA)
 #'
-#' @return path to repository for the project.
+#' @return path to the repository for the project.
 #'
 #' @family in extending RSuite with Repo adapter
 #'
@@ -143,10 +143,10 @@ repo_adapter_get_path.default <- function(repo_adapter, params) {
 #'
 #' Creates repo manager to manage its repository.
 #'
-#' For repositories which needs some kind of connection to manage it initializes
+#' For repositories which need some kind of connection to manage it initializes
 #' appropriate resources.
 #'
-#' Raises error if fails to create manager.
+#' Raises an error if fails to create the manager.
 #'
 #' @param repo_adapter repo adapter on which manager is base. (type: rsuite_repo_adapter)
 #' @param ... manager specific parameters.

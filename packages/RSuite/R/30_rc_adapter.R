@@ -6,9 +6,9 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Creates base presentation for RC adapter to use by concrete implementations.
+#' Creates the base presentation for the RC adapter to use by concrete implementations.
 #'
-#' @param name name under which RC adapter will registered in RSuite. It
+#' @param name name under which RC adapter will be registered in RSuite. It
 #'   cannot contain whitespaces or comma. (type: character)
 #'
 #' @return object of type rsuite_rc_adapter
@@ -39,7 +39,7 @@ rc_adapter_create_base <- function(name) {
 #' Detects if dir is under adapter's managed version control.
 #'
 #' @param rc_adapter rc adapter object
-#' @param dir path to directory to check. Folder must exist (type: character)
+#' @param dir path to the directory to check. The folder must exist (type: character)
 #'
 #' @return TRUE if dir is under version control.
 #'
@@ -125,11 +125,11 @@ rc_adapter_prj_struct_add.default <- function(rc_adapter, params) {
 
 
 #'
-#' Puts package structure under RC adapter's managed version control.
+#' Puts the package structure under RC adapter's managed version control.
 #'
 #' @param rc_adapter rc adapter object
 #' @param params rsuite_project_params object of the project.
-#' @param name name of package to put under RC adapter's managed version control.
+#' @param name name of the package to put under RC adapter's managed version control.
 #'   Appropriate sub-folder must exist in project packages folder. (type: character)
 #'
 #' @family in extending RSuite with RC adapter
@@ -175,13 +175,13 @@ rc_adapter_pkg_struct_add.default <- function(rc_adapter, params, name) {
 #' Retrieves current RC version number for working copy at directory passed.
 #'
 #' @param rc_adapter rc adapter object
-#' @param dir path to directory to get version for. Folder must exist (type: character)
+#' @param dir path to the directory to get the version for. The folder must exist (type: character)
 #'
 #' @return named list with following entries:
 #' \describe{
 #'   \item{has_changes}{TRUE if changes detected by RC in the directory. (type: logical)}
 #'   \item{revision}{revision reported by RC. (type: character)}
-#'   \item{latest}{latest revision reported by RC at repository. (type: character)}
+#'   \item{latest}{the latest revision reported by RC at the repository. (type: character)}
 #' }
 #'
 #' @family in extending RSuite with RC adapter
@@ -233,7 +233,7 @@ rc_adapter_get_version.default <- function(rc_adapter, dir) {
 #' put into project zip package.
 #'
 #' @param rc_adapter rc adapter object
-#' @param dir path to directory to remove administrators from. Folder must
+#' @param dir path to the directory to remove administrators from. The folder must
 #'   exist (type: character)
 #'
 #' @family in extending RSuite with RC adapter

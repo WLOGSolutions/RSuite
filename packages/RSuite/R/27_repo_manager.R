@@ -7,7 +7,7 @@
 
 
 #'
-#' Returns informations on repo manager.
+#' Returns information on repo manager.
 #'
 #' @param repo_manager repo manager object
 #'
@@ -16,7 +16,7 @@
 #'   \item{types}{Types of packages manager can manage. (type: character)}
 #'   \item{rver}{R version repo manager is managing. NA if repo
 #'     manager is managing source packages. (type: character)}
-#'   \item{url}{Url to repository. (type: character)}
+#'   \item{url}{Url to the repository. (type: character)}
 #' }
 #'
 #' @family in extending RSuite with Repo adapter
@@ -74,7 +74,7 @@ repo_manager_get_info.default <- function(repo_manager) {
 #'   If missing all project supported package types will be initialized (type: character)
 #'
 #' @return TRUE if initialized repository for at least one type, FALSE if
-#'   structure was fully initialized already. (type:logical, invisible)
+#'   the structure was fully initialized already. (type:logical, invisible)
 #'
 #' @family in extending RSuite with Repo adapter
 #'
@@ -127,12 +127,12 @@ repo_manager_init.default <- function(repo_manager, types) {
 
 
 #'
-#' Adds packages to managed repository.
+#' Adds packages to the managed repository.
 #'
 #' @param repo_manager repo manager object.
-#' @param src_dir local directory repository path. Directory must exist. (type: character)
+#' @param src_dir local directory repository path. The directory must exist. (type: character)
 #' @param types type of packages to sync. If missing all project supported
-#'   package types will by synced. (type: character(N))
+#'   package types will be synced. (type: character(N))
 #'
 #' @family in extending RSuite with Repo adapter
 #'
@@ -198,7 +198,7 @@ repo_manager_upload.default <- function(repo_manager, src_dir, types) {
 #' @family in extending RSuite with Repo adapter
 #'
 #' @examples
-#' # create you own repo adapter
+#' # create your own repo adapter
 #' repo_adapter_create_own <- function() {
 #'   result <- repo_adapter_create_base("Own")
 #'   class(result) <- c("repo_adapter_own", class(result))
@@ -254,7 +254,7 @@ repo_manager_remove.default <- function(repo_manager, toremove, type) {
 #'
 #' Releases resources allocated to manage the repository.
 #'
-#' For repositories which needs some kind of connection to manage it cleans up
+#' For repositories which need some kind of connection to manage it cleans up
 #' previously initialized connection and releases all appropriate resources.
 #'
 #' @param repo_manager repo adapter object.

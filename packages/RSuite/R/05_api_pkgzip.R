@@ -57,7 +57,7 @@
 #'   or NULL to include all project packages (type: character, default: NULL)
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
-#' @param zip_ver if passed enforce version of PKGZIP package to passed value.
+#' @param zip_ver if passed enforce the version of PKGZIP package to the passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
 #' @param pkg_type type of packages to build (type: character, default: platform default)
 #' @param path folder path to put output zip into. The folder must exist.
@@ -65,7 +65,7 @@
 #' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
 #'    (type: logical, default: FALSE)
 #' @param filter_repo repository address to not include dependencies available in.
-#'     In project dependencies will nether be filtered. If NULL will not filter
+#'     In a project, dependencies will never be filtered. If NULL will not filter
 #'     dependencies. Will be omitted if with_deps is FALSE. (type: character(1), default: NULL)
 #' @param skip_build_steps character vector with steps to skip while building
 #'    project packages. Can contain following entries:
@@ -74,7 +74,7 @@
 #'   \item{docs}{Try build documentation with roxygen}
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
-#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
 #'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
@@ -287,7 +287,7 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
 #' Builds PKGZIP out of passed external packages.
 #'
 #' @details
-#' It uses project to detect repositories to look for packages in.
+#' It uses the project to detect repositories to look for packages in.
 #'
 #' Logs all messages onto rsuite logger. Use  \code{logging::setLevel} to control logs
 #' verbosity.
@@ -387,10 +387,10 @@ pkgzip_build_ext_packages <- function(pkgs,
 
 
 #'
-#' Builds PKGZIP out of package on GitHub.
+#' Builds PKGZIP out of a package on GitHub.
 #'
-#' Loads package from github repository, packages it into package file and builds
-#' PKGZIP out of it. It uses project to detect repositories to look for dependencies
+#' Loads package from the GitHub repository, packages it into package file and builds
+#' a PKGZIP out of it. It uses the project to detect repositories to look for dependencies
 #' and to detect rversion if required.
 #'
 #' @details
@@ -399,7 +399,7 @@ pkgzip_build_ext_packages <- function(pkgs,
 #'
 #' @param repo repository address in format username/repo[/subdir][\@ref|#pull]. See
 #'   devtools::install_github for more information.
-#' @param ... github specific parameters passed to  \code{devtools::install_github}.
+#' @param ... GitHub specific parameters passed to  \code{devtools::install_github}.
 #' @param prj project object to use. If not passed will init project from
 #'   working directory. (type: rsuite_project, default: NULL)
 #' @param pkg_type type of packages to build (type: character, default: platform default)
@@ -417,12 +417,12 @@ pkgzip_build_ext_packages <- function(pkgs,
 #'   \item{docs}{Try build documentation with roxygen}
 #'   \item{imps}{Perform imports validation}
 #'   \item{tests}{Run package tests}
-#'   \item{rcpp_attribs}{Run rppAttribs on package}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
 #'   \item{vignettes}{Build package vignettes}
 #' }
 #' (type: character(N), default: NULL).
 #' @param keep_sources if TRUE downloaded package sources will not be removed
-#'   after build. (type: logical, default: FALSE)
+#'   after building. (type: logical, default: FALSE)
 #'
 #' @return created pkgzip file path (invisible).
 #'

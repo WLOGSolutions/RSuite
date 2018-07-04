@@ -75,15 +75,15 @@ is_prj <- function(prj) {
 
 
 #'
-#' Loads project settings without loading it into environment.
+#' Loads project settings without loading them into the environment.
 #'
 #' @details
-#' Project parameters are searched and loaded. If project has been loaded
+#' Project parameters are searched and loaded. If the project has been loaded
 #' previously from the path the same project instance will be used without
 #' reloading.
 #'
-#' It project is the first one loaded it will became default project (used then
-#' NULL is passed as project for project management functions).
+#' If the project is the first one loaded it will become the default project (used then
+#' NULL is passed as the project for project management functions).
 #'
 #' @param path path to start searching project base folder from. Search is
 #'   performed upwards folder structure. Should be existing directory.
@@ -132,32 +132,32 @@ prj_init <- function(path = getwd()) {
 }
 
 #'
-#' Creates project structure at specified path.
+#' Creates project structure at the specified path.
 #'
 #' @details
-#' Project is not loaded, just created.
+#' The project is not loaded, just created.
 #'
 #' If name passed folder under such name will be created and project structure
 #' will be placed under it. If not passed folder under path will contain project
-#' structure and project name will be assumed to be basename of path.
+#' structure and project name will be assumed to be basename of the path.
 #'
-#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
-#' to control logs verbosity. DEBUG level turns on build and download messages.
+#' Logs all messages from the building process onto the rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on building and downloading messages.
 #'
 #' Project templates have to include a PARAMETERS file
 #'
-#' @param name name of project to create. It must not contain special characters
+#' @param name name of the project to create. It must not contain special characters
 #'   like \\/\"\'<> otherwise project folder could not be created. It can be NULL.
-#'   If so project will be created at path directly with name of the first folder.
+#'   If so project will be created at path directly with the name of the first folder.
 #'   (type: character).
-#' @param path path to folder where project structure should be created.
+#' @param path path to the folder where project structure should be created.
 #' @param skip_rc if TRUE skip adding project under revision control.
 #'   (type: logical, default: FALSE)
 #' @param tmpl name of the project template (or path to it) to use for project
 #'   structure  creation.
 #'   (type: character).
 #'
-#' @return rsuite_project object for project just created.
+#' @return rsuite_project object for the project just created.
 #'
 #' @family in project management
 #'
@@ -212,22 +212,22 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
 }
 
 #'
-#' Creates package structure inside project.
+#' Creates package structure inside the project.
 #'
 #' @details
-#' It fails if package exists already in the project.
+#' It fails if the package exists already in the project.
 #'
-#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
-#' to control logs verbosity. DEBUG level turns on build and download messages.
+#' Logs all messages from the building process onto the rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on building and downloading messages.
 #'
 #' Package templates have to include the following files: DESCRIPTION, NAMESPACE, NEWS
 #'
-#' @param name name of package to create. It must not contain special characters
+#' @param name name of the package to create. It must not contain special characters
 #'    like \\/\"\'<> otherwise package folder could not be created. It must not
-#'    contain _ also as it is requirement enforced on R package names. Folder
+#'    contain _ also as it is requirement enforced on R package names. The folder
 #'    must not exist.
 #'    (type: character).
-#' @param prj project object to create package in. If not passed will init
+#' @param prj project object to create the package in. If not passed will init
 #'    project from working directory. (type: rsuite_project, default: NULL)
 #' @param skip_rc if TRUE skip adding package under revision control.
 #'    (type: logical, default: FALSE)
@@ -286,7 +286,7 @@ prj_start_package <- function(name,
 
 
 #'
-#' Loads project into environment so all master scripts can run.
+#' Loads project into the environment so all master scripts can run.
 #'
 #' It changes \code{.libPaths()} so project internal environment is visible
 #' for R. Use \code{\link{prj_unload}} to restore your environment.
@@ -294,10 +294,10 @@ prj_start_package <- function(name,
 #' @param prj project to load or NULL to use path for new project
 #'   initialization. If not path passed project will be initialized from working
 #'   folder. (type: rsuite_project, default: NULL)
-#' @param path if prj is NULL, path will be used to init new project to load.
+#' @param path if prj is NULL, the path will be used to init new project to load.
 #'   If passed must be existing folder path. (type: character)
 #'
-#' @return previously loaded project or NULL if no project have been loaded.
+#' @return previously loaded project or NULL if no project has been loaded.
 #'
 #' @family in project management
 #'
@@ -393,8 +393,9 @@ prj_unload <- function() {
 #' Installs project dependencies and needed supportive packages.
 #'
 #' @details
-#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
-#' to control logs verbosity. DEBUG level turns on build and download messages.
+#' Logs all messages from the building process onto the rsuite logger. Use
+#' \code{logging::setLevel} to control logs verbosity. DEBUG level turns
+#' on building and downloading messages.
 #'
 #' @param prj project to collect dependencies for if not passed will build
 #'    project for working directory. (type: rsuite_project, default: NULL)
@@ -402,13 +403,13 @@ prj_unload <- function() {
 #'   (type: logical, default: FALSE)
 #' @param vanilla_sups if TRUE install only base supportive packages (like devtools & roxygen2).
 #'   (type: logical, default: FALSE)
-#' @param relock if TRUE allows to update the env.lock file
+#' @param relock if TRUE allows updating the env.lock file
 #'   (type: logical, default: FALSE)
 #' @param check_repos_consistency if TRUE will check installed packages if they are
 #'   consistent with required R version (info taken from DESCRIPTION Built field).
-#'   If package is built for different version repository probably contains packages
-#'   not rebuilt for the R version required. If check for target R version fails
-#'   package is removed from local project environment and error is reported that it
+#'   If the package is built for different version repository probably contains packages
+#'   not rebuilt for the R version required. If the check for target R version fails
+#'   the package is removed from the local project environment and error is reported that it
 #'   is not available. (type: logical, default: \code{!grepl("unstable", R.version$status)})
 #'
 #' @return TRUE if all build successfully.
@@ -463,17 +464,17 @@ prj_install_deps <- function(prj = NULL,
 }
 
 #'
-#' Uninstalls unused packages from project local environment.
+#' Uninstalls unused packages from the local project environment.
 #'
 #' Checks if all dependencies installed are required by project packages or
 #' master scripts and removes those which are not required any more.
 #'
 #' @details
-#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
-#' to control logs verbosity. DEBUG level turns on build and download messages.
+#' Logs all messages from the building process onto the rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on building and downloading messages.
 #'
-#' @param prj project to clean dependencies of. If not passed will use project
-#'    base in working directory. (type: rsuite_project, default: NULL)
+#' @param prj project to clean dependencies of. If not passed will use the project
+#'    base in the working directory. (type: rsuite_project, default: NULL)
 #'
 #' @family in project management
 #'
@@ -518,8 +519,9 @@ prj_clean_deps <- function(prj = NULL) {
 #' Builds project internal packages and installs them.
 #'
 #' @details
-#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
-#' to control logs verbosity. DEBUG level turns on build and download messages.
+#' Logs all messages from the building process onto the rsuite logger. Use
+#' \code{logging::setLevel} to control logs verbosity. DEBUG level turns
+#' on building and downloading messages.
 #'
 #' @param prj project to build if not passed will build project for working
 #'    directory. (type: rsuite_project, default: NULL)
@@ -583,13 +585,13 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #'
 #' It collects all dependencies and project packages installed in local project
 #' environment together with master scripts and artifacts and zips them into
-#' single zip file.
+#' a single zip file.
 #'
 #' @details
 #' Zip package generated is stamped with version. It can be enforced with zip_ver
-#' parameter (zip will have suffix <zip_ver>x in the case). If version is not
+#' parameter (zip will have suffix <zip_ver>x in the case). If the version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
-#' from maximal project packages version number. In that case revision number is
+#' from the maximal project packages version number. In that case, revision number is
 #' appended to version: version number will be <zip_ver>_<rc_ver>. Check for
 #' changes in project sources is performed for zip package consistency.
 #'
@@ -597,15 +599,15 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
 #' project packages will have version altered: revision will be added as least
 #' number to package version.
 #'
-#' Logs all messages from build onto rsuite logger. Use \code{logging::setLevel}
-#' to control logs verbosity. DEBUG level turns on build and download messages.
+#' Logs all messages from the building process onto rsuite logger. Use \code{logging::setLevel}
+#' to control logs verbosity. DEBUG level turns on building and downloading messages.
 #'
-#' @param prj project object to zip. if not passed will zip loaded project or
-#'    default whichever exists. Will init default project from working
+#' @param prj project object to zip. if not passed will zip the loaded project or
+#'    the default whichever exists. Will init default project from the working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
-#' @param path folder path to put output zip into. If folder does not exist, will
+#' @param path folder path to put output zip into. If the folder does not exist, will
 #'    create it. (type: character: default: \code{getwd()})
-#' @param zip_ver if passed enforce version of zip package to passed value.
+#' @param zip_ver if passed enforce the version of the zip package to the passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
 #'
 #' @return invisible file path to pack file created. The file name will be
@@ -656,40 +658,40 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #'
 #' Prepares project source pack tagged with version.
 #'
-#' It collects all sources and assemblies found in project folder and packs them
-#' into single zip file.
+#' It collects all sources and assemblies found in the project folder and packs them
+#' into a single zip file.
 #'
 #' @details
-#' The function is heavily used for building project for alternative environments
+#' The function is heavily used for building projects for alternative environments
 #' (like in docker).
 #'
 #' Pack generated is stamped with version. It can be enforced with pack_ver
-#' parameter (zip will have suffix <pack_ver>x in the case). If version is not
+#' parameter (zip will have suffix <pack_ver>x in the case). If the version is not
 #' enforced it is detected out of ZipVersion setting in project PARAMETERS file or
-#' from maximal project packages version number. In that case revision number is
-#' appended to version: version number will be <ZipVersion>_<rc_ver>. Check for
-#' changes in project sources is performed for pack consistency. Resulted pack
+#' from the maximal project packages version number. In that case, the revision number
+#' is appended to version: version number will be <ZipVersion>_<rc_ver>. Check for
+#' changes in project sources is performed for pack consistency. The resulted pack
 #' is marked with the version detected so while building zip after unpacking will
-#' have the same version as original project.
+#' have the same version as the original project.
 #'
 #' Before building pack project packages will have version altered: revision will
-#' be added as least number to package version.
+#' be added as the least number to package version.
 #'
 #' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control
 #' logs verbosity.
 #'
-#' @param prj project object to pack. if not passed will pack loaded project or
-#'    default whichever exists. Will init default project from working
+#' @param prj project object to pack. if not passed the loaded project will be packed or
+#'    the default whichever exists. Will init default project from the working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
 #' @param path folder path to put output pack into. The folder must exist.
 #'    (type: character, default: \code{getwd()})
-#' @param pkgs names of packages to include into pack. If NULL will include all
+#' @param pkgs names of packages to include in the pack. If NULL will include all
 #'    project packages (type: character, default: NULL)
-#' @param inc_master if TRUE will include master scripts into pack.
+#' @param inc_master if TRUE will include master scripts in the pack.
 #'    (type: logical, default: TRUE)
-#' @param pack_ver if passed enforce version of pack to passed value.
+#' @param pack_ver if passed enforce the version of the pack to the passed value.
 #'    Expected form of version is DD.DD. (type: character, default: NULL)
-#' @param rver if passed enforce destination R version of pack.
+#' @param rver if passed enforce destination R version of the pack.
 #'    (type: character(1), default: NULL)
 #'
 #' @return invisible file path to pack file created. The file name will be
@@ -788,14 +790,14 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #' the 'env.lock' file will be used to detect whether any package will change
 #' versions. If that's the case a warning message will be displayed like this:
 #'
-#' \code{...:rsuite: The following packages will be updated from last lock: colorspace}
+#' \code{...:rsuite: The following packages will be updated from the last lock: colorspace}
 #'
 #' The feature allows preventing errors caused by newer versions of packages
 #' which might work differently than previous versions used in the project.
 #'
-#' @param prj project object to be locked. If not passed will lock loaded
-#'    project or default whichever exists. Will init default project from
-#'    working directory if no default project exists.
+#' @param prj project object to be locked. If not passed the loaded project
+#'    will be locked or the default whichever exists. Will init default project from
+#'    the working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
 #'
 #' @family in project management
@@ -855,8 +857,8 @@ prj_lock_env <- function(prj = NULL) {
 #' It removes the lock file created with \code{\link{prj_lock_env}}. If the project
 #' environment is not locked (there is no lock file) the prj_unlock_env will fail.
 #'
-#' @param prj project object to be unlocked. if not passed will lock loaded
-#'    project or default whichever exists. Will init default project from working
+#' @param prj project object to be unlocked. if not passed the loaded project will be
+#'    locked or the default whichever exists. Will init default project from the working
 #'    directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
 #'

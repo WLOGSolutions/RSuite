@@ -6,7 +6,7 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Returns all available of project/package templates
+#' Returns all available project/package templates
 #'
 #' @details
 #' Project templates have to include a PARAMETERS file
@@ -14,7 +14,7 @@
 #'
 #' All templates can be found in folder pointed by rsuite.user_templ_path option.
 #'
-#' @return names of registered project and package templates together with their
+#' @return names of the registered project and package templates together with their
 #' file path
 #'
 #' @family in templates management
@@ -76,7 +76,7 @@ tmpl_get_registered <- function() {
 #' @param name name of the template being created. (type: character(1))
 #'
 #' @param path path to the directory where the template should be created. If
-#'   NULL will use folder with user template. (type: character(1), default: NULL)
+#'   NULL will use the folder with user template. (type: character(1), default: NULL)
 #'
 #' @family in templates management
 #'
@@ -145,7 +145,7 @@ tmpl_start_prj <- function(name, path = NULL) {
 #' @param name name of the template being created. (type: character(1))
 #'
 #' @param path path to the directory where the template should be created. If
-#'   NULL will use folder with user template. (type: character(1), default: NULL)
+#'   NULL will use the folder with user template. (type: character(1), default: NULL)
 #'
 #' @examples
 #' tmpl_dir <- tempfile("pkgtempl_")
