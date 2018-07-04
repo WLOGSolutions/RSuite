@@ -104,7 +104,7 @@ cat > rsuitecli/Distribution <<EOL
 <body>
 <font face="Helvetica">
 <p>
-This installer will guide you throu the steps necessary to setup <i>RSuite CLI ${ver}</i> on your machine.
+This installer will guide you throu the steps necessary to setup <b>RSuite CLI ${ver}</b> on your machine.
 </font>
 </ul>
 </body>
@@ -119,7 +119,8 @@ This installer will guide you throu the steps necessary to setup <i>RSuite CLI $
 <body>
 	<font face="Helvetica">
         <p>This software is distributed under terms of Apache License Version 2.0. The terms of this license are in a file LICENSE which you should have received with this software.    
-        <p>``Share and Enjoy.''
+		<p>If you have not received a copy of this file, you can obtain one via WWW at http://www.apache.org/licenses/LICENSE-2.0.
+        <p>''Share and Enjoy.''
 	</font>
 </body>                                                                                                                                                                                  
 </html>                                                                                                                                                                                  
