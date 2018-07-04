@@ -41,7 +41,9 @@ detect_zip_version <- function(params, zip_ver) {
     pkg_vers <- retrieve_project_pkgsvers(params$pkgs_path)
     assert(length(pkg_vers) > 0,
            paste0("Project does not contain packages, so zip version cannot be detected.",
-                  " Please, enforce zip version with zip_ver parameter."))
+                  " Please, enforce zip version with zip_ver parameter.",
+                  " Use the --version option in RSuite CLI or pass the version",
+                  " explicitly along with the zip_ver argument"))
     zip_ver <- denorm_version(max(norm_version(pkg_vers)))
   }
 
