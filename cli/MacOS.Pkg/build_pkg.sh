@@ -65,13 +65,13 @@ chmod +x scripts/postinstall
 sizeKBytes=$(du --apparent-size --block-size=1K -s ./root | sed -e "s/^\([0-9]*\).*$/\1/")
 filesNo=$(find ./root | wc -l)
 cat > rsuitecli/base.pkg/PackageInfo <<EOL
-<pkg-info format-version="2" identifier="com.WLOGSolutions.RSuiteCLI.base.pkg" version="${ver}" install-location="/Applications" auth="root">
+<pkg-info format-version="2" identifier="com.WLOGSolutions.RSuiteCLI.base.pkg" version="${ver}" install-location="/" auth="root">
   <payload installKBytes="${sizeKBytes}" numberOfFiles="${filesNo}"/>
   <scripts>
 	<postinstall file="./postinstall"/>
   </scripts>
   <bundle-version>
-    <bundle id="com.WLOGSolutions.RSuiteCLI" CFBundleIdentifier="com.WLOGSolutions.RSuiteCLI" path="./RSuiteCLI.app" CFBundleVersion="${ver}"/>
+    <bundle id="com.WLOGSolutions.RSuiteCLI" CFBundleIdentifier="com.WLOGSolutions.RSuiteCLI" path="./Applications/RSuiteCLI.app" CFBundleVersion="${ver}"/>
   </bundle-version>
 </pkg-info>
 EOL
