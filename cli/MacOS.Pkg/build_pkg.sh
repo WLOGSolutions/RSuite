@@ -15,7 +15,6 @@ build_dir=${base_dir}/build
 rm -rf ${build_dir} ${base_dir}/pkgs
 mkdir ${build_dir}
 mkdir -p ${build_dir}/rsuitecli/base.pkg ${build_dir}/rsuitecli/Resources/en.lproj ${build_dir}/scripts
-cp -R ${base_dir}/resources/*.html ${build_dir}/rsuitecli/Resources/en.lproj/
 
 app_dir="${build_dir}/root/Applications/RSuiteCLI.app"
 mkdir -p "${app_dir}"
