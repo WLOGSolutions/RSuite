@@ -23,10 +23,11 @@ init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject",
   write.dcf(params_df, file = params_path)
 
   on_test_exit(function() {
-    unlink(prj$path, recursive = T, force = T)
+    #unlink(prj$path, recursive = T, force = T)
   })
   return(prj)
 }
+
 
 deploy_package_to_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
   loc_repo <- .get_local_repo_path(prj, type)
@@ -34,11 +35,13 @@ deploy_package_to_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
   RSuite:::rsuite_write_PACKAGES(loc_repo, type = type)
 }
 
+
 remove_package_from_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
   loc_repo <- .get_local_repo_path(prj, type)
-  file.remove(file.path(loc_repo, pkg_file), loc_repo, overwrite = T)
+  unlink(file.path(loc_repo, pkg_file), force = T, recursive = T)
   RSuite:::rsuite_write_PACKAGES(loc_repo, type = type)
 }
+
 
 create_test_package <- function(name, prj, ver = "1.0", deps = "",
                                 imps = "", tmpl = "builtin") {
@@ -52,11 +55,11 @@ create_test_package <- function(name, prj, ver = "1.0", deps = "",
     pkg_desc$Version <- ver
     deps <- trimws(deps)
     if (nchar(deps)) {
-      pkg_desc$Depends <- deps
+      pkg_desc$Depends <- paste(deps, collapse = ", ")
     }
     imps <- trimws(imps)
     if (nchar(imps)) {
-      pkg_desc$Imports <- imps
+      pkg_desc$Imports <- paste(imps, collapse = ", ")
     }
     write.dcf(pkg_desc, file = pkg_desc_fname)
   }
@@ -64,10 +67,12 @@ create_test_package <- function(name, prj, ver = "1.0", deps = "",
   invisible(pkg_path)
 }
 
+
 set_test_package_ns_imports <- function(name, prj, imps) {
   imp_path <- file.path(prj$path, "packages", name, "R", "packages_import.R")
   writeLines(c(sprintf("#' @import %s", imps), "NULL"), con = imp_path)
 }
+
 
 create_test_master_script <- function(code, prj) {
   fn <- tempfile(pattern = "test_", fileext = ".R", tmpdir = file.path(prj$path, "R"))
@@ -76,6 +81,7 @@ create_test_master_script <- function(code, prj) {
   close(f)
   invisible(fn)
 }
+
 
 create_package_deploy_to_lrepo <- function(name, prj, ver = "1.0", type = .Platform$pkgType,
                                            deps = "", imps = "logging") {
@@ -101,9 +107,23 @@ create_package_deploy_to_lrepo <- function(name, prj, ver = "1.0", type = .Platf
   RSuite:::rsuite_write_PACKAGES(loc_repo, type = type)
 }
 
+
 remove_test_packages <- function(prj) {
   unlink(file.path(prj$path, "packages", "*"), recursive = T, force = T)
 }
+
+set_test_package_deps <- function(name, prj, deps) {
+  params <- prj$load_params()
+  pkg_desc_fname <- file.path(params$pkgs_path, name, "DESCRIPTION")
+  
+  if (file.exists(pkg_desc_fname)) {
+    pkg_desc <- data.frame(read.dcf(file = pkg_desc_fname))
+    pkg_desc$Depends <- paste(deps, collapes = ", ")
+  }
+  
+  write.dcf(pkg_desc, file = pkg_desc_fname)
+}
+
 
 .get_local_repo_path <- function(prj, type) {
   path <- RSuite:::rsuite_contrib_url(repos = file.path(prj$path, "repository"), type = type)
@@ -113,6 +133,9 @@ remove_test_packages <- function(prj) {
   return(path)
 }
 
+#----------------------------------------------------------------------------
+# Custom expects
+#----------------------------------------------------------------------------
 
 expect_that_packages_installed <- function(names, prj, versions = NULL) {
   stopifnot(is.null(versions) || length(names) == length(versions))
@@ -148,6 +171,7 @@ expect_that_packages_installed <- function(names, prj, versions = NULL) {
   invisible(installed)
 }
 
+
 expect_that_has_docs <- function(topics, pkg_name, prj) {
   doc_path <- file.path(prj$path, "deployment", "libs", pkg_name, "help", "AnIndex")
   if (!file.exists(doc_path)) {
@@ -167,6 +191,7 @@ expect_that_has_docs <- function(topics, pkg_name, prj) {
   }
   expect(pass, msg)
 }
+
 
 expect_that_packages_locked <- function(expects, params) {
   lock_data <- data.frame(read.dcf(params$lock_path), stringsAsFactors = FALSE)
