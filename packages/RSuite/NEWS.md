@@ -3,6 +3,7 @@
      commands to download/build packages adapted to run on MacOS, handling of
      mac.binary type added.
   * documentation spell-checked
+  * deprecated packages handling fixed
 
 # RSuite 0.29 (2018-06-24)
   * #169: if project package depends on some dependents of devtools and devtools
