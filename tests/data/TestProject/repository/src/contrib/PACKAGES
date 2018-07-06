@@ -1,0 +1,8 @@
+Package: logging
+Version: 0.7-103
+Depends: R (>= 2.12.0), methods
+Suggests: svUnit, XML
+License: GPL (>= 2)
+MD5sum: 09a72bed3d5368c05b80d33557e3d696
+NeedsCompilation: no
+File: logging_0.7-103.tar.gz

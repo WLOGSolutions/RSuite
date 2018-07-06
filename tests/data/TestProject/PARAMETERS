@@ -1,0 +1,5 @@
+RSuiteVersion: 0.30
+RVersion: 3.5
+Project: TestProject
+Repositories: Dir
+Artifacts: config_templ.txt

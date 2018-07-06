@@ -12,15 +12,12 @@ source("R/repo_management.R")
 
 context("Testing if project environment locking works properly")
 
-
 test_that_managed("Project environment lock file creation", {
    # Prepare project
-   prj <- init_test_project(repo_adapters = c("Dir"))
+   prj <- init_lock_test_prj()
    params <- prj$load_params()
 
-   # Prepare repo
-   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-   create_test_package("TestPackage", prj, deps = c("logging"))
+   create_test_package(name = "TestPackage", prj = prj, deps = c("logging"))
 
    # install dependencies
    RSuite::prj_install_deps(prj)
@@ -37,11 +34,9 @@ test_that_managed("Project environment lock file creation", {
 
 test_that_managed("Locking environment with uninstalled direct dependencies", {
    # Prepare project
-   prj <- init_test_project(repo_adapters = c("Dir"))
+   prj <- init_lock_test_prj()
    params <- prj$load_params()
 
-   # Prepare repo
-   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
    create_test_package("TestPackage", prj, deps = c("logging"))
 
    # Try locking the project environment with uninstalled dependencies
@@ -50,47 +45,38 @@ test_that_managed("Locking environment with uninstalled direct dependencies", {
 
 
 test_that_managed("Locked environment, no unfeasibles", {
-   prj <- init_test_project(repo_adapters = c("Dir"))
+   prj <- init_lock_test_prj()
    params <- prj$load_params()
 
-   # Prepare repo
-   pkg_deps <- "TestDependency"
-   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-   create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.0")
 
    # Create package and install deps
-   create_test_package("TestPackage", prj, deps = pkg_deps)
+   create_test_package("TestPackage", prj, deps = "TestDependencyToUpdate (== 1.0)")
    RSuite::prj_install_deps(prj)
 
    # Lock environment
    RSuite::prj_lock_env(prj)
 
-   # Add newer version and rebuild
-   create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.1")
+   # Set dependency to make newer version available
+   set_test_package_deps("TestPackage", prj = prj, deps = "TestDependencyToUpdate")
    RSuite::prj_install_deps(prj, clean = TRUE)
 
-   expect_that_packages_installed(c("TestDependency", "logging"), prj, versions = c("1.0", "0.7-103"))
+   expect_that_packages_installed(c("TestDependencyToUpdate", "logging"), prj, versions = c("1.0", "0.7-103"))
  })
 
 
 test_that_managed("Locked environment, unfeasibles", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "1.0")
-
   # Create package and install deps
-  create_test_package("TestPackage", prj, deps = "TestDependency")
+  create_test_package("TestPackage", prj, deps = "TestDependencyToUpdate (== 1.0)")
   RSuite::prj_install_deps(prj)
 
   # Lock environment
   RSuite::prj_lock_env(prj)
 
-  # Add newer version and rebuild
-  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "1.1")
-  create_test_package("TestPackage2", prj, deps = "TestDependency (>= 1.1)")
+  # Update dependency
+  set_test_package_deps("TestPackage", prj = prj, deps = "TestDependencyToUpdate (>= 1.1)")
 
   # Expect warning message
   expect_log_message(RSuite::prj_install_deps(prj = prj, clean = TRUE, relock = TRUE),
@@ -100,12 +86,8 @@ test_that_managed("Locked environment, unfeasibles", {
 
 test_that_managed("Unlocking locked environment", {
    # Prepare project
-   prj <- init_test_project(repo_adapters = c("Dir"))
+   prj <- init_lock_test_prj()
    params <- prj$load_params()
-
-   # Prepare repo
-   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-   create_test_package("TestPackage", prj, deps = c("logging"))
 
    # install dependencies
    RSuite::prj_install_deps(prj)
@@ -123,7 +105,7 @@ test_that_managed("Unlocking locked environment", {
 
 test_that_managed("Unlocking not unlock environment", {
    # Prepare project
-   prj <- init_test_project(repo_adapters = c("Dir"))
+   prj <- init_lock_test_prj()
    params <- prj$load_params()
 
    # Unlock project environment
@@ -133,11 +115,8 @@ test_that_managed("Unlocking not unlock environment", {
 
 
 test_that_managed("Add new dependency, lock updating", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
-
-  # Prepare repo
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
 
   # Create package and install deps
   RSuite::prj_install_deps(prj)
@@ -147,80 +126,63 @@ test_that_managed("Add new dependency, lock updating", {
   expect_that_packages_locked(c(logging = "0.7-103"), params)
 
   # Add new dependency
-  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "1.0")
-  create_test_package("TestPackage", prj, deps = "TestDependency")
+  create_test_package("TestPackage", prj, deps = "AddedTestDependency")
 
   # Install new dependencies (lock should be automatically updated)
   RSuite::prj_install_deps(prj)
 
-  expect_that_packages_locked(c(logging = "0.7-103", TestDependency = "1.0"),
+  expect_that_packages_locked(c(logging = "0.7-103", AddedTestDependency = "1.0"),
                               params)
 })
 
 
-test_that_managed("Udpate dependency, no relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+test_that_managed("Update dependency, no relocking", {
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  pkg_deps <- "TestDependency"
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.0")
-
   # Create package and install deps
-  create_test_package("TestPackage", prj, deps = pkg_deps)
+  create_test_package("TestPackage", prj, deps = "TestDependencyToUpdate (== 1.0)")
   RSuite::prj_install_deps(prj)
 
   # Lock environment
   RSuite::prj_lock_env(prj)
 
   # Update dependency
-  create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.1")
-  create_test_package("TestPackage2", prj, deps = "TestDependency (>= 1.1)")
+  set_test_package_deps("TestPackage", prj = prj, deps = "TestDependencyToUpdate (>= 1.1)")
 
   # Expect error
   expect_error(prj_install_deps(prj))
 })
 
 
-test_that_managed("Udpate dependency, relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+test_that_managed("Update dependency, relocking", {
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "1.0")
-
   # Create package and install deps
-  create_test_package("TestPackage", prj, deps = "TestDependency")
+  create_test_package(name = "TestPackage", prj, deps = "TestDependencyToUpdate (== 1.0)")
   RSuite::prj_install_deps(prj)
 
   # Lock environment
   RSuite::prj_lock_env(prj)
 
   # Update dependency
-  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "1.1")
-  create_test_package("TestPackage2", prj, deps = "TestDependency (>= 1.1)")
+  set_test_package_deps(name = "TestPackage", prj = prj, deps = "TestDependencyToUpdate (>= 1.1)")
 
   RSuite::prj_install_deps(prj = prj, relock = TRUE)
 
   # Check if lock was updated
-  expect_that_packages_locked(c(logging = "0.7-103", TestDependency = "1.1"),
+  expect_that_packages_locked(c(logging = "0.7-103", TestDependencyToUpdate = "1.1"),
                               params)
 })
 
 
 test_that_managed("Remove dependency, no relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  pkg_deps <- "TestDependency"
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.0")
-
   # Create package and install deps
-  create_test_package("TestPackage", prj, deps = pkg_deps)
+  create_test_package("TestPackage", prj, deps = "TestDependencyToRemove")
   RSuite::prj_install_deps(prj)
 
   # Lock environment
@@ -236,24 +198,18 @@ test_that_managed("Remove dependency, no relocking", {
 
 
 test_that_managed("Remove dependency, relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  pkg_deps <- "TestDependency"
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = pkg_deps, prj = prj, ver = "1.0")
-
   # Create package and install deps
-  create_test_package("TestPackage", prj, deps = pkg_deps)
+  create_test_package("TestPackage", prj, deps = "TestDependencyToRemove")
   RSuite::prj_install_deps(prj)
 
   # Lock environment
   RSuite::prj_lock_env(prj)
 
   # Remove dependency
-  remove_test_packages(prj)
-  create_test_package("TestPackage", prj, deps = "logging")
+  set_test_package_deps(name = "TestPackage", prj = prj, deps = "logging")
 
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)
@@ -265,31 +221,22 @@ test_that_managed("Remove dependency, relocking", {
 
 
 test_that_managed("Add and Remove dependency, relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  added_pkg_deps <- "AddedTestDependency"
-  pkg_deps_to_remove <- "TestDependencyToRemove"
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = added_pkg_deps, prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = pkg_deps_to_remove, prj = prj, ver = "1.0")
-
   # Create package with dependency to remove and install deps
-  create_test_package("TestPackageWithDependencyToRemove", prj, deps = pkg_deps_to_remove)
+  create_test_package("TestPackageWithDependencyToRemove", prj, deps = "TestDependencyToRemove")
   RSuite::prj_install_deps(prj)
 
   # Lock environment
   RSuite::prj_lock_env(prj)
 
-  # Remove dependency
-  remove_test_packages(prj)
-
-  # Add package with new dependency
-  create_test_package("TestPackageWithNewDependency", prj, deps = added_pkg_deps)
+  # Add package with new dependency and remove old one
+  set_test_package_deps("TestPackageWithDependencyToRemove", prj = prj, deps = "AddedTestDependency")
 
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)
+  
   # Check updated lock
   expect_that_packages_locked(c(logging = "0.7-103", AddedTestDependency = "1.0"),
                               params)
@@ -297,27 +244,20 @@ test_that_managed("Add and Remove dependency, relocking", {
 
 
 test_that_managed("Add and Update dependency, relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "AddedTestDependency", prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.0")
-
   # Create package with dependency to update and install deps
-  create_test_package("TestPackageWithBaseDependency", prj, deps = "TestDependencyToUpdate")
+  create_test_package("TestPackage", prj, deps = "TestDependencyToUpdate (== 1.0)")
   RSuite::prj_install_deps(prj)
 
   # Lock environment
   RSuite::prj_lock_env(prj)
 
-  # Add package with new dependency
-  create_test_package("TestPackageWithNewDependency", prj, deps = "AddedTestDependency")
-
-  # Add package with updated dependency
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.1")
-  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate (>= 1.1)")
+  # Add new dependency and update old one
+  set_test_package_deps(name = "TestPackage", prj = prj,
+                        deps = c("TestDependencyToUpdate (>= 1.1)",
+                                 "AddedTestDependency"))
 
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)
@@ -332,17 +272,12 @@ test_that_managed("Add and Update dependency, relocking", {
 
 
 test_that_managed("Remove and Update dependency, relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "TestDependencyToRemove", prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.0")
-
   # Create package with dependency to update
-  create_test_package("TestPackageWithBaseDependency", prj, deps = "TestDependencyToUpdate")
-  create_test_package("TestPackageWithDependencyToRemove", prj, deps = "TestDependencyToRemove")
+  create_test_package("TestPackage", prj, deps = c("TestDependencyToUpdate",
+                                                   "TestDependencyToRemove"))
 
   # Intall dependencies
   RSuite::prj_install_deps(prj)
@@ -350,13 +285,8 @@ test_that_managed("Remove and Update dependency, relocking", {
   # Lock environment
   RSuite::prj_lock_env(prj)
 
-  # Add package with updated dependency
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.1")
-
-  # Remove dependencies
-  remove_test_packages(prj)
-
-  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate (>= 1.1)")
+  # Update/remove dependencies
+  set_test_package_deps(name = "TestPackage", prj = prj, deps = c("TestDependencyToUpdate (>= 1.1)"))
 
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)
@@ -369,18 +299,13 @@ test_that_managed("Remove and Update dependency, relocking", {
 
 
 test_that_managed("Add, Remove and Update dependency, relocking", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_lock_test_prj()
   params <- prj$load_params()
 
-  # Prepare repo
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "AddedTestDependency", prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = "TestDependencyToRemove", prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.0")
-
   # Create package with dependency to update
-  create_test_package("TestPackageWithBaseDependency", prj, deps = "TestDependencyToUpdate")
-  create_test_package("TestPackageWithDependencyToRemove", prj, deps = "TestDependencyToRemove")
+  create_test_package(name = "TestPackage", prj = prj,
+                      deps = c("TestDependencyToUpdate (== 1.0)",
+                               "TestDependencyToRemove"))
 
   # Intall dependencies
   RSuite::prj_install_deps(prj)
@@ -388,16 +313,10 @@ test_that_managed("Add, Remove and Update dependency, relocking", {
   # Lock environment
   RSuite::prj_lock_env(prj)
 
-  # Add package with updated dependency
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.1")
-
-  # Remove dependencies
-  remove_test_packages(prj)
-
-  create_test_package("TestPackageWithUpdatedDependency", prj, deps = "TestDependencyToUpdate (>= 1.1)")
-
-  # Add package with new dependency
-  create_test_package("TestPackageWithNewDependency", prj, deps = "AddedTestDependency")
+  # Add/Remove/Update dependencies
+  set_test_package_deps(name = "TestPackage", prj = prj,
+                        c("TestDependencyToUpdate (>= 1.1)",
+                          "AddedTestDependency"))
 
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)

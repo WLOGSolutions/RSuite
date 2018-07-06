@@ -125,3 +125,66 @@ test_that_template <- function(desc, ...) {
   })
   test_that_managed(desc, ...) 
 }
+
+
+# used for the lock test project source creation, might be useful in the future
+create_lock_test_prj <- function() {
+  RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
+
+  prj <- RSuite::prj_start("TestProject", skip_rc = T, path = "data")
+  RSuite::prj_config_set_repo_adapters(repos = c("Dir"), prj = prj)
+
+  unlink(file.path(prj$path, "deployment", "libs", "logging"),
+         recursive = T, force = T) # remove precreated logger
+
+  # remove SnapshotDate
+  params_path <- file.path(prj$path, "PARAMETERS")
+  params_df <- data.frame(read.dcf(file = params_path))
+  params_df$SnapshotDate <- NULL
+  write.dcf(params_df, file = params_path)
+  
+  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  create_package_deploy_to_lrepo(name = "AddedTestDependency", prj = prj, ver = "1.0")
+  create_package_deploy_to_lrepo(name = "TestDependencyToRemove", prj = prj, ver = "1.0")
+  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.0")
+  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.1")
+}
+
+init_lock_test_prj <- function() {
+  copy_folder(file.path("data", "TestProject"), file.path(get_wspace_dir(), "TestProject"))
+  prj <- prj_init(file.path(get_wspace_dir(), "TestProject"))
+  
+  on_test_exit(function() {
+    unlink(file.path(get_wspace_dir(), "TestProject"), force = T, recursive = T)
+  })
+  
+  return(prj)
+}
+
+
+copy_folder <- function(from, to) {
+  if (basename(from) == basename(to)) {
+    success <- file.copy(from = from, to = dirname(to),
+                         recursive = TRUE, copy.mode = TRUE, overwrite = FALSE)
+    return(invisible(success))
+  }
+  
+  success <- TRUE
+  
+  if (!dir.exists(to)) {
+    success <- (dir.create(to, recursive = TRUE, showWarnings = FALSE)
+                && success)
+  }
+  
+  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
+    file.copy(from = file.path(from, ent), to = to,
+              recursive = TRUE, copy.mode = TRUE, overwrite = FALSE)
+  }
+  
+  expected <- list.files(from, all.files = TRUE, recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
+  copied <- list.files(to, all.files = TRUE, recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
+  success <- (length(setdiff(expected, copied)) == 0
+              && success)
+  
+  invisible(success)
+}

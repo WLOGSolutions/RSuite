@@ -23,7 +23,7 @@ init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject",
   write.dcf(params_df, file = params_path)
 
   on_test_exit(function() {
-    #unlink(prj$path, recursive = T, force = T)
+    unlink(prj$path, recursive = T, force = T)
   })
   return(prj)
 }
@@ -54,11 +54,11 @@ create_test_package <- function(name, prj, ver = "1.0", deps = "",
     pkg_desc <- data.frame(read.dcf(file = pkg_desc_fname))
     pkg_desc$Version <- ver
     deps <- trimws(deps)
-    if (nchar(deps)) {
+    if (sum(nchar(deps))) {
       pkg_desc$Depends <- paste(deps, collapse = ", ")
     }
     imps <- trimws(imps)
-    if (nchar(imps)) {
+    if (sum(nchar(imps))) {
       pkg_desc$Imports <- paste(imps, collapse = ", ")
     }
     write.dcf(pkg_desc, file = pkg_desc_fname)
@@ -118,7 +118,7 @@ set_test_package_deps <- function(name, prj, deps) {
   
   if (file.exists(pkg_desc_fname)) {
     pkg_desc <- data.frame(read.dcf(file = pkg_desc_fname))
-    pkg_desc$Depends <- paste(deps, collapes = ", ")
+    pkg_desc$Depends <- paste(deps, collapse = ", ")
   }
   
   write.dcf(pkg_desc, file = pkg_desc_fname)
