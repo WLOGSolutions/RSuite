@@ -151,40 +151,11 @@ create_lock_test_prj <- function() {
 }
 
 init_lock_test_prj <- function() {
-  copy_folder(file.path("data", "TestProject"), file.path(get_wspace_dir(), "TestProject"))
-  prj <- prj_init(file.path(get_wspace_dir(), "TestProject"))
+  prj <- init_test_project(tmpl = file.path("data", "TestProject"))
   
   on_test_exit(function() {
     unlink(file.path(get_wspace_dir(), "TestProject"), force = T, recursive = T)
   })
   
   return(prj)
-}
-
-
-copy_folder <- function(from, to) {
-  if (basename(from) == basename(to)) {
-    success <- file.copy(from = from, to = dirname(to),
-                         recursive = TRUE, copy.mode = TRUE, overwrite = FALSE)
-    return(invisible(success))
-  }
-  
-  success <- TRUE
-  
-  if (!dir.exists(to)) {
-    success <- (dir.create(to, recursive = TRUE, showWarnings = FALSE)
-                && success)
-  }
-  
-  for (ent in list.files(from, all.files = TRUE, recursive = FALSE, include.dirs = TRUE, no.. = TRUE)) {
-    file.copy(from = file.path(from, ent), to = to,
-              recursive = TRUE, copy.mode = TRUE, overwrite = FALSE)
-  }
-  
-  expected <- list.files(from, all.files = TRUE, recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
-  copied <- list.files(to, all.files = TRUE, recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
-  success <- (length(setdiff(expected, copied)) == 0
-              && success)
-  
-  invisible(success)
 }
