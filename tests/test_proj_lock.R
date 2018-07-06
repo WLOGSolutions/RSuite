@@ -12,6 +12,9 @@ source("R/repo_management.R")
 
 context("Testing if project environment locking works properly")
 
+# create test project with prepared repo
+invisible(capture.output(create_lock_test_prj()))
+
 test_that_managed("Project environment lock file creation", {
    # Prepare project
    prj <- init_lock_test_prj()

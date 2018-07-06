@@ -129,9 +129,13 @@ test_that_template <- function(desc, ...) {
 
 # used for the lock test project source creation, might be useful in the future
 create_lock_test_prj <- function() {
+  if (dir.exists(file.path("data", "TestProject"))) {
+    unlink(file.path("data", "TestProject"), recursive = TRUE, force = TRUE)
+  }
+  
   RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
 
-  prj <- RSuite::prj_start("TestProject", skip_rc = T, path = "data")
+  prj <- RSuite::prj_start("TestProject", skip_rc = TRUE, path = "data")
   RSuite::prj_config_set_repo_adapters(repos = c("Dir"), prj = prj)
 
   unlink(file.path(prj$path, "deployment", "libs", "logging"),

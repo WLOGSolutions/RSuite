@@ -1,5 +1,0 @@
-RSuiteVersion: __RSuiteVersion__
-RVersion: __RVersion__
-Project: TestProject
-Repositories: Dir
-Artifacts: config_templ.txt
