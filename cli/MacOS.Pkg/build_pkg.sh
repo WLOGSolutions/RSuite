@@ -15,9 +15,8 @@ build_dir=${base_dir}/build
 rm -rf ${build_dir} ${base_dir}/pkgs
 mkdir ${build_dir}
 mkdir -p ${build_dir}/rsuitecli/base.pkg ${build_dir}/rsuitecli/Resources/en.lproj ${build_dir}/scripts
-cp -R ${base_dir}/resources/*.html ${build_dir}/rsuitecli/Resources/en.lproj/
 
-app_dir="${build_dir}/root/Applications/RSuiteCLI ${ver}.app"
+app_dir="${build_dir}/root/Applications/RSuiteCLI.app"
 mkdir -p "${app_dir}"
 cp -R ${base_dir}/../R "${app_dir}"
 cp ${base_dir}/../rsuite "${app_dir}/rsuite"
@@ -49,7 +48,7 @@ fi
 
 # create convenience script to RSuite CLI
 rm -rf rsuite
-rsuite_sh=/Applications/RSuiteCLI\ ${ver}.app/rsuite
+rsuite_sh=/Applications/RSuiteCLI.app/rsuite
 cat > rsuite <<EOLsh
 #!/bin/bash
 if [ ! -e "\$rsuite_sh" ]; then
@@ -72,7 +71,7 @@ cat > rsuitecli/base.pkg/PackageInfo <<EOL
 	<postinstall file="./postinstall"/>
   </scripts>
   <bundle-version>
-    <bundle id="com.WLOGSolutions.RSuiteCLI" CFBundleIdentifier="com.WLOGSolutions.RSuiteCLI" path="./Applications/RSuiteCLI ${ver}.app" CFBundleVersion="${ver}"/>
+    <bundle id="com.WLOGSolutions.RSuiteCLI" CFBundleIdentifier="com.WLOGSolutions.RSuiteCLI" path="./Applications/RSuiteCLI.app" CFBundleVersion="${ver}"/>
   </bundle-version>
 </pkg-info>
 EOL
@@ -96,8 +95,36 @@ cat > rsuitecli/Distribution <<EOL
   return true;
 }
 </script>
-	<welcome language="en" mime-type="text/html"/>
-	<license language="en" mime-type="text/html"/>
+	<welcome language="en" mime-type="text/html"><![CDATA[
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+    <title>Install my_archive </title>
+</head>
+<body>
+<font face="Helvetica">
+<p>
+This installer will guide you throu the steps necessary to setup <b>RSuite CLI ${ver}</b> on your machine.
+</font>
+</ul>
+</body>
+</html>
+]]></welcome>
+	<license language="en" mime-type="text/html"><![CDATA[
+<html lang="en">                                                                                                                                                                         
+<head>                                                                                                                                                                                   
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">                                                                                                             
+    <title>License agreement</title>                                                                                                                                                   
+</head>                                                                                                                                                                                  
+<body>
+	<font face="Helvetica">
+        <p>This software is distributed under terms of Apache License Version 2.0. The terms of this license are in a file LICENSE which you should have received with this software.    
+		<p>If you have not received a copy of this file, you can obtain one via WWW at http://www.apache.org/licenses/LICENSE-2.0.
+        <p>''Share and Enjoy.''
+	</font>
+</body>                                                                                                                                                                                  
+</html>                                                                                                                                                                                  
+]]></license>
     <choices-outline>
         <line choice="rsuiteclibase"/>
     </choices-outline>
