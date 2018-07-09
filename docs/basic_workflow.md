@@ -33,7 +33,7 @@ If you are stuck feel free to contact us:
   * [Step 8 - install dependencies](#step-8---install-dependencies "Step 8 - install dependencies")
   * [Step 9 - developing custom package using `devtools`](#step-9---developing-custom-package-using-devtools "Step 9 - developing custom package using `devtools`")
   * [Step 11 - loggers in packages](#step-11---loggers-in-packages "Step 11 - loggers in packages")
-  * [Step 12 - Project environment locking](#step-12---project-environment-locking "Step 12 - Project environment locking")
+  * [Step 12 - project environment locking](#step-12---project-environment-locking "Step 12 - project environment locking")
   * [Step 13 - prepare deployment package](#step-13---prepare-deployment-package "Step 13 - prepare deployment package")
   * [Step 14 - running deployment package](#step-14---running-deployment-package "Step 14 - running deployment package")
 
@@ -590,7 +590,7 @@ Loading required package: data.table
 As you can see there are messages from your package. They are marked with the package name `mypackage`. Please also note that
 as you used `devtools` in your master script you did not have to build the package to see the changes.
 
-# Step 12 - Project environment locking 
+# Step 12 - project environment locking 
 RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment you have to execute the following command:
 
 ```bash

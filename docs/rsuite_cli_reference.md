@@ -285,8 +285,8 @@ RSuite templates support the usage of markers - special keywords which will be r
 - `__PackageName__` - will be replaced with the name of the package
 - `__RSuiteVersion__` - will be replaced with the used RSuite version
 - `__RVersion__` - will be replaced with the used R version
-- `__Date__` - will be replaced with the current data
-- `__User__` - will be replaced with username
+- `__Date__` - will be replaced with the current date
+- `__User__` - will be replaced with the username
 
 ## Registering custom templates
 Templates can be developed outside of the default template folder, to create a template in a specific directory use the `-t` (short for `--tmpl`) while creating templates
