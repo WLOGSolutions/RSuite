@@ -90,6 +90,7 @@ test_that_managed("Test if failes if old version only available", {
                "Required dependencies are not available: TestDependency")
 })
 
+
 test_that_managed("Test if failes if new version only available", {
   prj <- init_test_project(repo_adapters = c("Dir"))
   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
@@ -99,4 +100,20 @@ test_that_managed("Test if failes if new version only available", {
 
   expect_error(RSuite::prj_install_deps(prj),
                "Required dependencies are not available: TestDependency")
+})
+
+
+test_that_managed("Test if strict inequalities are handled properly", {
+  prj <- init_test_project(repo_adapters = c("Dir"))
+  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "0.1")
+  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "0.2")
+  
+  create_test_package(name = "TestPackage", prj = prj, deps = "TestDependency (> 0.1)")
+  RSuite::prj_install_deps(prj = prj) 
+  expect_that_packages_installed(c("TestDependency", "logging"), prj, versions = c("0.2", NA))
+  
+  set_test_package_deps("TestPackage", prj = prj, deps = "TestDependency (< 0.2)")
+  RSuite::prj_install_deps(prj = prj, clean = TRUE) 
+  expect_that_packages_installed(c("TestDependency", "logging"), prj, versions = c("0.1", NA))
 })

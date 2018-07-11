@@ -53,6 +53,54 @@ denorm_version <- function(ver) {
   return(ver)
 }
 
+#' Retrieves version numbers from the input version string e.g. 1.2.0
+#' returns  c(1, 2, 0)
+#'
+#' @param vers list of versions which can contain blocks of digits separeded with a dot
+#' or dash character (type: character).
+#'
+#' @return list of versiong digit vectors (type: list)
+#'
+get_version_numbers <- function(vers) {
+  return(strsplit(vers, split = "[.-]"))
+}
+
+get_closest_version <- function(ver, type) {
+  ver_digits <- as.integer(get_version_numbers(ver)[[1]])
+  ver_digits_len <- length(ver_digits)
+
+  assert(ver_digits_len <= 4, "Incorrect version format: %s", ver)
+
+  if (ver_digits_len == 3 && type == "next") {
+    result <- paste(c(ver_digits, "1"), collapse = ".")
+    return(result)
+  }
+
+  carry <- ifelse(type == "prev", -1, 1)
+  lower_limit <- -1
+  upper_limit <- 10000
+
+  while (ver_digits_len != 0) {
+    ver_digits[ver_digits_len] = ver_digits[ver_digits_len] + carry
+
+    if (ver_digits_len < 4) {
+      upper_limit <- 10
+    }
+
+    if ((ver_digits[ver_digits_len] == lower_limit) || (ver_digits[ver_digits_len] == upper_limit)) {
+      ver_digits[ver_digits_len] = 0
+    } else {
+      break
+    }
+
+    ver_digits_len = ver_digits_len - 1
+  }
+
+  result <- paste(ver_digits, collapse = ".")
+  return(result)
+
+}
+
 #'
 #' Returns standard columns expected in data.frame returned from available.packages.
 #'
@@ -543,6 +591,14 @@ vers.from_deps <- function(deps, pkg_name = NA) {
                      return(vers.build(pdesc, vmin = ver, vmax = NA))
                    }
                    if (ver_op == "<=") {
+                     return(vers.build(pdesc, vmin = NA, vmax = ver))
+                   }
+                   if (ver_op == ">") {
+                     ver <- get_closest_version(ver, type = "next")
+                     return(vers.build(pdesc, vmin = ver, vmax = NA))
+                   }
+                   if (ver_op == "<") {
+                     ver <- get_closest_version(ver, type = "prev")
                      return(vers.build(pdesc, vmin = NA, vmax = ver))
                    }
 
