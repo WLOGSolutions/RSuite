@@ -34,8 +34,7 @@ test_that_managed("Handling unavailable deprecated package", {
   RSuite::prj_install_deps(prj)
   expect_that_packages_installed(c("TestDependency", "logging"), prj = prj, versions = c("1.1", "0.7-103"))
 })
-
-
+  
 
 test_that_managed("Handling available \"deprecated\" package", {
   # Create project

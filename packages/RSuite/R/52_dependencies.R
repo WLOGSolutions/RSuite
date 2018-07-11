@@ -92,7 +92,7 @@ collect_prj_support_pkgs <- function(params, vanilla = FALSE) {
                                   unspec_roclets <- roclets[!grepl("^[a-zA-Z]+::", roclets)]
                                   assert(length(unspec_roclets) == 0,
                                          "Some extra roclets in %s are underspecified: %s",
-                                          pkg_dir, paste(unspec_roclets, collapse = ", "))
+                                         pkg_dir, paste(unspec_roclets, collapse = ", "))
 
                                   roc_pkgs <- gsub("^([a-zA-Z]+)::.+$", "\\1", roclets)
                                   sup_pkgs <- c(sup_pkgs, roc_pkgs)
@@ -269,8 +269,9 @@ collect_dir_script_deps <- function(dir, recursive = TRUE) {
 #' @keywords internal
 #' @noRd
 #'
-collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL) {
+collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extra_reqs = NULL) {
   stopifnot(is.versions(vers))
+  stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
 
   if (is.null(all_pkgs)) {
     stopifnot(!missing(repo_info))
@@ -316,9 +317,9 @@ get_lock_env_vers <- function(params) {
   env_lock <- read.dcf(params$lock_path)
   env_lock_vers <- do.call("vers.union",
                            apply(X = env_lock, 1,
-                                  FUN = function(pkg){
-                                    vers.build(pkg["Package"], pkg["Version"], pkg["Version"])
-                                  })) # from 60_versions.R
+                                 FUN = function(pkg){
+                                   vers.build(pkg["Package"], pkg["Version"], pkg["Version"])
+                                 })) # from 60_versions.R
   return(env_lock_vers)
 }
 

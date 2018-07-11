@@ -81,7 +81,7 @@ resolve_prj_sups <- function(repo_infos, params, only_source = FALSE, vanilla = 
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   prj_sup_vers <- vers.rm(prj_sup_vers, project_packages)
 
-  # remove installed already packages
+  # remove already installed packages
   installed <- get_loadable_packages(vers.get_names(prj_sup_vers),
                                      ex_liblocs = c(params$sbox_path, params$lib_path),
                                      rver = params$r_ver)
@@ -89,7 +89,18 @@ resolve_prj_sups <- function(repo_infos, params, only_source = FALSE, vanilla = 
 
   if (!vers.is_empty(prj_sup_vers)) {
     pkg_logdebug("Resolving support packages (with deps) (for R %s)...", params$r_ver)
-    avail_vers <- resolve_dependencies(prj_sup_vers, repo_infos = repo_infos, pkg_types = pkg_types)
+
+    # prepare additional requirements based on installed packages
+    installed_pkgs <- as.data.frame(utils::installed.packages(lib.loc = params$lib_path),
+                                    stringAsFactors = FALSE)
+    installed_vers <- do.call("vers.union",
+                              by(installed_pkgs, seq_len(nrow(installed_pkgs)),
+                                 FUN = function(pkg) {
+                                   vers.build(pkg$Package, vmin = pkg$Version, vmax = pkg$Version)
+                                 }))
+
+    avail_vers <- resolve_dependencies(prj_sup_vers, repo_infos = repo_infos,
+                                       pkg_types = pkg_types, extra_reqs = installed_vers)
     stopifnot(avail_vers$has_avails())
     return(avail_vers)
   }
@@ -351,42 +362,68 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
 #' @keywords internal
 #' @noRd
 #'
-resolve_dependencies <- function(vers, repo_infos, pkg_types) {
+resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL) {
   stopifnot(is.versions(vers))
+  stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
   stopifnot(is.character(pkg_types) && length(pkg_types) >= 1)
+
+  # collect all available packages
+  contrib_urls <- c()
+  for (tp in pkg_types) {
+    contrib_urls <- c(contrib_urls, lapply(repo_infos, function(repo_info) {
+      repo_info$get_contrib_url(tp)
+    }))
+  }
+
+  # convert to data_frame
+  avail_vers <- do.call("vers.union", lapply(contrib_urls, vers.collect))
+  all_pkgs <- as.data.frame(avail_vers$get_avails())
+
+  if (is.null(extra_reqs)) {
+    extra_reqs <- vers
+  } else {
+    extra_reqs <- vers.union(extra_reqs, vers)
+  }
+
+  unfeasibles <- vers.get_unfeasibles(extra_reqs)
+  assert(length(unfeasibles) == 0,
+         "Additional requirements are conflicting with base requirements for : %s", unfeasibles)
+
+  # Check dependency requirements of available packages
+  is_compatible <- by(all_pkgs, seq_len(nrow(all_pkgs)), FUN = function(deps) {
+    pkg_deps <- unname(unlist(deps[, c("Depends", "Imports", "LinkingTo")]))
+    pkg_vers <- vers.from_deps(deps = paste(pkg_deps[!is.na(pkg_deps)], collapse = ", "),
+                               pkg_name = deps$Package)
+    pkg_vers$pkgs <- pkg_vers$pkgs[pkg_vers$pkgs$pkg %in% extra_reqs$pkgs$pkg, ] # keep only packages from vers
+    dep_req_vers <- vers.union(pkg_vers, vers.drop_avails(extra_reqs))
+
+    length(vers.get_unfeasibles(dep_req_vers)) == 0
+  })
+
+  all_pkgs <- all_pkgs[is_compatible, ]
+
 
   curr_cr <- check_res.build(missing = vers.rm_base(vers))
   all_deps <- check_res.get_missing(curr_cr)
   while (!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
     curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
-    for (ri in repo_infos) {
-      for (tp in pkg_types) {
-          tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
-                                         repo_info = ri,
-                                         type = tp)
-        if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
-          next
-        }
+    tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
+                                     all_pkgs = all_pkgs)
 
-        all_deps <- vers.union(all_deps,
-                               vers.drop_avails(check_res.get_found(tp_cr)),
-                               check_res.get_missing(tp_cr))
-
-        # remove new dependencies: these must be searched again from the beginning of pkg_types
-        tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings)))
-        tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings)))
-        curr_cr <- check_res.join(tp_cr, curr_cr)
-
-        curr_missings <- vers.rm(curr_missings, curr_cr$get_found_names())
-        if (vers.is_empty(curr_missings)) {
-          break
-        }
-      }
-
-      if (vers.is_empty(curr_missings)) {
-        break
-      }
+    if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
+      next
     }
+
+    all_deps <- vers.union(all_deps,
+                           vers.drop_avails(check_res.get_found(tp_cr)),
+                           check_res.get_missing(tp_cr))
+
+    # remove new dependencies: these must be searched again from the beginning of pkg_types
+    tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings)))
+    tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings)))
+    curr_cr <- check_res.join(tp_cr, curr_cr)
+
+    curr_missings <- vers.rm(curr_missings, curr_cr$get_found_names())
 
     assert(vers.is_empty(curr_missings),
            "Required dependencies are not available: %s",

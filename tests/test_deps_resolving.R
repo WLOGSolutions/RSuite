@@ -48,3 +48,23 @@ test_that_managed("Installs dependency sequence src -> bin -> src -> Package", {
   expect_that_packages_installed(c("logging", "TestPackage1", "TestPackage2", "TestPackage3", "TestPackage4"), prj)
 })
 
+
+test_that_managed("Test if specific subdependencies versions are handled properly", {
+  prj <- init_test_project(repo_adapters = c("Dir"))
+
+  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  create_package_deploy_to_lrepo(name = "TestDependency", prj, ver = "1.0")
+  create_package_deploy_to_lrepo(name = "TestDependency", prj, ver = "1.1")
+  create_package_deploy_to_lrepo(name = "TestParentDependency", prj, ver = "1.0",
+                                 deps = "TestDependency (>= 1.0)")
+  create_package_deploy_to_lrepo(name = "TestParentDependency", prj, ver = "1.1",
+                                 deps = "TestDependency (>= 1.1)")
+  
+  create_test_package("TestPackage", prj, deps = c("TestDependency (== 1.0)",
+                                                   "TestParentDependency"))
+
+  RSuite::prj_install_deps(prj)
+  expect_that_packages_installed(names =  c("logging", "TestDependency", "TestParentDependency"),
+                                 prj = prj,
+                                 versions = c(NA, "1.0", "1.0"))
+})
