@@ -356,6 +356,8 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
 #'    to resolve dependencies with
 #' @param pkg_types types of packages which are tried for dependencies in order
 #'    to check. (type: character)
+#' @param extra_reqs additional version requirements, those will be used while
+#' checking vers requirements subdependencies. (type: versions, default: NULL)
 #'
 #' @return versions object describing all resolved dependencies.
 #'

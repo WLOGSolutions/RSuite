@@ -28,8 +28,7 @@ Project folder structure is the following:
 * config_templ.txt - template for your solution configuration. It will be copied onto config.txt (if it does not exist) on the first run of any master script.
 * PARAMETERS - parameters of your project like project name and repositories it is used to collect the isolated project environment.
 
-# TODO WHAT HAPPENED HERE?
-Then you have project created setwd to anywhere inside it.
+After creating the project setwd to anywhere inside it
 
 To create a package inside your project simply run:
 

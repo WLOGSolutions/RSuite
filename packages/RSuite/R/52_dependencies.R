@@ -142,8 +142,6 @@ collect_prj_support_pkgs <- function(params, vanilla = FALSE) {
                                                 fields = "Suggests")
              vers.from_deps(sugs, prj_packages[[pkg_dir]])
            }))
-  suggest_vers <- vers.rm(suggest_vers,
-                          setdiff(vers.get_names(suggest_vers), vers.get_names(support_vers)))
 
   return(vers.union(suggest_vers, support_vers))
 }

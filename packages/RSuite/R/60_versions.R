@@ -654,22 +654,34 @@ vers.from_deps_in_avails <- function(avails) {
 }
 
 
+#'
+#' Removes packages from ver avails whose dependencies do not satisfy requirements
+#' from ver and extra_reqs.
+#'
+#' @param ver version object to filter
+#'
+#' @param extra_reqs additional requirements
+#'
+#' @keywords internal
+#' @noRd
+#'
 vers.filter_sub_deps <- function(ver, extra_reqs = NULL) {
   stopifnot(is.versions(ver))
   stopifnot(ver$has_avails())
-  stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
+  stopifnot(is.null(extra_reqs) || (is.versions(extra_reqs) && !extra_reqs$has_avails()))
 
   all_pkgs <- as.data.frame(ver$get_avails())
 
   if (is.null(extra_reqs)) {
     extra_reqs <- ver
   } else {
-    extra_reqs <- vers.union(extra_reqs, ver)
+    extra_reqs <- vers.union(extra_reqs, vers.drop_avails(ver))
   }
 
   unfeasibles <- vers.get_unfeasibles(extra_reqs)
-  #assert(length(unfeasibles) == 0,
-  #       "Additional requirements are conflicting with base requirements for : %s", unfeasibles)
+  if (length(unfeasibles) == 0) {
+    pkg_logerror("Additional requiremens are conflicting with main requirements: %s", unfeasibles)
+  }
 
   # Check dependency requirements of available packages
   is_compatible <- by(all_pkgs, seq_len(nrow(all_pkgs)), FUN = function(deps) {
