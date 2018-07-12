@@ -390,7 +390,10 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
                                      extra_reqs = extra_reqs)
 
     if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
-      next
+      assert(vers.is_empty(curr_missings),
+             "Required dependencies are not available: %s",
+             paste(vers.get_names(curr_missings), collapse = ", "))
+      break
     }
 
     all_deps <- vers.union(all_deps,
@@ -403,10 +406,6 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
     curr_cr <- check_res.join(tp_cr, curr_cr)
 
     curr_missings <- vers.rm(curr_missings, curr_cr$get_found_names())
-
-    assert(vers.is_empty(curr_missings),
-           "Required dependencies are not available: %s",
-           paste(vers.get_names(curr_missings), collapse = ", "))
   }
 
   return(check_res.get_found(curr_cr))
