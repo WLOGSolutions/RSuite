@@ -369,14 +369,14 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
 
   # collect all available packages
   contrib_urls <- c()
-  for (tp in pkg_types) {
-    contrib_urls <- c(contrib_urls, lapply(repo_infos, function(repo_info) {
-      repo_info$get_contrib_url(tp)
-    }))
+  for (repo in repo_infos) {
+    for (tp in pkg_types) {
+      contrib_urls <- c(contrib_urls, repo$get_contrib_url(tp))
+    }
   }
 
   # convert to data_frame
-  avail_vers <- do.call("vers.union", lapply(contrib_urls, vers.collect))
+  avail_vers <- do.call("vers.union", lapply(as.list(contrib_urls), vers.collect))
   all_pkgs <- as.data.frame(avail_vers$get_avails())
 
   if (is.null(extra_reqs)) {
