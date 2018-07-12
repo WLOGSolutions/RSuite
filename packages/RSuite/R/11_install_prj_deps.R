@@ -377,38 +377,15 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
 
   # convert to data_frame
   avail_vers <- do.call("vers.union", lapply(as.list(contrib_urls), vers.collect))
-  all_pkgs <- as.data.frame(avail_vers$get_avails())
-
-  if (is.null(extra_reqs)) {
-    extra_reqs <- vers
-  } else {
-    extra_reqs <- vers.union(extra_reqs, vers)
-  }
-
-  unfeasibles <- vers.get_unfeasibles(extra_reqs)
-  assert(length(unfeasibles) == 0,
-         "Additional requirements are conflicting with base requirements for : %s", unfeasibles)
-
-  # Check dependency requirements of available packages
-  is_compatible <- by(all_pkgs, seq_len(nrow(all_pkgs)), FUN = function(deps) {
-    pkg_deps <- unname(unlist(deps[, c("Depends", "Imports", "LinkingTo")]))
-    pkg_vers <- vers.from_deps(deps = paste(pkg_deps[!is.na(pkg_deps)], collapse = ", "),
-                               pkg_name = deps$Package)
-    pkg_vers$pkgs <- pkg_vers$pkgs[pkg_vers$pkgs$pkg %in% extra_reqs$pkgs$pkg, ] # keep only packages from vers
-    dep_req_vers <- vers.union(pkg_vers, vers.drop_avails(extra_reqs))
-
-    length(vers.get_unfeasibles(dep_req_vers)) == 0
-  })
-
-  all_pkgs <- all_pkgs[is_compatible, ]
-
+  all_pkgs <- avail_vers$get_avails()
 
   curr_cr <- check_res.build(missing = vers.rm_base(vers))
   all_deps <- check_res.get_missing(curr_cr)
   while (!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
     curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
     tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
-                                     all_pkgs = all_pkgs)
+                                     all_pkgs = all_pkgs,
+                                     extra_reqs = extra_reqs)
 
     if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
       next

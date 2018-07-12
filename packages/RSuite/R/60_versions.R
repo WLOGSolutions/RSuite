@@ -231,7 +231,7 @@ vers.build <- function(pkg_names = c(), vmin = NA, vmax = NA, avails = NULL) {
 #' @keywords internal
 #' @noRd
 #'
-vers.check_against <- function(ver, oth) {
+vers.check_against <- function(ver, oth, extra_reqs = NULL) {
   stopifnot(is.versions(ver))
   stopifnot(is.versions(oth))
   stopifnot(ver$has_avails() || oth$has_avails())
@@ -252,10 +252,15 @@ vers.check_against <- function(ver, oth) {
 
   # test against version availability and version requirements
   test_ver <- .df2ver(ver_diff, avails = avails)
+  test_ver <- vers.filter_sub_deps(test_ver, extra_reqs)
+
+  nonavail <- rbind(nonavail, ver_diff[!(ver_diff$pkg %in% test_ver$get_avails()$Package), ])
+  ver_diff <- ver_diff[!(ver_diff$pkg %in% nonavail$pkg), ]
+
   unfeasibles <- ver_diff[ver_diff$pkg %in% vers.get_unfeasibles(test_ver), ]
   ver_diff <- ver_diff[!(ver_diff$pkg %in% unfeasibles$pkg), ]
 
-  found <- .df2ver(ver_diff, avails = avails)
+  found <- .df2ver(ver_diff, avails = test_ver$get_avails())
   missing <- .df2ver(rbind(nonavail, unfeasibles))
 
   return(check_res.build(found = found, missing = missing))
@@ -425,7 +430,14 @@ vers.pick_available_pkgs <- function(ver) {
   stopifnot(ver$has_avails())
 
   avail_ver <- ver$get_avails()
-  avail_ver <- avail_ver[order(avail_ver$Package, avail_ver$NVersion, decreasing = TRUE), ]
+  avail_ver <- deduce_package_files(avail_ver)
+
+  avail_ver$Type <- get_package_url_infos(file.path(avail_ver$Repository, avail_ver$File))$Type
+  avail_ver$Type <- factor(avail_ver$Type,
+                           levels = c("source", "win.binary", "mac.binary", "binary"),
+                           labels = c(1, 0, 0, 0))
+
+  avail_ver <- avail_ver[order(avail_ver$Package, avail_ver$Type, avail_ver$NVersion, decreasing = TRUE), ]
   avail_ver <- avail_ver[!duplicated(avail_ver$Package), ]
 
   return(avail_ver)
@@ -639,6 +651,40 @@ vers.from_deps_in_avails <- function(avails) {
     pkg_vers
   })
   do.call("vers.union", pdfs)
+}
+
+
+vers.filter_sub_deps <- function(ver, extra_reqs = NULL) {
+  stopifnot(is.versions(ver))
+  stopifnot(ver$has_avails())
+  stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
+
+  all_pkgs <- as.data.frame(ver$get_avails())
+
+  if (is.null(extra_reqs)) {
+    extra_reqs <- ver
+  } else {
+    extra_reqs <- vers.union(extra_reqs, ver)
+  }
+
+  unfeasibles <- vers.get_unfeasibles(extra_reqs)
+  #assert(length(unfeasibles) == 0,
+  #       "Additional requirements are conflicting with base requirements for : %s", unfeasibles)
+
+  # Check dependency requirements of available packages
+  is_compatible <- by(all_pkgs, seq_len(nrow(all_pkgs)), FUN = function(deps) {
+    pkg_deps <- unname(unlist(deps[, c("Depends", "Imports", "LinkingTo")]))
+    pkg_vers <- vers.from_deps(deps = paste(pkg_deps[!is.na(pkg_deps)], collapse = ", "),
+                               pkg_name = deps$Package)
+    pkg_vers$pkgs <- pkg_vers$pkgs[pkg_vers$pkgs$pkg %in% extra_reqs$pkgs$pkg, ] # keep only packages from vers
+    dep_req_vers <- vers.union(pkg_vers, vers.drop_avails(extra_reqs))
+
+    length(vers.get_unfeasibles(dep_req_vers)) == 0
+  })
+
+  all_pkgs <- all_pkgs[is_compatible, ]
+  ver$pkgs <- ver$pkgs[ver$pkgs$pkg %in% all_pkgs$Package, ]
+  return(vers.add_avails(ver, all_pkgs))
 }
 
 

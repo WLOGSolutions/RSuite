@@ -286,7 +286,7 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
   }
 
   vers <- vers.rm_base(vers)
-  vers_cr <- vers.check_against(vers, avail_vers)
+  vers_cr <- vers.check_against(vers, avail_vers, extra_reqs)
 
   next_cr <- vers_cr
   while (check_res.has_found(next_cr)) {
@@ -295,7 +295,7 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
     dep_vers <- vers.from_deps_in_avails(dep_avails)
     dep_vers <- vers.rm_base(dep_vers)
 
-    next_cr <- vers.check_against(dep_vers, avail_vers)
+    next_cr <- vers.check_against(dep_vers, avail_vers, extra_reqs)
     vers_cr <- check_res.union(vers_cr, next_cr)
   }
 
