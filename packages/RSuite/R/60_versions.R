@@ -81,19 +81,19 @@ get_closest_version <- function(ver, type) {
   upper_limit <- 10000
 
   while (ver_digits_len != 0) {
-    ver_digits[ver_digits_len] = ver_digits[ver_digits_len] + carry
+    ver_digits[ver_digits_len] <- ver_digits[ver_digits_len] + carry
 
     if (ver_digits_len < 4) {
       upper_limit <- 10
     }
 
-    if ((ver_digits[ver_digits_len] == lower_limit) || (ver_digits[ver_digits_len] == upper_limit)) {
-      ver_digits[ver_digits_len] = 0
+    if (ver_digits[ver_digits_len] == lower_limit || ver_digits[ver_digits_len] == upper_limit) {
+      ver_digits[ver_digits_len] <- 0
     } else {
       break
     }
 
-    ver_digits_len = ver_digits_len - 1
+    ver_digits_len <- ver_digits_len - 1
   }
 
   result <- paste(ver_digits, collapse = ".")
@@ -434,8 +434,8 @@ vers.pick_available_pkgs <- function(ver) {
 
   avail_ver$Type <- get_package_url_infos(file.path(avail_ver$Repository, avail_ver$File))$Type
   avail_ver$Type <- factor(avail_ver$Type,
-                           levels = c("source", "win.binary", "mac.binary", "binary"),
-                           labels = c(1, 0, 0, 0))
+                           levels = c("source",
+                                      "binary" = c("win.binary", "mac.binary", "binary")))
 
   avail_ver <- avail_ver[order(avail_ver$Package, avail_ver$Type, avail_ver$NVersion, decreasing = TRUE), ]
   avail_ver <- avail_ver[!duplicated(avail_ver$Package), ]
