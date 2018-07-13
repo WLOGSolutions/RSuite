@@ -83,7 +83,8 @@ rsuite_write_PACKAGES <- function(url, type) {
 
   if (type %in% c("win.binary", "source", "mac.binary")) {
     nr <- tools::write_PACKAGES(url, type = type, latestOnly = FALSE, addFiles = TRUE)
-  } else if (grepl("^mac[.]binary[.]", type)) { # mac.binary.el-capitan is not accepted by write_PACKAGES
+  } else if (grepl("^mac[.]binary[.]", type)) {
+    # mac.binary.el-capitan is not accepted by write_PACKAGES
     nr <- tools::write_PACKAGES(url, type = "mac.binary", latestOnly = FALSE, addFiles = TRUE)
   } else {
     nr <- tools::write_PACKAGES(url, latestOnly = FALSE, addFiles = TRUE)
