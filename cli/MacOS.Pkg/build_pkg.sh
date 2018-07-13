@@ -139,5 +139,26 @@ EOL
 
 popd > /dev/null
 
+if [ ! -e "${base_dir}/macos_signing.tar.gz" ]; then
+	echo "No package signing staff available."
+	exit 1
+fi 
+
+pkg=${build_dir}/RSuiteCLI\ ${ver}\ Installer.pkg
+rm -rf ${base_dir}/macos_signing
+echo "Signing ${pkg} ..."
+
+tar xzf "${base_dir}/macos_signing.tar.gz" -C "${base_dir}"
+pushd ${base_dir}/macos_signing/ > /dev/null
+
+xar --sign -f "${pkg}" --digestinfo-to-sign digestinfo.dat --sig-size 256 --cert-loc ./cert00 --cert-loc ./cert01 --cert-loc ./cert02
+openssl rsautl -sign -inkey developerID_installer.pem -in digestinfo.dat -out signature.dat
+xar --inject-sig signature.dat -f "${pkg}"
+
+echo "... done"
+popd > /dev/null
+rm -rf ${base_dir}/macos_signing
+
 mkdir -p ${base_dir}/pkgs
-mv ${build_dir}/RSuiteCLI\ ${ver}*.pkg ${base_dir}/pkgs/
+mv "${pkg}" ${base_dir}/pkgs/
+
