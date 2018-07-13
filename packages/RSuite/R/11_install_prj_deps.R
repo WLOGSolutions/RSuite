@@ -299,8 +299,11 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
     if (nrow(avails) != 0) {
       missing <- merge(installed, avails, by = c("Package", "Version"))
       missing <- installed[!installed$Package %in% missing$Package, ]
-      pkg_loginfo("The following packages are no longer available in the repository and will be updated: %s",
-                  missing$Package)
+
+      if (length(missing) != 0) {
+        pkg_loginfo("The following packages are no longer available in the repository and will be updated: %s",
+                    missing$Package)
+      }
 
       # remove deprecated packages from installed so they get updated
       installed <- installed[!installed$Package %in% missing$Package, ]

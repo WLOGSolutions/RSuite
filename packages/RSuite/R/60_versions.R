@@ -669,13 +669,13 @@ vers.filter_sub_deps <- function(ver, extra_reqs = NULL) {
   if (is.null(extra_reqs)) {
     extra_reqs <- ver
   } else {
-    extra_reqs <- vers.union(extra_reqs, vers.drop_avails(ver))
+    extra_reqs <- vers.union(vers.drop_avails(extra_reqs), vers.drop_avails(ver))
+    unfeasibles <- vers.get_unfeasibles(extra_reqs)
+    if (length(unfeasibles) == 0) {
+      pkg_logerror("Additional requiremens are conflicting with main requirements: %s", unfeasibles)
+    }
   }
 
-  unfeasibles <- vers.get_unfeasibles(extra_reqs)
-  if (length(unfeasibles) == 0) {
-    pkg_logerror("Additional requiremens are conflicting with main requirements: %s", unfeasibles)
-  }
 
   # Check dependency requirements of available packages
   is_compatible <- by(all_pkgs, seq_len(nrow(all_pkgs)), FUN = function(deps) {
