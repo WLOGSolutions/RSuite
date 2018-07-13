@@ -1,5 +1,7 @@
 VERSION 0.30 (2018-07-??)
   * Fixes related to MacOS support (realpath behaves differently)
+  * 'update' command for MacOS works properly: it will ask for admin 
+	password if not running as administrator.
 
 VERSION 0.29 (2018-06-24)
   * `proj lock` and `proj unlock` subcommands added.
