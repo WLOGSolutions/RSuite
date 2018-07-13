@@ -65,6 +65,19 @@ platform_dict <- list(
       }
       c("-i", dest_file)
     }
+  ),
+  macos = list(
+    get_platform_id = function() { "pkg" },
+    installer = "sudo",
+    get_install_args = function(url) {
+      dest_file <- file.path(dirname(tempdir()), basename(url))
+      errcode <- download.file(URLencode(url), destfile = dest_file,
+                               mode = "wb", quite = any(opts$quiet))
+      if (errcode != 0) {
+        .fatal_error(sprintf("Failed to download package from %s.", url))
+      }
+      c("installer", "-pkg", gsub(" ", "\\\\ ", dest_file), "-target", "/")
+    }
   )
 )
 
@@ -74,6 +87,8 @@ if (platform == "unix") {
     platform <- "redhat"
   } else if (file.exists("/etc/debian_version")) {
     platform <- "debian"
+  } else if (grepl("darwin", R.version$os)) {
+    platform <- "macos";
   } else {
     platform <- "unknown"
   }

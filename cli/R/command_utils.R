@@ -102,7 +102,7 @@ get_latest_release <- function(platform_id) {
   }
 
   path <- gsub("^[^:]+: ", "", plat_pkgs[1])
-  ver <- gsub("^.+rsuitecli[-_]v?([\\.0-9]+)[-_].+$", "\\1", plat_pkgs[1], ignore.case = T)
+  ver <- gsub("^.+rsuitecli[-_ ]v?([\\.0-9]+)[-_ ].+$", "\\1", plat_pkgs[1], ignore.case = T)
   loginfo("... found v%s (%s)", ver, path)
   return(list(
     url = paste0("http://wlog-rsuite.s3.amazonaws.com/cli/", path),
