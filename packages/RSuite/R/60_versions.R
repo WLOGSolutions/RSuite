@@ -430,14 +430,8 @@ vers.pick_available_pkgs <- function(ver) {
   stopifnot(ver$has_avails())
 
   avail_ver <- ver$get_avails()
-  avail_ver <- deduce_package_files(avail_ver)
 
-  avail_ver$Type <- get_package_url_infos(file.path(avail_ver$Repository, avail_ver$File))$Type
-  avail_ver$Type <- factor(avail_ver$Type,
-                           levels = c("source",
-                                      "binary" = c("win.binary", "mac.binary", "binary")))
-
-  avail_ver <- avail_ver[order(avail_ver$Package, avail_ver$Type, avail_ver$NVersion, decreasing = TRUE), ]
+  avail_ver <- avail_ver[order(avail_ver$Package, avail_ver$NVersion, decreasing = TRUE), ]
   avail_ver <- avail_ver[!duplicated(avail_ver$Package), ]
 
   return(avail_ver)

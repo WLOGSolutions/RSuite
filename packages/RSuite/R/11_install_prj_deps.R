@@ -369,43 +369,37 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
   stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
   stopifnot(is.character(pkg_types) && length(pkg_types) >= 1)
 
-  # collect all available packages
-  contrib_urls <- c()
-  for (repo in repo_infos) {
-    for (tp in pkg_types) {
-      contrib_urls <- c(contrib_urls, repo$get_contrib_url(tp))
-    }
-  }
-
-  # convert to data_frame
-  avail_vers <- do.call("vers.union", lapply(as.list(contrib_urls), vers.collect))
-  all_pkgs <- avail_vers$get_avails()
 
   curr_cr <- check_res.build(missing = vers.rm_base(vers))
   all_deps <- check_res.get_missing(curr_cr)
   while (!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
     curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
-    tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
-                                     all_pkgs = all_pkgs,
-                                     extra_reqs = extra_reqs)
+    for (rp in repo_infos) {
+      for (tp in pkg_types) {
+        tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
+                                         repo_info = rp,
+                                         type = tp,
+                                         extra_reqs = extra_reqs)
 
-    if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
+        if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
+          next
+        }
+
+        all_deps <- vers.union(all_deps,
+                               vers.drop_avails(check_res.get_found(tp_cr)),
+                               check_res.get_missing(tp_cr))
+
+        # remove new dependencies: these must be searched again from the beginning of pkg_types
+        tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings)))
+        tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings)))
+        curr_cr <- check_res.join(tp_cr, curr_cr)
+
+        curr_missings <- vers.rm(curr_missings, curr_cr$get_found_names())
+      }
+    }
       assert(vers.is_empty(curr_missings),
              "Required dependencies are not available: %s",
              paste(vers.get_names(curr_missings), collapse = ", "))
-      break
-    }
-
-    all_deps <- vers.union(all_deps,
-                           vers.drop_avails(check_res.get_found(tp_cr)),
-                           check_res.get_missing(tp_cr))
-
-    # remove new dependencies: these must be searched again from the beginning of pkg_types
-    tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings)))
-    tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings)))
-    curr_cr <- check_res.join(tp_cr, curr_cr)
-
-    curr_missings <- vers.rm(curr_missings, curr_cr$get_found_names())
   }
 
   return(check_res.get_found(curr_cr))
