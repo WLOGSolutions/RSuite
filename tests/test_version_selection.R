@@ -121,10 +121,12 @@ test_that_managed("Test if strict inequalities are handled properly", {
 test_that_managed("Test if suggests versions are chosen properly", {
   prj <- init_test_project(repo_adapters = c("Dir"))
   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "0.1")
-  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "0.2")
-  create_package_deploy_to_lrepo(name = "TestSuggest", prj = prj, ver = "0.1", deps = "TestDependency (>= 0.1)")
-  create_package_deploy_to_lrepo(name = "TestSuggest", prj = prj, ver = "0.2", deps = "TestDependency (>= 0.2)")
+  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "0.1", type = "source")
+  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, ver = "0.2", type = "source")
+  create_package_deploy_to_lrepo(name = "TestSuggest", prj = prj, ver = "0.1", deps = "TestDependency (>= 0.1)",
+                                 type = "source")
+  create_package_deploy_to_lrepo(name = "TestSuggest", prj = prj, ver = "0.2", deps = "TestDependency (>= 0.2)",
+                                 type = "source")
   
   create_test_package(name = "TestPackage", prj = prj, deps = "TestDependency (== 0.1)")
   RSuite::prj_install_deps(prj = prj) 

@@ -323,11 +323,13 @@ pkg_remove <- function(pkgs, lib_dir) {
 #' @param check_repo_consistency If TRUE binary consistency with rver will be
 #'   checked after installation of each package.
 #'   (type: logical(1), default: TRUE)
+#' @param ex_libpath extra path to add to .libPaths. (type: character, default: NULL)
 #'
 #' @keywords internal
 #' @noRd
 #'
-pkg_install <- function(pkgs, lib_dir, type, repos, rver, check_repos_consistency = TRUE) {
+pkg_install <- function(pkgs, lib_dir, type, repos, rver, check_repos_consistency = TRUE,
+                        ex_libpath = NULL) {
   common_args <- c(rscript_arg("lib", lib_dir), "quiet = FALSE")
   if (!missing(type)) {
     common_args <- c(common_args, rscript_arg("type", type))
@@ -346,7 +348,8 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver, check_repos_consistenc
                                   "utils::install.packages(%s)"),
                                 rscript_arg("dir", lib_dir),
                                 paste(pkg_args, collapse = ", "),
-                                rver = rver)
+                                rver = rver,
+                                ex_libpath = ex_libpath)
     if (is.null(build_result)) {
       return(TRUE)
     }

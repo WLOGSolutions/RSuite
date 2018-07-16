@@ -261,7 +261,8 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver,
               type = "source",
               repos = NULL,
               rver = rver,
-              check_repos_consistency = check_repos_consistency)
+              check_repos_consistency = check_repos_consistency,
+              ex_libpath = lib_dir)
 
   avail_vers <- remove_installed(avail_vers, check_repos_consistency)
   assert(vers.is_empty(avail_vers),
@@ -300,7 +301,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
       missing <- merge(installed, avails, by = c("Package", "Version"))
       missing <- installed[!installed$Package %in% missing$Package, ]
 
-      if (length(missing) != 0) {
+      if (length(missing$Package) != 0) {
         pkg_loginfo("The following packages are no longer available in the repository and will be updated: %s",
                     missing$Package)
       }

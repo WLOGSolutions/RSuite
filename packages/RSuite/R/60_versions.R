@@ -671,9 +671,6 @@ vers.filter_sub_deps <- function(ver, extra_reqs = NULL) {
   } else {
     extra_reqs <- vers.union(vers.drop_avails(extra_reqs), vers.drop_avails(ver))
     unfeasibles <- vers.get_unfeasibles(extra_reqs)
-    if (length(unfeasibles) == 0) {
-      pkg_logerror("Additional requiremens are conflicting with main requirements: %s", unfeasibles)
-    }
   }
 
 
