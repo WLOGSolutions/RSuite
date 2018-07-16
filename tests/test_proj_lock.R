@@ -239,7 +239,7 @@ test_that_managed("Add and Remove dependency, relocking", {
 
   # Update lock
   RSuite::prj_install_deps(prj, relock = TRUE)
-  
+
   # Check updated lock
   expect_that_packages_locked(c(logging = "0.7-103", AddedTestDependency = "1.0"),
                               params)

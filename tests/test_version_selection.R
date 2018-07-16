@@ -127,18 +127,18 @@ test_that_managed("Test if suggests versions are chosen properly", {
                                  type = "source")
   create_package_deploy_to_lrepo(name = "TestSuggest", prj = prj, ver = "0.2", deps = "TestDependency (>= 0.2)",
                                  type = "source")
-  
+
   create_test_package(name = "TestPackage", prj = prj, deps = "TestDependency (== 0.1)")
-  RSuite::prj_install_deps(prj = prj) 
+  RSuite::prj_install_deps(prj = prj)
   expect_that_packages_installed(c("TestDependency", "logging"), prj, versions = c("0.1", NA))
-  
+
   set_test_package_deps("TestPackage", prj = prj, deps = "TestDependency", sugs = "TestSuggest")
-  
+
   test_file_path <- file.path(prj$load_params()$pkgs_path, "TestPackage", "tests")
   dir.create(test_file_path)
   writeLines(c("library(TestSuggest)"), con = file.path(test_file_path, "test_case.R"))
-  
-  RSuite::prj_install_deps(prj = prj) 
+
+  RSuite::prj_install_deps(prj = prj)
   expect_that_packages_installed(c("TestDependency", "logging"), prj, versions = c("0.1", NA))
   expect_that_packages_installed(c("TestSuggest"), prj, versions = c("0.1"), supports = TRUE)
 })

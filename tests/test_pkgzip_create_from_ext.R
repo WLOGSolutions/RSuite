@@ -92,4 +92,3 @@ test_that_managed("Create PKGZIP out of external package (with filtering and ver
   # TestPackage1 v1.0 is available in mgr$url repository, but TestPackage2 requires v2.0
   expect_that_pkgzip_contains(c("logging", "TestPackage2", "TestPackage1"), type = "source", pkgzip = pkgzip)
 })
-

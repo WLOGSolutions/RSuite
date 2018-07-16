@@ -54,7 +54,9 @@ installOracleInstantClient <- function() {
 
   message("Preparing ROracle environment ...")
 
-  build_win_path <- function(...) { normalizePath(file.path(...)) }
+  build_win_path <- function(...) {
+    normalizePath(file.path(...))
+  }
   Sys.setenv(PATH = paste(build_win_path(base_dir, "instantclient-basic-nt", "instantclient_12_1"),
                           build_win_path(base_dir, "instantclient-basic-windows.x64", "instantclient_12_1"),
                           Sys.getenv("PATH"),

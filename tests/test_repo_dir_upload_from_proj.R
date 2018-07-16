@@ -37,4 +37,3 @@ test_that_managed("Uploading project packages (with deps)", {
 
   expect_that_packages_available(c("TestPackage", "logging"), .Platform$pkgType, mgr)
 })
-

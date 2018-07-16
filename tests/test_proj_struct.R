@@ -24,7 +24,9 @@ test_that_managed("Updating old project deployment switch", {
 
   RSuite::prj_start(name = "TestRepo", path = wspace_dir)
 
-  cur_path <- suppressWarnings({ get_repo_path(file.path(proj_dir, "deployment")) })
+  cur_path <- suppressWarnings({
+    get_repo_path(file.path(proj_dir, "deployment"))
+  })
   expect_equal(cur_path, exp_path)
 })
 

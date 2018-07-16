@@ -25,7 +25,7 @@ test_that_managed <- function(desc, ...) {
     cat(sprintf("====> %s <====\n", desc), file = log_file, append = T)
 
     logging::setLevel("CRITICAL")
-    logging::setLevel("DEBUG", logging::getLogger('rsuite'))
+    logging::setLevel("DEBUG", logging::getLogger("rsuite"))
     logging::addHandler(action = logging::writeToFile,
                         file = log_file,
                         handler = "RSuite.tests.file.logger", level = "DEBUG",
@@ -42,7 +42,7 @@ test_that_managed <- function(desc, ...) {
 
 fire_cleanups <- function() {
   cleanups <- get("cleanup", envir = .test_env)
-  for(cup in cleanups) {
+  for (cup in cleanups) {
     cup()
   }
   assign("cleanup", c(), envir = .test_env)
@@ -118,12 +118,12 @@ test_that_template <- function(desc, ...) {
   # setup test environment options
   old_option <- options("rsuite.user_templ_path")
   options(rsuite.user_templ_path = get_wspace_template_dir())
-  
+
   on_test_exit(function() {
     # clean up, set options back to normal
     options(rsuite.user_templ_path = unlist(old_option))
   })
-  test_that_managed(desc, ...) 
+  test_that_managed(desc, ...)
 }
 
 
@@ -132,7 +132,7 @@ create_lock_test_prj <- function() {
   if (dir.exists(file.path("data", "TestProject"))) {
     unlink(file.path("data", "TestProject"), recursive = TRUE, force = TRUE)
   }
-  
+
   RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
 
   prj <- RSuite::prj_start("TestProject", skip_rc = TRUE, path = "data")
@@ -146,7 +146,7 @@ create_lock_test_prj <- function() {
   params_df <- data.frame(read.dcf(file = params_path))
   params_df$SnapshotDate <- NULL
   write.dcf(params_df, file = params_path)
-  
+
   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_package_deploy_to_lrepo(name = "AddedTestDependency", prj = prj, ver = "1.0")
   create_package_deploy_to_lrepo(name = "TestDependencyToRemove", prj = prj, ver = "1.0")
@@ -156,10 +156,10 @@ create_lock_test_prj <- function() {
 
 init_lock_test_prj <- function() {
   prj <- init_test_project(tmpl = file.path("data", "TestProject"))
-  
+
   on_test_exit(function() {
     unlink(file.path(get_wspace_dir(), "TestProject"), force = T, recursive = T)
   })
-  
+
   return(prj)
 }

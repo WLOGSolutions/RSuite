@@ -96,7 +96,7 @@ test_that_template("Project creation using custom template defined in user's loc
 
   prj_files <- list.files(params$prj_path, all.files = TRUE,
                           recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
-  
+
   expect_true(all(expected_files %in% prj_files))
 })
 
@@ -143,7 +143,7 @@ test_that_template("Project creation using custom template (path as argument)", 
 test_that_template("Package creation using custom template defined in user's local directory", {
   # create project template not
   create_pkg_test_template(name = "TestTemplate")
-  
+
   # create package using custom template
   prj <- init_test_project(repo_adapters = c("Dir"))
   create_test_package("TestPackage", prj = prj, tmpl = "TestTemplate")
@@ -176,7 +176,7 @@ test_that_template("Package creation using custom template (path as argument)", 
   # create project template not
   create_pkg_test_template(name = "TestTemplate")
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
-  
+
 
   # check if template contains files from default template
   file.create(file.path(tmpl_path, "__PackageName__.txt"))
@@ -246,14 +246,14 @@ test_that_template("Template priority during project/package creation", {
   create_prj_test_template(name = "builtin", path = wspace_dir)
   success <- file.create(file.path(wspace_dir, "builtin", "project", "prj_builtin.txt"))
   stopifnot(success)
-  
+
   create_pkg_test_template(name = "builtin", path = wspace_dir)
   success <- file.create(file.path(wspace_dir, "builtin", "package", "pkg_builtin.txt"))
   stopifnot(success)
-  
+
   # register created custom builtin template
   RSuite::tmpl_register(path = file.path(wspace_dir, "builtin"))
-  
+
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "builtin")
   create_test_package("TestPackage", prj = prj, tmpl = "builtin")
@@ -276,7 +276,7 @@ test_that_template("Template priority during project/package creation", {
     "tests/.Rprofile",
     "prj_builtin.txt"
   )
-  
+
   prj_files <- list.files(params$prj_path, all.files = TRUE,
                           recursive = TRUE, include.dirs = TRUE, no.. = TRUE)
   pkg_files <- list.files(file.path(params$pkgs_path, "TestPackage"),
@@ -294,7 +294,7 @@ test_that_template("Template priority during project/package creation", {
     "R/packages_import.R",
     "pkg_builtin.txt"
   )
-  
+
   expect_true(all(expected_prj_files %in% prj_files))
   expect_true(all(expected_pkg_files %in% pkg_files))
 })
@@ -312,20 +312,20 @@ test_that_template("Overwriting existing project files", {
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
   params <- prj$load_params()
-  
+
   # add changes to TestProjectInfo.txt file in the created project
   changed_file_path <- file.path(params$prj_path, "TestProjectInfo.txt")
   file_connection <- file(changed_file_path)
   new_file_content <- "My very important changes."
   writeLines(new_file_content, file_connection)
   close(file_connection)
-  
+
   # create project again and check if files got overwritten
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
   file_connection <- file(changed_file_path)
   line <- readLines(file_connection, n = 1)
   close(file_connection)
-  
+
   expect_equal(line, new_file_content)
 })
 
@@ -340,20 +340,20 @@ test_that_template("Overwriting existing project files while renaming", {
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
   params <- prj$load_params()
-  
+
   # add changes to TestProjectInfo.txt file in the created project
   changed_file_path <- file.path(params$prj_path, "TestProjectInfo.txt")
   file_connection <- file(changed_file_path)
   new_file_content <- "My very important changes."
   writeLines(new_file_content, file_connection)
   close(file_connection)
-  
+
   # create project again and check if files got overwritten
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
   file_connection <- file(changed_file_path)
   line <- readLines(file_connection, n = 1)
   close(file_connection)
-  
+
   expect_equal(line, new_file_content)
 })
 
@@ -361,10 +361,10 @@ test_that_template("Overwriting existing project files while renaming", {
 test_that_template("Project creation from empty template", {
   wspace_dir <- get_wspace_dir()
   minimal_tmpl_path <- file.path(wspace_dir, "minimal")
-  
+
   # create empty directory
   dir.create(minimal_tmpl_path)
-  
+
   expect_silent(init_test_project(tmpl = minimal_tmpl_path))
 })
 
@@ -372,10 +372,10 @@ test_that_template("Project creation from empty template", {
 test_that_template("Package creation from empty template", {
   wspace_dir <- get_wspace_dir()
   minimal_tmpl_path <- file.path(wspace_dir, "minimal")
-  
+
   # create empty directory
   dir.create(minimal_tmpl_path)
-  
+
   prj <- init_test_project()
   expect_silent(create_test_package("TestPackage", prj = prj, tmpl = minimal_tmpl_path))
 })

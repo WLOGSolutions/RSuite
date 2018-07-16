@@ -49,7 +49,7 @@ create_test_package <- function(name, prj, ver = "1.0", deps = "",
   pkg_path <- file.path(prj$path, "packages", name)
 
   pkg_desc_fname <- file.path(pkg_path, "DESCRIPTION")
-  
+
   if (file.exists(pkg_desc_fname)) {
     pkg_desc <- data.frame(read.dcf(file = pkg_desc_fname))
     pkg_desc$Version <- ver
@@ -115,18 +115,18 @@ remove_test_packages <- function(prj) {
 set_test_package_deps <- function(name, prj, deps = NULL, sugs = NULL) {
   params <- prj$load_params()
   pkg_desc_fname <- file.path(params$pkgs_path, name, "DESCRIPTION")
-  
+
   if (file.exists(pkg_desc_fname)) {
     pkg_desc <- data.frame(read.dcf(file = pkg_desc_fname))
     if (!is.null(deps)) {
       pkg_desc$Depends <- paste(deps, collapse = ", ")
     }
-    if(!is.null(sugs)) {
+    if (!is.null(sugs)) {
       pkg_desc$Suggests <- paste(sugs, collapse = ", ")
     }
-    
+ 
   }
-  
+
   write.dcf(pkg_desc, file = pkg_desc_fname)
 }
 
@@ -151,7 +151,7 @@ expect_that_packages_installed <- function(names, prj, versions = NULL, supports
   } else {
     lib_path <- file.path(prj$path, "deployment", "libs")
   }
-  
+
   installed <- installed.packages(lib.loc = lib_path, noCache = T)[, "Package"]
   pass <- setequal(installed, names)
   if (pass) {

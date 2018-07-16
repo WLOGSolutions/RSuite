@@ -121,18 +121,18 @@ test_that_template("Package template creation in specified path", {
 })
 
 
-test_that_template("Template getting",{
+test_that_template("Template getting", {
   # create templates
   create_pkg_test_template(name = "TestTemplateOnlyPackage")
   create_prj_test_template(name = "TestTemplateOnlyProject")
-  
+
   expected_templates <- data.frame(
     Name = c("TestTemplateOnlyPackage",
              "TestTemplateOnlyProject"),
-    HasProjectTemplate = c(FALSE , TRUE),
-    HasPackageTemplate = c(TRUE , FALSE)
+    HasProjectTemplate = c(FALSE, TRUE),
+    HasPackageTemplate = c(TRUE, FALSE)
   )
-  
+
   expect_templates(expected_templates)
 })
 
@@ -142,16 +142,16 @@ test_that_template("Template registering", {
   wspace_dir <- get_wspace_dir()
   create_pkg_test_template(name = "TestTemplateOnlyPackage", path = wspace_dir)
   create_prj_test_template(name = "TestTemplateOnlyProject", path = wspace_dir)
-  
+
   RSuite::tmpl_register(path = file.path(wspace_dir, "TestTemplateOnlyPackage"))
   RSuite::tmpl_register(path = file.path(wspace_dir, "TestTemplateOnlyProject"))
-  
+
   expected_templates <- data.frame(
     Name = c("TestTemplateOnlyPackage",
              "TestTemplateOnlyProject"),
-    HasProjectTemplate = c(FALSE , TRUE),
-    HasPackageTemplate = c(TRUE , FALSE)
+    HasProjectTemplate = c(FALSE, TRUE),
+    HasPackageTemplate = c(TRUE, FALSE)
   )
-  
+
   expect_templates(expected_templates)
 })

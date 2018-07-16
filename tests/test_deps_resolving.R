@@ -59,7 +59,7 @@ test_that_managed("Test if specific subdependencies versions are handled properl
                                  deps = "TestDependency (>= 1.0)")
   create_package_deploy_to_lrepo(name = "TestParentDependency", prj, ver = "1.1",
                                  deps = "TestDependency (>= 1.1)")
-  
+
   create_test_package("TestPackage", prj, deps = c("TestDependency (== 1.0)",
                                                    "TestParentDependency"))
 

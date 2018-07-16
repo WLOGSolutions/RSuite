@@ -7,7 +7,7 @@
 
 create_prj_test_template <- function(name = NULL, path = NULL) {
   stopifnot(!is.null(name))
-  
+
   RSuite::tmpl_start_prj(name, path)
 
   on_test_exit(function() {
@@ -37,6 +37,6 @@ expect_templates <- function(expected_data) {
   result <- do.call(paste0, expected_data) %in% do.call(paste0, template_data)
   pass <- all(result)
   msg <- ifelse(pass, "", sprintf("%s templates were not found", expected_data[!result, ]))
-  
+
   expect(pass, msg)
 }
