@@ -670,7 +670,6 @@ vers.filter_sub_deps <- function(ver, extra_reqs = NULL) {
     extra_reqs <- ver
   } else {
     extra_reqs <- vers.union(vers.drop_avails(extra_reqs), vers.drop_avails(ver))
-    unfeasibles <- vers.get_unfeasibles(extra_reqs)
   }
 
 
