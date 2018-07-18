@@ -721,12 +721,12 @@ You can provide following options to rsuite docker img:
 * `--templ` accepts Dockerfile template file to use for building image. It is regular Dockerfile which can contain tags to be replaced by R Suite CLI with
    automatically generated commands.
    Following tags are accepted:
-    * `<From>` will be replaced with base image name
-    * `<DeployProject>` will be replaced with commands for deploying project out of project deployment zip package.
+    * `<RSuite:From>` will be replaced with base image name
+    * `<RSuite:DeployProject>` will be replaced with commands for deploying project out of project deployment zip package.
   If not passed default Dockerfile template will be generated of following content:
 ``` bash
-FROM <From>
-<DeployProject>
+FROM <RSuite:From>
+<RSuite:DeployProject>
 ``` 
 * `--templ-ctx` accepts comma separated list of folders to add to image building context. You will be able to copy files from these folders inside your image
    while building with COPY command in Dockerfile.
