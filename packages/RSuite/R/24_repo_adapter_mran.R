@@ -68,3 +68,36 @@ repo_adapter_get_path.rsuite_repo_adapter_mran <- function(repo_adapter, params,
 repo_adapter_create_manager.rsuite_repo_adapter_mran <- function(repo_adapter, ...) {
   assert(FALSE, "MRAN is readonly and cannot be managed")
 }
+
+#'
+#' Looks for the latest available MRAN repository
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_latest_mran_date <- function(days_back_thresh = 14) {
+  # find available MRAN snapshot
+  mran_repo_adapter <- repo_adapter_create_mran("MRAN")
+  mran_date <- Sys.Date()
+
+  mran_url <- mran_repo_adapter$get_repo_path(mran_date)
+  found_mran <- FALSE
+
+  while (Sys.Date() - mran_date != days_back_thresh) {
+    pkg_logdebug("Checking repo url %s.", mran_url)
+    if (!httr::http_error(mran_url)) {
+      found_mran <- TRUE
+      break
+    }
+
+    mran_date <- mran_date - 1
+    mran_url <- mran_repo_adapter$get_repo_path(mran_date)
+  }
+
+  if (!found_mran) {
+    pkg_logwarn("Couldn't find working MRAN repo within last %s days.", days_back_thresh)
+    return(Sys.Date())
+  }
+
+  return(mran_date)
+}

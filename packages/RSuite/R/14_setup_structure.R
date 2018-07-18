@@ -263,36 +263,14 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
   files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
 
-
-  # find available MRAN snapshot
-  mran_repo_adapter <- find_repo_adapter("MRAN")
-  mran_date <- Sys.Date()
-  days_back_thresh <- 14 # how many days back to look
-
-  mran_url <- mran_repo_adapter$get_repo_path(mran_date)
-  found_mran <- FALSE
-
-  while (Sys.Date() - mran_date != days_back_thresh) {
-    pkg_logdebug("Checking repo url %s.", mran_url)
-    if (!httr::http_error(mran_url)) {
-      found_mran <- TRUE
-      break
-    }
-
-    mran_date <- mran_date - 1
-    mran_url <- mran_repo_adapter$get_repo_path(mran_date)
-
-    if (!found_mran) {
-      pkg_logwarn("Couldn't find working MRAN repo within last %s days.", days_back_thresh)
-    }
-  }
+  mran_date <- get_latest_mran_date()
 
   keywords <- c(
     ProjectName = basename(prj_dir),
     RSuiteVersion = as.character(utils::packageVersion("RSuite")),
     RVersion = current_rver(), # from 97_rversion.R
     Date = as.character(Sys.Date()),
-    MranDate = as.character(mran_date),
+    LatestMRAN = sprintf("MRAN[%s]", as.character(mran_date)),
     User = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
 
