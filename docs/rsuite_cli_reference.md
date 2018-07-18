@@ -1,21 +1,21 @@
 # R Suite CLI reference manual
 
-RSuite CLI is a command line utility to manage you R projects.
+R Suite CLI is a command line utility to manage you R projects.
 
 It helps you with number of tasks like
 
-* installing (upgrading to newest version) of RSuite package
+* installing (upgrading to newest version) of R Suite package
 * creating projects and packages inside them
 * building project internal environment, project packages and packaging them into deployment zip
 * managing you own local (Dir) or S3 package repositories
 * building PKGZIP to transfer packages and build repositories in connection less environment.
 
-RSuite supports you in developing you R projects in a standardized way and helps with dependencies control and project consistency management while preparing to deploy on production.
+R Suite supports you in developing you R projects in a standardized way and helps with dependencies control and project consistency management while preparing to deploy on production.
 
 # Requirements
 
-RSuite CLI requires R being available on your machine. Any version will do, but we tested it mostly on v3.2+.
-While running RSuite CLI checks if R is available in the PATH environment variable. If it's not it will try 
+R Suite CLI requires R being available on your machine. Any version will do, but we tested it mostly on v3.2+.
+While running R Suite CLI checks if R is available in the PATH environment variable. If it's not it will try 
 to detect the R base folder from standard locations. On Windows it will also look in the registry to find 
 installed R version.
 
@@ -23,9 +23,9 @@ For working with Subversion and/or Git revision control command line clients res
 
 To manage S3 repositories you will need the aws command line client and aws credentials (.aws folder in you home directory).
 
-# Installing RSuite
+# Installing R Suite
 
-To install RSuite just open you command line (terminal) and run 
+To install R Suite just open you command line (terminal) and run 
 
 ```bash
 rsuite install 
@@ -37,9 +37,9 @@ It accepts some advanced options. If you call
 rsuite install -v
 ```
 
-It will log lots of messages to the console which can be used to detect the reason if any problem with installing RSuite will occur.
+It will log lots of messages to the console which can be used to detect the reason if any problem with installing R Suite will occur.
 
-If you would like to use some specific repository to look for RSuite package instead of default (`http://wlog-rsuite.s3.amazonaws.com`) you can call it like this
+If you would like to use some specific repository to look for R Suite package instead of default (`http://wlog-rsuite.s3.amazonaws.com`) you can call it like this
 
 ```bash
 rsuite install -u http://url.to.your.repository
@@ -51,7 +51,7 @@ You can also see all supported options 'rsuite install' supports please call
 rsuite install -h
 ```
 
-There is also the `--rstudio-addin` option which will install the `RSuiteRStudio` package. The RSuiteRStudio package is an RStudio addin which provides menu items for RSuite functionalities. Currently the following features are supported:
+There is also the `--rstudio-addin` option which will install the `RSuiteRStudio` package. The RSuiteRStudio package is an RStudio addin which provides menu items for R Suite functionalities. Currently the following features are supported:
 
 * project starting
 * package starting
@@ -64,31 +64,31 @@ There is also the `--rstudio-addin` option which will install the `RSuiteRStudio
 rsuite install --rstudio-addin
 ```
 
-## Updating RSuite CLI
+## Updating R Suite CLI
 
-RSuite CLI works with compatible version of RSuite. Compatibility is determined by
-two higher numbers in versions of both: they should match. While installing RSuite
-RSuite CLI picks the latest available but still compatible version of RSuite to 
+R Suite CLI works with compatible version of R Suite. Compatibility is determined by
+two higher numbers in versions of both: they should match. While installing R Suite
+R Suite CLI picks the latest available but still compatible version of R Suite to 
 install.
 
-You can update RSuite CLI with following command:
+You can update R Suite CLI with following command:
 
 ```bash
 rsuite update
 ```
 
-The command checks that version of RSuite CLI is installed and if newer version is
+The command checks that version of R Suite CLI is installed and if newer version is
 available. If so it will download installer and commit installation process. You
-will probably need elevated privileges to upgrade RSuite CLI properly.
+will probably need elevated privileges to upgrade R Suite CLI properly.
 
-Pay attention that new version of RSuite CLI will need newer version of RSuite
-to work. You will need to issue RSuite installation (update to compatible version)
-just after RSuite CLI gets updated.
+Pay attention that new version of R Suite CLI will need newer version of R Suite
+to work. You will need to issue R Suite installation (update to compatible version)
+just after R Suite CLI gets updated.
 
 # Project management
 
-After you have installed RSuite you are ready to start developing your projects.
-Command proj gives you access to all related RSuite functionalities.
+After you have installed R Suite you are ready to start developing your projects.
+Command proj gives you access to all related R Suite functionalities.
 
 It accepts `-h` option which prints all accepted sub-commands with brief description.
 
@@ -140,7 +140,7 @@ and `-h` (short for `--help`) to print all accepted options with some short desc
 
 ## Project environment locking
 
-RSuite CLI allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to execute the following function:
+R Suite CLI allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to execute the following function:
 
 ```bash
 rsuite proj lock
@@ -184,7 +184,7 @@ After building local project environment you can build project packages by calli
 rsuite proj build
 ```
 
-RSuite detects if project package have been changed and not rebuilds it in the case. If you would like to enforce rebuilding your project packages
+R Suite detects if project package have been changed and not rebuilds it in the case. If you would like to enforce rebuilding your project packages
 use following command:
 
 ```bash
@@ -234,7 +234,7 @@ It also accepts standard options `-v` and `-h`.
 
 ## Testing project
 
-RSuite CLI can run testthat tests for you. Just execute following command
+R Suite CLI can run testthat tests for you. Just execute following command
 
 ```bash
 rsuite proj test 
@@ -249,7 +249,7 @@ rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 ```
 
 # Template management
-RSuite CLI allows you to create your own custom project and package templates. For example the default RSuite project template uses MRAN as the default package repository, if your projects make use of a different repository you can define your own project template with the adequate settings (in this case the Repositories option in the PARAMETERS file).
+R Suite CLI allows you to create your own custom project and package templates. For example the default R Suite project template uses MRAN as the default package repository, if your projects make use of a different repository you can define your own project template with the adequate settings (in this case the Repositories option in the PARAMETERS file).
 
 ## Starting custom project/package templates
 To start a project template execute the following command
@@ -275,15 +275,15 @@ The above-mentioned commands register a project/package template called "MyTempl
                4 Dir(s)  260 126 388 224 bytes free
 ```
 
-Templates contain directories named `project` and `package`, they are created by the `rsuite tmpl prjadd` and `rsuite tmpl pkgadd` commands accordingly. These directories contain the default RSuite project/package files. You can add/delete files according to your preference.
+Templates contain directories named `project` and `package`, they are created by the `rsuite tmpl prjadd` and `rsuite tmpl pkgadd` commands accordingly. These directories contain the default R Suite project/package files. You can add/delete files according to your preference.
 
 **Important**: Templates have specific requirements in case of projects they have to contain a PARAMETERS file as for packages they have to contain a DESCRIPTION file.
 
-RSuite templates support the usage of markers - special keywords which will be replaced while creating a project/package from a custom template. All markers have the following form: `__<word>__` for example `__ProjectName__`. The following markers are supported:
+R Suite templates support the usage of markers - special keywords which will be replaced while creating a project/package from a custom template. All markers have the following form: `__<word>__` for example `__ProjectName__`. The following markers are supported:
 
 - `__ProjectName__` - will be replaced with the name of the project
 - `__PackageName__` - will be replaced with the name of the package
-- `__RSuiteVersion__` - will be replaced with the used RSuite version
+- `__RSuiteVersion__` - will be replaced with the used R Suite version
 - `__RVersion__` - will be replaced with the used R version
 - `__Date__` - will be replaced with the current date
 - `__User__` - will be replaced with the username
@@ -345,14 +345,14 @@ Similarly package templates can be used
   rsuite proj pkgadd -n MyPackage -t <path to template>/package
 ```
 
-**Important**: The default RSuite template is called `builtin` and can also be provided to the `-t` option. 
+**Important**: The default R Suite template is called `builtin` and can also be provided to the `-t` option. 
 
 # System requirements management
 
 Project environment can contain packages which have system requirements declared (in SystemRequirements field in their 
-DESCRIPTION file). RSuite tries to interpret them and can help you to update your system for packages to build/work properly.
+DESCRIPTION file). R Suite tries to interpret them and can help you to update your system for packages to build/work properly.
 For example xml package on Linuxes requires libxml2 system library on Linuxes. Depending on platform (RedHat like or Debian like)
-appropriate package should be installed using appropriate package management utility. RSuite can check your system against these 
+appropriate package should be installed using appropriate package management utility. R Suite can check your system against these 
 system requirements, try to install them (if running as privileged user) and generate script to to check/install them.
 
 ## Collecting system requirements
@@ -378,7 +378,7 @@ database. Matched requirements will enforce platform dependent checks of the sys
 
 ## Installing system requirements
 
-RSuite not only checks system against dependency requirements but also can update your system. Pay attention that to install 
+R Suite not only checks system against dependency requirements but also can update your system. Pay attention that to install 
 system libraries privilege access is usually required. To update your system use following command:
 
 ```bash
@@ -399,7 +399,7 @@ utility.
 
 # Repository management
 
-You can also manage content of local (Dir) and S3 repositories with RSuite CLI. For that purpose repo command should be used.
+You can also manage content of local (Dir) and S3 repositories with R Suite CLI. For that purpose repo command should be used.
 
 All repo sub-commands accept beside standard `-v` and `-h` following options 
 
@@ -513,7 +513,7 @@ If you want to add package available on GitHub repository you can achieve it cal
 rsuite repo addgithub -d /path/to/your/repository -r github/ProjectName
 ```
 
-RSuite CLI will download sources, build package and add it to specified repository.
+R Suite CLI will download sources, build package and add it to specified repository.
 
 GitHub repository can be specified in format `username/repo[/subdir][@ref|#pull]`. 
 
@@ -639,7 +639,7 @@ If you want to create PKGZIP out of available on GitHub repository call followin
 rsuite pkgzip github -r github/ProjectName
 ```
 
-RSuite CLI will download sources, build package and add create PKGZIP out of it.
+R Suite CLI will download sources, build package and add create PKGZIP out of it.
 
 GitHub repository can be specified in format `username/repo[/subdir][@ref|#pull]`. 
 
@@ -656,7 +656,7 @@ You can also specify following options to github:
 
 # Docker integration
 
-RSuite CLI can help you with building your solution on some different platform than the one you are working on or build docker images containing solutions
+R Suite CLI can help you with building your solution on some different platform than the one you are working on or build docker images containing solutions
 you developed.
 
 All commands described below assume that you have docker command usable/available.
@@ -672,7 +672,7 @@ rsuite docker zip -p centos
 It will run docker container for centos platform, build project inside it and create zip deployment package. Generated zip is retrieved from the container and
 can be used to deploy solution on your production environment.
 
-RSuite CLI uses standard images for building solution. We support ubuntu and centos platforms for R version 3.2, 3.3 and 3.4. Each image contain installation of
+R Suite CLI uses standard images for building solution. We support ubuntu and centos platforms for R version 3.2, 3.3 and 3.4. Each image contain installation of
 appropriate R version and R Suite with R Suite CLI installed. Image for with latest version of R Suite is always used.
 
 You can provide following options to rsuite docker zip:
@@ -714,11 +714,11 @@ If passed docker tag does not have tag part, project tag detected from project d
 You can provide following options to rsuite docker img:
 
 * `--tag-latest` if passed image build will also tagged as latest.
-* `-p` (short for `--platform`) takes platform name to deploy solution under. centos and ubuntu platforms are supported (ubuntu is default).
+* `-p` (short for `--platform`) takes platform name to deploy solution under. centos, ubuntu and debian platforms are supported (ubuntu is default).
 * `-f` (short for `--from`) accepts image name to use as base image. If not passed default base images will be used: for appropriate platform and R version.
 * `-z` (short for `--zip`) accepts project deployment zip package file (built probably with 'rsuite docker zip' command). If passed project deployment zip
    package will not be built. Passed zip package will be used instead.
-* `--templ` accepts Dockerfile template file to use for building image. It is regular Dockerfile which can contain tags to be replaced by RSuite CLI with
+* `--templ` accepts Dockerfile template file to use for building image. It is regular Dockerfile which can contain tags to be replaced by R Suite CLI with
    automatically generated commands.
    Following tags are accepted:
     * `<From>` will be replaced with base image name

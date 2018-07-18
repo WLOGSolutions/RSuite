@@ -8,9 +8,9 @@ screencast](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuit
 
 If you are stuck feel free to contact us:
 
-* through RSuite website (http://rsuite.io#contact) or 
-* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
-  "Gitter RSuite room")
+* through R Suite website (http://rsuite.io#contact) or 
+* using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
+  "Gitter R Suite room")
 * directly by sending email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 

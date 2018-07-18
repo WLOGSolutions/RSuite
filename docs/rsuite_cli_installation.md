@@ -1,15 +1,15 @@
-# How to install RSuite CLI
+# How to install R Suite CLI
 
-RSuite CLI is a command line api to functionalities that the RSuite package provides. It also provides some integration features (with docker e.g.)
-based on RSuite functionalities.
+R Suite CLI is a command line api to functionalities that the R Suite package provides. It also provides some integration features (with docker e.g.)
+based on R Suite functionalities.
 
-RSuite CLI is just a simple command line shell with enhanced arguments parsing and help system (and bash completion configuration for bash).
-It internally performs some environment checks (like detection there R is installed on Windows) and calls R to get access to RSuite.
+R Suite CLI is just a simple command line shell with enhanced arguments parsing and help system (and bash completion configuration for bash).
+It internally performs some environment checks (like detection there R is installed on Windows) and calls R to get access to R Suite.
 
-RSuite and RSuite calling code are platform independent but RSuite CLI depends on platform: on Windows it is a cmd script on Linuxes it is a
+R Suite and R Suite calling code are platform independent but R Suite CLI depends on platform: on Windows it is a cmd script on Linuxes it is a
 bash script.
 
-To make the start of the journey with RSuite CLI as easy as possible we prepared installation packages for you. Herein we discuss how they can be
+To make the start of the journey with R Suite CLI as easy as possible we prepared installation packages for you. Herein we discuss how they can be
 installed on each supported platform. You can download them from [R
 Suite Download](http://rsuite.io/RSuite_Download.php).
 
@@ -17,16 +17,16 @@ Suite Download](http://rsuite.io/RSuite_Download.php).
 
 If you are stuck feel free to contact us:
 
-* through the RSuite website (http://rsuite.io#contact) or 
-* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
-  "RSuite room")
+* through the R Suite website (http://rsuite.io#contact) or 
+* using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
+  "R Suite room")
 * directly by sending an email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
   
 # Windows installation
 
-For Windows RSuite CLI is provided as MSI packages for both x86 and x64 platforms. You can just download the appropriate MSI and run it.
-It will install RSuite CLI and will add a reference to it to your PATH so then when you open the console rsuite command will be available. 
+For Windows R Suite CLI is provided as MSI packages for both x86 and x64 platforms. You can just download the appropriate MSI and run it.
+It will install R Suite CLI and will add a reference to it to your PATH so then when you open the console rsuite command will be available. 
 
 You can check that everything installed properly with the following command:
 
@@ -34,13 +34,13 @@ You can check that everything installed properly with the following command:
 > rsuite version
 ```
 
-RSuite CLI on first run will try to detect if R is available. If it is not available in  the PATH it will search for the R installation in the windows
+R Suite CLI on first run will try to detect if R is available. If it is not available in  the PATH it will search for the R installation in the windows
 registry. 
 
 # Debian (Ubuntu) installation
 
-For Debian-like systems RSuite CLI is provided as DEB package. It is architecture independent. It has some dependencies which will be
-required to install the RSuite package (libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev).
+For Debian-like systems R Suite CLI is provided as DEB package. It is architecture independent. It has some dependencies which will be
+required to install the R Suite package (libssl-dev libxml2-dev libcurl4-openssl-dev zlib1g-dev).
 
 You will need administrative privileges (root access) to install DEP package. It is a requirement of Linux package management system.
 
@@ -66,8 +66,8 @@ $ rsuite version
 
 # RedHat (CentOS, Fedora) installation
 
-For RedHat-like systems RSuite CLI is provided as RPM package. It is architecture independent. It has some dependencies which will be
-required to install the RSuite package (openssl-devel libxml2-devel libcurl-devel zlib-devel).
+For RedHat-like systems R Suite CLI is provided as RPM package. It is architecture independent. It has some dependencies which will be
+required to install the R Suite package (openssl-devel libxml2-devel libcurl-devel zlib-devel).
 
 You will need administrative privileges (root access) to install RPM package. It is a requirement of the Linux package management system.
 
@@ -85,12 +85,12 @@ You can check that everything installed properly with the following command:
 $ rsuite version
 ```
 
-# After you installed RSuite CLI
+# After you installed R Suite CLI
 
-After RSuite CLI is installed you probably will need to install the RSuite package into you R environment:
+After R Suite CLI is installed you probably will need to install the R Suite package into you R environment:
 
 ``` bash
 rsuite install
 ```
 
-For the full description of how to use RSuite CLI please refer to [RSuite CLI reference manual](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md).
+For the full description of how to use R Suite CLI please refer to [R Suite CLI reference manual](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md).

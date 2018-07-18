@@ -12,15 +12,15 @@ issues.
 
 If you are stuck feel free to contact us:
 
-* through RSuite website (http://rsuite.io#contact) or 
-* using Gitter [RSuite room](https://gitter.im/WLOGSolutions/RSuite
-  "Gitter RSuite room")
+* through R Suite website (http://rsuite.io#contact) or 
+* using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
+  "Gitter R Suite room")
 * directly by sending an email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
 # Verbosity of logs
 
-## RSuite logging
+## R Suite logging
 
 To make R Suite log more information set the logging level with following command:
 
@@ -30,7 +30,7 @@ logging::setLevel('DEBUG')
 
 Each R Suite command logs all log messages and output of sub-commands it runs while performing tasks. It will probably give you some hints on what is wrong.
 
-## RSuite CLI logging
+## R Suite CLI logging
 
 Nearly all commands of R Suite CLI accept -v (short for --verbose) option. It works the same way as setting DEBUG level while using R Suite in the R console. For example the following command for project environment building
 
