@@ -338,13 +338,13 @@ logging::setLevel('INFO')
 ## Project environment locking
 RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to call the following function:
 
-```{r}
+```{r error = TRUE}
 RSuite::prj_lock_env()
 ```
 
 The lock file is in the 'deployment' directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions. A sample record from the 'env.lock' file is presented below:
 
-```{r}
+```{r error = TRUE}
 cat(readLines("deployment/env.lock"), sep = "\n")
 ```
 
@@ -380,7 +380,7 @@ Now lets check that all project dependencies have been collected:
 RSuite::prj_install_deps()
 ```
 
-As you did not add any new dependencies R Suite smartly understands it and do not repeat lengthy dependencies installation phase.
+As you did not add any new dependencies R Suite smartly understands it and does not repeat lengthy dependencies installation phase.
 
 Lets rebuild our custom packages:
 ```{r error = TRUE}
