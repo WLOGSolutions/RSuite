@@ -267,7 +267,7 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
     ProjectName = basename(prj_dir),
     RSuiteVersion = as.character(utils::packageVersion("RSuite")),
     RVersion = current_rver(), # from 97_rversion.R
-    Date = as.character(Sys.Date()),
+    Date = as.character(Sys.Date() - 7),
     User = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
 
