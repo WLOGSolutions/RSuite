@@ -263,42 +263,24 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
   files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
 
-  # check if MRAN repository is defined
-  repo_infos <- c()
 
-  if (file.exists(file.path(prj_dir, "PARAMETERS"))) {
-    params <- load_prj_parameters(prj_dir)
-    repo_infos <- get_all_repo_infos(params)
-
-    # find MRAN repos defined using the __MRAN__ keyword
-    indexes <- sapply(repo_infos, function(repo_info) {
-      return(grepl("MranDate", repo_info$path))
-    })
-    repo_infos <- repo_infos[params$get_repo_adapter_names() == "MRAN" & indexes]
-  }
-
+  # find available MRAN snapshot
+  mran_repo_adapter <- find_repo_adapter("MRAN")
   mran_date <- Sys.Date()
+  days_back_thresh <- 14 # how many days back to look
 
-  if (length(repo_infos) != 0) {
-    mran_url <- repo_infos[[1]]$path
+  mran_url <- mran_repo_adapter$get_repo_path(mran_date)
+  found_mran <- FALSE
 
-    # find available MRAN snapshot
-    days_back_thresh <- 14 # how many days back to look
-    mran_url <- replace_markers(c(MranDate = mran_date),
-                                repo_infos[[1]]$path)
-    found_mran <- FALSE
-
-    while (Sys.Date() - mran_date != days_back_thresh) {
-      pkg_logdebug("Checking repo url %s.", mran_url)
-      if (!httr::http_error(mran_url)) {
-        found_mran <- TRUE
-        break
-      }
-
-      mran_date <- mran_date - 1
-      mran_url <- replace_markers(c(MranDate = mran_date),
-                                  repo_infos[[1]]$path)
+  while (Sys.Date() - mran_date != days_back_thresh) {
+    pkg_logdebug("Checking repo url %s.", mran_url)
+    if (!httr::http_error(mran_url)) {
+      found_mran <- TRUE
+      break
     }
+
+    mran_date <- mran_date - 1
+    mran_url <- mran_repo_adapter$get_repo_path(mran_date)
 
     if (!found_mran) {
       pkg_logwarn("Couldn't find working MRAN repo within last %s days.", days_back_thresh)
