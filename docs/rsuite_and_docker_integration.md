@@ -1,13 +1,19 @@
-# R Suite and Docker integration
+# R Suite and Docker
+In this document basic R Suite Docker functionalities are presented. It covers:
 
-## Motivation
+* creating deployment zips 
+* creating Docker images
+* Dockerfile templates
+
+**Important** This tutorial was tested with R Suite version 0.30-241.
+
+
+# Motivation
 The goal of Docker is to separate the application from the infrastructure. It allows developers to deploy their applications on different platforms without worrying about hidden dependencies and system settings. But is it the ultimate solution for software developed in R?
 
 Software written in R is based on R packages. That kind of structure leads to problems regarding dependencies which can't be always resolved using Docker. For example, when installing RStudio Addins or RMarkdown features some packages might install dependencies which will conflict with your currently developed software.
 
-<center>
 ![Shiny deps](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/shiny_deps.png)
-</center>
 
 Additionally, your solution might require:
 
@@ -22,7 +28,7 @@ R Suite aims to resolve those issues by isolating project packages from global p
 
 No Docker knowledge is necessary in basic scenarios. However, if desired, R Suite provides Dockerfile templates which can be used for creating more advanced Docker images.
 
-## Project preparation
+# Project preparation
 
 Before proceeding to the tutorial, it is necessary to create an R Suite project. Let's create a simply Shiny app using R Suite.
 
@@ -66,12 +72,10 @@ More information about project management is presented in the [Basic R Suite usa
 
 **Important:** From now on Docker has to be running when issuing R Suite commands.
 
-## Creating a deployment zip for Ubuntu
+# Creating a deployment zip for Ubuntu
 R Suite allows you to build a deployment package for a specific operating system. By using a Docker container running in the background R Suite prepares a deployment zip for the production environment.
 
-<center>
 ![Deployment Scenario 1](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/deployment_scenario1.PNG)
-</center>
 
 The following command can be used to create a deployment zip for a production environment running on Ubuntu:
 
@@ -109,12 +113,10 @@ You have created the `my_project_1.0x.zip` file that contains all information ne
 
 The zip version can be enforced by using the `--version` option. The specified version should have a DD.DD format. By default, the zip version is determined based on the PARAMETERS file while the revision version is taken from Revision Control.
 
-## Creating a Docker image containing our R solution
+# Creating a Docker image containing our R solution
 R Suite provides the user with the possibility of creating Docker images which contain the production version of your project. It allows convenient development and deployment using Docker containers altogether with Docker Swarms and Kubernetes.
 
-<center>
 ![Deployment scenario 2](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/deployment_scenario2.PNG)
-</center>
 
 Let's assume that we need to create a Docker image containing our project for the Ubuntu platform. Additionally, we want to tag the image in order to provide version control. It can be achieved by using the following command:
 
@@ -167,15 +169,14 @@ docker run --name my_container -p 8888:8888 -d --rm my_image:1.0 Rscript my_proj
 
 The shiny app should be available at http://localhost:8888
 
-<center>
 ![Shiny running](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/shiny_running.PNG)
-</center>
+
 To stop the container issue the following command
 ```bash
 docker stop my_container
 ```
 
-### R Suite Dockerfile templates
+## R Suite Dockerfile templates
 More complex Docker images can be created by using R Suite's Dockerfile templates. Those are regular Dockerfiles with specific tags which will be automatically replaced by R Suite generated commands. The following tags are supported:
 
 * `<RSuite:From>` will be replaced with the base image name
@@ -207,9 +208,7 @@ docker run --name my_container -p 8888:8888 -d --rm my_image:2.0
 
 The shiny app should start automatically http://localhost:8888
 
-<center>
 ![Shiny running](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/shiny_running.PNG)
-</center>
 
 To stop the container, issue the following command:
 ```bash

@@ -1,4 +1,4 @@
-# RSuite 0.31 (2018-07-??)
+# RSuite 0.31 (2018-07-26)
   * deprecated packages handling fixed
   * fix fedora version detection
   * add working MRAN date searching
