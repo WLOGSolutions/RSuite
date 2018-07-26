@@ -1,8 +1,3 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
 # R Suite and Docker integration
 
 ## Motivation
@@ -11,7 +6,7 @@ The goal of Docker is to separate the application from the infrastructure. It al
 Software written in R is based on R packages. That kind of structure leads to problems regarding dependencies which can't be always resolved using Docker. For example, when installing RStudio Addins or RMarkdown features some packages might install dependencies which will conflict with your currently developed software.
 
 <center>
-![](shiny_deps.png){ width=65% }
+![](media/shiny_deps.png){ width=65% }
 </center>
 
 Additionally, your solution might require:
@@ -75,7 +70,7 @@ More information about project management is presented in the [Basic R Suite usa
 R Suite allows you to build a deployment package for a specific operating system. By using a Docker container running in the background R Suite prepares a deployment zip for the production environment.
 
 <center>
-![](deployment_scenario1.PNG){ width=65% }
+![](media/deployment_scenario1.PNG){ width=65% }
 </center>
 
 The following command can be used to create a deployment zip for a production environment running on Ubuntu:
@@ -118,7 +113,7 @@ The zip version can be enforced by using the `--version` option. The specified v
 R Suite provides the user with the possibility of creating Docker images which contain the production version of your project. It allows convenient development and deployment using Docker containers altogether with Docker Swarms and Kubernetes.
 
 <center>
-![](deployment_scenario2.PNG){ width=65% }
+![](media/deployment_scenario2.PNG){ width=65% }
 </center>
 
 Let's assume that we need to create a Docker image containing our project for the Ubuntu platform. Additionally, we want to tag the image in order to provide version control. It can be achieved by using the following command:
@@ -173,7 +168,7 @@ docker run --name my_container -p 8888:8888 -d --rm my_image:1.0 Rscript my_proj
 The shiny app should be available at http://localhost:8888
 
 <center>
-![](shiny_running.PNG){ width=85% }
+![](media/shiny_running.PNG){ width=85% }
 </center>
 To stop the container issue the following command
 ```bash
@@ -213,7 +208,7 @@ docker run --name my_container -p 8888:8888 -d --rm my_image:2.0
 The shiny app should start automatically http://localhost:8888
 
 <center>
-![](shiny_running.PNG){ width=85% }
+![](media/shiny_running.PNG){ width=85% }
 </center>
 
 To stop the container, issue the following command:
