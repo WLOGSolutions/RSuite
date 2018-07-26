@@ -4,6 +4,8 @@
      mac.binary type added.
   * documentation spell-checked
   * deprecated packages handling fixed
+  * fix fedora version detection
+  * add working MRAN date searching
 
 # RSuite 0.29 (2018-06-24)
   * #169: if project package depends on some dependents of devtools and devtools

@@ -4,3 +4,4 @@ rsuite_installation.md: R Suite installation
 rsuite_cli_installation.md: R Suite CLI installation
 rsuite_cli_reference.md: R Suite CLI reference manual
 rsuite_emacs_integration.md: Integration with Emacs
+rsuite_and_docker_integration.md: Integration with Docker
