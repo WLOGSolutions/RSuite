@@ -12,6 +12,7 @@
 #' @import jsonlite
 #' @import subprocess
 #' @importFrom stats aggregate
+#' @importFrom httr http_error
 NULL
 
 #' Supports Developing, Building and Deploying R Solutions.
