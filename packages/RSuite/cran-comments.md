@@ -13,7 +13,8 @@ There were no ERRORs, WARNINGs or NOTEs.
 No issues detected
 
 ## Previous submission comments
-Authomatic building used to fail because some examples (and vignette building) 
-assumed todays MRAN is available. While creating R Suite project available MRAN 
-is detected now, so there is no dependency on time of build. Examples which 
-required MRAN access marked with donttest.
+* Authomatic building used to fail because some examples (and vignette building) 
+  assumed todays MRAN is available. While creating R Suite project available MRAN 
+  is detected now, so there is no dependency on time of build. Examples which 
+  required MRAN access marked with donttest.
+* imports from httr fixed not to collide with git2r
