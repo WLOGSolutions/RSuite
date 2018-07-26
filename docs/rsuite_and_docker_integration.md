@@ -1,4 +1,4 @@
-# R Suite Docker utilities
+# R Suite and Docker utilities
 In this document basic R Suite Docker functionalities are presented. It covers:
 
 * creating deployment zips 
