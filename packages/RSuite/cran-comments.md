@@ -13,13 +13,7 @@ There were no ERRORs, WARNINGs or NOTEs.
 No issues detected
 
 ## Previous submission comments
-* examples added to all API functions and none of them runs 
-	longer than 5secs. Examples which cannot take less time
-	(as their main purpose is to present functionality of
-	downloading/installing/building packages) are marked with
-	\donttest{}. But all of them checked with devtools::run_examples.
-* package functionalities do not modify user space (only tempdir()
-	is in use) unless user specifies to put cache (or project/package
-	templates) there by means of setting option rsuite.cache_path.
-* fixed wording in package DESCRIPTION.
-* spell checked DESCRIPTION, NEWS and documentation files.
+Authomatic building used to fail because some examples (and vignette building) 
+assumed todays MRAN is available. While creating R Suite project available MRAN 
+is detected now, so there is no dependency on time of build. Examples which 
+required MRAN access marked with donttest.
