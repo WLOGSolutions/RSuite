@@ -68,8 +68,6 @@ runExample(example = "02_text", port = 8888, host = "0.0.0.0")
 
 More information about project management is presented in the [Basic R Suite usage](http://rsuite.io/RSuite_Tutorial.php?article=basic_workflow.md#) document.
 
-**Important:** Make sure that the RVersion in the project PARAMETERS file is set to 3.2, 3.3 or 3.4 (at the time of this tutorial only those versions were supported)
-
 **Important:** From now on Docker has to be running when issuing R Suite commands.
 
 # Creating a deployment zip for Ubuntu
