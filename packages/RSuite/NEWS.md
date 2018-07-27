@@ -1,3 +1,6 @@
+# RSuite 0.32 (2018-08-??)
+  * Unregistering repo adapters functionality added.
+
 # RSuite 0.31 (2018-07-26)
   * Handling of old (not available in currently selected repositories) packages
      (and their versions). They are reinstalled. Versions of packages to install

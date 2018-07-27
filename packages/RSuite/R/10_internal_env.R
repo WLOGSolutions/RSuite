@@ -100,6 +100,23 @@ reg_repo_adapter <- function(name, repo_adapter) {
   assign("repo_adapter_reg", reg, envir = internal_env)
 }
 
+
+#'
+#' Unregister repo_adapter from internal environment under name.
+#'
+#' @param name name of the repo_adapter to unregister (type: character(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
+unreg_repo_adapter <- function(name) {
+  stopifnot(name %in% reg_repo_adapter_names())
+
+  reg <- get("repo_adapter_reg", envir = internal_env)
+  reg[[name]] <- NULL
+  assign("repo_adapter_reg", reg, envir = internal_env)
+}
+
 #'
 #' Get all registered repo adapter names.
 #'

@@ -130,6 +130,30 @@ rsuite_register_repo_adapter <- function(repo_adapter) {
 }
 
 #'
+#' Unegisters repository adapter.
+#'
+#' @param repo_adapter_name name of the repo adapter to unregister. (type: character(1))
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' \donttest{
+#'   repo_adapter <- repo_adapter_create_base("Own") # create your custom adapter
+#'   class(repo_adapter) <- c("repo_adapter_own", class(repo_adapter))
+#'   rsuite_register_repo_adapter(repo_adapter)
+#'   rsuite_unregister_repo_adapter(repo_adapter_name)
+#' }
+#'
+#' @export
+#'
+rsuite_unregister_repo_adapter <- function(repo_adapter_name) {
+  assert(!is.null(find_repo_adapter(repo_adapter_name)),
+         "Repo adapter '%s' is not registered", repo_adapter_name)
+
+  unreg_repo_adapter(repo_adapter_name)
+}
+
+#'
 #' Gets all names of known repository adapters.
 #'
 #' @return names of registered repository management adapters as character vector.
