@@ -20,6 +20,7 @@ try(detach("package:mypackage", unload = TRUE), silent = TRUE)
 unlink(file.path(tempdir(), "my_project"), recursive = TRUE, force = TRUE)
 ```
 
+# Basic R Suite usage
 
 In this document we present a basic R Suite usage. It covers:
 
@@ -30,6 +31,16 @@ In this document we present a basic R Suite usage. It covers:
 - developing custom package with devtools
 - understanding loggers
 - project environment locking
+
+## **Got stuck?**
+
+If you are stuck feel free to contact us:
+
+* through the R Suite website (http://rsuite.io#contact) or 
+* using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
+  "Gitter R Suite room")
+* directly by sending an email with the description of your problem to
+  [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
 ## Package options
 RSuite uses the following options to configure behavior:
