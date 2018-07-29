@@ -25,7 +25,7 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
   get_os_version <- function(rel_file) {
     rel_str <- readLines(rel_file)[[1]]
     toks <- unlist(strsplit(rel_str, " "))
-    ver <- toks[grep("^\\d+[.]\\d+([.]\\d+)?$", toks)][1]
+    ver <- toks[grep("^(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$", toks)][1]
     ver <- gsub("^(\\d+[.]\\d+)([.]\\d+)?$", "\\1", ver)
     return(ver)
   }

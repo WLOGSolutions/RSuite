@@ -367,7 +367,7 @@ lock_prj_deps <- function(avail_vers, params, relock = FALSE) {
   is_relocking_needed <- FALSE
 
   # look for new dependencies
-  new_deps <- avail_pkgs[!avail_pkgs %in% env_lock_pkgs]
+  new_deps <- setdiff(avail_pkgs, env_lock_pkgs)
   if (length(new_deps) != 0) {
     pkg_loginfo("Following packages will be added to lock requirements: %s",
                 paste(new_deps, collapse = ","))
@@ -375,7 +375,7 @@ lock_prj_deps <- function(avail_vers, params, relock = FALSE) {
   }
 
   # look for deleted dependencies
-  deleted_deps <- env_lock_pkgs[!env_lock_pkgs %in% avail_pkgs]
+  deleted_deps <- setdiff(env_lock_pkgs, avail_pkgs)
   if (length(deleted_deps) != 0) {
     assert(any(relock),
            paste0("Following packages to be removed from lock requirements: %s.",
@@ -388,8 +388,10 @@ lock_prj_deps <- function(avail_vers, params, relock = FALSE) {
     is_relocking_needed <- TRUE
   }
 
+  avail_vers_candidate <- vers.add_avails(avail_vers_locked, avail_vers$get_avails())
+
   # look for updated dependencies
-  unfeasibles <- vers.get_unfeasibles(avail_vers_locked)
+  unfeasibles <- vers.get_unfeasibles(avail_vers_candidate)
   if (length(unfeasibles) != 0) {
     assert(any(relock),
            paste0("Locked environment requirements cannot be satisfied for: %s.",
@@ -400,8 +402,8 @@ lock_prj_deps <- function(avail_vers, params, relock = FALSE) {
                 paste(unfeasibles, collapse = ","))
     is_relocking_needed <- TRUE
   } else {
-    # assign locked package requirements
-    avail_vers <- vers.add_avails(avail_vers_locked, avail_vers$get_avails())
+    # candidate is good
+    avail_vers <- avail_vers_candidate
   }
 
   if (is_relocking_needed) {

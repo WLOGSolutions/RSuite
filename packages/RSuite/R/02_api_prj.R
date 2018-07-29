@@ -803,22 +803,23 @@ prj_pack <- function(prj = NULL, path = getwd(),
 #' @family in project management
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # build project local environment
-#' prj_install_deps(prj = prj)
+#'   # build project local environment
+#'   prj_install_deps(prj = prj)
 #'
-#' # lock project environment
-#' prj_lock_env(prj = prj)
+#'   # lock project environment
+#'   prj_lock_env(prj = prj)
 #'
-#' # present contents of lock file created
-#' cat(readLines(file.path(prj$path, "deployment", "env.lock")), sep = "\n")
-#'
+#'   # present contents of lock file created
+#'   cat(readLines(file.path(prj$path, "deployment", "env.lock")), sep = "\n")
+#' }
 #' @export
 #'
 prj_lock_env <- function(prj = NULL) {
@@ -863,22 +864,23 @@ prj_lock_env <- function(prj = NULL) {
 #'    (type: rsuite_project, default: NULL)
 #'
 #' @examples
-#' # create exemplary project base folder
-#' prj_base <- tempfile("example_")
-#' dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
 #'
-#' # start project
-#' prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
 #'
-#' # build project local environment
-#' prj_install_deps(prj = prj)
+#'   # build project local environment
+#'   prj_install_deps(prj = prj)
 #'
-#' # lock project environment
-#' prj_lock_env(prj = prj)
+#'   # lock project environment
+#'   prj_lock_env(prj = prj)
 #'
-#' # unlock project environment
-#' prj_unlock_env(prj = prj)
-#'
+#'   # unlock project environment
+#'   prj_unlock_env(prj = prj)
+#' }
 #' @export
 #'
 prj_unlock_env <- function(prj = NULL) {

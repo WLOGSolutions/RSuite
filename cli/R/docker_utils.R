@@ -62,29 +62,45 @@ get_docker_rsuite_image <- function(rver, platform) {
 #' Raises error if command failes.
 #'
 exec_docker_cmd <- function(args, cmd_desc) {
-  success_code <- basename(tempfile("success_code_"))
-  cmd <- paste(c(get_docker_cmd(), args, "2>&1", "&&", "echo", success_code),
-               collapse = " ")
-
-  logdebug("running: %s", cmd)
-  con <- pipe(cmd, open = "rt")
-
-  tryCatch({
+  .log_single_out <- function(out_arr, desc) {
     lines <- c()
-    while(TRUE) {
-      ln <- readLines(con, n = 1, skipNul = T)
-      if (!length(ln)) {
-        stop(sprintf("%s failed.", cmd_desc))
+    for (single_out in out_arr) {
+      for (line in single_out) {
+        if (nchar(line) > 0) {
+          logdebug("%s> %s", desc, line)
+          lines <- c(lines, line)
+        }
       }
-      if (ln == success_code) {
-        break
-      }
-      lines <- c(lines, ln)
-      logdebug("> %s", ln)
     }
-    return(invisible(lines))
+    return(lines)
+  }
+
+  docker_cmd <- get_docker_cmd()
+  logdebug("running: %s", paste(c(docker_cmd, args), collapse = " "))
+  con <- subprocess::spawn_process(command = docker_cmd, arguments = args)
+
+  result <- list(
+    out_lines = c(),
+    err_lines = c(),
+    ret_code = NA
+  )
+  tryCatch({
+    while (subprocess::process_state(con) == "running") {
+      out_arr <- subprocess::process_read(con, subprocess::PIPE_BOTH, timeout = 3000)
+
+      out_lines <- .log_single_out(out_arr$stdout, "out")
+      result$out_lines <- c(result$out_lines, out_lines)
+
+      err_lines <- .log_single_out(out_arr$stderr, "err")
+      result$err_lines <- c(result$err_lines, err_lines)
+    }
   },
-  finally = close(con))
+  finally = {
+    result$ret_code <- subprocess::process_return_code(con)
+    logdebug("return code: %s", result$ret_code)
+  })
+
+  return(invisible(result))
 }
 
 #'
@@ -99,8 +115,11 @@ run_container <- function(docker_image, name) {
     cont_name <- paste0("rsbuild-", name)
   }
   loginfo("Starting container %s based on %s image ...", cont_name, docker_image)
-  exec_docker_cmd(c("run", "--name", cont_name, "-d", docker_image),
-                  sprintf("Starting container %s based on %s", cont_name, docker_image))
+  output <- exec_docker_cmd(c("run", "--name", cont_name, "-d", docker_image),
+                            sprintf("Starting container %s based on %s", cont_name, docker_image))
+  if (output$ret_code != 0) {
+    stop(sprintf("Failed to start container based on %s image", docker_image))
+  }
   loginfo("... done.")
   return(cont_name)
 }
@@ -137,7 +156,7 @@ stop_container <- function(cont_name) {
 #'
 get_rsbuild_names <- function(cont_name = NULL) {
   output <- exec_docker_cmd(c("ps", "-f", "name=rsbuild-"), "Listing RSuite build containers") # from docker_utils.R
-  names <- unlist(lapply(strsplit(output[-1], "\\s+"), function(ln) { ln[length(ln)] }))
+  names <- unlist(lapply(strsplit(output$out_lines[-1], "\\s+"), function(ln) { ln[length(ln)] }))
 
   if (is.null(cont_name)) {
     return(names)

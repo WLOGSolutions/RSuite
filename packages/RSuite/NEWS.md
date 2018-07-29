@@ -1,9 +1,21 @@
+# RSuite 0.31 (2018-07-26)
+  * Handling of old (not available in currently selected repositories) packages
+     (and their versions). They are reinstalled. Versions of packages to install
+     in sandbox are detected to conform with packages installed in project env.
+  * Fedora platform version detection fixed.
+  * New template tag added (__LatestMRAN__) which is expanded to latest available
+     MRAN snapshot specification. RSuite searchs from NOW 14 days back checking 
+     day by day if snapshot is available. This is required due to some days 
+     (e.g 2018-07-18) are not available at all.
+  * NAMESPACE validation fixed: it supports both import and importFrom clauses.
+  * Checking dependencies on locked project fixed. It crached previously if some
+     dependencies failed to satisfy lock.
+
 # RSuite 0.30 (2018-07-03)
   * RSuite package supports MacOS from now on: proper repository url handling,
      commands to download/build packages adapted to run on MacOS, handling of
      mac.binary type added.
   * documentation spell-checked
-  * deprecated packages handling fixed
 
 # RSuite 0.29 (2018-06-24)
   * #169: if project package depends on some dependents of devtools and devtools

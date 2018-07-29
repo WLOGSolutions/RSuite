@@ -263,7 +263,7 @@ sub_commands <- list(
     options = list(),
     run = function(opts) {
       output <- exec_docker_cmd(c("ps", "-f", "name=rsbuild-"), "Listing RSuite build containers") # from docker_utils.R
-      cat(output, sep = "\n")
+      cat(output$out_lines, sep = "\n")
     }
   ),
   stop = list(
@@ -330,9 +330,9 @@ sub_commands <- list(
       prj <- RSuite::prj_init()
       pkgs <- if (!is.null(opts$packages)) { trimws(unlist(strsplit(opts$packages, ","))) }
 
-      rver_str <- exec_docker_cmd(c("exec", cont_name, "Rscript", "--version"), # from docker_utils.R
-                                  "Detecting R version on the container")
-      rver <- gsub("^.+version (\\d+[.]\\d+).+$", "\\1", rver_str)
+      ver_output <- exec_docker_cmd(c("exec", cont_name, "Rscript", "--version"), # from docker_utils.R
+                                    "Detecting R version on the container")
+      rver <- gsub("^.+version (\\d+[.]\\d+).+$", "\\1", ver_output$err_lines)
 
       pack_fpath <- RSuite::prj_pack(prj = prj, path = tempdir(), pack_ver = opts$version,
                                      pkgs = pkgs, inc_master = !opts$exc_master,
@@ -400,8 +400,8 @@ sub_commands <- list(
       cont_name <- get_rsbuild_names(opts$name) # from docker_utils.R
       stopifnot(length(cont_name) == 1)
 
-      cat(exec_docker_cmd(c("exec", cont_name, opts$cmd), "Running command in container"),
-          sep = "\n")
+      exec_output <- exec_docker_cmd(c("exec", cont_name, opts$cmd), "Running command in container")
+      cat(exec_output$out_lines, sep = "\n")
     }
   )
 )

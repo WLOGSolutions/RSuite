@@ -263,11 +263,14 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
   files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
 
+  mran_date <- get_latest_mran_date()
+
   keywords <- c(
     ProjectName = basename(prj_dir),
     RSuiteVersion = as.character(utils::packageVersion("RSuite")),
     RVersion = current_rver(), # from 97_rversion.R
     Date = as.character(Sys.Date()),
+    LatestMRAN = sprintf("MRAN[%s]", as.character(mran_date)),
     User = iconv(Sys.info()[["user"]], from = "utf-8", to = "latin1")
   )
 
