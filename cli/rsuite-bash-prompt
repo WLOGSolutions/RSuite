@@ -445,7 +445,7 @@ _rsuite() {
 			;;
 		docker)
 			if [ $COMP_CWORD == 2 ]; then
-				opts="zip img run list stop build exec help"
+				opts="zip img run list stop build exec update help"
 			else
 				case "${COMP_WORDS[2]}" in
 					zip)
@@ -557,6 +557,13 @@ _rsuite() {
 									opts="-n -c $common_opts_short"
 									;;
 							esac
+						fi
+						;;
+					update)
+						if [[ $cur = --* ]]; then
+							opts="$common_opts_long"
+						else
+							opts="$common_opts_short"
 						fi
 						;;
 					*)

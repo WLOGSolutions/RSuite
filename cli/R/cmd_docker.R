@@ -403,6 +403,50 @@ sub_commands <- list(
       exec_output <- exec_docker_cmd(c("exec", cont_name, opts$cmd), "Running command in container")
       cat(exec_output$out_lines, sep = "\n")
     }
+  ),
+  update = list(
+    help = "Update RSuite images",
+    options = list(
+
+    ),
+    run = function(opts) {
+      # collect all images
+      output <- exec_docker_cmd("images")
+      image_list <- strsplit(output$out_lines[-1], "\\s+") # remove header and convert to list
+
+      # retrieve rsuite images
+      rsuite_images <- sapply(image_list, function(line) {
+          if (line[1] != "wlog/rsuite") {
+            return(NA)
+          }
+
+          return(paste0("wlog/rsuite:", line[2]))
+      })
+
+      # remove NAs (docker images that aren't used by R Suite)
+      rsuite_images <- rsuite_images[!is.na(rsuite_images)]
+
+      # update images
+      updated_images <- lapply(rsuite_images, function(image) {
+        output <- exec_docker_cmd(c("pull", image))
+        output_msg <- paste(output$out_lines, collapse = "\n")
+        if (grepl("Image is up to date for", output_msg)) {
+          logdebug("%s is up to date.", image)
+          return(NA)
+        }
+
+        logdebug("%s updated.", image)
+        return(image)
+      })
+
+      updated_images <- updated_images[!is.na(updated_images)]
+      info_msg <- ifelse(length(updated_images) == 0,
+                         "No images to update",
+                         sprintf("Updated the following images: %s",
+                                 paste0(updated_images, collapse = ", ")))
+
+      loginfo(info_msg)
+    }
   )
 )
 

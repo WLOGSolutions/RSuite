@@ -1,8 +1,9 @@
 VERSION 0.32 (2018-07-??)
   * Handling of errors in running docker commands fixed.
+  * 'update' command for docker submenu added.
 
 VERSION 0.31 (2018-07-26)
-  * Adapted to new version of RSuite
+  * Adapted to new version of RSuite.
 
 VERSION 0.30 (2018-07-06)
   * Fixes related to MacOS support (realpath behaves differently)
