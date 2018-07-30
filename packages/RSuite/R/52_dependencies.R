@@ -111,21 +111,30 @@ collect_prj_support_pkgs <- function(params, vanilla = FALSE) {
                                 sup_pkgs <- c(sup_pkgs, desc[1, "VignetteBuilder"])
                               }
 
-                              tests_path <- file.path(pkg_path, "tests")
-                              if (dir.exists(tests_path)) {
-                                sup_pkgs <- c(sup_pkgs,
-                                              collect_dir_script_deps(tests_path, recursive = FALSE))
+                              test_paths <- c(file.path(pkg_path, "tests"),
+                                              file.path(pkg_path, "tests/testthat"))
+
+                              for (i in seq_along(test_paths)) {
+                                if (dir.exists(test_paths[i])) {
+                                  sup_pkgs <- c(sup_pkgs,
+                                                collect_dir_script_deps(test_paths[i], recursive = FALSE))
+                                }
                               }
 
                               return(sup_pkgs)
                             }))
 
   if (!any(vanilla)) {
-    prj_tests_path <- file.path(params$prj_path, "tests")
-    if (dir.exists(prj_tests_path)) {
-      sup_pkgs <- c(sup_pkgs,
-                    collect_dir_script_deps(prj_tests_path, recursive = FALSE))
+    prj_test_paths <- c(file.path(params$prj_path, "tests"),
+                         file.path(params$prj_path, "tests/testthat"))
+
+    for (i in seq_along(prj_test_paths)) {
+      if (dir.exists(prj_test_paths[i])) {
+        sup_pkgs <- c(sup_pkgs,
+                      collect_dir_script_deps(prj_test_paths[i], recursive = FALSE))
+      }
     }
+
     if ("knitr" %in% sup_pkgs) {
       sup_pkgs <- c(sup_pkgs, "rmarkdown")
     }
