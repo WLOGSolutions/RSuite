@@ -29,10 +29,15 @@
       (setq rsuite-verbose nil)
     (setq rsuite-verbose 1)))
 
-(defun run-rsuite (args)
+(defun run-async-rsuite (args)
   "Utility for running rsuite cli.
 ARGS is a string of arguments forwarded to rsuite cli."
   (async-shell-command (concat rsuite/cli " " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
+
+(defun run-sync-rsuite (args)
+  "Utility for running rsuite cli.
+ARGS is a string of arguments forwarded to rsuite cli."
+  (shell-command (concat rsuite/cli " " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
 
 (defun rsuite-detect-prj-path ()
   "Return R Suite's project path or throws error if none found."
@@ -57,34 +62,53 @@ ARGS is a string of arguments forwarded to rsuite cli."
   "Start project."
   (interactive)
   (let ((proj_path nil)
-	(proj_name nil))
+	(proj_name nil)
+	(proj_tmpl nil))
     
     (setq proj_path (read-directory-name "Project path: "))
     (setq proj_name (read-string (concat "Give project name: " proj_path)))
+    (setq proj_tmpl (read-string (concat "Give project template: " proj_tmpl)))
     (cd proj_path)
-    (run-rsuite (concat "proj start --name=" proj_name))
+    (if (> (length proj_tmpl) 0)
+	(run-sync-rsuite (concat "proj start --name=" proj_name " --tmpl=" proj_tmpl))
+      (run-sync-rsuite (concat "proj start --name=" proj_name)))
+      
     (dired (concat proj_path "/" proj_name))))
 
 (defun rsuite-proj-pkg-start ()
   "Start package."
   (interactive)
-  (let ((pkg_name nil))
+  (let ((pkg_name nil)
+	(pkg_tmpl nil))
     (setq pkg_name (read-string "Give package name: "))
-    (run-rsuite (concat "proj pkgadd --name=" pkg_name))))
+    (setq pkg_tmpl (read-string "Give package template: "))
+    (if (> (length pkg_tmpl) 0)
+	(run-async-rsuite (concat "proj pkgadd --name=" pkg_name " --tmpl=" pkg_tmpl))
+      (run-async-rsuite (concat "proj pkgadd --name=" pkg_name)))))
 
 (defun rsuite-proj-build ()
   "Build current project."
   (interactive)
-  (run-rsuite "proj build"))
+  (run-async-rsuite "proj build"))
 
 (defun rsuite-proj-depsinst ()
   "Install dependencies."
   (interactive)
-  (run-rsuite "proj depsinst"))
+  (run-async-rsuite "proj depsinst"))
+
+(defun rsuite-proj-lock ()
+  "Lock current version of packages."
+  (interactive)
+  (run-async-rsuite "proj lock"))
+
+(defun rsuite-proj-unlock ()
+  "Release lock of current version of packages."
+  (interactive)
+  (run-async-rsuite "proj lock"))
 
 (defun rsuite-proj-test ()
   "Run project test."
-  (run-rsuite "proj test"))
+  (run-async-rsuite "proj test"))
 
 (defun rsuite-proj-zip ()
   "Make deployment."
@@ -93,8 +117,8 @@ ARGS is a string of arguments forwarded to rsuite cli."
     (setq version (read-string "Version: "))
     (setq path (read-directory-name "Path: "))
     (if (> (length version) 0)
-	(run-rsuite (concat "proj zip --version=" version " --path=" path))
-      (run-rsuite (concat "proj zip --path=" path)))))
+	(run-async-rsuite (concat "proj zip --version=" version " --path=" path))
+      (run-async-rsuite (concat "proj zip --path=" path)))))
 
 (defun rsuite-docker-zip-image ()
   "Make deployment zip using docker and custom base image."
@@ -113,9 +137,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
 		       " --rver=" rver
 		       " --image=" image))
     (if (> (length version) 0)
-	(run-rsuite (concat rcmd
+	(run-async-rsuite (concat rcmd
 			    " --version=" version))
-      (run-rsuite rcmd))))
+      (run-async-rsuite rcmd))))
 
 (defun rsuite-docker-zip-platform ()
   "Make deployment zip using docker and image of one of the supported OSs."
@@ -131,9 +155,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
 		       " --dest=" path
 		       " --platform=" platform))
     (if (> (length version) 0)
-	(run-rsuite (concat rcmd
+	(run-async-rsuite (concat rcmd
 			    " --version=" version))
-      (run-rsuite rcmd))))
+      (run-async-rsuite rcmd))))
 
 (defun rsuite-docker-image-platform ()
   "Make deployment docker image for supported OSs."
@@ -150,9 +174,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
 		       " --tag=" tag
 		       " --platform=" platform))
     (if (> (length version) 0)
-	(run-rsuite (concat rcmd
+	(run-async-rsuite (concat rcmd
 			    " --version=" version))
-      (run-rsuite rcmd))))
+      (run-async-rsuite rcmd))))
 
 (defun rsuite-docker-image-image ()
   "Make deployment docker image using custom base image."
@@ -169,9 +193,28 @@ ARGS is a string of arguments forwarded to rsuite cli."
 		       " --tag=" tag
 		       " --image=" image))
     (if (> (length version) 0)
-	(run-rsuite (concat rcmd
+	(run-async-rsuite (concat rcmd
 			    " --version=" version))
-      (run-rsuite rcmd))))
+      (run-async-rsuite rcmd))))
+
+(defun rsuite-docker-image-template ()
+  "Make deployment docker image using template Dockerfile."
+  (interactive)
+  (let ((version nil)
+	(tag nil)
+	(tmpl nil)
+	(rcmd "docker img"))
+    
+    (setq version (read-string "Version: "))
+    (setq tag (read-string "Tag: "))
+    (setq tmpl (read-string "Dockerfile template file: "))
+    (setq rcmd (concat rcmd
+		       " --tag=" tag
+		       " --templ " tmpl))
+    (if (> (length version) 0)
+	(run-async-rsuite (concat rcmd
+			    " --version=" version))
+      (run-async-rsuite rcmd))))
 
 (defun rsuite-proj-pack ()
   "Pack R Suite project."
@@ -184,9 +227,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
     (setq rcmd (concat rcmd
 		       " --path=" path))
     (if (> (length version) 0)
-	(run-rsuite (concat rcmd
+	(run-async-rsuite (concat rcmd
 			    " --version=" version))
-      (run-rsuite rcmd))))
+      (run-async-rsuite rcmd))))
 
 (defun rsuite-proj-find-master ()
   "Find existing or new master file.
@@ -220,6 +263,19 @@ args <- args_parser()
 " nil m_name)
        (find-file m_name)
        (goto-char (point-max))))))
+
+
+;; ;; a simple major mode, mymath-mode
+
+;; (defvar rsuite-highlights
+;;   '(("INFO" . font-lock-constant-face)
+;;     ("WARNING\\|ERROR" . font-lock-warning-face)))
+
+;; (define-derived-mode rsuite-mode fundamental-mode "rsuite"
+;;   "major mode for rsuite output."
+;;   (setq font-lock-defaults '(rsuite-highlights)))
+
+;; (provide 'rsuite-mode)
 
 (provide 'rsuite)
 ;;; rsuite.el ends here
