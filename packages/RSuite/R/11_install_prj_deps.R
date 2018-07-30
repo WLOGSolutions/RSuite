@@ -374,8 +374,10 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
 
   curr_cr <- check_res.build(missing = vers.rm_base(vers))
   all_deps <- check_res.get_missing(curr_cr)
+  curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
   while (!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
     curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
+    has_found_new_deps <- FALSE
     for (rp in repo_infos) {
       for (tp in pkg_types) {
         tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
@@ -392,6 +394,12 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
                                check_res.get_missing(tp_cr))
 
         # remove new dependencies: these must be searched again from the beginning of pkg_types
+        new_deps_found <- setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings))
+        new_deps_missing <- setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings))
+        if (length(c(new_deps_missing, new_deps_found)) != 0) {
+          has_found_new_deps <- TRUE
+        }
+
         tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings)))
         tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings)))
         curr_cr <- check_res.join(tp_cr, curr_cr)
@@ -399,10 +407,15 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
         curr_missings <- vers.rm(curr_missings, curr_cr$get_found_names())
       }
     }
-      assert(vers.is_empty(curr_missings),
-             "Required dependencies are not available: %s",
-             paste(vers.get_names(curr_missings), collapse = ", "))
+
+    if (!has_found_new_deps) {
+      break
+    }
   }
+
+  assert(vers.is_empty(curr_missings),
+         "Required dependencies are not available: %s",
+         paste(vers.get_names(curr_missings), collapse = ", "))
 
   return(check_res.get_found(curr_cr))
 }

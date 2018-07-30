@@ -141,7 +141,7 @@ rsuite_register_repo_adapter <- function(repo_adapter) {
 #'   repo_adapter <- repo_adapter_create_base("Own") # create your custom adapter
 #'   class(repo_adapter) <- c("repo_adapter_own", class(repo_adapter))
 #'   rsuite_register_repo_adapter(repo_adapter)
-#'   rsuite_unregister_repo_adapter(repo_adapter_name)
+#'   rsuite_unregister_repo_adapter("Own")
 #' }
 #'
 #' @export

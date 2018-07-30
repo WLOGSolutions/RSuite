@@ -5,13 +5,13 @@
 # Tools for repository management during testing.
 #----------------------------------------------------------------------------
 
-init_test_manager <- function(prj) {
-  repo_path <- tempfile(tmpdir = get_wspace_dir(), pattern = "repo_")
-
+init_test_manager <- function(prj, ra_name = "Dir") {
   params <- prj$load_params()
+  repo_path <- tempfile(tmpdir = params$prj_path, pattern = "repo_")
+
 
   types <- c(params$pkgs_type, params$aux_pkgs_type)
-  repo_mgr <- RSuite::repo_mng_start(ra_name = "Dir",
+  repo_mgr <- RSuite::repo_mng_start(ra_name = ra_name,
                                      path = repo_path, rver = params$r_ver,
                                      types = types)
   RSuite::repo_mng_init(repo_mgr)
@@ -22,6 +22,43 @@ init_test_manager <- function(prj) {
   })
 
   return(list(repo_mgr = repo_mgr, path = repo_path, url = sprintf("file:///%s", repo_path)))
+}
+
+init_test_dir_adapter <- function(name) {
+  repo_adapter <- RSuite:::repo_adapter_create_dir(name)
+  RSuite::rsuite_register_repo_adapter(repo_adapter)
+  
+  on_test_exit(function() {
+    RSuite::rsuite_unregister_repo_adapter(name)
+  })
+  
+  return(repo_adapter)
+}
+
+create_package_deploy_to_repo <- function(name,
+                                           prj,
+                                           repo_manager = repo_manager,
+                                           ver = "1.0",
+                                           type = .Platform$pkgType,
+                                           deps = "",
+                                           imps = "logging") {
+  pkg_path <- create_test_package(name, prj, ver, deps = deps, imps = imps)
+  set_test_package_ns_imports(name, prj, unlist(strsplit(imps, ",")))
+
+  params <- prj$load_params()
+  on.exit({
+    unlink(pkg_path, recursive = T, force = T)
+    unlink(file.path(params$lib_path, "*"), recursive = T, force = T)
+  }, add = T)
+  loc_repo <- .get_local_repo_path(prj, type)
+
+  prj_install_deps(prj, clean = T)
+  prj_build(prj, type = type)
+
+  repo_upload_prj_packages(repo_manager,
+                           pkgs = name,
+                           prj = prj,
+                           skip_rc = TRUE)
 }
 
 get_intrepo_manager <- function(prj) {
