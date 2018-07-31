@@ -2,6 +2,15 @@
 
 language: R
 sudo: false
+pandoc: false
 cache: packages
 
 before_install: cd packages/RSuite
+
+install:
+  - Rscript -e 'if(!"devtools" %in% rownames(installed.packages())) { install.packages("devtools", dependencies = TRUE) }'
+  - Rscript -e 'if(!"roxygen2" %in% rownames(installed.packages())) { install.packages("roxygen2", dependencies = TRUE) }'
+  - Rscript -e 'devtools::install_deps(pkg = ".", dependencies = TRUE)'
+  
+script:
+  - R CMD build . --no-build-vignettes --no-manual
