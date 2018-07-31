@@ -1,8 +1,23 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: R
-sudo: false
-pandoc: false
 cache: packages
 
-before_install: cd packages/RSuite
+before_install: 
+- cd packages/RSuite
+
+addons:
+  apt:
+    packages:
+      - libxml2-dev
+      - libssl-dev
+      - libcurl4-openssl-dev
+      - zlib1g-dev
+      - libgit2-dev	 
+	  
+install:
+- R -e 'devtools::install_deps(dep = T)' --no-init-file
+	  
+script:
+- R CMD build .
+- R CMD check *tar.gz
