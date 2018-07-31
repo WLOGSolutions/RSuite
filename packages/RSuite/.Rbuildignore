@@ -3,3 +3,4 @@ cran-comments.md
 .lintr
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.travis\.yml$
