@@ -2,6 +2,6 @@
 #  is required
 .libPaths(c('../../deployment/sbox', '../../deployment/libs', .libPaths()))
 
-if ("roxygen2" %in% installed.packages()[, "Package"]) {
+if ("roxygen2" %in% utils::installed.packages()[, "Package"]) {
   library(roxygen2)
 }
