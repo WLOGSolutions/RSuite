@@ -9,15 +9,15 @@ before_install:
 addons:
   apt:
     packages:
-      - libxml2-dev
-      - libssl-dev
-      - libcurl4-openssl-dev
-      - zlib1g-dev
-      - libgit2-dev	 
-	  
+    - libxml2-dev
+    - libssl-dev
+    - libcurl4-openssl-dev
+    - zlib1g-dev
+    - libgit2-dev
+
 install:
 - R -e 'devtools::install_deps(dep = T)' --no-init-file
-	  
+
 script:
 - R CMD build .
 - R CMD check *tar.gz
