@@ -110,7 +110,7 @@ get_package_build_name <- function(pkg_path, pkg_type) {
 #'
 collect_pkg_source_md5 <- function(pkg_path) {
   files <- c(file.path(pkg_path, c("DESCRIPTION", "NAMESPACE")),
-             list.files(file.path(pkg_path, c("inst", "data", "man", "R", "vignettes")),
+             list.files(file.path(pkg_path, c("inst", "data", "man", "R", "vignettes", "src")),
                         recursive = TRUE, full.names = TRUE))
   sums <- tools::md5sum(files)
 
