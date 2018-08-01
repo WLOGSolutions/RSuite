@@ -13,7 +13,7 @@ r:
 
 cache: packages
 
-before_install: 
+before_install:
 - cd packages/RSuite
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libgit2; fi
 
