@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if base dependencies are handled properly")
 
 library(RSuite)
 library(testthat)
@@ -9,7 +10,6 @@ library(testthat)
 source("R/test_utils.R")
 source("R/project_management.R")
 
-context("Testing if base dependencies are handled properly")
 
 test_that_managed("Instaling package which requires methods", {
   prj <- init_test_project(repo_adapters = c("Dir"))
