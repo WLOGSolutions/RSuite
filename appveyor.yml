@@ -20,15 +20,15 @@ environment:
     USE_RTOOLS: true
 
 build_script:
-  - cd packages/RSuite
-  - cmd: Rscript -e "install.packages(c('devtools'), repos='https://cran.r-project.org');if (!all(c('devtools') %in% installed.packages())) { q(status = 1, save = 'no')}" --no-init-file
-  - cmd: Rscript -e "devtools::install_deps(dep = T)" --no-init-file
-  - cmd: Rscript -e "devtools::document()"
-  - R CMD build .
-  - R CMD check *tar.gz
+  - sh: cd packages/RSuite
+  - sh: Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}' --no-init-file
+  - sh: Rscript -e 'devtools::install_deps(dep = T)' --no-init-file
+  - sh: Rscript -e 'devtools::document()'
+  - sh: R CMD build .
+  - sh: R CMD check *tar.gz
 
 test_script:
-  - R -e "testthat::test_dir('../../tests')"
+  - sh: R -e "testthat::test_dir('../../tests')"
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
