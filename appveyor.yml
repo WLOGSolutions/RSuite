@@ -16,26 +16,30 @@ cache:
 # Adapt as necessary starting from here
 
 environment:
-  global:
-    USE_RTOOLS: true
-    
+  USE_RTOOLS: true
+  
   matrix:
   - R_VERSION: devel
-
-  - R_VERSION: release
-
   - R_VERSION: oldrel
-
+  - R_VERSION: release
+  
 build_script:
-  - cd packages/RSuite
-  - Rscript -e "install.packages(c('devtools'))" --no-init-file
-  - Rscript -e "devtools::install_deps(dep = T)" --no-init-file
-  - Rscript -e "devtools::document()"
-  - R CMD build .
-  - R CMD check *tar.gz
+- sh: >-
+    cd packages/RSuite
 
+    Rscript -e 'install.packages(c("devtools"), repos='https://cran.r-project.org'));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}' --no-init-file
+
+    Rscript -e 'devtools::install_deps(dep = T)' --no-init-file
+
+    Rscript -e 'devtools::document()'
+
+    R CMD build .
+
+    R CMD check *tar.gz
+    
 test_script:
-  - R -e "testthat::test_dir('../../tests')"
+- sh: R -e 'testthat::test_dir("../../tests")'
+
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
