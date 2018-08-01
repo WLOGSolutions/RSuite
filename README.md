@@ -1,3 +1,4 @@
+[![CRAN total downloads](http://cranlogs.r-pkg.org/badges/grand-total/RSuite)](http://cranlogs.r-pkg.org/badges/grand-total/RSuite)
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/RSuite)](https://cranlogs.r-pkg.org/badges/RSuite)
 [![CRAN version](http://www.r-pkg.org/badges/version/RSuite)](http://www.r-pkg.org/badges/version/RSuite)
 [![Gitter](https://badges.gitter.im/WLOGSolutions/RSuite.svg)](https://gitter.im/WLOGSolutions/RSuite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -10,6 +11,7 @@ R Suite is the most complete R development and data science platform. It was dev
 * Package based solution development.
 * Management of custom CRAN-alike repositories.
 * Automation of deployment package preparation.
+* Flawless integration with Docker.
 * Development process integrated with version control system (currently git and svn).
 * Working in internetless environments.
 
