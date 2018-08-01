@@ -1,8 +1,39 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
-sudo: false
-pandoc: false
+language: r
+
+os:
+- linux
+- osx
+
+r:
+- oldrel
+- release
+- devel
+
 cache: packages
 
-before_install: cd packages/RSuite
+before_install: 
+- cd packages/RSuite
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install libgit2; fi
+
+addons:
+  apt:
+    packages:
+    - libxml2-dev
+    - libssl-dev
+    - libcurl4-openssl-dev
+    - zlib1g-dev
+    - libgit2-dev
+
+install:
+- Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}' --no-init-file
+- Rscript -e 'devtools::install_deps(dep = T)' --no-init-file
+- Rscript -e 'devtools::document()'
+
+script:
+- R CMD build .
+- R CMD check *tar.gz
+
+after_success:
+- R -e 'testthat::test_dir("../../tests")'
