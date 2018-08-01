@@ -21,9 +21,9 @@ environment:
 
 build_script:
   - cd packages/RSuite
-  - Rscript -e "install.packages(c('devtools'), repos='https://cran.r-project.org');if (!all(c('devtools') "%in%" installed.packages())) { q(status = 1, save = 'no')}" --no-init-file
-  - Rscript -e "devtools::install_deps(dep = T)" --no-init-file
-  - Rscript -e "devtools::document()"
+  - cmd: Rscript -e "install.packages(c('devtools'), repos='https://cran.r-project.org');if (!all(c('devtools') %in% installed.packages())) { q(status = 1, save = 'no')}" --no-init-file
+  - cmd: Rscript -e "devtools::install_deps(dep = T)" --no-init-file
+  - cmd: Rscript -e "devtools::document()"
   - R CMD build .
   - R CMD check *tar.gz
 
