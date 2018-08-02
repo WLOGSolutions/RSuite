@@ -40,11 +40,15 @@ build_script:
 
 test_script:
   - cmd: Rscript -e "devtools::install()"
-  - cmd: R -e "testthat::test_dir('../../tests')"
+  - cd ../../tests
+  - cmd: Rscript run_tests.R
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
   - appveyor PushArtifact failure.zip
+
+on_finish:
+  - 7z a logs.zip ../../tests/*
 
 artifacts:
   - path: '*.Rcheck\**\*.log'

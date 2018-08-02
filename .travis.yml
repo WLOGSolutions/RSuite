@@ -42,4 +42,5 @@ script:
 
 after_success:
 - Rscript -e 'devtools::install()' --no-init-file
-- R -e 'testthat::test_dir("../../tests")'
+- cd ../../tests
+- Rscript run_tests.R
