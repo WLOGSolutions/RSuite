@@ -39,4 +39,5 @@ install:
 script:
 - R CMD build .
 - R CMD check *tar.gz
+- R CMD INSTALL .
 - R -e 'testthat::test_dir("../../tests")'

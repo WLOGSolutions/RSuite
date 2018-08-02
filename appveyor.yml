@@ -41,6 +41,7 @@ build_script:
       R CMD check *tar.gz --no-manual
 
 test_script:
+  - cmd: R CMD INSTALL .
   - cmd: R -e "testthat::test_dir('../../tests')"
 
 on_failure:
