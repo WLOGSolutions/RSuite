@@ -26,29 +26,28 @@ environment:
 
 build_script:
   - cmd: >-
-      cd packages/RSuite
 
       Rscript -e "install.packages(c('devtools'), repos='https://cran.r-project.org')" --no-init-file
 
-      Rscript -e "devtools::install_deps(dep = T)" --no-init-file
+      Rscript -e "devtools::install_deps(pkg = 'packages/RSuite',dep = T)" --no-init-file
 
-      Rscript -e "devtools::document()"
+      Rscript -e "devtools::document(pkg = 'packages/RSuite')"
 
-      R CMD build .
+      R CMD build ./packages/RSuite
 
-      R CMD check *tar.gz --no-manual
+      R CMD check ./packages/RSuite/*tar.gz --no-manual
 
 test_script:
-  - cmd: Rscript -e "devtools::install()"
-  - cd ../../tests
-  - cmd: Rscript run_tests.R
+  - cmd: Rscript -e "devtools::install('./packages/RSuite')"
+  - cmd: Rscript -e "source('test/run_tests.R', chdir = TRUE)"
 
 on_failure:
-  - 7z a failure.zip *.Rcheck\*
+  - 7z a failure.zip packages\RSuite\*.Rcheck\*
   - appveyor PushArtifact failure.zip
 
 on_finish:
-  - 7z a logs.zip ../../tests/*
+  - 7z a logs.zip tests/logs*
+  - appveyor PushArtifact logs.zip
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
