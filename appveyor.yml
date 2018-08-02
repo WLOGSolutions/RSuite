@@ -23,8 +23,6 @@ environment:
   - R_VERSION: oldrel
   - R_VERSION: release
 
-install:
-  - ps: Bootstrap
 
 build_script:
   - cmd: >-
@@ -41,7 +39,7 @@ build_script:
       R CMD check *tar.gz --no-manual
 
 test_script:
-  - cmd: R CMD INSTALL .
+  - cmd: Rscript -e "devtools::install()"
   - cmd: R -e "testthat::test_dir('../../tests')"
 
 on_failure:

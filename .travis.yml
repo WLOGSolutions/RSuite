@@ -39,5 +39,7 @@ install:
 script:
 - R CMD build .
 - R CMD check *tar.gz
-- R CMD INSTALL .
+
+after_success:
+- Rscript -e 'devtools::install()' --no-init-file
 - R -e 'testthat::test_dir("../../tests")'

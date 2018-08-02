@@ -144,12 +144,19 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
 
   cmd0 <- get_rscript_path(rver = ifelse(is.na(rver), current_rver(), rver)) # from 97_rversion.R
 
-  old_libs_user <- Sys.getenv("R_LIBS_USER")
-  Sys.unsetenv("R_LIBS_USER") # required to prevent Rscript detecting own user libraries
-  on.exit({
-    Sys.setenv(R_LIBS_USER = old_libs_user)
-  },
-  add = TRUE)
+  # Before unsetting the R_LIBS_USER variable we have to check whether we are
+  # going to run a subprocess using a different R version than the one
+  # that we're currently using. As the subprocess inherints environment variables
+  # from the parent process it may result in errors because one R version might
+  # be using enviromental variables defined for the other R version.
+  if (!is.na(rver) && current_rver() != rver) {
+    old_libs_user <- Sys.getenv("R_LIBS_USER")
+    Sys.unsetenv("R_LIBS_USER") # required to prevent Rscript detecting own user libraries
+    on.exit({
+      Sys.setenv(R_LIBS_USER = old_libs_user)
+    },
+    add = TRUE)
+  }
 
   script <- sprintf(paste0(".Library <- NULL;",
                            ".libPaths(c(%s, Sys.getenv('R_LIBS_USER'), .Library.site));",
