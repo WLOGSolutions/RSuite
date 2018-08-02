@@ -39,7 +39,7 @@ build_script:
 
 test_script:
   - cmd: Rscript -e "devtools::install('./packages/RSuite')"
-  - cmd: Rscript -e "source('test/run_tests.R', chdir = TRUE)"
+  - cmd: Rscript -e "source('tests/run_tests.R', chdir = TRUE)"
 
 on_failure:
   - 7z a failure.zip packages\RSuite\*.Rcheck\*
