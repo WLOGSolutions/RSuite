@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if deprecated packages handling works properly")
 
 library(RSuite)
 library(testthat)
@@ -9,8 +10,6 @@ library(testthat)
 source("R/test_utils.R")
 source("R/project_management.R")
 source("R/repo_management.R")
-
-context("Testing if deprecated packages handling works properly")
 
 
 test_that_managed("Handling unavailable deprecated package", {

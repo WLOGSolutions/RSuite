@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if specific packages are installing properly (ROracle, H2O)")
 
 library(RSuite)
 library(testthat)
@@ -12,7 +13,6 @@ source("R/project_management.R")
 
 installOracleInstantClient()
 
-context("Testing if specific packages are installing properly (ROracle, H2O)")
 
 test_that_managed("Installing ROracle", {
   prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))

@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if building succeeds for package dependant on stringr (roxygen issue)")
 
 library(RSuite)
 library(testthat)
@@ -9,7 +10,6 @@ library(testthat)
 source("R/test_utils.R")
 source("R/project_management.R")
 
-context("Testing if building succeeds for package dependant on stringr (roxygen issue)")
 
 test_that_managed("Build package which dependents on stringr", {
   prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))

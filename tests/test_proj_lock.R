@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if project environment locking works properly")
 
 library(RSuite)
 library(testthat)
@@ -10,7 +11,6 @@ source("R/test_utils.R")
 source("R/project_management.R")
 source("R/repo_management.R")
 
-context("Testing if project environment locking works properly")
 
 # create test project with prepared repo
 invisible(capture.output(create_lock_test_prj()))

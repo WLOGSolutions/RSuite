@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if .libPaths is preserved after project/env build")
 
 library(RSuite)
 library(testthat)
@@ -10,7 +11,6 @@ source("R/test_utils.R")
 source("R/project_management.R")
 source("R/libpaths_management.R")
 
-context("Testing if .libPaths is preserved after project/env build")
 
 test_that_managed("Testing if .libPaths is preserved after env build", {
   prj <- init_test_project(repo_adapters = c("Dir"))

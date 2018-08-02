@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if creation of PKGZIP from GitHub works properly")
 
 library(RSuite)
 library(testthat)
@@ -10,7 +11,6 @@ source("R/test_utils.R")
 source("R/project_management.R")
 source("R/pkgzip_management.R")
 
-context("Testing if creation of PKGZIP from GitHub works properly")
 
 test_that_managed("Create PKGZIP out of sources on GitHub (basic)", {
   prj <- init_test_project(repo_adapters = c("CRAN"))

@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if project building works properly")
 
 library(RSuite)
 library(testthat)
@@ -10,7 +11,6 @@ source("R/test_utils.R")
 source("R/project_management.R")
 source("R/repo_management.R")
 
-context("Testing if project building works properly")
 
 test_that_managed("Handling project with package without NAMESPACE", {
   prj <- init_test_project(repo_adapters = c("Dir"))

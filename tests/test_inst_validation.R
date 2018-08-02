@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if package install validations works properly")
 
 library(RSuite)
 library(testthat)
@@ -9,7 +10,6 @@ library(testthat)
 source("R/test_utils.R")
 source("R/project_management.R")
 
-context("Testing if package install validations works properly")
 
 test_that_managed("Post-install R version check works", {
   skip_if_not(.Platform$pkgType == "win.binary")

@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing proper version selection")
 
 library(RSuite)
 library(testthat)
@@ -9,7 +10,6 @@ library(testthat)
 source("R/test_utils.R")
 source("R/project_management.R")
 
-context("Testing proper version selection")
 
 test_that_managed("Installs last available if no requirements", {
   prj <- init_test_project(repo_adapters = c("Dir"))

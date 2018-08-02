@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing simple CRAN installation (dependencies detection, basic deployment scenarios)")
 
 library(RSuite)
 library(testthat)
@@ -9,7 +10,6 @@ library(testthat)
 source("R/test_utils.R")
 source("R/project_management.R")
 
-context("Testing simple CRAN installation (dependencies detection, basic deployment scenarios)")
 
 test_that_managed("No deps install", {
   prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))

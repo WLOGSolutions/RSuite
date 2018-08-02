@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if creation of PKGZIP from external packages works properly")
 
 library(RSuite)
 library(testthat)
@@ -11,7 +12,6 @@ source("R/project_management.R")
 source("R/pkgzip_management.R")
 source("R/repo_management.R")
 
-context("Testing if creation of PKGZIP from external packages works properly")
 
 test_that_managed("Create PKGZIP out of external package (basic)", {
   prj <- init_test_project(repo_adapters = c("Dir"))

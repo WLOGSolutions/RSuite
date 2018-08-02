@@ -2,6 +2,8 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if creation of project/package using templates works properly")
+
 library(RSuite)
 library(testthat)
 
@@ -9,7 +11,6 @@ source("R/test_utils.R")
 source("R/template_managment.R")
 source("R/project_management.R")
 
-context("Testing if creation of project/package using templates works properly")
 
 test_that_template("Project creation from builtin template", {
   # create test project using the builtin template

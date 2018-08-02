@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if project/package templates API functions work properly")
 
 library(RSuite)
 library(testthat)
@@ -10,7 +11,6 @@ source("R/test_utils.R")
 source("R/template_managment.R")
 source("R/project_management.R")
 
-context("Testing if project/package templates API functions work properly")
 
 test_that_template("Project template creation in user local path", {
   # create project template

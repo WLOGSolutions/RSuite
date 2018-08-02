@@ -2,6 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
+context("Testing if master script dependencies are handled properly")
 
 library(RSuite)
 library(testthat)
@@ -9,7 +10,6 @@ library(testthat)
 source("R/test_utils.R")
 source("R/project_management.R")
 
-context("Testing if master script dependencies are handled properly")
 
 test_that_managed("Install with package requiring 'logging'", {
   prj <- init_test_project(repo_adapters = c("Dir"))
