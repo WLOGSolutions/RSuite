@@ -169,8 +169,9 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
                            "  cat(sprintf('~ error:%%s\\n', e))",
                            "})"),
                     rscript_arg("new", rsuite_fullUnifiedPath(ex_libpath)), full_code)
-  if (get_os_type() == "macos") {
+  if (get_os_platform() %in% c("MacOS", "SunOS")) {
     # On MacOS special characters are interpreted by process, so they have to be twice escaped
+    # something alike is happening on SunOS
     script <- gsub("\\\\([tn])", "\\\\\\\\\\1", script)
   }
 
@@ -349,7 +350,7 @@ get_os_type <- function() {
 #'
 get_os_info <- function() {
   type <- get_os_type()
-  platform <- .get_platform(type)
+  platform <- get_os_platform()
   assert(!is.na(platform), "Could not detect current platform name.")
 
   distrib <- .get_distrib(platform)
@@ -372,7 +373,8 @@ get_os_info <- function() {
 #' @keywords internal
 #' @noRd
 #'
-.get_platform <- function(os_type) {
+get_os_platform <- function() {
+  os_type <- get_os_type()
   if (os_type == "windows") {
     return("Windows")
   }
