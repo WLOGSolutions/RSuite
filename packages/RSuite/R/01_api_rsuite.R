@@ -246,8 +246,8 @@ rsuite_get_rc_adapter_names <- function() {
 #' @return named list with following items
 #' \describe{
 #'   \item{type}{One of windows, macos, unix. (type: character)}
-#'   \item{platform}{One of Windows, MacOS, RedHat, Debian. (type: character(1))}
-#'   \item{release}{One of Ubuntu, Debian, Fedora, CentOS or RedHat or NA. (type: character(1))}
+#'   \item{platform}{One of Windows, MacOS, SunOS, RedHat, Debian. (type: character(1))}
+#'   \item{release}{One of Solaris, MacOS, Ubuntu, Debian, Fedora, CentOS or RedHat or NA. (type: character(1))}
 #'   \item{distrib}{Distribution release e.g. for Debian: squeeze, wheezy, jessie. (type: character(1))}
 #'   \item{version}{Version number of the distribution. (type: character(1))}
 #' }

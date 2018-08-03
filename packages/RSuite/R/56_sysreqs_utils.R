@@ -44,6 +44,8 @@ get_platform_desc <- function() {
                         RedHat = "RPM",
                         Debian = "DEB",
                         NA_character_)
+  assert(!is.na(sysreq_type),
+         "Platform %s is currently not supported by sysreqs.", os_info$platform)
   check_syslibs <- switch(
     os_info$platform,
     RedHat = paste("[shell]",

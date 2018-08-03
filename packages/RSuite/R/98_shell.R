@@ -338,8 +338,8 @@ get_os_type <- function() {
 #' @return named list od following contents
 #' \describe{
 #'   \item{type}{One of windows, macos, unix. (type: character)}
-#'   \item{platform}{One of Windows, MacOS, RedHat, Debian. (type: character(1))}
-#'   \item{release}{One of Ubuntu, Debian, Fedora, CentOS or RedHat or NA. (type: character(1))}
+#'   \item{platform}{One of Windows, MacOS, SunOS, RedHat, Debian. (type: character(1))}
+#'   \item{release}{One of Solaris, Ubuntu, Debian, Fedora, CentOS or RedHat or NA. (type: character(1))}
 #'   \item{distrib}{Distribution release e.g. for Debian: squeeze, wheezy, jessie. (type: character(1))}
 #'   \item{version}{Version number of the distribution. (type: character(1))}
 #' }
@@ -364,7 +364,7 @@ get_os_info <- function() {
 }
 
 #'
-#' Retrieves platform identifier: Windows, MacOS, RedHat or Debian
+#' Retrieves platform identifier: Windows, MacOS, SunOS, RedHat or Debian
 #'
 #' @return platform identifier retrieved or NA if failed to retrieve.
 #'   (type: character(1))
@@ -380,6 +380,9 @@ get_os_info <- function() {
     return("MacOS")
   }
   if (os_type == "unix") {
+    if (grepl("^solaris", R.version$os)) {
+      return("SunOS")
+    }
     if (file.exists("/etc/redhat-release") || file.exists("/etc/fedora-release")) {
       return("RedHat")
     }
@@ -392,7 +395,7 @@ get_os_info <- function() {
 }
 
 #'
-#' Retrieves distribution for the platform: Ubuntu, Debian, Fedora, CentOS or RedHat.
+#' Retrieves distribution for the platform: Solaris, Ubuntu, Debian, Fedora, CentOS, RedHat or MacOS.
 #'
 #' @param platform current platform identifier (type: character(1))
 #' @return platform distribution name or NA if failed to detect. (type: character(1))
@@ -428,6 +431,12 @@ get_os_info <- function() {
     return(NA_character_)
   }
 
+  if (platform == "SunOS") {
+    return("Solaris")
+  }
+  if (platform == "MacOS") {
+    return("MacOS")
+  }
   return(NA_character_)
 }
 
@@ -494,11 +503,25 @@ get_os_info <- function() {
       return(NA_character_)
     }
 
-    ver <- grep("^VERSION[ _]ID=", readLines("/etc/os-release"), value = TRUE)
+    ver <- grep("^VERSION[ _]ID=[0-9]+([.][0-9]+)$*", readLines("/etc/os-release"), value = TRUE)
     if (length(ver) != 1) {
       return(NA_character_)
     }
-    return(gsub("^.+=([0-9]+).*$", "\\1", ver))
+    return(gsub("^.+=([0-9]+([.][0-9]+)*)$", "\\1", ver))
+  }
+
+  if (distrib == "Solaris") {
+    if (!grepl("^solaris[0-9]+[.][0-9]+$", R.version$os)) {
+      return(NA_character_)
+    }
+    return(gsub("^solaris([0-9]+[.][0-9]+)$", "\\1", R.version$os))
+  }
+
+  if (distrib == "MacOS") {
+    if (!grepl("^darwin[0-9]+[.][0-9]+.+$", R.version$os)) {
+      return(NA_character_)
+    }
+    return(gsub("^darwin([0-9]+[.][0-9]+).+$", "\\1", R.version$os))
   }
 
   return(NA_character_)
@@ -522,22 +545,22 @@ get_os_info <- function() {
     if (!file.exists("/etc/lsb-release")) {
       return(NA_character_)
     }
-    release <- grep("^DISTRIB[ _]REALEASE=", readLines("/etc/lsb-release"), value = TRUE)
+    release <- grep("^DISTRIB[ _]RELEASE=[0-9]+([.][0-9]+)*$", readLines("/etc/lsb-release"), value = TRUE)
     if (length(release) != 1) {
       return(NA_character_)
     }
-    return(gsub("^.+=([a-z]+).*$", "\\1", release))
+    return(gsub("^.+=([0-9]+([.][0-9]+)*)$", "\\1", release))
   }
 
   if (distrib == "Debian") {
     if (!file.exists("/etc/os-release")) {
       return(NA_character_)
     }
-    ver <- grep("^VERSION[ _]ID=\"[0-9]+\"$", readLines("/etc/os-release"), value = TRUE)
+    ver <- grep("^VERSION[ _]ID=\"[0-9]+([.][0-9]+)*\"$", readLines("/etc/os-release"), value = TRUE)
     if (length(ver) != 1) {
       return(NA_character_)
     }
-    return(gsub("^.+=\"([0-9]+)\"$", "\\1", ver))
+    return(gsub("^.+=\"([0-9]+([.][0-9]+)*)\"$", "\\1", ver))
   }
 
   if (distrib %in% c("RedHat", "CentOS")) {
@@ -556,11 +579,25 @@ get_os_info <- function() {
       return(NA_character_)
     }
 
-    ver <- grep("^VERSION[ _]ID=", readLines("/etc/os-release"), value = TRUE)
+    ver <- grep("^VERSION[ _]ID=[0-9]+([.][0-9]+)*$", readLines("/etc/os-release"), value = TRUE)
     if (length(ver) != 1) {
       return(NA_character_)
     }
-    return(gsub("^.+=([0-9]+).*$", "\\1", ver))
+    return(gsub("^.+=([0-9]+([.][0-9]+)*)$", "\\1", ver))
+  }
+
+  if (distrib == "Solaris") {
+    if (!grepl("^solaris[0-9]+[.][0-9]+$", R.version$os)) {
+      return(NA_character_)
+    }
+    return(gsub("^solaris([0-9]+[.][0-9]+)$", "\\1", R.version$os))
+  }
+
+  if (distrib == "MacOS") {
+    if (!grepl("^darwin[0-9]+[.][0-9]+.+$", R.version$os)) {
+      return(NA_character_)
+    }
+    return(gsub("^darwin([0-9]+[.][0-9]+).+$", "\\1", R.version$os))
   }
 
   return(NA_character_)
