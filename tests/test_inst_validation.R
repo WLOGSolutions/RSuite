@@ -13,10 +13,18 @@ source("R/project_management.R")
 
 test_that_managed("Post-install R version check works", {
   skip_if_not(.Platform$pkgType == "win.binary")
+  
+  # skip test if there is no R 3.4 available
+  tryCatch({
+    get_rscript_path("3.4")
+  }, error = function(e) {
+    skip("Could not find valid R 3.4")
+  })
 
   prj <- init_test_project(repo_adapters = c("Dir", "MRAN[2017-01-08]"))
   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
 
+  
   prj_config_set_rversion("3.4", prj = prj)
   create_test_master_script(prj = prj, code = "library(colorspace)")
 

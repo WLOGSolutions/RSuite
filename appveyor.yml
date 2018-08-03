@@ -42,7 +42,7 @@ test_script:
   - cmd: Rscript -e "source('tests/run_tests.R', chdir = TRUE)"
 
 on_failure:
-  - 7z a failure.zip packages\RSuite\*.Rcheck\*
+  - 7z a failure.zip *.Rcheck\*
   - appveyor PushArtifact failure.zip
 
 on_finish:
