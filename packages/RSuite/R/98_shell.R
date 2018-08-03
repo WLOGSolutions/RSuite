@@ -331,3 +331,237 @@ get_os_type <- function() {
 
   return("unknown")
 }
+
+#'
+#' Retrieves various information on current platform.
+#'
+#' @return named list od following contents
+#' \describe{
+#'   \item{type}{One of windows, macos, unix. (type: character)}
+#'   \item{platform}{One of Windows, MacOS, RedHat, Debian. (type: character(1))}
+#'   \item{release}{One of Ubuntu, Debian, Fedora, CentOS or RedHat or NA. (type: character(1))}
+#'   \item{distrib}{Distribution release e.g. for Debian: squeeze, wheezy, jessie. (type: character(1))}
+#'   \item{version}{Version number of the distribution. (type: character(1))}
+#' }
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_os_info <- function() {
+  type <- get_os_type()
+  platform <- .get_platform(type)
+  assert(!is.na(platform), "Could not detect current platform name.")
+
+  distrib <- .get_distrib(platform)
+  release <- .get_release(distrib)
+  version <- .get_os_version(distrib)
+
+  return(list(type = type,
+              platform = platform,
+              distrib = distrib,
+              release = release,
+              version = version))
+}
+
+#'
+#' Retrieves platform identifier: Windows, MacOS, RedHat or Debian
+#'
+#' @return platform identifier retrieved or NA if failed to retrieve.
+#'   (type: character(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
+.get_platform <- function(os_type) {
+  if (os_type == "windows") {
+    return("Windows")
+  }
+  if (os_type == "macos") {
+    return("MacOS")
+  }
+  if (os_type == "unix") {
+    if (file.exists("/etc/redhat-release") || file.exists("/etc/fedora-release")) {
+      return("RedHat")
+    }
+    if (file.exists("/etc/debian_version")) {
+      return("Debian")
+    }
+    return(NA_character_)
+  }
+  return(NA_character_)
+}
+
+#'
+#' Retrieves distribution for the platform: Ubuntu, Debian, Fedora, CentOS or RedHat.
+#'
+#' @param platform current platform identifier (type: character(1))
+#' @return platform distribution name or NA if failed to detect. (type: character(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
+.get_distrib <- function(platform) {
+  if (platform == "Debian") {
+    if (file.exists("/etc/lsb-release") && any(grepl("DISTRIB[ _]ID=Ubuntu", readLines("/etc/lsb-release")))) {
+      return("Ubuntu")
+    }
+    if (file.exists("/etc/os-release") && any(grepl("ID=debian", readLines("/etc/os-release")))) {
+      return("Debian")
+    }
+    return(NA_character_)
+  }
+
+  if (platform == "RedHat") {
+    if (file.exists("/etc/fedora-release")) {
+      return("Fedora")
+    }
+    if (!file.exists("/etc/redhat-release")) {
+      # unexpected: RPM must have redhat-release file
+      return(NA_character_)
+    }
+    if (file.exists("/etc/os-release") && any(grepl("ID=\"?centos\"?", readLines("/etc/os-release")))) {
+      return("CentOS")
+    }
+    if (file.exists("/etc/redhat-release") && any(grepl("^Red Hat Linux", readLines("/etc/redhat-release")))) {
+      return("RedHat")
+    }
+    return(NA_character_)
+  }
+
+  return(NA_character_)
+}
+
+#'
+#' Retrieves release name(or number) for passed distribution.
+#'
+#' @param distrib current distribution to detect release for. (type: character(1))
+#' @return release identifier retrieved or NA if failed to detected. (type: character(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
+.get_release <- function(distrib) {
+  if (is.na(distrib)) {
+    return(NA_character_)
+  }
+
+  if (distrib == "Ubuntu") {
+    if (!file.exists("/etc/lsb-release")) {
+      return(NA_character_)
+    }
+    codename <- grep("^DISTRIB[ _]CODENAME=", readLines("/etc/lsb-release"), value = TRUE)
+    if (length(codename) != 1) {
+      return(NA_character_)
+    }
+    return(gsub("^.+=([a-z]+).*$", "\\1", codename))
+  }
+
+  if (distrib == "Debian") {
+    if (!file.exists("/etc/os-release")) {
+      return(NA_character_)
+    }
+    ver <- grep("^VERSION=", readLines("/etc/os-release"), value = TRUE)
+    if (length(ver) != 1) {
+      return(NA_character_)
+    }
+    return(gsub("^.+\\(([^)]+)\\).*$", "\\1", ver))
+  }
+
+  if (distrib == "CentOS") {
+    if (!file.exists("/etc/redhat-release")) {
+      return(NA_character_)
+    }
+    rel_ln <- readLines("/etc/redhat-release")[1]
+    if (!grepl("^.+release\\s+([0-9]+[.][0-9]+).+$", rel_ln)) {
+      return(NA_character_)
+    }
+    return(gsub("^.+release\\s+([0-9]+[.][0-9]+).+$", "\\1", rel_ln))
+  }
+
+  if (distrib == "RedHat") {
+    if (!file.exists("/etc/redhat-release")) {
+      return(NA_character_)
+    }
+    rel_ln <- readLines("/etc/redhat-release")[1]
+    if (!grepl("^.+release\\s+([0-9]+([.][0-9]+)?)\\s+\\(([^)]+)\\).*$", rel_ln)) {
+      return(NA_character_)
+    }
+    return(gsub("^.+release\\s+([0-9]+([.][0-9]+)?)\\s+\\(([^)]+)\\).*$", "\\3", rel_ln))
+  }
+
+  if (distrib == "Fedora") {
+    if (!file.exists("/etc/os-release")) {
+      return(NA_character_)
+    }
+
+    ver <- grep("^VERSION[ _]ID=", readLines("/etc/os-release"), value = TRUE)
+    if (length(ver) != 1) {
+      return(NA_character_)
+    }
+    return(gsub("^.+=([0-9]+).*$", "\\1", ver))
+  }
+
+  return(NA_character_)
+}
+
+#'
+#' Retrieves os version for passed distribution.
+#'
+#' @param distrib current distribution to detect release for. (type: character(1))
+#' @return release identifier retrieved or NA if failed to detected. (type: character(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
+.get_os_version <- function(distrib) {
+  if (is.na(distrib)) {
+    return(NA_character_)
+  }
+
+  if (distrib == "Ubuntu") {
+    if (!file.exists("/etc/lsb-release")) {
+      return(NA_character_)
+    }
+    release <- grep("^DISTRIB[ _]REALEASE=", readLines("/etc/lsb-release"), value = TRUE)
+    if (length(release) != 1) {
+      return(NA_character_)
+    }
+    return(gsub("^.+=([a-z]+).*$", "\\1", release))
+  }
+
+  if (distrib == "Debian") {
+    if (!file.exists("/etc/os-release")) {
+      return(NA_character_)
+    }
+    ver <- grep("^VERSION[ _]ID=\"[0-9]+\"$", readLines("/etc/os-release"), value = TRUE)
+    if (length(ver) != 1) {
+      return(NA_character_)
+    }
+    return(gsub("^.+=\"([0-9]+)\"$", "\\1", ver))
+  }
+
+  if (distrib %in% c("RedHat", "CentOS")) {
+    if (!file.exists("/etc/redhat-release")) {
+      return(NA_character_)
+    }
+    rel_ln <- readLines("/etc/redhat-release")[1]
+    if (!grepl("^.+release\\s+([0-9]+([.][0-9]+)?).+$", rel_ln)) {
+      return(NA_character_)
+    }
+    return(gsub("^.+release\\s+([0-9]+([.][0-9]+)?).+$", "\\1", rel_ln))
+  }
+
+  if (distrib == "Fedora") {
+    if (!file.exists("/etc/os-release")) {
+      return(NA_character_)
+    }
+
+    ver <- grep("^VERSION[ _]ID=", readLines("/etc/os-release"), value = TRUE)
+    if (length(ver) != 1) {
+      return(NA_character_)
+    }
+    return(gsub("^.+=([0-9]+).*$", "\\1", ver))
+  }
+
+  return(NA_character_)
+}

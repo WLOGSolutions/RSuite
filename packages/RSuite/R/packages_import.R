@@ -92,6 +92,7 @@ NULL
 #'   \item{\code{\link{rsuite_unregister_rc_adapter}}}{Unregisters RC (revision control) adapter.}
 #'   \item{\code{\link{rsuite_get_rc_adapter_names}}}{Gets all names of known RC (revision control) adapters.}
 #'   \item{\code{\link{rsuite_getLogger}}}{Retrieves RSuite logger.}
+#'   \item{\code{\link{rsuite_get_os_info}}}{Retrieves information on current OS.}
 #' }
 #'
 #' @section Template management:

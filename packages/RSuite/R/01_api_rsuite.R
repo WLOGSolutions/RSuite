@@ -239,3 +239,26 @@ rsuite_unregister_rc_adapter <- function(name) {
 rsuite_get_rc_adapter_names <- function() {
   reg_rc_adapter_names()
 }
+
+#'
+#' Retrieves information on current OS.
+#'
+#' @return named list with following items
+#' \describe{
+#'   \item{type}{One of windows, macos, unix. (type: character)}
+#'   \item{platform}{One of Windows, MacOS, RedHat, Debian. (type: character(1))}
+#'   \item{release}{One of Ubuntu, Debian, Fedora, CentOS or RedHat or NA. (type: character(1))}
+#'   \item{distrib}{Distribution release e.g. for Debian: squeeze, wheezy, jessie. (type: character(1))}
+#'   \item{version}{Version number of the distribution. (type: character(1))}
+#' }
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' rsuite_get_os_info()
+#'
+#' @export
+#'
+rsuite_get_os_info <- function() {
+  get_os_info() # from 98_shell.R
+}

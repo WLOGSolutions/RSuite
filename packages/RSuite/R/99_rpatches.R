@@ -21,43 +21,22 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
     }
     return(gsub("\\d+\\.\\d+$", rver, url))
   }
-
-  get_os_version <- function(rel_file) {
-    rel_str <- readLines(rel_file)[[1]]
-    toks <- unlist(strsplit(rel_str, " "))
-    ver <- toks[grep("^(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)$", toks)][1]
-    ver <- gsub("^(\\d+[.]\\d+)([.]\\d+)?$", "\\1", ver)
-    return(ver)
-  }
-  if (file.exists("/etc/redhat-release")) {
-    ver <- get_os_version("/etc/redhat-release")
-    if (is.na(ver)) {
-      os_path <- sprintf("rhel_%s",  R.version$platform)
-      pkg_logwarn("Failed to detect os version. Tried /etc/redhat-release. Will use generic %s",
-                  os_path)
-    } else {
-      os_path <- sprintf("rhel%s_%s", ver, R.version$arch)
-    }
-  } else if (file.exists("/etc/debian_version")) {
-    ver <- get_os_version("/etc/debian_version")
-    if (is.na(ver)) {
-      rel_str <- readLines("/etc/issue")[[1]]
-      toks <- unlist(strsplit(rel_str, " "))
-      toks <- toks[grep("^\\d+[.]\\d+([.]\\d+)?$", toks)]
-      ver <- gsub("^(\\d+[.]\\d+)([.]\\d+)?$", "\\1", toks)[1]
-    }
-    if (is.na(ver)) {
-      os_path <- sprintf("deb_%s",  R.version$platform)
-      pkg_logwarn("Failed to detect os version. Tried /etc/debian_version and /etc/issue. Will use generic %s",
-                  os_path)
-    } else {
-      os_path <- sprintf("deb%s_%s", ver, R.version$arch)
-    }
-  } else {
+  os_info <- get_os_info() # from 98_shell.R
+  if (os_info$platform %in% c("RedHat", "Debian")) {
     os_path <- sprintf("%s_%s", R.version$platform, R.version$arch)
     pkg_logwarn("Unknown platform neigher Debian-like nor RedHat-like. Will use generic %s", os_path)
+  } else if (is_na(os_info$version)) {
+    os_path = switch(os_info$platform,
+                     RedHat = sprintf("rhel_%s", R.version$platform),
+                     Debian = sprintf("deb_%s", R.version$platform))
+    pkg_logwarn("Could not detect %s(%s) version number. Will use generic %s",
+                os_info$distrib, os_info$platform, os_path)
+  } else {
+    os_path = switch(os_info$platform,
+                     RedHat = sprintf("rhel%s_%s", os_info$version, R.version$platform),
+                     Debian = sprintf("deb%s_%s", os_info$version, R.version$platform),
+                     NA_character_)
   }
-
   res <- paste(gsub("/$", "", repos), "bin", os_path, "contrib", rver, sep = "/")
   res
 }

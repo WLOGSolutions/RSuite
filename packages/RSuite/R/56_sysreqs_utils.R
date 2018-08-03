@@ -25,173 +25,47 @@ get_sysreqsdb_path <- function() {
 #'
 #' @return named list with following content:
 #' \describe{
-#'   \item{name}{One of Windows, RPM, DEB (type: character)}
-#'   \item{distrib}{Distribution e.g. for DEB: Debian, Ubuntu; for RPM: CentOS, RedHat, Fedora (type: character(1))}
+#'   \item{name}{One of Windows, MacOS, RedHat, Debian (type: character)}
+#'   \item{distrib}{Distribution e.g. for Debian: Debian, Ubuntu; for RedHat: CentOS, RedHat, Fedora (type: character(1))}
 #'   \item{release}{Distribution release e.g. for Debian: squeeze, wheezy, jessie (type: character(1))}
+#'   \item{sysreq_type}{One of Windows, Pkg, RPM, DEB (type: character(1))}
 #'   \item{build}{True if build environment is required (type: logical(1))}
-#' } one of
+#' }
 #'
 #' @keywords internal
 #' @noRd
 #'
 get_platform_desc <- function() {
-  platform <- .get_platform()
-  assert(!is.na(platform), "Could not detect current platform name.")
+  os_info <- get_os_info() # from 98_shell.R
 
-  distrib <- .get_distrib(platform)
-
+  sysreq_type <- switch(os_info$platform,
+                        Windows = "Windows",
+                        MaCOS = "Pkg",
+                        RedHat = "RPM",
+                        Debian = "DEB",
+                        NA_character_)
   check_syslibs <- switch(
-    platform,
-    RPM = paste("[shell]",
-                "all_pkgs=$(rpm -qa | sed -e \"s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/\");",
-                "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done"),
-    DEB = paste("[shell]",
-                "all_pkgs=$(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\");",
-                "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done")
+    os_info$platform,
+    RedHat = paste("[shell]",
+                   "all_pkgs=$(rpm -qa | sed -e \"s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/\");",
+                   "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done"),
+    Debian = paste("[shell]",
+                   "all_pkgs=$(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\");",
+                   "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done")
   )
   install_syslibs <- switch(
-    platform,
-    RPM = "[shell] yum install -y :params",
-    DEB = "[shell] apt-get update && apt-get install -y :params"
+    os_info$platform,
+    RedHat = "[shell] yum install -y :params",
+    Debian = "[shell] apt-get update && apt-get install -y :params"
   )
 
-  return(list(name = platform,
-              distrib = distrib,
-              release = .get_release(distrib),
+  return(list(name = os_info$platform,
+              distrib = os_info$distrib,
+              release = os_info$release,
+              sysreq_type = sysreq_type,
               lib_tools = list(check = check_syslibs,
                                install = install_syslibs),
               build = TRUE))
-}
-
-#'
-#' Retrieves platform identifier: Windows, DEB or RPM
-#'
-#' @return platform identifier retrieved or NA if failed to retrieve.
-#'   (type: character(1))
-#'
-#' @keywords internal
-#' @noRd
-#'
-.get_platform <- function() {
-  os_type <- get_os_type()
-  if (os_type == "windows") {
-    return("Windows")
-  }
-  if (os_type == "macos") {
-    return("Pkg")
-  }
-  if (os_type == "unix") {
-    if (file.exists("/etc/redhat-release") || file.exists("/etc/fedora-release")) {
-      return("RPM")
-    }
-    if (file.exists("/etc/debian_version")) {
-      return("DEB")
-    }
-    return(NA_character_)
-  }
-  return(NA_character_)
-}
-
-#'
-#' Retrieves distribution for the platform: Ubuntu, Debian, Fedora, CentOS or RedHat.
-#'
-#' @param platform current platform identifier (type: character(1))
-#' @return platform distribution name or NA if failed to detect. (type: character(1))
-#'
-#' @keywords internal
-#' @noRd
-#'
-.get_distrib <- function(platform) {
-  if (platform == "DEB") {
-    if (file.exists("/etc/lsb-release") && any(grepl("DISTRIB[ _]ID=Ubuntu", readLines("/etc/lsb-release")))) {
-      return("Ubuntu")
-    }
-    if (file.exists("/etc/os-release") && any(grepl("ID=debian", readLines("/etc/os-release")))) {
-      return("Debian")
-    }
-    return(NA_character_)
-  }
-
-  if (platform == "RPM") {
-    if (file.exists("/etc/fedora-release")) {
-      return("Fedora")
-    }
-
-    if (!file.exists("/etc/redhat-release")) {
-      # unexpected: RPM must have redhat-release file
-      return(NA_character_)
-    }
-    if (file.exists("/etc/os-release") && any(grepl("ID=\"?centos\"?", readLines("/etc/os-release")))) {
-      return("CentOS")
-    }
-    if (file.exists("/etc/redhat-release") && any(grepl("^Red Hat Linux", readLines("/etc/redhat-release")))) {
-      return("RedHat")
-    }
-    return(NA_character_)
-  }
-
-  return(NA_character_)
-}
-
-#'
-#' Retrieves release for passed distribution.
-#'
-#' @param distrib current distribution to detect release for. (type: character(1))
-#' @return release identifier retrieved or NA if failed to detected. (type: character(1))
-#'
-#' @keywords internal
-#' @noRd
-#'
-.get_release <- function(distrib) {
-  if (is.na(distrib)) {
-    return(NA_character_)
-  }
-
-  if (distrib == "Ubuntu") {
-    if (!file.exists("/etc/lsb-release")) {
-      return(NA_character_)
-    }
-    codename <- grep("^DISTRIB[ _]CODENAME=", readLines("/etc/lsb-release"), value = TRUE)
-    if (length(codename) != 1) {
-      return(NA_character_)
-    }
-    return(gsub("^.+=([a-z]+).*$", "\\1", codename))
-  }
-
-  if (distrib == "Debian") {
-    if (!file.exists("/etc/os-release")) {
-      return(NA_character_)
-    }
-    ver <- grep("^VERSION=", readLines("/etc/os-release"), value = TRUE)
-    if (length(ver) != 1) {
-      return(NA_character_)
-    }
-    return(gsub("^.+\\(([^)]+)\\).*$", "\\1", ver))
-  }
-
-  if (distrib == "CentOS") {
-    if (!file.exists("/etc/redhat-release")) {
-      return(NA_character_)
-    }
-    rel_ln <- readLines("/etc/redhat-release")[1]
-    if (!grepl("^.+release\\s+([0-9]+[.][0-9]+).+$", rel_ln)) {
-      return(NA_character_)
-    }
-    return(gsub("^.+release\\s+([0-9]+[.][0-9]+).+$", "\\1", rel_ln))
-  }
-
-  if (distrib == "RedHat") {
-    if (!file.exists("/etc/redhat-release")) {
-      return(NA_character_)
-    }
-    rel_ln <- readLines("/etc/redhat-release")[1]
-    if (!grepl("^.+release\\s+([0-9]+([.][0-9]+)?)\\s+\\(([^)]+)\\).*$", rel_ln)) {
-      return(NA_character_)
-    }
-    return(gsub("^.+release\\s+([0-9]+([.][0-9]+)?)\\s+\\(([^)]+)\\).*$", "\\3", rel_ln))
-  }
-
-  return(NA_character_)
 }
 
 #'
@@ -336,7 +210,7 @@ get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
   req_type <- ifelse(plat_desc$build, "buildtime", "runtime")
   if (is.data.frame(plat_specs)
       && all(c("distribution", "releases", "runtime", "buildtime") %in% colnames(plat_specs))) {
-    distrib <- plat_desc$distrib
+    distrib <- plat_desc$sysreq_type
     release <- plat_desc$release
     dist_specs <- plat_specs[plat_specs$distribution == distrib
                              & grepl(release, plat_specs$releases, fixed = TRUE), ]

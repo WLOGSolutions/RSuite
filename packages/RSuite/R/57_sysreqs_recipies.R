@@ -191,7 +191,7 @@ perform.sysreqs_install_recipe <- function(recipe) {
   .is_retcode_failure <- function(cmd_ret_code, req_name) {
     return(is.null(cmd_ret_code) || cmd_ret_code > 0)
   }
-  plat_desc <- get_platform_desc()
+  plat_desc <- get_platform_desc() # from 56_sysreqs_utils.R
 
   failed_reqs <- c()
 
