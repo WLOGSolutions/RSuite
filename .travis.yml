@@ -10,6 +10,7 @@ r:
 - oldrel
 - release
 - devel
+- 3.3.0
 
 cache: packages
 
