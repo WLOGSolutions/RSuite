@@ -1,3 +1,5 @@
+[![Travis build status](https://travis-ci.com/WLOGSolutions/RSuite.svg?branch=master)](https://travis-ci.com/WLOGSolutions/RSuite)
+[![Build status](https://ci.appveyor.com/api/projects/status/ij0r41fsgsfuuwe2?svg=true)](https://ci.appveyor.com/project/szymanskir/rsuite)
 [![CRAN total downloads](http://cranlogs.r-pkg.org/badges/grand-total/RSuite)](http://cranlogs.r-pkg.org/badges/grand-total/RSuite)
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/RSuite)](https://cranlogs.r-pkg.org/badges/RSuite)
 [![CRAN version](http://www.r-pkg.org/badges/version/RSuite)](http://www.r-pkg.org/badges/version/RSuite)
