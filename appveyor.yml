@@ -22,6 +22,7 @@ environment:
   - R_VERSION: devel
   - R_VERSION: oldrel
   - R_VERSION: release
+  - R_VERSION: 3.3.0
 
 
 build_script:
