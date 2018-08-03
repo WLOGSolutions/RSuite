@@ -22,7 +22,7 @@ rsuite_contrib_url <- function(repos, type, rver = NA) {
     return(gsub("\\d+\\.\\d+$", rver, url))
   }
   os_info <- get_os_info() # from 98_shell.R
-  if (os_info$platform %in% c("RedHat", "Debian", "SunOS")) {
+  if (!(os_info$platform %in% c("RedHat", "Debian", "SunOS"))) {
     os_path <- sprintf("%s_%s", R.version$platform, R.version$arch)
     pkg_logwarn("Unknown platform %s. Only RedHat-like, Debian-like and SunOS are supported. Will use generic %s",
                 os_info$platform, os_path)

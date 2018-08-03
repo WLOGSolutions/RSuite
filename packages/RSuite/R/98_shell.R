@@ -518,10 +518,13 @@ get_os_info <- function() {
   }
 
   if (distrib == "MacOS") {
-    if (!grepl("^darwin[0-9]+[.][0-9]+.+$", R.version$os)) {
-      return(NA_character_)
+    if (grepl("^mac[.]binary[.][a-z-]+$", .Platform$pkgType)) {
+      return(gsub("^mac[.]binary[.]([a-z-]+)$", "\\1", .Platform$pkgType))
     }
-    return(gsub("^darwin([0-9]+[.][0-9]+).+$", "\\1", R.version$os))
+    if (grepl("^darwin[0-9]+[.][0-9]+.+$", R.version$os)) {
+      return(gsub("^darwin([0-9]+[.][0-9]+).+$", "\\1", R.version$os))
+    }
+    return(NA_character_)
   }
 
   return(NA_character_)
