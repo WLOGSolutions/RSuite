@@ -127,13 +127,14 @@ run_container <- function(docker_image, name) {
 #'
 #' Runs shell command inside docker container passed..
 #'
-#' @return docker container name
+#' @return invisible command output with errcode.
 #'
 run_incont_cmd <- function(cont_name, cmd) {
   loginfo("Running command '%s' in %s container ...", cmd, cont_name)
-  exec_docker_cmd(c("exec", "-i", cont_name, "sh", "-c", shQuote(cmd)),
-                  sprintf("Running command '%s' in %s container", cmd, cont_name))
+  result <- exec_docker_cmd(c("exec", "-i", cont_name, "sh", "-c", shQuote(cmd)),
+                            sprintf("Running command '%s' in %s container", cmd, cont_name))
   loginfo("... done.")
+  return(invisible(result))
 }
 
 #'
@@ -152,29 +153,42 @@ stop_container <- function(cont_name) {
 #' @param cont_name container name prefix to find. If NULL will return all RSuite build containers.
 #'   If passed should be exactly one container with such name (type: character(1), default: NULL).
 #'
-#' @return names of RSuite build containers detectected. (type: character(N))
+#' @return list of infos describing RSuite build containers detectected named by their names.
+#' Each info is names list of following content
+#' \describe{
+#'   \item{base}{Base image of detected container (type: character(1))}
+#' }
 #'
-get_rsbuild_names <- function(cont_name = NULL) {
+find_rsbuild_infos <- function(cont_name = NULL) {
   output <- exec_docker_cmd(c("ps", "-f", "name=rsbuild-"), "Listing RSuite build containers") # from docker_utils.R
-  names <- unlist(lapply(strsplit(output$out_lines[-1], "\\s+"), function(ln) { ln[length(ln)] }))
+  infos <- lapply(output$out_lines[-1],
+                   function(ln) {
+                     toks <- unlist(strsplit(ln, "\\s+"))
+                     list(base = toks[[2]])
+                   })
+  names(infos) <- unlist(lapply(output$out_lines[-1],
+                                function(ln) {
+                                  toks <- unlist(strsplit(ln, "\\s+"))
+                                  toks[length(toks)]
+                                }))
 
   if (is.null(cont_name)) {
-    return(names)
+    return(infos)
   }
 
   if (grepl("^rsbuild[-]", cont_name)) {
-    names <- names[names == cont_name]
+    infos <- infos[names(infos) == cont_name]
   } else {
-    names <- names[grepl(paste0("^rsbuild[-]", cont_name), names)]
+    infos <- infos[grepl(paste0("^rsbuild[-]", cont_name), names(infos))]
   }
 
-  if (length(names) > 1) {
+  if (length(infos) > 1) {
     stop(sprintf("Name '%s' is ambiguous", cont_name))
   }
-  if (length(names) != 1) {
+  if (length(infos) != 1) {
     stop(sprintf("Container '%s' not found", cont_name))
   }
-  return(names)
+  return(infos)
 }
 
 #'
@@ -213,4 +227,64 @@ build_dockerfile <- function(templ_fpath, docker_fpath, tags) {
   }
 
   writeLines(dfile_lines, con = docker_fpath)
+}
+
+#'
+#' Retrieves docker cache file name: <prj>/deployment/docker_cache/<cont_img>/<platform_desc>.zip
+#'
+build_incont_cache_fpath <- function(cont_name, cont_img, prj) {
+  cache_base_dir <- file.path(dirname(prj$load_params()$lib_path), "docker_cache")
+  cont_img <- gsub("^([^:]+):.+$", "\\1", cont_img)
+  cont_img <- gsub("/", "@", cont_img)
+
+  plat_desc_rcode <- paste('os_info <- RSuite::rsuite_get_os_info();',
+                           'cat(c(',
+                           'sprintf(\"Distrib: %s\\n\", os_info$distrib),',
+                           'sprintf(\"Version: %s\\n\", os_info$version),',
+                           'sprintf(\"Arch:    %s\\n\", R.version$arch)))',
+                           sep = "")
+  plat_desc_res <- run_incont_cmd(cont_name, sprintf("Rscript -e '%s'", plat_desc_rcode))
+  cache_fname <- sprintf("%s_%s_%s.zip",
+                         gsub("^\\s*Distrib:\\s+(.+)$", "\\1", plat_desc_res$out_lines[[1]]),
+                         gsub("^\\s*Version:\\s+(.+)$", "\\1", plat_desc_res$out_lines[[2]]),
+                         gsub("^\\s*Arch:\\s+(.+)$", "\\1", plat_desc_res$out_lines[[3]]))
+  return(file.path(cache_base_dir, cont_img, cache_fname))
+}
+
+#'
+#' Retrieves project environment from container and stores it into cache file
+#'
+cache_incont_env <- function(cont_name, prj_name, cache_fpath) {
+  loginfo("Caching project environment into %s ...", cache_fpath)
+
+  if (!dir.exists(dirname(cache_fpath))) {
+    dir.create(dirname(cache_fpath), recursive = TRUE, showWarnings = FALSE)
+  }
+
+  cache_fname <- basename(cache_fpath)
+  run_incont_cmd(cont_name, sprintf("cd %s && zip -qr /tmp/%s ./deployment", prj_name, cache_fname)) # ...
+  exec_docker_cmd(c("cp", sprintf("%s:/tmp/%s", cont_name, cache_fname), cache_fpath), # ...
+                  "Copying project cache from container")
+
+  loginfo("... done.")
+}
+
+#'
+#' If cache file exists unzips it into project environment in container.
+#'
+decache_incont_env <- function(cont_name, prj_name, cache_fpath) {
+  cache_fname <- basename(cache_fpath)
+  if (!file.exists(cache_fpath)) {
+    loginfo("No project cache found.")
+    return(invisible(FALSE))
+  }
+
+  loginfo("Copying project cache into container (%s) ...", cache_fpath)
+
+  exec_docker_cmd(c("cp", cache_fpath, sprintf("%s:/tmp/", cont_name)), "Copying project cache into container")
+  run_incont_cmd(cont_name,
+                 sprintf("cd %s && unzip -qu /tmp/%s && rm -f /tmp/%s", prj_name, cache_fname, cache_fname))
+
+  loginfo("... done.")
+  return(invisible(TRUE))
 }

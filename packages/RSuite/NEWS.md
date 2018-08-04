@@ -3,6 +3,7 @@
   * Dependency resolving when using multiple repos. Previously if a subdependency
     was present in a preceding repository R Suite was unable to find it.
   * rsuite_get_os_info added to retrieve OS release/version etc.
+  * SunOS is supported.
 
 # RSuite 0.31 (2018-07-26)
   * Handling of old (not available in currently selected repositories) packages

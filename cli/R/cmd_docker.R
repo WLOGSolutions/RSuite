@@ -285,14 +285,15 @@ sub_commands <- list(
         }
       }
 
-      names <- get_rsbuild_names(opts$name)
-      if (length(names) == 0) {
+      cont_infos <- find_rsbuild_infos(opts$name) # from docker_utils.h
+      if (length(cont_infos) == 0) {
         loginfo("No containers found.")
         return(invisible())
       }
 
-      exec_docker_cmd(c("rm", "-f", names), sprintf("Stoping %s containers", length(names)))
-      loginfo("Container(s) stopped: %s", paste(names, collapse = " "))
+      cont_names <- names(cont_infos)
+      exec_docker_cmd(c("rm", "-f", cont_names), sprintf("Stoping %s containers", length(cont_names)))
+      loginfo("Container(s) stopped: %s", paste(cont_names, collapse = " "))
     }
   ),
   build = list(
@@ -311,6 +312,9 @@ sub_commands <- list(
       make_option(c("--exc-master"), dest = "exc_master", action="store_true", default=FALSE,
                   help="If passed will exclude master scripts from project pack created. (default: %default)"),
 
+      make_option(c("--no-cache"), dest = "no_cache", action="store_true", default=FALSE,
+                  help="If passed will not use or create cache while building. (default: %default)"),
+
       make_option(c("-z", "--zip"), dest = "zip", default=NULL,
                   help=paste("Accepts folder as argument. If passed after building will create deployment zip.",
                              "Created zip will be retrieved from the container. (default: %default)",
@@ -324,8 +328,9 @@ sub_commands <- list(
         stop("Destination folder for zip does not exist.")
       }
 
-      cont_name <- get_rsbuild_names(opts$name) # from docker_utils.R
-      stopifnot(length(cont_name) == 1)
+      cont_infos <- find_rsbuild_infos(opts$name) # from docker_utils.R
+      stopifnot(length(cont_infos) == 1)
+      cont_name <- names(cont_infos)
 
       prj <- RSuite::prj_init()
       pkgs <- if (!is.null(opts$packages)) { trimws(unlist(strsplit(opts$packages, ","))) }
@@ -354,13 +359,24 @@ sub_commands <- list(
                       "Cleaning old package build")
 
       run_incont_cmd(cont_name, sprintf("unzip %s", basename(pack_fpath))) # from docker_utils.R
+
+      cache_fpath <- NULL
+      if (!opts$no_cache) {
+        cache_fpath <- build_incont_cache_fpath(cont_name, cont_infos[[cont_name]]$base, prj)
+        decache_incont_env(cont_name, prj_name, cache_fpath)
+      }
+
       run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj depsinst -v", prj_name)) # ...
       run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj depsclean -v", prj_name)) # ...
+
+      if (!opts$no_cache) {
+        stopifnot(!is.null(cache_fpath))
+        cache_incont_env(cont_name, prj_name, cache_fpath)
+      }
 
       if (is.null(opts$zip)) {
         run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj build -v", prj_name)) # ...
         loginfo("Project %s is built in %s container.", prj_name, cont_name)
-
         return(invisible(NULL))
       }
 
@@ -397,8 +413,9 @@ sub_commands <- list(
         stop("Provide command to run in container -c (--cmd) option")
       }
 
-      cont_name <- get_rsbuild_names(opts$name) # from docker_utils.R
-      stopifnot(length(cont_name) == 1)
+      cont_infos <- find_rsbuild_infos(opts$name) # from docker_utils.R
+      stopifnot(length(cont_infos) == 1)
+      cont_name <- names(cont_infos)
 
       exec_output <- exec_docker_cmd(c("exec", cont_name, opts$cmd), "Running command in container")
       cat(exec_output$out_lines, sep = "\n")

@@ -1,6 +1,9 @@
 VERSION 0.32 (2018-07-??)
   * Handling of errors in running docker commands fixed.
-  * 'update' command for docker submenu added.
+  * 'docker update' command added which updates all rsuite containers
+     to newer versions.
+  * `docker build` caches project environment. It speeds up zip building
+     process a lot as dependencies from cache need not compilation.
 
 VERSION 0.31 (2018-07-26)
   * Adapted to new version of RSuite.
