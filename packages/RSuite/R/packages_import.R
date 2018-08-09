@@ -101,7 +101,7 @@ NULL
 #' local or global template directory and list all registered templates.
 #'
 #' \describe{
-#'   \item{\code{\link{tmpl_get_registered}}}{Lists all registered templates}
+#'   \item{\code{\link{tmpl_list_registered}}}{Lists all registered templates}
 #'   \item{\code{\link{tmpl_start_prj}}}{Creates a project template.}
 #'   \item{\code{\link{tmpl_start_pkg}}}{Creates a package template.}
 #'   \item{\code{\link{tmpl_register}}}{Registers a template.}
