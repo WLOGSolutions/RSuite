@@ -20,11 +20,11 @@
 #' @family in templates management
 #'
 #' @examples
-#' tmpl_get_registered()
+#' tmpl_list_registered()
 #'
 #' @export
 #'
-tmpl_get_registered <- function() {
+tmpl_list_registered <- function() {
   templ_base_dirs <- c()
 
   # look for templates in the local user's environment
@@ -243,7 +243,7 @@ tmpl_register <- function(path = NULL, global = FALSE) {
   assert(!is.null(path), "No template path specified.")
   assert(dir.exists(path), "Directory %s does not exist.", path)
 
-  path <- normalizePath(path)
+  path <- rsuite_fullUnifiedPath(path, short = FALSE)
   if (global) {
     tmpl_dir <- get_global_templ_dir()
     assert(!is.null(tmpl_dir), "Global template directory error.")

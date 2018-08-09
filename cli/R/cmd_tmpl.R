@@ -14,7 +14,7 @@ if (grepl("darwin", R.version$os)) {
 source(file.path(base, "command_mgr.R"), chdir = T)
 
 sub_commands <- list(
-  get = list(
+  list = list(
     help = "List all available project/package templates",
     options = list(
     ),

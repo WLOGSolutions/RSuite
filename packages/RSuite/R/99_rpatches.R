@@ -91,17 +91,18 @@ rsuite_write_PACKAGES <- function(url, type) {
 }
 
 #'
-#' Converts passed path to full path and replaces it to short names on Windows.
+#' Converts passed path to full path and replaces it to short names on Windows. Short
+#' argument specifies whether we want to convert the path to short names.
 #'
 #' @keywords internal
 #' @noRd
 #'
-rsuite_fullUnifiedPath <- function(path) {
+rsuite_fullUnifiedPath <- function(path, short = TRUE) {
   if (is.null(path) || length(path) == 0) {
     return(c())
   }
   path <- suppressWarnings(normalizePath(path))
-  if (get_os_type() == "windows") {
+  if (get_os_type() == "windows" && short) {
     path <- suppressWarnings(utils::shortPathName(path))
   }
   return(sub("[/\\]*$", "", path))

@@ -32,7 +32,7 @@ create_pkg_test_template <- function(name = NULL, path = NULL) {
 
 
 expect_templates <- function(expected_data) {
-  template_data <- RSuite::tmpl_get_registered()
+  template_data <- RSuite::tmpl_list_registered()
   template_data <- template_data[, c("Name", "HasProjectTemplate", "HasPackageTemplate")]
   result <- do.call(paste0, expected_data) %in% do.call(paste0, template_data)
   pass <- all(result)
