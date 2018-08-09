@@ -14,7 +14,7 @@ source("R/project_management.R")
 
 test_that_template("Project template creation in user local path", {
   # create project template
-  create_prj_test_template(name = "TestTemplate")
+  create_test_template(name = "TestTemplate", path = get_wspace_template_dir(), skip_pkg = TRUE)
 
   # check if template was created
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
@@ -40,7 +40,7 @@ test_that_template("Project template creation in user local path", {
 
 test_that_template("Project template creation in specified path", {
   # create project template
-  create_prj_test_template(name = "TestTemplate", path = get_wspace_dir())
+  create_test_template(name = "TestTemplate", path = get_wspace_dir(), skip_pkg = TRUE)
 
   # check if template was created
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate", "project")
@@ -68,7 +68,7 @@ test_that_template("Project template creation in specified path", {
 
 test_that_template("Package template creation in local user default path", {
   # create package template
-  create_pkg_test_template(name = "TestTemplate")
+  create_test_template(name = "TestTemplate", path = get_wspace_template_dir(), skip_prj = TRUE)
 
   # check if template was created
   tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
@@ -96,7 +96,7 @@ test_that_template("Package template creation in local user default path", {
 
 test_that_template("Package template creation in specified path", {
   # create package template
-  create_pkg_test_template(name = "TestTemplate", path = get_wspace_dir())
+  create_test_template(name = "TestTemplate", path = get_wspace_dir(), skip_prj = TRUE)
 
   # check if template was created
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate", "package")
@@ -123,8 +123,8 @@ test_that_template("Package template creation in specified path", {
 
 test_that_template("Template getting", {
   # create templates
-  create_pkg_test_template(name = "TestTemplateOnlyPackage")
-  create_prj_test_template(name = "TestTemplateOnlyProject")
+  create_test_template(name = "TestTemplateOnlyPackage", path = get_wspace_template_dir(), skip_prj = TRUE)
+  create_test_template(name = "TestTemplateOnlyProject", path = get_wspace_template_dir(), skip_pkg = TRUE)
 
   expected_templates <- data.frame(
     Name = c("TestTemplateOnlyPackage",
@@ -140,8 +140,8 @@ test_that_template("Template getting", {
 test_that_template("Template registering", {
   # create templates
   wspace_dir <- get_wspace_dir()
-  create_pkg_test_template(name = "TestTemplateOnlyPackage", path = wspace_dir)
-  create_prj_test_template(name = "TestTemplateOnlyProject", path = wspace_dir)
+  create_test_template(name = "TestTemplateOnlyPackage", path = wspace_dir, skip_prj = TRUE)
+  create_test_template(name = "TestTemplateOnlyProject", path = wspace_dir, skip_pkg = TRUE)
 
   RSuite::tmpl_register(path = file.path(wspace_dir, "TestTemplateOnlyPackage"))
   RSuite::tmpl_register(path = file.path(wspace_dir, "TestTemplateOnlyProject"))
@@ -160,8 +160,7 @@ test_that_template("Template registering", {
 test_that_template("Template register using current directory", {
   # create templates
   wspace_dir <- get_wspace_dir()
-  create_pkg_test_template(name = "TestTemplate", path = wspace_dir)
-  create_prj_test_template(name = "TestTemplate", path = wspace_dir)
+  create_test_template("TestTemplate", path = wspace_dir)
 
   oldwd <- getwd()
   setwd(file.path(wspace_dir, "TestTemplate"))
@@ -184,8 +183,7 @@ test_that_template("Template register using current directory", {
 test_that_template("Template register using previous directory", {
   # create templates
   wspace_dir <- get_wspace_dir()
-  create_pkg_test_template(name = "TestTemplate", path = wspace_dir)
-  create_prj_test_template(name = "TestTemplate", path = wspace_dir)
+  create_test_template(name = "TestTemplate", path = wspace_dir)
 
   oldwd <- getwd()
   setwd(file.path(wspace_dir, "TestTemplate", "project"))
@@ -207,8 +205,7 @@ test_that_template("Template register using previous directory", {
 test_that_template("Template register overwriting", {
   # create templates
   wspace_dir <- get_wspace_dir()
-  create_pkg_test_template(name = "TestTemplate", path = wspace_dir)
-  create_prj_test_template(name = "TestTemplate", path = wspace_dir)
+  create_test_template(name = "TestTemplate", path = wspace_dir)
 
   test_template_path <- file.path(wspace_dir, "TestTemplate") 
   RSuite::tmpl_register(path = test_template_path)

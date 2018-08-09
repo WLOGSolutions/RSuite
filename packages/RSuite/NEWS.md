@@ -8,6 +8,9 @@
     a project/package from a registered template and a directory with the same name was
     present in the working directory. If we want to use a template that is present in
     the working directory we have to like this "./<name_of_template>"
+  * Merged tmpl_prjadd, tmpl_pkgadd into tmpl_start previously the user had to create both of those
+    components separately. Now the user creates a full template using tmpl_start, but it is possible
+    to skip project or package template creation by using specific flags: skip_prj, skip_pkg
 
 # RSuite 0.31 (2018-07-26)
   * Handling of old (not available in currently selected repositories) packages

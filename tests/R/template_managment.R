@@ -5,6 +5,19 @@
 # Tools for template managment during testing
 #----------------------------------------------------------------------------
 
+create_test_template <- function(name = NULL, path = get_wspace_dir(),
+                                 skip_prj = FALSE, skip_pkg = FALSE) {
+  stopifnot(!is.null(name))
+  
+  RSuite::tmpl_start(name, path, skip_prj, skip_pkg)
+  
+  on_test_exit(function() {
+    if (!is.null(path)) {
+      unlink(file.path(path, name), recursive = T, force = T)
+    }
+  })
+}
+
 create_prj_test_template <- function(name = NULL, path = NULL) {
   stopifnot(!is.null(name))
 
