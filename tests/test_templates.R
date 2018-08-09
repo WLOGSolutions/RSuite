@@ -155,3 +155,71 @@ test_that_template("Template registering", {
 
   expect_templates(expected_templates)
 })
+
+
+test_that_template("Template register using current directory", {
+  # create templates
+  wspace_dir <- get_wspace_dir()
+  create_pkg_test_template(name = "TestTemplate", path = wspace_dir)
+  create_prj_test_template(name = "TestTemplate", path = wspace_dir)
+
+  oldwd <- getwd()
+  setwd(file.path(wspace_dir, "TestTemplate"))
+  on_test_exit(function() {
+    setwd(oldwd) 
+  })
+  
+  RSuite::tmpl_register(path = ".")
+
+  expected_templates <- data.frame(
+    Name = c("TestTemplate"),
+    HasProjectTemplate = c(TRUE),
+    HasPackageTemplate = c(TRUE)
+  )
+
+  expect_templates(expected_templates)
+})
+
+
+test_that_template("Template register using previous directory", {
+  # create templates
+  wspace_dir <- get_wspace_dir()
+  create_pkg_test_template(name = "TestTemplate", path = wspace_dir)
+  create_prj_test_template(name = "TestTemplate", path = wspace_dir)
+
+  oldwd <- getwd()
+  setwd(file.path(wspace_dir, "TestTemplate", "project"))
+  on_test_exit(function() {
+    setwd(oldwd) 
+  })
+  
+  RSuite::tmpl_register(path = "..")
+
+  expected_templates <- data.frame(
+    Name = c("TestTemplate"),
+    HasProjectTemplate = c(TRUE),
+    HasPackageTemplate = c(TRUE)
+  )
+
+  expect_templates(expected_templates)
+})
+
+test_that_template("Template register overwriting", {
+  # create templates
+  wspace_dir <- get_wspace_dir()
+  create_pkg_test_template(name = "TestTemplate", path = wspace_dir)
+  create_prj_test_template(name = "TestTemplate", path = wspace_dir)
+
+  test_template_path <- file.path(wspace_dir, "TestTemplate") 
+  RSuite::tmpl_register(path = test_template_path)
+  expect_log_message(RSuite::tmpl_register(path = test_template_path),
+                     "Overwriting existing template: TestTemplate")
+
+  expected_templates <- data.frame(
+    Name = c("TestTemplate"),
+    HasProjectTemplate = c(TRUE),
+    HasPackageTemplate = c(TRUE)
+  )
+
+  expect_templates(expected_templates)
+})

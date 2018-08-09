@@ -243,12 +243,17 @@ tmpl_register <- function(path = NULL, global = FALSE) {
   assert(!is.null(path), "No template path specified.")
   assert(dir.exists(path), "Directory %s does not exist.", path)
 
+  path <- normalizePath(path)
   if (global) {
     tmpl_dir <- get_global_templ_dir()
     assert(!is.null(tmpl_dir), "Global template directory error.")
   } else{
     tmpl_dir <- get_user_templ_base_dir(create = TRUE) # from 58_templates.R
     assert(!is.null(tmpl_dir), "Local templates directory is not defined(rsuite.user_templ_path)")
+  }
+
+  if (dir.exists(file.path(tmpl_dir, basename(path)))) {
+    pkg_loginfo("Overwriting existing template: %s", basename(path))
   }
 
   success <- file.copy(from = path, to = tmpl_dir, recursive = TRUE) # from 14_setup_structure.R
