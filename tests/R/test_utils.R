@@ -133,9 +133,10 @@ create_lock_test_prj <- function() {
     unlink(file.path("data", "LockTestProjectTemplate"), recursive = TRUE, force = TRUE)
   }
 
+  dir.create("data/LockTestProjectTemplate", recursive = TRUE)
   RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
 
-  prj <- RSuite::prj_start("LockTestProjectTemplate", skip_rc = TRUE, path = "data")
+  prj <- RSuite::prj_start("LockTestProjectTemplate", skip_rc = TRUE, path = "data/LockTestProjectTemplate")
   RSuite::prj_config_set_repo_adapters(repos = c("Dir"), prj = prj)
 
   unlink(file.path(prj$path, "deployment", "libs", "logging"),
@@ -152,6 +153,8 @@ create_lock_test_prj <- function() {
   create_package_deploy_to_lrepo(name = "TestDependencyToRemove", prj = prj, ver = "1.0")
   create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.0")
   create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.1")
+  
+  file.rename("data/LockTestProjectTemplate/LockTestProjectTemplate", "data/LockTestProjectTemplate/project")
 }
 
 init_lock_test_prj <- function() {

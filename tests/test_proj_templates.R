@@ -106,10 +106,10 @@ test_that_template("Project creation using custom template defined in user's loc
 test_that_template("Project creation using custom template (path as argument)", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate")
 
   # check if template contains files from default template
-  file.create(file.path(tmpl_path, "__ProjectName__.txt"))
+  file.create(file.path(tmpl_path, "project", "__ProjectName__.txt"))
 
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = tmpl_path)
@@ -176,11 +176,11 @@ test_that_template("Package creation using custom template defined in user's loc
 test_that_template("Package creation using custom template (path as argument)", {
   # create project template not
   create_pkg_test_template(name = "TestTemplate")
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate")
 
 
   # check if template contains files from default template
-  file.create(file.path(tmpl_path, "__PackageName__.txt"))
+  file.create(file.path(tmpl_path, "package", "__PackageName__.txt"))
 
   # create package using custom template
   prj <- init_test_project(repo_adapters = c("Dir"))
@@ -216,8 +216,8 @@ test_that_template("Project creation using template not containing the PARAMETER
   create_prj_test_template(name = "TestTemplate")
 
   # remove required PARAMETERS file
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
-  unlink(file.path(tmpl_path, "PARAMETERS"))
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate")
+  unlink(file.path(tmpl_path, "project", "PARAMETERS"))
 
   expect_log_message(init_test_project(name = "TestProject", tmpl = tmpl_path),
                regexp = "does not contain required files: PARAMETERS")
@@ -229,8 +229,8 @@ test_that_template("Package creation using template not containing the DESCRIPTI
   create_pkg_test_template(name = "TestTemplate")
 
   # remove required PARAMETERS file
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "package")
-  unlink(file.path(tmpl_path, "DESCRIPTION"))
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate")
+  unlink(file.path(tmpl_path, "package", "DESCRIPTION"))
 
   prj <- init_test_project(name = "TestProject")
 
@@ -252,9 +252,6 @@ test_that_template("Template priority during project/package creation", {
   success <- file.create(file.path(wspace_dir, "builtin", "package", "pkg_builtin.txt"))
   stopifnot(success)
 
-  # register created custom builtin template
-  RSuite::tmpl_register(path = file.path(wspace_dir, "builtin"))
-
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "builtin")
   create_test_package("TestPackage", prj = prj, tmpl = "builtin")
@@ -274,8 +271,7 @@ test_that_template("Template priority during project/package creation", {
     "R/master.R",
     "R/set_env.R",
     "tests/TestProject_Tests.Rproj",
-    "tests/.Rprofile",
-    "prj_builtin.txt"
+    "tests/.Rprofile"
   )
 
   prj_files <- list.files(params$prj_path, all.files = TRUE,
@@ -292,8 +288,7 @@ test_that_template("Template priority during project/package creation", {
     "R",
     "R/package_logger.R",
     "R/package_validation.R",
-    "R/packages_import.R",
-    "pkg_builtin.txt"
+    "R/packages_import.R"
   )
 
   expect_true(all(expected_prj_files %in% prj_files))
@@ -305,7 +300,7 @@ test_that_template("Template priority during project/package creation", {
 test_that_template("Overwriting existing project files", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate")
 
   # check if template contains files from default template
   file.create(file.path(tmpl_path, "TestProjectInfo.txt"))
@@ -333,7 +328,7 @@ test_that_template("Overwriting existing project files", {
 test_that_template("Overwriting existing project files while renaming", {
   # create project template not
   create_prj_test_template(name = "TestTemplate")
-  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate", "project")
+  tmpl_path <- file.path(get_wspace_template_dir(), "TestTemplate")
 
   # check if template contains files from default template
   file.create(file.path(tmpl_path, "__ProjectName__Info.txt"))
@@ -364,7 +359,7 @@ test_that_template("Project creation from empty template", {
   minimal_tmpl_path <- file.path(wspace_dir, "minimal")
 
   # create empty directory
-  dir.create(minimal_tmpl_path)
+  dir.create(file.path(minimal_tmpl_path, "project"), recursive = TRUE)
 
   expect_silent(init_test_project(tmpl = minimal_tmpl_path))
 })
@@ -375,7 +370,7 @@ test_that_template("Package creation from empty template", {
   minimal_tmpl_path <- file.path(wspace_dir, "minimal")
 
   # create empty directory
-  dir.create(minimal_tmpl_path)
+  dir.create(file.path(minimal_tmpl_path, "package"), recursive = TRUE)
 
   prj <- init_test_project()
   expect_silent(create_test_package("TestPackage", prj = prj, tmpl = minimal_tmpl_path))

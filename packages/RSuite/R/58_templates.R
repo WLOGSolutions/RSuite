@@ -55,12 +55,12 @@ get_prj_tmpl_dir <- function(tmpl) {
          "Non empty character(1) required for template name")
 
   # treat tmpl as the path to the template
-  if (dir.exists(tmpl)) {
-    return(tmpl)
+  if (dir.exists(tmpl) && !tmpl %in% tmpl_list_registered()$Name) {
+    return(file.path(tmpl, "project"))
   }
 
   prj_templ_dirs <- file.path(.get_base_tmpl_dirs(tmpl), "project")
-  if (length(prj_templ_dirs) == 0){
+  if (length(prj_templ_dirs) == 0) {
     return(NULL)
   }
 
@@ -88,12 +88,12 @@ get_pkg_tmpl_dir <- function(tmpl) {
          "Non empty character(1) required for name")
 
   # treat tmpl as the path to the template
-  if (dir.exists(tmpl)) {
-    return(tmpl)
+  if (dir.exists(tmpl) && !tmpl %in% tmpl_list_registered()$Name) {
+    return(file.path(tmpl, "package"))
   }
 
   pkg_templ_dirs <- file.path(.get_base_tmpl_dirs(tmpl), "package")
-  if (length(pkg_templ_dirs) == 0){
+  if (length(pkg_templ_dirs) == 0) {
     return(NULL)
   }
 

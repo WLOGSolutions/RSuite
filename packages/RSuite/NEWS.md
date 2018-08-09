@@ -4,6 +4,10 @@
     was present in a preceding repository R Suite was unable to find it.
   * rsuite_get_os_info added to retrieve OS release/version etc.
   * SunOS is supported.
+  * Changed logic when passing template as filepath, it caused issues when creating
+    a project/package from a registered template and a directory with the same name was
+    present in the working directory. If we want to use a template that is present in
+    the working directory we have to like this "./<name_of_template>"
 
 # RSuite 0.31 (2018-07-26)
   * Handling of old (not available in currently selected repositories) packages
@@ -11,7 +15,7 @@
      in sandbox are detected to conform with packages installed in project env.
   * Fedora platform version detection fixed.
   * New template tag added (__LatestMRAN__) which is expanded to latest available
-     MRAN snapshot specification. RSuite searchs from NOW 14 days back checking 
+     MRAN snapshot specification. RSuite searches from NOW 14 days back checking 
      day by day if snapshot is available. This is required due to some days 
      (e.g 2018-07-18) are not available at all.
   * NAMESPACE validation fixed: it supports both import and importFrom clauses.
