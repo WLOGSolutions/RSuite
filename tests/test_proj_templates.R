@@ -72,7 +72,7 @@ test_that_template("Package creation from builtin template", {
 
 test_that_template("Project creation using custom template defined in user's local path", {
   # create project template not
-  create_test_template(name = "TestTemplate", path = get_wspace_template_dir(), skip_pkg = TRUE)
+  create_test_template(name = "TestTemplate", path = get_wspace_template_dir(), add_prj = TRUE)
 
   # create project using custom template
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = "TestTemplate")
@@ -104,7 +104,7 @@ test_that_template("Project creation using custom template defined in user's loc
 
 test_that_template("Project creation using custom template (path as argument)", {
   # create project template not
-  create_test_template(name = "TestTemplate", skip_pkg = TRUE)
+  create_test_template(name = "TestTemplate", add_prj = TRUE)
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate")
 
   # check if template contains files from default template
@@ -142,7 +142,7 @@ test_that_template("Project creation using custom template (path as argument)", 
 
 test_that_template("Package creation using custom template defined in user's local directory", {
   # create project template not
-  create_test_template(name = "TestTemplate", path = get_wspace_template_dir(), skip_prj = FALSE)
+  create_test_template(name = "TestTemplate", path = get_wspace_template_dir(), add_pkg = TRUE)
 
   # create package using custom template
   prj <- init_test_project(repo_adapters = c("Dir"))
@@ -173,7 +173,7 @@ test_that_template("Package creation using custom template defined in user's loc
 
 test_that_template("Package creation using custom template (path as argument)", {
   # create project template not
-  create_test_template(name = "TestTemplate", skip_prj = FALSE)
+  create_test_template(name = "TestTemplate", add_pkg = TRUE)
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate")
 
 
@@ -211,7 +211,7 @@ test_that_template("Package creation using custom template (path as argument)", 
 
 test_that_template("Project creation using a template not containing the PARAMETERS file", {
   # create project template
-  create_test_template(name = "TestTemplate", skip_pkg = TRUE)
+  create_test_template(name = "TestTemplate", add_prj = TRUE)
 
   # remove required PARAMETERS file
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate")
@@ -224,7 +224,7 @@ test_that_template("Project creation using a template not containing the PARAMET
 
 test_that_template("Package creation using a template not containing the DESCRIPTION file", {
   # create package template
-  create_test_template(name = "TestTemplate", skip_prj = TRUE)
+  create_test_template(name = "TestTemplate", add_pkg = TRUE)
 
   # remove required PARAMETERS file
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate")
@@ -242,11 +242,11 @@ test_that_template("Package creation using a template not containing the DESCRIP
 test_that_template("Template priority during project/package creation", {
   # create custom builtin template
   wspace_dir <- get_wspace_dir()
-  create_prj_test_template(name = "builtin", path = wspace_dir)
+  create_test_template(name = "builtin", path = wspace_dir, add_prj = TRUE)
   success <- file.create(file.path(wspace_dir, "builtin", "project", "prj_builtin.txt"))
   stopifnot(success)
 
-  create_pkg_test_template(name = "builtin", path = wspace_dir)
+  create_test_template(name = "builtin", path = wspace_dir, add_pkg = TRUE)
   success <- file.create(file.path(wspace_dir, "builtin", "package", "pkg_builtin.txt"))
   stopifnot(success)
 
@@ -297,7 +297,7 @@ test_that_template("Template priority during project/package creation", {
 
 test_that_template("Overwriting existing project files", {
   # create project template not
-  create_test_template(name = "TestTemplate", skip_pkg = TRUE)
+  create_test_template(name = "TestTemplate", add_prj = TRUE)
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate")
 
   # check if template contains files from default template
@@ -325,7 +325,7 @@ test_that_template("Overwriting existing project files", {
 
 test_that_template("Overwriting existing project files while renaming", {
   # create project template not
-  create_test_template(name = "TestTemplate", skip_pkg = TRUE)
+  create_test_template(name = "TestTemplate", add_prj = TRUE)
   tmpl_path <- file.path(get_wspace_dir(), "TestTemplate")
 
   # check if template contains files from default template

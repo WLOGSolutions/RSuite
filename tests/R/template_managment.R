@@ -6,39 +6,14 @@
 #----------------------------------------------------------------------------
 
 create_test_template <- function(name = NULL, path = get_wspace_dir(),
-                                 skip_prj = FALSE, skip_pkg = FALSE) {
+                                 add_prj = FALSE, add_pkg = FALSE) {
   stopifnot(!is.null(name))
   
-  RSuite::tmpl_start(name, path, skip_prj, skip_pkg)
+  RSuite::tmpl_start(name, path, add_prj, add_pkg)
   
   on_test_exit(function() {
     if (!is.null(path)) {
       unlink(file.path(path, name), recursive = T, force = T)
-    }
-  })
-}
-
-create_prj_test_template <- function(name = NULL, path = NULL) {
-  stopifnot(!is.null(name))
-
-  RSuite::tmpl_start_prj(name, path)
-
-  on_test_exit(function() {
-    if (!is.null(path)) {
-      unlink(path, recursive = T, force = T)
-    }
-  })
-}
-
-
-create_pkg_test_template <- function(name = NULL, path = NULL) {
-  stopifnot(!is.null(name))
-
-  RSuite::tmpl_start_pkg(name, path)
-
-  on_test_exit(function() {
-    if (!is.null(path)) {
-      unlink(path, recursive = T, force = T)
     }
   })
 }
