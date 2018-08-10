@@ -13,6 +13,7 @@ r:
 - 3.3.0
 
 cache: packages
+warnings_are_errors: true
 
 matrix:
   exclude:
