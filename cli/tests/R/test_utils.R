@@ -18,6 +18,23 @@ test_that_managed <- function(desc, ...) {
   })
 }
 
+test_that_template <- function(desc, ...) {
+  tryCatch({
+    # setup test environment options
+    old_option <- options("rsuite.user_templ_path")
+    options(rsuite.user_templ_path = get_wspace_template_dir())
+  
+    on_test_exit(function() {
+      # clean up, set options back to normal
+      options(rsuite.user_templ_path = unlist(old_option))
+      unlink(get_wspace_dir(), recursive = TRUE, force = TRUE)
+    })
+    test_that_managed(desc, ...)
+  }, finally = {
+    fire_cleanups()
+  })
+}
+
 init_test <- function() {
   path <- Sys.getenv("PATH")
 
@@ -47,6 +64,7 @@ on_test_exit <- function(cup) {
 }
 
 get_wspace_dir <- function() { .get_create_dir("wspace") }
+get_wspace_template_dir <- function() { .get_create_dir(file.path("wspace", "templates")) }
 get_data_dir <- function() { .get_create_dir("data") }
 get_log_dir <- function() { .get_create_dir("logs") }
 get_log_file <- function() { file.path(get_log_dir(), sprintf("test_log_%s.log", Sys.Date())) }

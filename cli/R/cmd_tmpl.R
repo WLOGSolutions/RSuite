@@ -32,10 +32,10 @@ sub_commands <- list(
                                "All templates are created by default in the working directory.",
                                "(default: %default)",
                                sep = "\n\t\t")),
-      make_option("--skip_prj", dest = "skip_prj", action = "store_true", default = FALSE,
-                  help = "Skip creating a project template."),
-      make_option("--skip_pkg", dest = "skip_pkg", action = "store_true", default = FALSE,
-                  help = "Skip creating a package template.")
+      make_option("--prj", dest = "add_prj", action = "store_true", default = FALSE,
+                  help = "Include project template."),
+      make_option("--pkg", dest = "add_pkg", action = "store_true", default = FALSE,
+                  help = "Include package template.")
       ),
 
       run = function(opts) {
@@ -46,46 +46,15 @@ sub_commands <- list(
         if (is.na(opts$path) || is.null(opts$path)) {
           opts$path <- getwd()
         }
-        RSuite::tmpl_start(opts$name, opts$path, opts$skip_prj, opts$skip_pkg)
-      }
-  ),
-  pkgadd = list(
-    help = "Create package template.",
-    options = list(
-      make_option(c("-n", "--name"), dest = "name",
-                  help = "Name of the package template to create."),
-      make_option(c("-p", "--path"), dest = "path", default = NULL,
-                  help = paste("Path to the directory where the project template will be created.",
-                               "All templates are created by default in the default template directory.",
-                               "(default: %default)",
-                               sep = "\n\t\t"))
-    ),
-    run = function(opts) {
-      if (is.na(opts$name) || is.null(opts$name)) {
-        stop("Package template name is required. Provide --name argument.")
-      }
 
-      RSuite::tmpl_start_pkg(opts$name, opts$path)
-    }
-  ),
-  prjadd = list(
-    help = "Create project template.",
-    options = list(
-      make_option(c("-n", "--name"), dest = "name",
-                  help = "Name of the project template to create."),
-      make_option(c("-p", "--path"), dest = "path", default = NULL,
-                  help = paste("Path to the directory where the project template will be created.",
-                               "All templates are created by default in the default template directory.",
-                               "(default: %default)",
-                               sep = "\n\t\t"))
-    ),
-    run = function(opts) {
-      if (is.na(opts$name) || is.null(opts$name)) {
-        stop("Project template name is required. Provide --name argument.")
-      }
+        if (!opts$add_prj && !opts$add_pkg) {
+          opts$add_prj <- TRUE
+          opts$add_pkg <- TRUE
+        }
+        print(opts)
 
-      RSuite::tmpl_start_prj(opts$name, opts$path)
-    }
+        RSuite::tmpl_start(opts$name, opts$path, opts$add_prj, opts$add_pkg)
+      }
   ),
   register = list(
     help = "Register template.",
