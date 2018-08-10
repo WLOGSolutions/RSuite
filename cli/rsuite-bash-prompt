@@ -135,12 +135,12 @@ _rsuite() {
 			;;
 		tmpl)
 			if [ $COMP_CWORD == 2 ]; then
-				opts="list prjadd pkgadd register help"
+				opts="list start register help"
 			else
 				case "${COMP_WORDS[2]}" in
-					prjadd|pkgadd)
+					start)
 						if [[ $cur == --* ]]; then
-							opts="--name --path $common_opts_long"
+							opts="--name --path --prj --pkg $common_opts_long"
 						else
 							case "${prev}" in
 								--name|-n)
@@ -151,7 +151,7 @@ _rsuite() {
 									return 0
 									;;
 								*)
-									opts="$common_opts_short"
+									opts="-n -p $common_opts_short"
 									;;
 							esac
 						fi

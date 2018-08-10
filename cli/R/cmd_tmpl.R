@@ -51,7 +51,6 @@ sub_commands <- list(
           opts$add_prj <- TRUE
           opts$add_pkg <- TRUE
         }
-        print(opts)
 
         RSuite::tmpl_start(opts$name, opts$path, opts$add_prj, opts$add_pkg)
       }
