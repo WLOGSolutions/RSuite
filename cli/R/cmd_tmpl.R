@@ -22,6 +22,33 @@ sub_commands <- list(
       RSuite::tmpl_get_registered()
     }
   ),
+  start = list(
+    help = "Create template",
+    options = list(
+      make_option(c("-n", "--name"), dest = "name",
+                  help = "Name of the package template to create."),
+      make_option(c("-p", "--path"), dest = "path", default = NULL,
+                  help = paste("Path to the directory where the project template will be created.",
+                               "All templates are created by default in the working directory.",
+                               "(default: %default)",
+                               sep = "\n\t\t")),
+      make_option("--skip_prj", dest = "skip_prj", action = "store_true", default = FALSE,
+                  help = "Skip creating a project template."),
+      make_option("--skip_pkg", dest = "skip_pkg", action = "store_true", default = FALSE,
+                  help = "Skip creating a package template.")
+      ),
+
+      run = function(opts) {
+        if (is.na(opts$name) || is.null(opts$name)) {
+          stop("Template name is required. Plesase, provide --name argument.")
+        }
+
+        if (is.na(opts$path) || is.null(opts$path)) {
+          opts$path <- getwd()
+        }
+        RSuite::tmpl_start(opts$name, opts$path, opts$skip_prj, opts$skip_pkg)
+      }
+  ),
   pkgadd = list(
     help = "Create package template.",
     options = list(

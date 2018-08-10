@@ -5,6 +5,7 @@ VERSION 0.32 (2018-07-??)
   * `docker build` caches project environment. It speeds up zip building
      process a lot as dependencies from cache need not compilation.
   * `tmpl get` renamed to `tmpl list`
+  * `tmpl start` command added
 
 VERSION 0.31 (2018-07-26)
   * Adapted to new version of RSuite.
