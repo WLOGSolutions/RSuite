@@ -19,7 +19,7 @@ sub_commands <- list(
     options = list(
     ),
     run = function(opts) {
-      RSuite::tmpl_get_registered()
+      RSuite::tmpl_list_registered()
     }
   ),
   start = list(
