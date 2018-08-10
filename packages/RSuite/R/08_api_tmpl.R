@@ -186,8 +186,7 @@ tmpl_start <- function(name, path = getwd(), add_prj = TRUE, add_pkg = TRUE) {
 #'   unlink(user_templ, recursive = TRUE, force = TRUE)
 #' }, add = TRUE)
 #'
-#' tmpl_start_prj(basename(user_templ), path = tempdir())
-#' tmpl_start_pkg(basename(user_templ), path = tempdir())
+#' tmpl_start(basename(user_templ), path = tempdir())
 #' tmpl_register(user_templ)
 #'
 #' @export
