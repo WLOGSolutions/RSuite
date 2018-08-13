@@ -11,6 +11,8 @@
   * Merged tmpl_prjadd, tmpl_pkgadd into tmpl_start previously the user had to create both of those
     components separately. Now the user creates a full template using tmpl_start, but it is possible
     to skip project or package template creation by using specific flags: skip_prj, skip_pkg
+  * Git RC adapter updates: detection of git2r version and using proper head retrieval function,
+    fix handling of s4 classes
 
 # RSuite 0.31 (2018-07-26)
   * Handling of old (not available in currently selected repositories) packages
