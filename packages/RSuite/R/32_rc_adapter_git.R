@@ -183,7 +183,7 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   st <- git2r::status(repo)
 
   # detect head target
-  head_branch <- if (packageVersion("git2r") > "0.21.0") {
+  head_branch <- if (utils::packageVersion("git2r") > "0.21.0") {
     git2r::repository_head(repo)
   } else {
     git2r::head(repo)
