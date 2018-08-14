@@ -11,6 +11,10 @@ r:
 - release
 - devel
 - 3.3.0
+- 3.2.5
+
+env:
+- TravisCI=true
 
 cache: packages
 warnings_are_errors: true
