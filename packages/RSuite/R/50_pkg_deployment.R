@@ -29,8 +29,8 @@ pkg_download <- function(avail_pkgs, dest_dir) {
   dloaded <- data.frame()
 
   common_args <- c(rscript_arg("destdir", dest_dir),
-                   rscript_arg("repos", NULL),
-                   rscript_arg("contriburl", NULL),
+                   rscript_arg("repos", ""),
+                   rscript_arg("contriburl", ""),
                    "quiet = FALSE")
   do_dload <- function(pkgs) {
     in_file <- tempfile(fileext = ".RData")
