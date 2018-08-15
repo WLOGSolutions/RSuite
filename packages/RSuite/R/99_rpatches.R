@@ -107,3 +107,26 @@ rsuite_fullUnifiedPath <- function(path, short = TRUE) {
   }
   return(sub("[/\\]*$", "", path))
 }
+
+
+#'
+#' Retrieve internal package object by name.
+#'
+#' @param package name of package to retrieve internal name from. (type: character(1))
+#' @param name name to retrieve.  (type: character(1))
+#'
+#' @return object found in devtools namespace.
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_pkg_intern <- function(package, name) {
+  search_res <- utils::getAnywhere(name)
+  ixs <- which(search_res$where == sprintf("namespace:%s", package))
+  if (!length(ixs)) {
+    return()
+  }
+  ixs <- ixs[1]
+  return(search_res$objs[[ixs]])
+}
+

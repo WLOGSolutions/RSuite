@@ -1,4 +1,4 @@
-# RSuite 0.32 (2018-08-??)
+# RSuite 0.32 (2018-08-15)
   * Unregistering repo adapters functionality added.
   * Dependency resolving when using multiple repos. Previously if a subdependency
     was present in a preceding repository R Suite was unable to find it.

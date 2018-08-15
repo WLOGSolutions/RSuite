@@ -6,27 +6,6 @@
 #----------------------------------------------------------------------------
 
 #'
-#' Retrieve devtools internal function by name.
-#'
-#' @param name name of function to retrieve
-#'
-#' @return object found in devtools namespace.
-#'
-#' @keywords internal
-#' @noRd
-#'
-.get_devtools_intern <- function(name) {
-  search_res <- utils::getAnywhere(name)
-  ixs <- which(search_res$where == "namespace:devtools")
-  if (!length(ixs)) {
-    return()
-  }
-  ixs <- ixs[1]
-  return(search_res$objs[[ixs]])
-}
-
-
-#'
 #' Common handling of source repository package downloading.
 #'
 #' @param bld_prj project to build package in.
@@ -56,14 +35,14 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
            NULL)
   stopifnot(!is.null(remote_builder_name))
 
-  remote_builder <- .get_devtools_intern(remote_builder_name)
+  remote_builder <- get_pkg_intern("devtools", remote_builder_name) # from 99_rpatches.R
   assert(!is.null(remote_builder),
          "Source repository '%s' handler is not available",
          srcrepo_type)
   remote <- remote_builder(srcrepo, ...)
 
   bundle <- tryCatch({
-    remote_download <- .get_devtools_intern("remote_download")
+    remote_download <- get_pkg_intern("devtools", "remote_download") # from 99_rpatches.R
     remote_download(remote, quiet = FALSE)
   },
   error = function(e) NULL)
@@ -77,7 +56,7 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   bld_params <- bld_prj$load_params()
   if (!file.info(bundle)$isdir) {
     bundle_path <- tryCatch({
-      decompress <- .get_devtools_intern("decompress")
+      decompress <- get_pkg_intern("devtools", "decompress") # from 99_rpatches.R
       decompress(bundle, bld_params$pkgs_path)
     },
     error = function(e) NULL)
@@ -89,7 +68,7 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   }
 
   source <- tryCatch({
-    source_pkg <- .get_devtools_intern("source_pkg")
+    source_pkg <- get_pkg_intern("devtools", "source_pkg") # from 99_rpatches.R
     source_pkg(bundle_path, subdir = remote$subdir)
   },
   error = function(e) NULL)

@@ -33,11 +33,16 @@ sub_commands <- list(
                                "(default: %default)",
                                sep = "\n\t\t")),
       make_option("--prj", dest = "add_prj", action = "store_true", default = FALSE,
-                  help = "Include project template."),
+                  help = paste("Include project template. If non of --prj or --pkg passed will create",
+                               "template which include both project and package template.",
+                               "(default: %default)",
+                               sep = "\n\t\t")),
       make_option("--pkg", dest = "add_pkg", action = "store_true", default = FALSE,
-                  help = "Include package template.")
+                  help = paste("Include package template. If non of --prj or --pkg passed will create",
+                               "template which include both project and package template.",
+                               "(default: %default)",
+                               sep = "\n\t\t"))
       ),
-
       run = function(opts) {
         if (is.na(opts$name) || is.null(opts$name)) {
           stop("Template name is required. Plesase, provide --name argument.")

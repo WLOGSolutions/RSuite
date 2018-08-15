@@ -1,4 +1,4 @@
-VERSION 0.32 (2018-07-??)
+VERSION 0.32 (2018-07-15)
   * Handling of errors in running docker commands fixed.
   * `docker update` command added which updates all rsuite containers
      to newer versions.
