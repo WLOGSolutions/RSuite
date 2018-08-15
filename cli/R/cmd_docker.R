@@ -68,6 +68,7 @@ sub_commands <- list(
                                                       version = opts$version,
                                                       pkgs = opts$pkgs,
                                                       exc_master = opts$exc_master,
+                                                      no_cache = FALSE,
                                                       zip = opts$dest))
       return(invisible(zip_fpath))
     }
