@@ -88,7 +88,7 @@ test_that_managed("Multiple repositories subdependency in previous repo.", {
                                 repo_manager = repo_manager$repo_mgr,
                                 deps = "TestSubdependency",
                                 type = "source")
-  
+
   create_test_package("TestPackage", prj, deps = c("TestDependency (== 1.0)",
                                                    "TestDependency"))
 
@@ -114,22 +114,22 @@ test_that_managed("Multiple repositories subsubdependency -> subdependency -> de
                                              sprintf("Dir3[%s]", dir3_repo_manager$path)))
 
   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  
+
   # upload subdependency to first repo
   create_package_deploy_to_lrepo(name = "TestDependency1", prj = prj, type = "source")
-  
+
   # upload dependency to second repo
   create_package_deploy_to_repo("TestDependency2", prj = prj,
                                 repo_manager = dir2_repo_manager$repo_mgr,
                                 deps = "TestDependency1",
                                 type = "source")
-  
+
   # upload dependency to third repo
   create_package_deploy_to_repo("TestDependency3", prj = prj,
                                 repo_manager = dir3_repo_manager$repo_mgr,
                                 deps = "TestDependency2",
                                 type = "source")
-  
+
   create_test_package("TestPackage", prj, deps = c("TestDependency3"))
 
   RSuite::prj_install_deps(prj)
@@ -150,13 +150,13 @@ test_that_managed("Multiple repositories subdependency in next repo.", {
   prj <- init_test_project(repo_adapters = c("Dir", sprintf("TestDir[%s]", repo_manager$path)))
 
   deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  
+
   # upload subdependency to first repo
   create_package_deploy_to_repo(name = "TestSubdependency",
                                 repo_manager = repo_manager$repo_mgr,
                                 prj = prj,
                                 type = "source")
-  
+
   # upload dependency to second repo
   create_package_deploy_to_lrepo("TestDependency", prj = prj,
                                 deps = "TestSubdependency",
@@ -183,4 +183,4 @@ test_that_managed("Multiple repositories unavailable dependency.", {
   create_test_package("TestPackage", prj, deps = c("TestDependency"))
 
   expect_error(RSuite::prj_install_deps(prj), "Required dependencies are not available: TestDependency")
-}) 
+})

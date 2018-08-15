@@ -255,9 +255,15 @@ collect_dir_script_deps <- function(dir, recursive = TRUE) {
     X = script_files,
     FUN = function(sf){
       lns <- readLines(sf)
+
       loads <- lns[grepl("^\\s*(require|library)\\((.+)\\)", lns)]
       loads <- gsub("\\s+", "", loads) # remove extra spaces
-      gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
+      explicit_pkgs <- gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
+
+      uses <- lns[grepl("^\\s*([^#]*[^A-Za-z0-9.#])?([A-Za-z0-9.]+)\\s*:::?.+$", lns)]
+      implicit_pkgs <- gsub("^(.*[^A-Za-z0-9.])?([A-Za-z0-9.]+)\\s*:::?.+$", "\\2", uses)
+
+      return(c(explicit_pkgs, implicit_pkgs))
     }))
   return(unique(pkgs))
 }
