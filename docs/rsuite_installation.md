@@ -59,18 +59,15 @@ $ rsuite install -v
 
 # Basic installation
 
-You can simply install R Suite from WLOG S3 repository executing the following command
-in your R environment:
+You can simply install R Suite in your R environment from [CRAN](https://cran.r-project.org/package=RSuite)
+executing the following command:
 
 ```bash
-> install.packages('RSuite', repo = c(options('repos'), 'http://wlog-rsuite.s3.amazonaws.com'))
+> install.packages('RSuite')
 ```
 
 It will install the latest released version of R Suite in the first folder mentioned in 
-.libPaths().
-
-The complicated parameter repo instructs install.packages to use beside standard repositories
-also R Suite repository located in S3 bundle.
+.libPaths() which is usually your user R packages folder.
 
 # Development version installation
 

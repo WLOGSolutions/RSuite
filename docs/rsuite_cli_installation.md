@@ -26,7 +26,7 @@ If you are stuck feel free to contact us:
 # Windows installation
 
 For Windows R Suite CLI is provided as MSI packages for both x86 and x64 platforms. You can just download the appropriate MSI and run it.
-It will install R Suite CLI and will add a reference to it to your PATH so then when you open the console rsuite command will be available. 
+It will install R Suite CLI and will add a reference to it to your PATH so when you open the console rsuite command will be available. 
 
 You can check that everything installed properly with the following command:
 
@@ -85,12 +85,24 @@ You can check that everything installed properly with the following command:
 $ rsuite version
 ```
 
+# Mac OS installation
+
+For Mac OS R Suite CLI is provided as PKG packages. You can just download it and let Mac OS package manager do the rest.
+It will install R Suite CLI and will link it to /usr/local/bin/rsuite so when you open terminal rsuite command will be available. 
+
+You can check that everything installed properly with the following command:
+
+``` bash
+$ rsuite version
+```
+
+
 # After you installed R Suite CLI
 
 After R Suite CLI is installed you probably will need to install the R Suite package into you R environment:
 
 ``` bash
-rsuite install
+> rsuite install
 ```
 
 For the full description of how to use R Suite CLI please refer to [R Suite CLI reference manual](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md).
