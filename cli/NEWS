@@ -1,4 +1,8 @@
-VERSION 0.32 (2018-07-15)
+VERSION 0.33 (2018-08-??)
+  * installation of RSuite fixed to user not only package available on CRAN:
+    it considers also user provided package and WLOG S3 repository.
+
+VERSION 0.32 (2018-08-15)
   * Handling of errors in running docker commands fixed.
   * `docker update` command added which updates all rsuite containers
      to newer versions.

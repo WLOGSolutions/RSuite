@@ -149,7 +149,7 @@ tryCatch({
 
   # install RSuite from local repository, dependencies (and other packages) are from CRAN
   utils::install.packages(pkgs,
-                          repos = c(CRAN = cran_path, Local = paste0("file:///", tmp_dir)),
+                          repos = c(Local = paste0("file:///", tmp_dir), CRAN = cran_path),
                           quiet = !opts$verbose,
                           verbose = opts$verbose)
 }, finally = {setwd(wd)})
