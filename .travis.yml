@@ -48,3 +48,6 @@ script:
 - Rscript -e 'devtools::install()' --no-init-file
 - cd ../../tests
 - Rscript run_tests.R
+
+after_script:
+- cat logs/*
