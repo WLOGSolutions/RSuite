@@ -25,6 +25,7 @@ environment:
   - R_VERSION: release
   - R_VERSION: 3.3.0
   - R_VERSION: 3.2.5
+    RTOOLS_VERSION: 33
 
 
 build_script:
