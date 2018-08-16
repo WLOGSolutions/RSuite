@@ -185,7 +185,8 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   # detect head target
   # in git2r > 0.21.0 head is depricated and cause warning: repository_head should be used
   # in earlier versions repository_head is not available and check will complain if referencing it directly
-  head_branch <- if (utils::compareVersion(utils::packageVersion("git2r"), "0.21.0") > 0) {
+  git2r_ver <- paste0(utils::packageVersion("git2r"))
+  head_branch <- if (utils::compareVersion(git2r_ver, "0.21.0") > 0) {
     get_pkg_intern("git2r", "repository_head") # from 99_rpatches.R
   } else {
     git2r::head(repo)
