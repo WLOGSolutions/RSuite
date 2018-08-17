@@ -246,7 +246,7 @@ The final package template should have the following file structure:
         packages_import.R
         package_logger.R
         package_validation.R
-        run_app.R
+       <font color="blue"><b> run_app.R </b></font>
 </pre>
 
 In order to make our template as complete as possible, we are going to additionally prepare a project template.
@@ -307,6 +307,7 @@ args <- args_parser()
 
 <font color="blue"><b>library(myShinyApp)
 run_app(port = as.numeric(config$port), host = config$host) </b></font>
+
 </pre>
 
 Finally, let's install dependencies, build the project and run our app
