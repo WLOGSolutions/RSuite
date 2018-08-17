@@ -319,7 +319,7 @@ Rscript R/master.R
 
 If our Shiny app is running, it should be available at http://localhost:8888/.
 
-![Shiny app](media/templates_shiny.PNG)
+![Shiny app](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/templates_shiny.PNG)
 
 We have created a template for developing Shiny applications using our favourite CSS theme. It allows us to  keep the reproducibility and ready to deploy features that R Suite provides and we can focus solely on the application related development.
 
@@ -467,7 +467,7 @@ rsuite proj depsinst
 Rscript R/master.R
 ```
 
-![R Markdown example](./media/templates_rmarkdown.PNG)
+![R Markdown example](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/templates_rmarkdown.PNG)
 
 # Summary
 R Suite templates provide a very flexible way of tailoring projects and packages to fit specific needs. By creating templates we can automate repetitive tasks that are associated with project and package configuration. The examples presented in this document are only a sample of potentially unlimited capabilities. However, it is important to remember that it is an advanced functionality that used improperly might cause unexpected errors when using other R Suite functionalities.
