@@ -14,30 +14,23 @@
 
 (require 'dired)
 
-(defvar rsuite-verbose nil "Make rsuite verbose.")
-(defvar rsuite-docker-platforms
+(defvar rsuite/verbose nil "Make rsuite verbose.")
+(defvar rsuite/docker-platforms
   (list "ubuntu" "centos")
   "Docker platforms supported by R Suite.")
 (defconst rsuite/buffer "rsuite" "Buffer for rsuite output.")
 (defconst rsuite/err_buffer "rsuite:error" "Buffer for rsuite error output.")
 (defconst rsuite/cli "rsuite" "Path to RSuite CLI.")
 
-(defun rsuite-toggle-verbose ()
-  "Toggle R Suite verbosity."
-  (interactive)
-  (if rsuite-verbose
-      (setq rsuite-verbose nil)
-    (setq rsuite-verbose 1)))
-
 (defun run-async-rsuite (args)
   "Utility for running rsuite cli.
 ARGS is a string of arguments forwarded to rsuite cli."
-  (async-shell-command (concat rsuite/cli " " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
+  (async-shell-command (concat rsuite/cli " " (concat args (if rsuite/verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
 
 (defun run-sync-rsuite (args)
   "Utility for running rsuite cli.
 ARGS is a string of arguments forwarded to rsuite cli."
-  (shell-command (concat rsuite/cli " " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
+  (shell-command (concat rsuite/cli " " (concat args (if rsuite/verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
 
 (defun rsuite-detect-prj-path ()
   "Return R Suite's project path or throws error if none found."
@@ -57,6 +50,12 @@ ARGS is a string of arguments forwarded to rsuite cli."
       )
     curr-dir))
 
+(defun rsuite-toggle-verbose ()
+  "Toggle R Suite verbosity."
+  (interactive)
+  (if rsuite/verbose
+      (setq rsuite/verbose nil)
+    (setq rsuite/verbose 1)))
 
 (defun rsuite-proj-start ()
   "Start project."
@@ -150,7 +149,7 @@ ARGS is a string of arguments forwarded to rsuite cli."
 	(rcmd "docker zip"))
     (setq version (read-string "Version: "))
     (setq path (read-directory-name "Path: "))
-    (setq platform (ido-completing-read "Platform: " rsuite-docker-platforms))
+    (setq platform (ido-completing-read "Platform: " rsuite/docker-platforms))
     (setq rcmd (concat rcmd
 		       " --dest=" path
 		       " --platform=" platform))
@@ -169,7 +168,7 @@ ARGS is a string of arguments forwarded to rsuite cli."
     
     (setq version (read-string "Version: "))
     (setq tag (read-string "Tag: "))
-    (setq platform (ido-completing-read "Platform: " rsuite-docker-platforms))
+    (setq platform (ido-completing-read "Platform: " rsuite/docker-platforms))
     (setq rcmd (concat rcmd
 		       " --tag=" tag
 		       " --platform=" platform))
@@ -245,17 +244,22 @@ If file exists it is opened.  Otherwise it is created and filled with R Suite in
 	  (goto-char (point-max))
 	  )
       (progn
-       (write-region
-	"# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
+	(write-region
+	 "# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
 script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub(\"--file=\", \"\", args[grep(\"--file=\", args)]))
-	if (!length(script_path)) { return(\".\") }
-	return(normalizePath(script_path))
+  args <- commandArgs(trailingOnly = FALSE)
+  script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
+  if (!length(script_path)) {
+    return("R")
+  }
+  if (grepl("darwin", R.version$os)) {
+    base <- gsub("~\\+~", " ", base) # on MacOS ~+~ in path denotes whitespace
+  }
+  return(normalizePath(script_path))
 })()
 
 # Setting .libPaths() to point to libs folder
-source(file.path(script_path, \"set_env.R\"), chdir = T)
+source(file.path(script_path, "set_env.R"), chdir = T)
 
 config <- load_config()
 args <- args_parser()
