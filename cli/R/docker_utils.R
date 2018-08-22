@@ -6,6 +6,18 @@
 #----------------------------------------------------------------------------
 
 
+.error_if <- function(cond, base_msg, ext_errs = c()) {
+  if (!cond) {
+    return()
+  }
+
+  for(m in gsub("^ERROR: ", "", ext_errs)) {
+    write(sprintf("ERROR: %s", m), stderr())
+  }
+  stop(base_msg)
+}
+
+
 #'
 #' Retrieves full path to docker command.
 #'
@@ -114,13 +126,16 @@ run_container <- function(docker_image, name) {
   } else {
     cont_name <- paste0("rsbuild-", name)
   }
-  loginfo("Starting container %s based on %s image ...", cont_name, docker_image)
-  output <- exec_docker_cmd(c("run", "--name", cont_name, "-d", docker_image),
-                            sprintf("Starting container %s based on %s", cont_name, docker_image))
-  if (output$ret_code != 0) {
-    stop(sprintf("Failed to start container based on %s image", docker_image))
-  }
-  loginfo("... done.")
+
+  cmd_desc <- sprintf("Starting container %s based on %s", cont_name, docker_image)
+  loginfo("%s ...", cmd_desc)
+
+  output <- exec_docker_cmd(c("run", "--name", cont_name, "-d", docker_image), cmd_desc)
+  .error_if(output$ret_code != 0,
+            base_msg = sprintf("%s failed", cmd_desc),
+            ext_errs = output$err_lines)
+
+  loginfo("%s ... done.", cmd_desc)
   return(cont_name)
 }
 
@@ -130,10 +145,15 @@ run_container <- function(docker_image, name) {
 #' @return invisible command output with errcode.
 #'
 run_incont_cmd <- function(cont_name, cmd) {
-  loginfo("Running command '%s' in %s container ...", cmd, cont_name)
-  result <- exec_docker_cmd(c("exec", "-i", cont_name, "sh", "-c", shQuote(cmd)),
-                            sprintf("Running command '%s' in %s container", cmd, cont_name))
-  loginfo("... done.")
+  cmd_desc <- sprintf("[%s] Running command '%s'", cont_name, cmd)
+  loginfo("%s ...", cmd_desc)
+
+  result <- exec_docker_cmd(c("exec", "-i", cont_name, "sh", "-c", shQuote(cmd)), cmd_desc)
+  .error_if(result$ret_code != 0,
+            base_msg = sprintf("%s failed", cmd_desc),
+            ext_errs = result$err_lines)
+
+  loginfo("%s ... done.", cmd_desc)
   return(invisible(result))
 }
 
@@ -141,10 +161,11 @@ run_incont_cmd <- function(cont_name, cmd) {
 #' Stops docker container passed and removes it completely.
 #'
 stop_container <- function(cont_name) {
-  loginfo("Removing container %s ...", cont_name)
-  exec_docker_cmd(c("rm", "-f", cont_name),
-                  sprintf("Removing container %s", cont_name))
-  loginfo("... done.")
+  cmd_desc <- sprintf("Removing container %s", cont_name)
+
+  loginfo("%s ...", cmd_desc)
+  exec_docker_cmd(c("rm", "-f", cont_name), cmd_desc)
+  loginfo("%s ... done.", cmd_desc)
 }
 
 #'
@@ -255,18 +276,19 @@ build_incont_cache_fpath <- function(cont_name, cont_img, prj) {
 #' Retrieves project environment from container and stores it into cache file
 #'
 cache_incont_env <- function(cont_name, prj_name, cache_fpath) {
-  loginfo("Caching project environment into %s ...", cache_fpath)
+  cmd_desc <- sprintf("Caching project environment into %s", cache_fpath)
+  loginfo("%s ...", cmd_desc)
 
   if (!dir.exists(dirname(cache_fpath))) {
     dir.create(dirname(cache_fpath), recursive = TRUE, showWarnings = FALSE)
   }
 
   cache_fname <- basename(cache_fpath)
-  run_incont_cmd(cont_name, sprintf("cd %s && zip -qr /tmp/%s ./deployment", prj_name, cache_fname)) # ...
+  run_incont_cmd(cont_name, sprintf("cd %s && zip -qr /tmp/%s deployment/libs deployment/sbox", prj_name, cache_fname)) # ...
   exec_docker_cmd(c("cp", sprintf("%s:/tmp/%s", cont_name, cache_fname), cache_fpath), # ...
                   "Copying project cache from container")
 
-  loginfo("... done.")
+  loginfo("%s ... done.", cmd_desc)
 }
 
 #'
@@ -279,12 +301,13 @@ decache_incont_env <- function(cont_name, prj_name, cache_fpath) {
     return(invisible(FALSE))
   }
 
-  loginfo("Copying project cache into container (%s) ...", cache_fpath)
+  cmd_desc <- sprintf("Copying project cache into container (%s)", cache_fpath)
+  loginfo("%s ...", cmd_desc)
 
   exec_docker_cmd(c("cp", cache_fpath, sprintf("%s:/tmp/", cont_name)), "Copying project cache into container")
   run_incont_cmd(cont_name,
                  sprintf("cd %s && unzip -qu /tmp/%s && rm -f /tmp/%s", prj_name, cache_fname, cache_fname))
 
-  loginfo("... done.")
+  loginfo("%s ... done.", cmd_desc)
   return(invisible(TRUE))
 }

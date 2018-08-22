@@ -8,7 +8,7 @@ if [ -z "$rscript_path" ]; then
 fi
 
 basedir=$(dirname "$0")
-basedir=$("$rscript_path" -e "cat(normalizePath('$basedir'))")
+basedir=$("$rscript_path" --no-init-file -e "cat(normalizePath('$basedir'))")
 
 cmd="$1"
 if [ -z "$cmd" ]; then

@@ -347,7 +347,7 @@ sub_commands <- list(
       loginfo("Copying project pack into container %s ...", cont_name)
       exec_docker_cmd(c("cp", pack_fpath, sprintf("%s:/opt/", cont_name)), # from docker_utils.R
                       "Copying project pack into container")
-      loginfo("... done.")
+      loginfo("Copying project pack into container %s ... done.", cont_name)
 
       prj_name <- prj$load_params()$get_safe_project_name()
 
@@ -393,7 +393,7 @@ sub_commands <- list(
       loginfo("Copying project deployment zip back from container %s ...", cont_name)
       exec_docker_cmd(c("cp", sprintf("%s:/opt/%s", cont_name, zip_name), opts$zip), # ...
                       "Copying project deployment zip back from container")
-      loginfo("... done.")
+      loginfo("Copying project deployment zip back from container %s ... done.", cont_name)
 
       return(invisible(zip_fpath))
     }
