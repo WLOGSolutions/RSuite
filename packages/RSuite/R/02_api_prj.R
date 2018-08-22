@@ -827,29 +827,23 @@ prj_lock_env <- function(prj = NULL) {
   stopifnot(!is.null(prj))
   params <- prj$load_params()
 
-  # Retrieve direct dependencies
-  prj_dep_vers <- collect_prj_direct_deps(params)        # from 52_dependencies.R
+  uninst_deps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
 
   prj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
-  prj_dep_vers <- vers.rm(prj_dep_vers, prj_pkgs)
+  uninst_deps <- vers.rm(uninst_deps, prj_pkgs)
 
-  # Retrieve installed packages
-  env_pkgs <- as.data.frame(utils::installed.packages(lib.loc = params$lib_path),
-                            stringsAsFactors = FALSE)[, c("Package", "Version")]
-
-  # Check if direct dependencies are installed
-  missing_deps_vers <- vers.rm_acceptable(prj_dep_vers, env_pkgs)
-  assert(vers.is_empty(missing_deps_vers),
+  assert(vers.is_empty(uninst_deps),
          paste0("Some dependencies are not installed in project env: %s.",
                 " Please, build project environment first."),
-         paste(vers.get_names(missing_deps_vers), collapse = ","))
+         paste(vers.get_names(uninst_deps), collapse = ","))
+
+  env_pkgs <- collect_installed_pkgs(params)$valid # from 52_dependencies.R
+  required <- collect_prj_required_dep_names(params, env_pkgs) # from 52_dependencies.R
 
   # Create lock data and save to 'env.lock' file
-  lock_data <- env_pkgs[!(env_pkgs$Package %in% prj_pkgs), ]
+  lock_data <- env_pkgs[env_pkgs$Package %in% required, c("Package", "Version")]
   write.dcf(lock_data, file = params$lock_path)
   pkg_loginfo("The project environment was locked successfully")
-
-  pkg_loginfo("Project environment has been locked")
 }
 
 #'

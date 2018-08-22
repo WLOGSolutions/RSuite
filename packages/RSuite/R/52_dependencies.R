@@ -7,6 +7,34 @@
 #----------------------------------------------------------------------------
 
 #'
+#' Detects packages installed in project local encironment.
+#'
+#' @param params object of rsuite_project_params class
+#'
+#' @return named list with of following structure
+#' \describe{
+#'   \item{valid}{
+#'     data.frame (compatible with instaled.packages result)
+#'     describing installed packages build for compatible R version
+#'   }
+#'   \item{invalid}{
+#'     data.frame (compatible with instaled.packages result)
+#'     describing installed packages build for in-compatible R version
+#'  }
+#' }
+#'
+#' @keywords internal
+#' @noRd
+#'
+collect_installed_pkgs <- function(params) {
+  installed <- as.data.frame(utils::installed.packages(params$lib_path), stringsAsFactors = FALSE)
+  is_rver_valid <- majmin_rver(installed$Built) == majmin_rver(params$r_ver)
+  return(list(valid = installed[is_rver_valid, ],
+              invalid = installed[!is_rver_valid, ]))
+}
+
+
+#'
 #' Detects direct uninstalled project dependencies
 #'
 #' @param params object of rsuite_project_params class
@@ -19,9 +47,9 @@
 #'
 collect_uninstalled_direct_deps <- function(params) {
   dep_vers <- collect_prj_direct_deps(params)
-  installed <- as.data.frame(utils::installed.packages(params$lib_path),
-                             stringsAsFactors = FALSE)[, c("Package", "Version")]
+  installed <- collect_installed_pkgs(params)$valid
   dep_vers <- vers.rm_acceptable(dep_vers, installed)
+  return(dep_vers)
 }
 
 #'
@@ -339,6 +367,32 @@ get_lock_env_vers <- function(params) {
   return(env_lock_vers)
 }
 
+#'
+#' Collects names of packages required by the project based on information
+#' provided in installed.
+#'
+#' @param params project parameters. (type: rsuite_project_params)
+#' @param installed data.frame compatible with installed.packages.
+#'
+#' @retrun names of required by the project packages. (type: character(N))
+#'
+#' @keywords internal
+#' @noRd
+#'
+collect_prj_required_dep_names <- function(params, installed) {
+  deps <- collect_prj_direct_deps(params)
+
+  # to satisfy collect_all_subseq_deps requirements
+  installed$Repository <- rep(params$lib_path, nrow(installed))
+  installed$File <- rep(NA, nrow(installed))
+
+  cr <- collect_all_subseq_deps(deps, all_pkgs = installed)
+
+  proj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
+  required <- c(cr$get_found_names(), proj_pkgs)
+
+  return(required)
+}
 
 #' Locks the project dependencies.
 #'

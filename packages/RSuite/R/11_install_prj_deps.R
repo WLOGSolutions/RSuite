@@ -517,24 +517,14 @@ pkg_inst_order <- function(pkgs, db) {
 #' @keywords internal
 #'
 clean_prj_deps <- function(params) {
-  all_installed <- data.frame(utils::installed.packages(lib.loc = params$lib_path), stringsAsFactors = FALSE)
+  all_installed <- collect_installed_pkgs(params) # from 52_dependencies.R
+  installed <- all_installed$valid
 
-  is_rver_valid <- majmin_rver(all_installed$Built) == majmin_rver(params$r_ver)
-  installed <- all_installed[is_rver_valid, ]
+  required <- collect_prj_required_dep_names(params, installed) # from 53_dependencies.R
+  proj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
 
-  deps <- collect_prj_direct_deps(params) # from 52_dependencies.R
-
-  # to satisfy collect_all_subseq_deps requirements
-  installed$Repository <- rep(params$lib_path, nrow(installed))
-  installed$File <- rep(NA, nrow(installed))
-
-  cr <- collect_all_subseq_deps(deps, all_pkgs = installed) # from 52_dependencies.R
-
-  proj_pkgs <- build_project_pkgslist(params$pkgs_path)
-
-  required <- c(cr$get_found_names(), proj_pkgs)
   to_clean <- c(setdiff(installed$Package, required), # non required
-                setdiff(all_installed[!is_rver_valid, "Package"], proj_pkgs))  # invalid
+                setdiff(all_installed$invalid[, "Package"], proj_pkgs))  # invalid
 
   if (!length(to_clean)) {
     pkg_loginfo("All installed packages are required by the project.")
