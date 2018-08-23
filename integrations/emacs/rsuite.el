@@ -268,6 +268,29 @@ args <- args_parser()
        (find-file m_name)
        (goto-char (point-max))))))
 
+(defun rsuite-sysreqs-collect ()
+  "Collect and display system requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs collect"))
+          (run-async-rsuite rcmd)))
+
+(defun rsuite-sysreqs-check ()
+  "Check current system against required requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs check"))
+    (run-async-rsuite rcmd)))
+
+(defun rsuite-sysreqs-script ()
+  "Collect and display system requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs script"))
+          (run-async-rsuite rcmd)))
+
+(defun rsuite-sysreqs-install ()
+  "Install system requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs install"))
+          (run-async-rsuite rcmd)))
 
 ;; ;; a simple major mode, mymath-mode
 
