@@ -13,10 +13,11 @@
 ;;; Code:
 
 (require 'dired)
+(require 'ivy)
 
 (defvar rsuite/verbose nil "Make rsuite verbose.")
 (defvar rsuite/docker-platforms
-  (list "ubuntu" "centos")
+  (list "ubuntu" "centos" "debian")
   "Docker platforms supported by R Suite.")
 (defconst rsuite/buffer "rsuite" "Buffer for rsuite output.")
 (defconst rsuite/err_buffer "rsuite:error" "Buffer for rsuite error output.")
@@ -50,6 +51,10 @@ ARGS is a string of arguments forwarded to rsuite cli."
       )
     curr-dir))
 
+(defun rsuite-get-templates ()
+  "Generate list of available R Suite templates."
+  (cons "builtin" (directory-files "~/.rsuite/templates" nil "^[^.].*" nil)))
+
 (defun rsuite-toggle-verbose ()
   "Toggle R Suite verbosity."
   (interactive)
@@ -66,7 +71,7 @@ ARGS is a string of arguments forwarded to rsuite cli."
     
     (setq proj_path (read-directory-name "Project path: "))
     (setq proj_name (read-string (concat "Give project name: " proj_path)))
-    (setq proj_tmpl (read-string (concat "Give project template: " proj_tmpl)))
+    (setq proj_tmpl (ivy-read "Give project template: " (rsuite-get-templates)))
     (cd proj_path)
     (if (> (length proj_tmpl) 0)
 	(run-sync-rsuite (concat "proj start --name=" proj_name " --tmpl=" proj_tmpl))
@@ -80,7 +85,7 @@ ARGS is a string of arguments forwarded to rsuite cli."
   (let ((pkg_name nil)
 	(pkg_tmpl nil))
     (setq pkg_name (read-string "Give package name: "))
-    (setq pkg_tmpl (read-string "Give package template: "))
+    (setq pkg_tmpl (ivy-read "Give package template: " (rsuite-get-templates)))
     (if (> (length pkg_tmpl) 0)
 	(run-async-rsuite (concat "proj pkgadd --name=" pkg_name " --tmpl=" pkg_tmpl))
       (run-async-rsuite (concat "proj pkgadd --name=" pkg_name)))))
@@ -149,7 +154,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
 	(rcmd "docker zip"))
     (setq version (read-string "Version: "))
     (setq path (read-directory-name "Path: "))
-    (setq platform (ido-completing-read "Platform: " rsuite/docker-platforms))
+    (setq platform (ivy-read
+		    "Platform: "
+		    rsuite/docker-platforms))
     (setq rcmd (concat rcmd
 		       " --dest=" path
 		       " --platform=" platform))
@@ -168,7 +175,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
     
     (setq version (read-string "Version: "))
     (setq tag (read-string "Tag: "))
-    (setq platform (ido-completing-read "Platform: " rsuite/docker-platforms))
+    (setq platform (ivy-read
+		    "Platform: "
+		    rsuite/docker-platforms))
     (setq rcmd (concat rcmd
 		       " --tag=" tag
 		       " --platform=" platform))
