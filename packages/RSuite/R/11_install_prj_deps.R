@@ -137,6 +137,15 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   prj_dep_vers <- vers.rm(prj_dep_vers, project_packages)
 
+  if (file.exists(params$lock_path)) { # if locked
+    # apply lock requirements
+    env_lock_vers <- get_lock_env_vers(params) #from 52_dependencies.R
+    env_lock_vers <- vers.rm(env_lock_vers, project_packages)
+    env_lock_vers <- vers.rm(env_lock_vers, # remove non required locks
+                             setdiff(vers.get_names(env_lock_vers), vers.get_names(prj_dep_vers)))
+
+    prj_dep_vers <- vers.union(prj_dep_vers, env_lock_vers)
+  }
 
   pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)
   avail_vers <- resolve_dependencies(prj_dep_vers, repo_infos = repo_infos, pkg_types = pkg_types)
@@ -289,7 +298,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
   stopifnot(avail_vers$has_avails())
   stopifnot(is_nonempty_char1(lib_dir))
 
-  remove_installed <- function(vers, check_built_rver) {
+  remove_installed <- function(vers, check_built_rver, notify_on_update) {
     installed <- as.data.frame(utils::installed.packages(lib.loc = lib_dir),
                                stringsAsFactors = FALSE)[, c("Package", "Version", "Built")]
     if (any(check_built_rver)) {
@@ -298,12 +307,11 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
 
     avails <- vers$get_avails()
     if (nrow(avails) != 0) {
-      missing <- merge(installed, avails, by = c("Package", "Version"))
-      missing <- installed[!installed$Package %in% missing$Package, ]
+      present <- merge(installed, avails, by = c("Package", "Version"))
+      missing <- installed[!(installed$Package %in% present$Package), ]
 
-      if (length(missing$Package) != 0) {
-        pkg_loginfo("The following packages are no longer available in the repository and will be updated: %s",
-                    missing$Package)
+      if (length(missing$Package) != 0 && notify_on_update) {
+        pkg_loginfo("Following installed packages will be updated: %s", missing$Package)
       }
 
       # remove deprecated packages from installed so they get updated
@@ -314,7 +322,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
   }
 
   is_r_stable <- !grepl("unstable", R.version$status)
-  avail_vers <- remove_installed(avail_vers, is_r_stable)
+  avail_vers <- remove_installed(avail_vers, is_r_stable, notify_on_update = TRUE)
   if (vers.is_empty(avail_vers)) {
     pkg_loginfo("No dependencies to install.")
     return(invisible())
@@ -343,7 +351,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
               rver = rver,
               check_repos_consistency = check_repos_consistency)
 
-  avail_vers <- remove_installed(avail_vers, check_repos_consistency)
+  avail_vers <- remove_installed(avail_vers, check_repos_consistency, notify_on_update = FALSE)
   assert(vers.is_empty(avail_vers),
          "Failed to install some dependencies: %s", paste(vers.get_names(avail_vers), collapse = ", "))
   pkg_loginfo("All dependencies successfully installed.")

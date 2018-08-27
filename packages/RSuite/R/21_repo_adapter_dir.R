@@ -76,7 +76,7 @@ repo_adapter_get_info.rsuite_repo_adapter_dir <- function(repo_adapter, params) 
 #'
 repo_adapter_get_path.rsuite_repo_adapter_dir <- function(repo_adapter, params, ix = NA) {
   full_path <- repo_adapter$get_full_path(params, ix)
-  return(paste0("file:///", full_path))
+  return(path2local_url(full_path)) # from 99_rpatches.R
 }
 
 #'

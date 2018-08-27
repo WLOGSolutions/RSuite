@@ -73,10 +73,10 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
                              pkg_type,
                              skip_build_steps = c("docs", "imps", "rcpp_attribs", "tests", "vignettes"))
 
-  res_url <- sprintf("file:///%s",
-                     rsuite_contrib_url(bld_params$irepo_path,
-                                        type = pkg_type,
-                                        rver = rver))
+  res_url <- path2local_url( # from 99_rpatches.R
+    rsuite_contrib_url(bld_params$irepo_path,
+                       type = pkg_type,
+                       rver = rver))
   res_avails <- vers.get_available_pkgs(avail_pkgs$Package, res_url)
   failed_pkgs <- setdiff(avail_pkgs$Package, res_avails$Package)
   assert(!length(failed_pkgs),

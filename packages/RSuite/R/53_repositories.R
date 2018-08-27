@@ -54,6 +54,9 @@
         return(get_available_packages(path, type, rver = rver))
       }
       NULL
+    },
+    get_arch_src_url = function(pkg_name) {
+      return(sprintf("%s/00Archive/%s", rsuite_contrib_url(path, "source", rver = rver), pkg_name))
     }
   )
   class(res) <- "rsuite_repo_info"

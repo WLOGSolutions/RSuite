@@ -317,6 +317,7 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
   stopifnot(is.versions(vers))
   stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
 
+  resolve_in_archive <- function(cr) { cr }
   if (is.null(all_pkgs)) {
     stopifnot(!missing(repo_info))
     stopifnot(!missing(type))
@@ -324,6 +325,10 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
     contrib_url <- repo_info$get_contrib_url(type)    # from 53_repositories.R
     avail_vers <- vers.collect(contrib_url)
     all_pkgs <- avail_vers$get_avails()
+
+    if (type == "source") {
+      resolve_in_archive <- function(cr) { resolve_deps_in_src_archive(cr, repo_info) }
+    }
   } else {
     avail_pkgs <- as.data.frame(all_pkgs, stringsAsFactors = FALSE)
     avail_vers <- vers.collect(pkgs = avail_pkgs)
@@ -331,6 +336,7 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
 
   vers <- vers.rm_base(vers)
   vers_cr <- vers.check_against(vers, avail_vers, extra_reqs)
+  vers_cr <- resolve_in_archive(vers_cr)
 
   next_cr <- vers_cr
   while (check_res.has_found(next_cr)) {
@@ -340,10 +346,73 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
     dep_vers <- vers.rm_base(dep_vers)
 
     next_cr <- vers.check_against(dep_vers, avail_vers, extra_reqs)
+    next_cr <- resolve_in_archive(next_cr)
     vers_cr <- check_res.union(vers_cr, next_cr)
   }
 
   return(vers_cr)
+}
+
+
+resolve_deps_in_src_archive <- function(cr, repo_info) {
+  missing_vers <- check_res.get_missing(cr)
+
+  reqs <- vers.get(missing_vers, vers.get_names(missing_vers))
+  pkg_avails <- by(reqs, seq_len(nrow(reqs)), FUN = function(req) {
+    if (is.na(req$vmin) && is.na(req$vmax)) {
+      return()
+    }
+
+    arch_url <- repo_info$get_arch_src_url(req$pkg)
+    if (httr::http_error(arch_url)) {
+      return()
+    }
+
+    conn <- url(arch_url)
+    html <- tryCatch({
+      readLines(conn)
+    },
+    error = function(e) NULL,
+    finally = {
+      close(conn)
+    })
+
+    ahref_re <- sprintf("^.*<a href=\"(%s_(.+)[.]tar[.]gz)\".+$", req$pkg)
+    html <- html[grepl(ahref_re, html)]
+
+    avails <- data.frame(Package = req$pkg,
+                         Version = gsub(ahref_re, "\\2", html),
+                         File = gsub(ahref_re, "\\1", html),
+                         Repository = arch_url,
+                         stringsAsFactors = FALSE)
+    avails$NVersion <- norm_version(avails$Version)
+    if (!is.na(req$vmin)) {
+      avails <- avails[avails$NVersion >= req$vmin, ]
+    }
+    if (!is.na(req$vmax)) {
+      avails <- avails[avails$NVersion <= req$vmax, ]
+    }
+
+    return(avails)
+  },
+  simplify = FALSE)
+
+  avail_pkgs <- do.call("rbind", pkg_avails)
+  if (is.null(avail_pkgs) || nrow(avail_pkgs) == 0) {
+    return(cr)
+  }
+
+  dload_dir <- file.path(tempdir(), "src_arch_dload")
+  if (!dir.exists(dload_dir)) {
+    dir.create(dload_dir, recursive = TRUE, showWarnings = FALSE)
+  }
+
+  dloads <- pkg_download(avail_pkgs = avail_pkgs, dest_dir = dload_dir)
+  avails <- get_package_files_info(dloads$Path)
+  found_vers <- vers.add_avails(missing_vers, avails)
+
+  next_cr <- vers.check_against(missing_vers, found_vers)
+  return(check_res.union(cr, next_cr))
 }
 
 

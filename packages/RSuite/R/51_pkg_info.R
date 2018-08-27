@@ -269,7 +269,9 @@ get_package_files_info <- function(files) {
     dcf[, setdiff(c("Depends", "Imports", "LinkingTo"), colnames(dcf))] <- NA
     data.frame(Package = pkg_name, Version = dcf$Version,
                Depends = dcf$Depends, Imports = dcf$Imports, LinkingTo = dcf$LinkingTo,
-               Type = pkg_type, RVersion = rver, File = file,
+               Type = pkg_type, RVersion = rver,
+               Repository = path2local_url(dirname(abs_file)), # from 99_rpatches.R
+               File = basename(file),
                stringsAsFactors = FALSE)
   }
 

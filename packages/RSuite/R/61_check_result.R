@@ -66,7 +66,7 @@ print.check_result <- function(cr) {
 
 
 #'
-#' Merges two check results. REsult hase common found and missings of two of them.
+#' Merges two check results. Result has common found and missings of two of them.
 #'
 #' @param cr check_result object.
 #' @param oth check_result object.
@@ -92,7 +92,7 @@ check_res.union <- function(cr, oth) {
 #'
 #' Joins two check_results controling if they have some new missings presended
 #'   due to common requiremets infeasibility. Result missings are fixed to
-#'   reflect thir common missing state.
+#'   reflect their common missing state.
 #'
 #' @param cr check_result object
 #' @param oth check_result object

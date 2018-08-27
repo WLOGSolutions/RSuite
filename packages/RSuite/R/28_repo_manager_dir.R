@@ -48,7 +48,7 @@ repo_manager_get_info.rsuite_repo_manager_dir <- function(repo_manager) {
   return(list(
     types = repo_manager$types,
     rver = repo_manager$rver,
-    url = sprintf("file:///%s", repo_manager$path)
+    url = path2local_url(repo_manager$path) # from 99_rpatches.R
   ))
 }
 
