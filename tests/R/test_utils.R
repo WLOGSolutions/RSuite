@@ -169,7 +169,7 @@ create_lock_test_prj <- function() {
                                    prj = build_prj,
                                    pkg_type = params$bin_pkgs_type)
 
-  RSuite::repo_mng_stop(rmgr)
+  RSuite::repo_mng_stop(dst_rmgr)
 }
 
 init_lock_test_prj <- function() {
