@@ -263,7 +263,11 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
   files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
   files <- files[!file.info(files)$isdir]
 
-  mran_date <- get_latest_mran_date()
+  if (any(grepl("__LatestMRAN__", readLines(file.path(tmpl_dir, "PARAMETERS"))))) {
+    mran_date <- get_latest_mran_date()
+  } else {
+    mran_date <- Sys.Date()
+  }
 
   keywords <- c(
     ProjectName = basename(prj_dir),
