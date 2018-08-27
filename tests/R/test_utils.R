@@ -150,7 +150,7 @@ create_lock_test_prj <- function() {
                                      types = params$bin_pkgs_type)
   RSuite::repo_upload_ext_packages(dst_rmgr,
                                    pkgs = c("logging", "AddedTestDependency", "TestDependencyToRemove", "TestDependencyToUpdate"),
-                                   prj = prj)
+                                   prj = build_prj)
 
   # repo_upload_ext_packages builds TestDependencyToUpdate v1.1 we still need v1.0, so ...
   # ... we remove TestDependencyToUpdate v1.1 and uploading ext packages again
@@ -165,7 +165,7 @@ create_lock_test_prj <- function() {
 
   RSuite::repo_upload_ext_packages(dst_rmgr,
                                    pkgs = c("TestDependencyToUpdate"),
-                                   prj = prj)
+                                   prj = build_prj)
 
   RSuite::repo_mng_stop(rmgr)
 }

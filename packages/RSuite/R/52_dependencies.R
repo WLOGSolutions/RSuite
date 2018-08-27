@@ -38,6 +38,8 @@ collect_installed_pkgs <- function(params) {
 #' Detects direct uninstalled project dependencies
 #'
 #' @param params object of rsuite_project_params class
+#' @param check_rver if TRUE will consider packages installed for other R version
+#'   uninstalled (type: logical(1); default: TRUE).
 #'
 #' @return object of versions class containing direct project dependencies
 #'   which are not installed in project local environment.
@@ -45,9 +47,14 @@ collect_installed_pkgs <- function(params) {
 #' @keywords internal
 #' @noRd
 #'
-collect_uninstalled_direct_deps <- function(params) {
+collect_uninstalled_direct_deps <- function(params, check_rver = TRUE) {
   dep_vers <- collect_prj_direct_deps(params)
-  installed <- collect_installed_pkgs(params)$valid
+
+  all_installed <- collect_installed_pkgs(params)
+  installed <- all_installed$valid
+  if (!check_rver) {
+    installed <- rbind(installed, all_installed$invalid)
+  }
   dep_vers <- vers.rm_acceptable(dep_vers, installed)
   return(dep_vers)
 }
@@ -443,7 +450,7 @@ get_lock_env_vers <- function(params) {
 #' @param params project parameters. (type: rsuite_project_params)
 #' @param installed data.frame compatible with installed.packages.
 #'
-#' @retrun names of required by the project packages. (type: character(N))
+#' @return names of required by the project packages. (type: character(N))
 #'
 #' @keywords internal
 #' @noRd

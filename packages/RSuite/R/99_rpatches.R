@@ -179,3 +179,12 @@ get_pkg_intern <- function(package, name) {
   return(search_res$objs[[ixs]])
 }
 
+#'
+#' Checks if R version is stable.
+#'
+#' @keywords internal
+#' @noRd
+#'
+is_r_stable <- function() {
+  !grepl("unstable", R.version$status)
+}

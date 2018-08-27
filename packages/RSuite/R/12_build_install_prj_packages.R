@@ -20,13 +20,16 @@
 #'   (type: character, default: NULL)
 #' @param rebuild if TRUE will force rebuild of packages even if no changes found.
 #'   (type: logical, default: FALSE)
+#' @param check_repos_consistency if TRUE will check if installed dependencies
+#'   are built for another R ver. (type: logical, default: TRUE if R is stable)
 #'
 #' @keywords internal
 #' @noRd
 #'
 build_install_tagged_prj_packages <- function(params, revision, build_type,
                                               skip_build_steps = NULL,
-                                              rebuild = FALSE) {
+                                              rebuild = FALSE,
+                                              check_repos_consistency = is_r_stable()) {
   if (!is.null(revision)) {
     bkp_info <- backup_pkgdesc_files(params$pkgs_path) # from 51_pkg_info.R
 
@@ -40,7 +43,7 @@ build_install_tagged_prj_packages <- function(params, revision, build_type,
   prj_pkgs <- build_project_pkgslist(params$pkgs_path)
 
   # check if environment has to be rebuilt
-  uninst_deps <- collect_uninstalled_direct_deps(params) # from 52_dependencies.R
+  uninst_deps <- collect_uninstalled_direct_deps(params, check_rver = check_repos_consistency) # from 52_dependencies.R
   uninst_deps <- vers.rm(uninst_deps, prj_pkgs)
   assert(vers.is_empty(uninst_deps),
          paste0("Some dependencies are not installed in project env: %s.",

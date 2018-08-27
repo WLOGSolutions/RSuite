@@ -96,7 +96,8 @@ tryCatch({
 
     message(sprintf("Installing RSuite(v%s) package ...", rsuite_avails$Version))
 
-    dloaded <- utils::download.packages(rsuite_pkg, destdir = src_dir, available = rsuite_avails, repos = NULL,
+    dloaded <- utils::download.packages(rsuite_pkg, destdir = src_dir, available = rsuite_avails,
+                                        repos = NULL, contriburl = "",
                                         quiet = !opts$verbose)
     if (nrow(dloaded) != 1) {
       pkg_url <- sprintf("%s/%s", rsuite_avails$Repository, paste(rsuite_avails$File, collapse = " "))
@@ -135,7 +136,8 @@ tryCatch({
 
     message(sprintf("... installing also %s(v%s) packages ...", rstudio_pkgs, rstudio_avails$Version))
 
-    dloaded <- utils::download.packages(rstudio_pkgs, destdir = src_dir, available = rstudio_avails, repos = NULL,
+    dloaded <- utils::download.packages(rstudio_pkgs, destdir = src_dir, available = rstudio_avails,
+                                        repos = NULL, contriburl = "",
                                         quiet = !opts$verbose)
     if (nrow(dloaded) != length(rstudio_pkgs)) {
       pkg_url <- sprintf("%s/%s", rstudio_avails$Repository, paste(rstudio_avails$File, collapse = " "))

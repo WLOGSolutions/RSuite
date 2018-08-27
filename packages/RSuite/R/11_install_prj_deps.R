@@ -18,7 +18,7 @@
 #' @param relock if TRUE allows to update the env.lock file
 #'   (type: logical, default: FALSE)
 #' @param check_repos_consistency if TRUE will prevent installing
-#'   packages built for another R ver. (type: logical, default: TRUE)
+#'   packages built for another R ver. (type: logical, default: TRUE if R is stable)
 #'
 #' @keywords internal
 #' @noRd
@@ -26,7 +26,7 @@
 install_prj_deps <- function(params,
                              vanilla_sups = FALSE,
                              relock = FALSE,
-                             check_repos_consistency = TRUE) {
+                             check_repos_consistency = is_r_stable()) {
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
 
   repo_infos <- get_all_repo_infos(params) # from 53_repositories.R
@@ -252,8 +252,7 @@ install_support_pkgs <- function(avail_vers, sbox_dir, lib_dir, rver,
     return(vers.rm_acceptable(vers, installed))
   }
 
-  is_r_stable <- !grepl("unstable", R.version$status)
-  avail_vers <- remove_installed(avail_vers, is_r_stable)
+  avail_vers <- remove_installed(avail_vers, is_r_stable())
   if (vers.is_empty(avail_vers)) {
     pkg_logdebug("No support packages to install.")
     return(invisible())
@@ -331,8 +330,7 @@ install_dependencies <- function(avail_vers, lib_dir, rver,
     return(vers.rm_acceptable(vers, installed))
   }
 
-  is_r_stable <- !grepl("unstable", R.version$status)
-  avail_vers <- remove_installed(avail_vers, is_r_stable, notify_on_update = TRUE)
+  avail_vers <- remove_installed(avail_vers, is_r_stable(), notify_on_update = TRUE)
   if (vers.is_empty(avail_vers)) {
     pkg_loginfo("No dependencies to install.")
     return(invisible())

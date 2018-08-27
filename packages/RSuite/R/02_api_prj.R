@@ -405,12 +405,6 @@ prj_unload <- function() {
 #'   (type: logical, default: FALSE)
 #' @param relock if TRUE allows updating the env.lock file
 #'   (type: logical, default: FALSE)
-#' @param check_repos_consistency if TRUE will check installed packages if they are
-#'   consistent with required R version (info taken from DESCRIPTION Built field).
-#'   If the package is built for different version repository probably contains packages
-#'   not rebuilt for the R version required. If the check for target R version fails
-#'   the package is removed from the local project environment and error is reported that it
-#'   is not available. (type: logical, default: \code{!grepl("unstable", R.version$status)})
 #'
 #' @return TRUE if all build successfully.
 #'
@@ -434,8 +428,7 @@ prj_unload <- function() {
 prj_install_deps <- function(prj = NULL,
                              clean = FALSE,
                              vanilla_sups = FALSE,
-                             relock = FALSE,
-                             check_repos_consistency = !grepl("unstable", R.version$status)) {
+                             relock = FALSE) {
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
@@ -459,8 +452,7 @@ prj_install_deps <- function(prj = NULL,
 
   install_prj_deps(params, # from 11_install_prj_deps.R
                    vanilla_sups = vanilla_sups,
-                   relock = relock,
-                   check_repos_consistency = check_repos_consistency)
+                   relock = relock)
 }
 
 #'
