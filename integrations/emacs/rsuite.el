@@ -13,31 +13,25 @@
 ;;; Code:
 
 (require 'dired)
+(require 'ivy)
 
-(defvar rsuite-verbose nil "Make rsuite verbose.")
-(defvar rsuite-docker-platforms
-  (list "ubuntu" "centos")
+(defvar rsuite/verbose nil "Make rsuite verbose.")
+(defvar rsuite/docker-platforms
+  (list "ubuntu" "centos" "debian")
   "Docker platforms supported by R Suite.")
 (defconst rsuite/buffer "rsuite" "Buffer for rsuite output.")
 (defconst rsuite/err_buffer "rsuite:error" "Buffer for rsuite error output.")
 (defconst rsuite/cli "rsuite" "Path to RSuite CLI.")
 
-(defun rsuite-toggle-verbose ()
-  "Toggle R Suite verbosity."
-  (interactive)
-  (if rsuite-verbose
-      (setq rsuite-verbose nil)
-    (setq rsuite-verbose 1)))
-
 (defun run-async-rsuite (args)
   "Utility for running rsuite cli.
 ARGS is a string of arguments forwarded to rsuite cli."
-  (async-shell-command (concat rsuite/cli " " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
+  (async-shell-command (concat rsuite/cli " " (concat args (if rsuite/verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
 
 (defun run-sync-rsuite (args)
   "Utility for running rsuite cli.
 ARGS is a string of arguments forwarded to rsuite cli."
-  (shell-command (concat rsuite/cli " " (concat args (if rsuite-verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
+  (shell-command (concat rsuite/cli " " (concat args (if rsuite/verbose " -v" " "))) rsuite/buffer rsuite/err_buffer))
 
 (defun rsuite-detect-prj-path ()
   "Return R Suite's project path or throws error if none found."
@@ -57,6 +51,16 @@ ARGS is a string of arguments forwarded to rsuite cli."
       )
     curr-dir))
 
+(defun rsuite-get-templates ()
+  "Generate list of available R Suite templates."
+  (cons "builtin" (directory-files "~/.rsuite/templates" nil "^[^.].*" nil)))
+
+(defun rsuite-toggle-verbose ()
+  "Toggle R Suite verbosity."
+  (interactive)
+  (if rsuite/verbose
+      (setq rsuite/verbose nil)
+    (setq rsuite/verbose 1)))
 
 (defun rsuite-proj-start ()
   "Start project."
@@ -67,7 +71,7 @@ ARGS is a string of arguments forwarded to rsuite cli."
     
     (setq proj_path (read-directory-name "Project path: "))
     (setq proj_name (read-string (concat "Give project name: " proj_path)))
-    (setq proj_tmpl (read-string (concat "Give project template: " proj_tmpl)))
+    (setq proj_tmpl (ivy-read "Give project template: " (rsuite-get-templates)))
     (cd proj_path)
     (if (> (length proj_tmpl) 0)
 	(run-sync-rsuite (concat "proj start --name=" proj_name " --tmpl=" proj_tmpl))
@@ -81,7 +85,7 @@ ARGS is a string of arguments forwarded to rsuite cli."
   (let ((pkg_name nil)
 	(pkg_tmpl nil))
     (setq pkg_name (read-string "Give package name: "))
-    (setq pkg_tmpl (read-string "Give package template: "))
+    (setq pkg_tmpl (ivy-read "Give package template: " (rsuite-get-templates)))
     (if (> (length pkg_tmpl) 0)
 	(run-async-rsuite (concat "proj pkgadd --name=" pkg_name " --tmpl=" pkg_tmpl))
       (run-async-rsuite (concat "proj pkgadd --name=" pkg_name)))))
@@ -150,7 +154,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
 	(rcmd "docker zip"))
     (setq version (read-string "Version: "))
     (setq path (read-directory-name "Path: "))
-    (setq platform (ido-completing-read "Platform: " rsuite-docker-platforms))
+    (setq platform (ivy-read
+		    "Platform: "
+		    rsuite/docker-platforms))
     (setq rcmd (concat rcmd
 		       " --dest=" path
 		       " --platform=" platform))
@@ -169,7 +175,9 @@ ARGS is a string of arguments forwarded to rsuite cli."
     
     (setq version (read-string "Version: "))
     (setq tag (read-string "Tag: "))
-    (setq platform (ido-completing-read "Platform: " rsuite-docker-platforms))
+    (setq platform (ivy-read
+		    "Platform: "
+		    rsuite/docker-platforms))
     (setq rcmd (concat rcmd
 		       " --tag=" tag
 		       " --platform=" platform))
@@ -245,17 +253,22 @@ If file exists it is opened.  Otherwise it is created and filled with R Suite in
 	  (goto-char (point-max))
 	  )
       (progn
-       (write-region
-	"# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
+	(write-region
+	 "# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
 script_path <- (function() {
-	args <- commandArgs(trailingOnly = FALSE)
-	script_path <- dirname(sub(\"--file=\", \"\", args[grep(\"--file=\", args)]))
-	if (!length(script_path)) { return(\".\") }
-	return(normalizePath(script_path))
+  args <- commandArgs(trailingOnly = FALSE)
+  script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
+  if (!length(script_path)) {
+    return("R")
+  }
+  if (grepl("darwin", R.version$os)) {
+    base <- gsub("~\\+~", " ", base) # on MacOS ~+~ in path denotes whitespace
+  }
+  return(normalizePath(script_path))
 })()
 
 # Setting .libPaths() to point to libs folder
-source(file.path(script_path, \"set_env.R\"), chdir = T)
+source(file.path(script_path, "set_env.R"), chdir = T)
 
 config <- load_config()
 args <- args_parser()
@@ -264,6 +277,29 @@ args <- args_parser()
        (find-file m_name)
        (goto-char (point-max))))))
 
+(defun rsuite-sysreqs-collect ()
+  "Collect and display system requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs collect"))
+          (run-async-rsuite rcmd)))
+
+(defun rsuite-sysreqs-check ()
+  "Check current system against required requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs check"))
+    (run-async-rsuite rcmd)))
+
+(defun rsuite-sysreqs-script ()
+  "Collect and display system requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs script"))
+          (run-async-rsuite rcmd)))
+
+(defun rsuite-sysreqs-install ()
+  "Install system requirements for R Suite project."
+  (interactive)
+  (let ((rcmd "sysreqs install"))
+          (run-async-rsuite rcmd)))
 
 ;; ;; a simple major mode, mymath-mode
 

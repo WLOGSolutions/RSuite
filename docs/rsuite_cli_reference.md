@@ -249,23 +249,18 @@ rsuite proj test -d path/to/test/folder/instide/your/project/folder/tree
 ```
 
 # Template management
-R Suite CLI allows you to create your own custom project and package templates. For example the default R Suite project template uses MRAN as the default package repository, if your projects make use of a different repository you can define your own project template with the adequate settings (in this case the Repositories option in the PARAMETERS file).
+R Suite CLI allows you to customise projects and packages structure by using templates. For example by default R Suite uses MRAN as the main package repository, if your projects require you to use a different repository, you can define your own project template with the adequate settings (in this case the Repositories option in the PARAMETERS file).
 
-## Starting custom project/package templates
-To start a project template execute the following command
 
-```bash
-rsuite tmpl prjadd -n MyTemplate
-```
 
-similarly package templates are created
+## Creating custom project and package templates
+To create a new template use the following command 
 
 ```bash
-rsuite tmpl pkgadd -n MyTemplate
+rsuite tmpl start -n MyTemplate
 ```
 
-The above-mentioned commands register a project/package template called "MyTemplate" in the user's local default template directory. The default template directory is defined by the `rsuite.user_templ_path` option (`~/.rsuite/templates` by default). All registered templates have a specific structure
-
+This command creates a folder called `MyTemplate` in your working directory. All templates have the following file structure
 ```bash
 2018-06-22  07:37    <DIR>          .
 2018-06-22  07:37    <DIR>          ..
@@ -274,8 +269,20 @@ The above-mentioned commands register a project/package template called "MyTempl
                0 File(s)              0 bytes
                4 Dir(s)  260 126 388 224 bytes free
 ```
+The `project` and `package` directories contain the default R Suite project and package files. You can add, delete and modify those files according to your preference. If you want to create a template containing only a `project` or `package` directory, you can do it by using the `--prj` and `--pkg` options accordingly.
 
-Templates contain directories named `project` and `package`, they are created by the `rsuite tmpl prjadd` and `rsuite tmpl pkgadd` commands accordingly. These directories contain the default R Suite project/package files. You can add/delete files according to your preference.
+```bash
+rsuite tmpl start -n MyTemplate --prj
+```
+
+```bash
+rsuite tmpl start -n MyTemplate --pkg
+```
+
+If you want to create a template in a different location just use the `-p` (short for `--path`) option
+```bash
+rsuite tmpl start -n MyTemplate -p /path/to/create/template
+```
 
 **Important**: Templates have specific requirements in case of projects they have to contain a PARAMETERS file as for packages they have to contain a DESCRIPTION file.
 
@@ -287,19 +294,10 @@ R Suite templates support the usage of markers - special keywords which will be 
 - `__RVersion__` - will be replaced with the used R version
 - `__Date__` - will be replaced with the current date
 - `__User__` - will be replaced with the username
+* `__LatestMRAN__` - will be replaced with `MRAN[<Date of latest working MRAN snapshot from the last 2 weeks>]`
 
 ## Registering custom templates
-Templates can be developed outside of the default template folder, to create a template in a specific directory use the `-t` (short for `--tmpl`) while creating templates
-
-```bash
-rsuite tmpl prjadd -n MyTemplate -p /path/to/create/template
-```
-
-```bash
-rsuite tmpl pkgadd -n MyTemplate -p /path/to/create/template
-```
-
-To register a template created outside of the default template directory use the following command
+To register a template use the following command
 
 ```bash
 rsuite tmpl register -p /path/to/created/template
@@ -311,28 +309,28 @@ Linux users can also register templates in the global template directory (`/etc/
 rsuite tmpl register -p /path/to/created/template -g
 ```
 
-**Important**: to register a template in the global template directory extended permissions are required
+**Important**: to register a template in the global template directory extended permissions are required.
 
 
 All registered templates can be listed using the following command
 
 ```bash
-rsuite tmpl get
+rsuite tmpl list
 ```
 
 additional information whether the registered templates have a defined project/package template will be displayed. 
 
 ## Starting projects/packages using created templates
-To start a project using a custom template the `-t` (short for `--tmpl`) option can be used. If `MyTemplate` is a registered template simply the name of the registered template to the `-t` option
+To start a project using a custom template the `-t` (short for `--tmpl`) option can be used. If `MyTemplate` is a registered template simply pass the name of the registered template to the `-t` option
 
 ```bash
   rsuite proj start -n MyProject -t MyTemplate
 ```
 
-Unregistered templates can also be provided to the `-t` option. You simply have to provide the path to the template. **Important**: the path has to point to the directory containing the template files e.g. `<path>/MyTemplate/project`
+Unregistered templates can also be provided to the `-t` option. You simply have to provide the path to the template
 
 ```bash
-  rsuite proj start -n MyProject -t <path to template>/project
+  rsuite proj start -n MyProject -t /path/to/template
 ```
 
 Similarly package templates can be used
@@ -342,7 +340,7 @@ Similarly package templates can be used
 ```
 
 ```bash
-  rsuite proj pkgadd -n MyPackage -t <path to template>/package
+  rsuite proj pkgadd -n MyPackage -t /path/to/template
 ```
 
 **Important**: The default R Suite template is called `builtin` and can also be provided to the `-t` option. 
