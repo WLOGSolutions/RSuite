@@ -364,7 +364,7 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
     }
 
     arch_url <- repo_info$get_arch_src_url(req$pkg)
-    if (httr::http_error(arch_url)) {
+    if (is.null(arch_url) || httr::http_error(arch_url)) {
       return()
     }
 

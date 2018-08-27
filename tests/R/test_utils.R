@@ -129,32 +129,45 @@ test_that_template <- function(desc, ...) {
 
 # used for the lock test project source creation, might be useful in the future
 create_lock_test_prj <- function() {
-  if (dir.exists(file.path("data", "LockTestProjectTemplate"))) {
-    unlink(file.path("data", "LockTestProjectTemplate"), recursive = TRUE, force = TRUE)
+  templ_path <- file.path("data", "LockTestProjectTemplate")
+  if (dir.exists(templ_path)) {
+    unlink(templ_path, recursive = TRUE, force = TRUE)
   }
 
-  dir.create("data/LockTestProjectTemplate", recursive = TRUE)
-  RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
+  unzip(file.path("data", "LockTestProjectTemplate.zip"), exdir = "data")
 
-  prj <- RSuite::prj_start("LockTestProjectTemplate", skip_rc = TRUE, path = "data/LockTestProjectTemplate")
-  RSuite::prj_config_set_repo_adapters(repos = c("Dir"), prj = prj)
+  build_prj <- RSuite::prj_start("LockTestProjectBuild", skip_rc = TRUE, path = templ_path, tmpl = templ_path)
+  params <- build_prj$load_params()
+  on.exit({
+    unlink(params$prj_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
 
-  unlink(file.path(prj$path, "deployment", "libs", "logging"),
-         recursive = T, force = T) # remove precreated logger
 
-  # remove SnapshotDate
-  params_path <- file.path(prj$path, "PARAMETERS")
-  params_df <- data.frame(read.dcf(file = params_path))
-  params_df$SnapshotDate <- NULL
-  write.dcf(params_df, file = params_path)
+  dst_rmgr <- RSuite::repo_mng_start("Dir",
+                                     path = normalizePath(file.path(templ_path, "project", "repository")),
+                                     rver = params$r_ver,
+                                     types = params$bin_pkgs_type)
+  RSuite::repo_upload_ext_packages(dst_rmgr,
+                                   pkgs = c("logging", "AddedTestDependency", "TestDependencyToRemove", "TestDependencyToUpdate"),
+                                   prj = prj)
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "AddedTestDependency", prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = "TestDependencyToRemove", prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.0")
-  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate", prj = prj, ver = "1.1")
-  
-  file.rename("data/LockTestProjectTemplate/LockTestProjectTemplate", "data/LockTestProjectTemplate/project")
+  # repo_upload_ext_packages builds TestDependencyToUpdate v1.1 we still need v1.0, so ...
+  # ... we remove TestDependencyToUpdate v1.1 and uploading ext packages again
+  src_rmgr <- RSuite::repo_mng_start("Dir",
+                                     path = normalizePath(file.path(params$prj_path, "repository")),
+                                     rver = params$r_ver,
+                                     types = "source")
+  RSuite::repo_mng_remove(src_rmgr,
+                          toremove = data.frame(Package = "TestDependencyToUpdate", Version = "1.1", stringsAsFactors = FALSE),
+                          pkg_type = "source")
+  RSuite::repo_mng_stop(src_rmgr)
+
+  RSuite::repo_upload_ext_packages(dst_rmgr,
+                                   pkgs = c("TestDependencyToUpdate"),
+                                   prj = prj)
+
+  RSuite::repo_mng_stop(rmgr)
 }
 
 init_lock_test_prj <- function() {

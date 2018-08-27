@@ -507,7 +507,7 @@ repo_upload_package_files <- function(repo_manager, files) {
 
   for (tp in pkg_types) {
     dest_path <- rsuite_contrib_url(tmp_path, tp, mgr_info$rver)
-    src_files <- pkg_infos[pkg_infos$Type == tp, ]$File
+    src_files <- pkg_infos[pkg_infos$Type == tp, ]$Path
     success <- file.copy(from = src_files, to = dest_path)
     assert(success,
            "Failed to copy to temporary repository: %s",

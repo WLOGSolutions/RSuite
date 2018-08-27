@@ -259,11 +259,11 @@ pkgzip_build_package_files <- function(files, path = getwd()) {
       for (tp in rver_types) {
         dest_path <- rsuite_contrib_url(tmp_path, tp, rver)
 
-        rver_tp_files <- pkg_infos[pkg_infos$Type == tp & pkg_infos$RVersion == rver, ]$File
-        success <- file.copy(from = rver_tp_files, to = dest_path)
+        rver_tp_paths <- pkg_infos[pkg_infos$Type == tp & pkg_infos$RVersion == rver, ]$Path
+        success <- file.copy(from = rver_tp_paths, to = dest_path)
         assert(all(success),
                "Failed to copy to temporary repository: %s",
-               paste(rver_tp_files[!success], collapse = ", "))
+               paste(rver_tp_paths[!success], collapse = ", "))
 
         rsuite_write_PACKAGES(dest_path, tp)
       }

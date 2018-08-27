@@ -56,6 +56,9 @@
       NULL
     },
     get_arch_src_url = function(pkg_name) {
+      if (is_local_url(path)) { # from 99_rpatches.R
+        return(NULL)
+      }
       return(sprintf("%s/00Archive/%s", rsuite_contrib_url(path, "source", rver = rver), pkg_name))
     }
   )

@@ -144,7 +144,17 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
     env_lock_vers <- vers.rm(env_lock_vers, # remove non required locks
                              setdiff(vers.get_names(env_lock_vers), vers.get_names(prj_dep_vers)))
 
-    prj_dep_vers <- vers.union(prj_dep_vers, env_lock_vers)
+    # if lock requirements introduce some unfesibles assume some
+    #  requirements added altered in packages itself. So do not try
+    #  enforce lock requirements for them. Leave the problem to be resolved
+    #  later: while handling relocking etc.
+    prj_dep_candidate <- vers.union(prj_dep_vers, env_lock_vers)
+    candidate_unfeasibles <- vers.get_unfeasibles(prj_dep_candidate)
+    if (length(candidate_unfeasibles) == 0) {
+      prj_dep_vers <- prj_dep_candidate
+    } else {
+      prj_dep_vers <- vers.union(prj_dep_vers, vers.rm(env_lock_vers, candidate_unfeasibles))
+    }
   }
 
   pkg_loginfo("Resolving dependencies (for R %s)...", params$r_ver)

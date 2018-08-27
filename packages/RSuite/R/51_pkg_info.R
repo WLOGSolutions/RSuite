@@ -272,6 +272,7 @@ get_package_files_info <- function(files) {
                Type = pkg_type, RVersion = rver,
                Repository = path2local_url(dirname(abs_file)), # from 99_rpatches.R
                File = basename(file),
+               Path = abs_file,
                stringsAsFactors = FALSE)
   }
 
