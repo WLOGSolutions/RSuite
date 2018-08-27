@@ -379,13 +379,16 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
     html <- tryCatch({
       readLines(conn)
     },
-    error = function(e) NULL,
+    error = function(e) character(0),
     finally = {
       close(conn)
     })
 
     ahref_re <- sprintf("^.*<a href=\"(%s_(.+)[.]tar[.]gz)\".+$", req$pkg)
     html <- html[grepl(ahref_re, html)]
+    if (length(html) == 0) {
+      return()
+    }
 
     avails <- data.frame(Package = req$pkg,
                          Version = gsub(ahref_re, "\\2", html),

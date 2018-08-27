@@ -11,7 +11,8 @@ source("R/test_utils.R")
 source("R/project_management.R")
 
 test_that_managed("glue in archive version is installed", {
-  skip_if(is.null(Sys.which("gcc")), "No src package build tools available (e.g. Rtools)")
+  gcc_available <- !is.null(Sys.which("gcc"))
+  skip_if_not(gcc_available, "No package build tools available (e.g. Rtools)")
 
   # CRAN contains in main repository glue 1.3.0 for R3.5 and 1.2.0 for R3.3 & R 3.4
   #  glue 1.1.0 is available only in source archive
