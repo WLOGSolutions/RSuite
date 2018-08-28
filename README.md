@@ -14,6 +14,11 @@ R Suite an R package which together with R Suite CLI tool enables you to design 
 * Development process integrated with version control system (currently git and svn).
 * Working in internetless environments.
 
+# Cheatsheet
+
+<a href=https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/cheatsheet/rsuite_cheatsheet.pdf><img src="https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/cheatsheet/rsuite_cheatsheet.png"/></a>
+
+
 # Want to learn more?
 
 Check R Suite's [official webpage](http://rsuite.io)!
