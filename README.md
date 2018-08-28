@@ -15,8 +15,7 @@ R Suite an R package which together with R Suite CLI tool enables you to design 
 * Working in internetless environments.
 
 # Cheatsheet
-<a href=""><img src="./docs/media/cheatsheet/rsuite_cheatsheet_01.png" width="630" height="252"/></a>
-
+<a href=https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/cheatsheet/rsuite_cheatsheet.pdf><img src="https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/cheatsheet/rsuite_cheatsheet.png"/></a>
 
 # Want to learn more?
 
