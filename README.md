@@ -19,4 +19,4 @@ R Suite an R package which together with R Suite CLI tool enables you to design 
 
 # Want to learn more?
 
-Check R Suite's [official webpage](http://rsuite.io)!
+Check R Suite's [official webpage](https://rsuite.io)!
