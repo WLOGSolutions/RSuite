@@ -18,6 +18,7 @@ cache:
 environment:
   USE_RTOOLS: true
   WARNINGS_ARE_ERRORS: 1
+  APPVEYOR_CI: true
 
   matrix:
   - R_VERSION: devel

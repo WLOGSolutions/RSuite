@@ -93,7 +93,7 @@ sysreqs_collect <- function(prj = NULL) {
 #' Checks for system requirements availability.
 #'
 #' Collects system requirements with \code{\link{sysreqs_collect}}
-#' and performs checks for their existence. Fill fail if some system
+#' and performs checks for their existence. Will fail if some system
 #' requirements are not satisfied.
 #'
 #' @param prj project object to check sys requirements for. If not passed the loaded
@@ -168,7 +168,7 @@ sysreqs_check <- function(prj = NULL) {
 #'       append = TRUE)
 #'
 #' \donttest{
-#'   # check if requirements or XML are satisfied
+#'   # check if requirements of XML are satisfied
 #'   sysreqs_install(prj)
 #' }
 #'

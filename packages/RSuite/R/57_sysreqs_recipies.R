@@ -220,7 +220,7 @@ perform.sysreqs_install_recipe <- function(recipe) {
         pkg_loginfo("... done")
         lapply(names(required_syslibs),
                function(req_name) {
-                 lapply(required_syslibs[[req_name]]$info,
+                 lapply(required_syslibs[[req_name]],
                         function(msg) pkg_loginfo("[%s]: %s", req_name, msg))
                })
       }

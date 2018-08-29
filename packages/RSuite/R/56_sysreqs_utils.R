@@ -40,7 +40,7 @@ get_platform_desc <- function() {
 
   sysreq_type <- switch(os_info$platform,
                         Windows = "Windows",
-                        MaCOS = "Pkg",
+                        MacOS = "Pkg",
                         RedHat = "RPM",
                         Debian = "DEB",
                         NA_character_)
@@ -198,12 +198,12 @@ try_build_sysreq <- function(pkg_name, field, db_ent_name, db_ent_val, plat_desc
 #' @noRd
 #'
 get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
-  if (!(plat_desc$name %in% names(dbent_platforms))) {
-    pkg_logdebug("... platform %s not suported by %s", plat_desc$name, dbent_name)
+  if (!(plat_desc$sysreq_type %in% names(dbent_platforms))) {
+    pkg_logdebug("... platform %s not supported by %s", plat_desc$name, dbent_name)
     return()
   }
 
-  plat_specs <- dbent_platforms[[plat_desc$name]]
+  plat_specs <- dbent_platforms[[plat_desc$sysreq_type]]
   if (is.character(plat_specs) && length(plat_specs) == 1) {
     return(plat_specs)
   }
@@ -228,7 +228,7 @@ get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
     return(dist_specs[1, req_type])
   }
 
-  if (is.list(plat_specs)){
+  if (is.list(plat_specs)) {
     if (!(req_type %in% names(plat_specs))) {
       pkg_logdebug("... build type %s for platform %s not supported by %s",
                    req_type, plat_desc$name, dbent_name)
