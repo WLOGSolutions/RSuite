@@ -42,9 +42,7 @@ test_that_managed("Checking system requirements", {
   prj <- init_test_project(repo_adapters = c("Dir"))
   params <- prj$load_params()
 
-  # create package with system requirements
-  deploy_package_to_lrepo(pkg_file = "png_0.1-7.tar.gz", prj = prj, type = "source")
-
+  # add system requirements
   create_test_master_script("library(png)", prj = prj)
 
   expect_error(RSuite::sysreqs_check(prj = prj))
@@ -63,12 +61,8 @@ test_that_managed("Checking script creation", {
   prj <- init_test_project(repo_adapters = c("Dir"))
   params <- prj$load_params()
 
-  # create package with system requirements
-  sysreqs <- "This package has some system requirements."
-  sysreqs_pkg_name <- "PackageWithSystemRequirements"
-
-  deploy_package_to_lrepo(pkg_file = "png_0.1-7.tar.gz", prj = prj, type = "source")
-  create_test_package("TestPackage", prj = prj, deps = "png")
+  # add system requirements
+  create_test_master_script("library(png)", prj = prj)
 
   RSuite::sysreqs_script(prj = prj)
 
