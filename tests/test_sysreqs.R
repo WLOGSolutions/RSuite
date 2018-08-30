@@ -67,7 +67,7 @@ test_that_managed("Checking script creation", {
 
   install_script <- ifelse(.Platform$OS.type == "windows", "sysreqs_install.cmd", "sysreqs_install.sh")
   command_function <- ifelse(.Platform$OS.type == "windows", shell, system)
-  command_function(install_script)
+  command_function(file.path(get_wspace_dir(), "TestProject", install_script))
 
   expect_silent(RSuite::sysreqs_check(prj = prj))
 })
