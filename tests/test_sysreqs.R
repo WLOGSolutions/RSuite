@@ -34,10 +34,10 @@ test_that_managed("Collecting package system requirements", {
 
 
 test_that_managed("Checking system requirements", {
-  travis_ci_flag <- as.logical(Sys.getenv("TravisCI"))
-  appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR_CI"))
+  travis_ci_flag <- as.logical(Sys.getenv("TravisCI", unset = FALSE))
+  appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR", unset = FALSE))
   is_windows <- .Platform$OS.type == "windows"
-  skip_if(is.na(travis_ci_flag) || is.na(appveyor_ci_flag) || is_windows)
+  skip_if(is_windows)
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
   
   prj <- init_test_project(repo_adapters = c("Dir")) 
@@ -60,9 +60,8 @@ test_that_managed("Checking system requirements", {
 
 
 test_that_managed("Checking script creation", {
-  travis_ci_flag <- as.logical(Sys.getenv("TravisCI"))
-  appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR_CI"))
-  skip_if(is.na(travis_ci_flag) || is.na(appveyor_ci_flag))
+  travis_ci_flag <- as.logical(Sys.getenv("TravisCI", unset = FALSE))
+  appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR", unset = FALSE))
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
   
   prj <- init_test_project(repo_adapters = c("Dir")) 
