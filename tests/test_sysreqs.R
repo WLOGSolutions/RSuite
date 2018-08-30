@@ -39,7 +39,7 @@ test_that_managed("Checking system requirements", {
   skip_if(is_windows)
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
 
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
   params <- prj$load_params()
 
   # add system requirements
@@ -58,8 +58,7 @@ test_that_managed("Checking script creation", {
   appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR", unset = FALSE))
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
 
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  params <- prj$load_params()
+  prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
 
   # add system requirements
   create_test_master_script("library(png)", prj = prj)
