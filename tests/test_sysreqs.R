@@ -36,7 +36,9 @@ test_that_managed("Collecting package system requirements", {
 test_that_managed("Checking system requirements", {
   travis_ci_flag <- as.logical(Sys.getenv("TravisCI"))
   appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR_CI"))
-  skip_if(is.na(travis_ci_flag) || is.na(appveyor_ci_flag))
+  is_windows <- .Platform$OS.type == "windows"
+  skip_if(is.na(travis_ci_flag) || is.na(appveyor_ci_flag) || is_windows)
+  skip_if_not(travis_ci_flag || appveyor_ci_flag)
   
   prj <- init_test_project(repo_adapters = c("Dir")) 
   params <- prj$load_params()
@@ -61,6 +63,7 @@ test_that_managed("Checking script creation", {
   travis_ci_flag <- as.logical(Sys.getenv("TravisCI"))
   appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR_CI"))
   skip_if(is.na(travis_ci_flag) || is.na(appveyor_ci_flag))
+  skip_if_not(travis_ci_flag || appveyor_ci_flag)
   
   prj <- init_test_project(repo_adapters = c("Dir")) 
   params <- prj$load_params()
@@ -75,10 +78,8 @@ test_that_managed("Checking script creation", {
   
   RSuite::sysreqs_script(prj = prj)
   
-  if (.Platform == "windows") {
-    shell(file.path(get_wspace_dir(), "TestProject", "sysreqs_install.sh"))
-  } else if (.Platform == "unix") {
-    shell(file.path(get_wspace_dir(), "TestProject", "sysreqs_install.sh"))
-  }
+  install_script <- ifelse(.Platform$OS.type == "windows", "sysreqs_install.cmd", "sysreqs_install.sh")
+  shell(file.path(get_wspace_dir(), "TestProject", install_script))
   
+  expect_silent(RSuite::sysreqs_check(prj = prj))
 })
