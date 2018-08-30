@@ -39,11 +39,8 @@ test_that_managed("Checking system requirements", {
   skip_if(is_windows)
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
 
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
   params <- prj$load_params()
-
-  # create package with system requirements
-  deploy_package_to_lrepo(pkg_file = "png_0.1-7.tar.gz", prj = prj, type = "source")
 
   create_test_master_script("library(png)", prj = prj)
 
@@ -60,15 +57,9 @@ test_that_managed("Checking script creation", {
   appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR", unset = FALSE))
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
 
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  params <- prj$load_params()
+  prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
 
-  # create package with system requirements
-  sysreqs <- "This package has some system requirements."
-  sysreqs_pkg_name <- "PackageWithSystemRequirements"
-
-  deploy_package_to_lrepo(pkg_file = "png_0.1-7.tar.gz", prj = prj, type = "source")
-  create_test_package("TestPackage", prj = prj, deps = "png")
+  create_test_master_script("library(png)", prj = prj)
 
   RSuite::sysreqs_script(prj = prj)
 
