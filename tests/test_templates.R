@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if project/package templates API functions work properly")
+context("Testing if project/package templates API functions work properly [test_templates]")
 
 library(RSuite)
 library(testthat)

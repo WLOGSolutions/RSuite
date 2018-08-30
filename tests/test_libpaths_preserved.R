@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if .libPaths is preserved after project/env build")
+context("Testing if .libPaths is preserved after project/env build [test_libpaths_preserved]")
 
 library(RSuite)
 library(testthat)
@@ -13,9 +13,7 @@ source("R/libpaths_management.R")
 
 
 test_that_managed("Testing if .libPaths is preserved after env build", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
-
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
 
   expected_libPaths <- add_extra_to_libpath()
 
@@ -30,9 +28,8 @@ test_that_managed("Testing if .libPaths is preserved after env build", {
 })
 
 test_that_managed("Testing if .libPaths is preserved after env build", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   prj_install_deps(prj)
 
   expected_libPaths <- add_extra_to_libpath()

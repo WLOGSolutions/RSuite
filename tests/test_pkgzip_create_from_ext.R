@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if creation of PKGZIP from external packages works properly")
+context("Testing if creation of PKGZIP from external packages works properly [test_pkgzip_create_from_ext]")
 
 library(RSuite)
 library(testthat)
@@ -14,10 +14,9 @@ source("R/repo_management.R")
 
 
 test_that_managed("Create PKGZIP out of external package (basic)", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
   pkgzip <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_package_deploy_to_lrepo("TestPackage1", prj, type = "source")
 
   RSuite::pkgzip_build_ext_packages("TestPackage1", prj = prj, pkg_type = "source", path = pkgzip$path)
@@ -26,10 +25,9 @@ test_that_managed("Create PKGZIP out of external package (basic)", {
 })
 
 test_that_managed("Create PKGZIP out of external package (with deps)", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
   pkgzip <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_package_deploy_to_lrepo("TestPackage1", prj, type = "source")
   create_package_deploy_to_lrepo("TestPackage2", prj, deps = "TestPackage1", type = "source")
 
@@ -41,10 +39,10 @@ test_that_managed("Create PKGZIP out of external package (with deps)", {
 
 test_that_managed("Create PKGZIP out of external package (with filtering)", {
   # first build repository containing TestPackage1 v1.0
-  prj1 <- init_test_project(repo_adapters = c("Dir"), name = "TestPackage1")
+  prj1 <- init_test_project(repo_adapters = c("Dir"),  # uses BaseTestProjectTemplate with logging 0.7-103
+                            name = "TestPackage1")
   pkgzip1 <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj1, type = "source")
   create_package_deploy_to_lrepo("TestPackage1", prj1, type = "source", ver = "1.0")
   RSuite::pkgzip_build_ext_packages("TestPackage1", prj = prj1, pkg_type = "source", path = pkgzip1$path)
   expect_that_pkgzip_contains("TestPackage1", type = "source", pkgzip = pkgzip1)
@@ -53,8 +51,7 @@ test_that_managed("Create PKGZIP out of external package (with filtering)", {
   RSuite::repo_upload_pkgzip(repo_manager = mgr$repo_mgr, pkgzip = pkgzip1$get_pkgzip_fpath())
 
   # next build project with repository containing TestPackage1 v2.0 and TestPackage2
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   create_package_deploy_to_lrepo("TestPackage1", prj, type = "source", ver = "2.0")
   create_package_deploy_to_lrepo("TestPackage2", prj, deps = "TestPackage1", type = "source")
 
@@ -68,10 +65,10 @@ test_that_managed("Create PKGZIP out of external package (with filtering)", {
 
 test_that_managed("Create PKGZIP out of external package (with filtering and version select)", {
   # first build repository containing TestPackage1 v1.0
-  prj1 <- init_test_project(repo_adapters = c("Dir"), name = "TestPackage1")
+  prj1 <- init_test_project(repo_adapters = c("Dir"),  # uses BaseTestProjectTemplate with logging 0.7-103
+                            name = "TestPackage1")
   pkgzip1 <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj1, type = "source")
   create_package_deploy_to_lrepo("TestPackage1", prj1, type = "source", ver = "1.0")
   RSuite::pkgzip_build_ext_packages("TestPackage1", prj = prj1, pkg_type = "source", path = pkgzip1$path)
   expect_that_pkgzip_contains("TestPackage1", type = "source", pkgzip = pkgzip1)
@@ -80,8 +77,7 @@ test_that_managed("Create PKGZIP out of external package (with filtering and ver
   RSuite::repo_upload_pkgzip(repo_manager = mgr$repo_mgr, pkgzip = pkgzip1$get_pkgzip_fpath())
 
   # next build project with repository containing TestPackage1 v2.0 and TestPackage2
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   create_package_deploy_to_lrepo("TestPackage1", prj, type = "source", ver = "2.0")
   create_package_deploy_to_lrepo("TestPackage2", prj, deps = "TestPackage1 (>= 2.0)", type = "source")
 

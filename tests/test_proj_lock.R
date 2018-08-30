@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if project environment locking works properly")
+context("Testing if project environment locking works properly [test_proj_lock]")
 
 library(RSuite)
 library(testthat)
@@ -11,64 +11,73 @@ source("R/test_utils.R")
 source("R/project_management.R")
 source("R/repo_management.R")
 
+register_project_templ("TestProjLock", function(prj) {
+  params <- prj$load_params()
+  create_package_deploy_to_lrepo(name = "AddedTestDependency",
+                                 prj = prj, ver = "1.0", type = params$bin_pkgs_type)
+  create_package_deploy_to_lrepo(name = "TestDependencyToRemove",
+                                 prj = prj, ver = "1.0", type = params$bin_pkgs_type)
+  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate",
+                                 prj = prj, ver = "1.0", type = params$bin_pkgs_type)
+  create_package_deploy_to_lrepo(name = "TestDependencyToUpdate",
+                                 prj = prj, ver = "1.1", type = params$bin_pkgs_type)
+})
 
-# create test project with prepared repo
-invisible(capture.output(create_lock_test_prj()))
 
 test_that_managed("Project environment lock file creation", {
-   # Prepare project
-   prj <- init_lock_test_prj()
-   params <- prj$load_params()
+  # Prepare project
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
+  params <- prj$load_params()
 
-   create_test_package(name = "TestPackage", prj = prj, deps = c("logging"))
+  create_test_package(name = "TestPackage", prj = prj, deps = c("logging"))
 
-   # install dependencies
-   RSuite::prj_install_deps(prj)
+  # install dependencies
+  RSuite::prj_install_deps(prj)
 
-   # Lock project environment
-   RSuite::prj_lock_env(prj)
-   lock_data <- read.dcf(params$lock_path)
+  # Lock project environment
+  RSuite::prj_lock_env(prj)
+  lock_data <- read.dcf(params$lock_path)
 
-   # Check if all installed packages where locked
-   expect_true(file.exists(params$lock_path))
-   expect_that_packages_locked(c(logging = "0.7-103"), params)
- })
+  # Check if all installed packages where locked
+  expect_true(file.exists(params$lock_path))
+  expect_that_packages_locked(c(logging = "0.7-103"), params)
+})
 
 
 test_that_managed("Locking environment with uninstalled direct dependencies", {
-   # Prepare project
-   prj <- init_lock_test_prj()
-   params <- prj$load_params()
+  # Prepare project
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
+  params <- prj$load_params()
 
-   create_test_package("TestPackage", prj, deps = c("logging"))
+  create_test_package("TestPackage", prj, deps = c("logging"))
 
-   # Try locking the project environment with uninstalled dependencies
-   expect_error(RSuite::prj_lock_env(prj))
+  # Try locking the project environment with uninstalled dependencies
+  expect_error(RSuite::prj_lock_env(prj))
 })
 
 
 test_that_managed("Locked environment, no unfeasibles", {
-   prj <- init_lock_test_prj()
-   params <- prj$load_params()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
+  params <- prj$load_params()
 
 
-   # Create package and install deps
-   create_test_package("TestPackage", prj, deps = "TestDependencyToUpdate (== 1.0)")
-   RSuite::prj_install_deps(prj)
+  # Create package and install deps
+  create_test_package("TestPackage", prj, deps = "TestDependencyToUpdate (== 1.0)")
+  RSuite::prj_install_deps(prj)
 
-   # Lock environment
-   RSuite::prj_lock_env(prj)
+  # Lock environment
+  RSuite::prj_lock_env(prj)
 
-   # Set dependency to make newer version available
-   set_test_package_deps("TestPackage", prj = prj, deps = "TestDependencyToUpdate")
-   RSuite::prj_install_deps(prj, clean = TRUE)
+  # Set dependency to make newer version available
+  set_test_package_deps("TestPackage", prj = prj, deps = "TestDependencyToUpdate")
+  RSuite::prj_install_deps(prj, clean = TRUE)
 
-   expect_that_packages_installed(c("TestDependencyToUpdate", "logging"), prj, versions = c("1.0", "0.7-103"))
- })
+  expect_that_packages_installed(c("TestDependencyToUpdate", "logging"), prj, versions = c("1.0", "0.7-103"))
+})
 
 
 test_that_managed("Locked environment, unfeasibles", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package and install deps
@@ -88,37 +97,37 @@ test_that_managed("Locked environment, unfeasibles", {
 
 
 test_that_managed("Unlocking locked environment", {
-   # Prepare project
-   prj <- init_lock_test_prj()
-   params <- prj$load_params()
+  # Prepare project
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
+  params <- prj$load_params()
 
-   # install dependencies
-   RSuite::prj_install_deps(prj)
+  # install dependencies
+  RSuite::prj_install_deps(prj)
 
-   # Lock project environment
-   RSuite::prj_lock_env(prj)
+  # Lock project environment
+  RSuite::prj_lock_env(prj)
 
-   # Unlock project environment
-   RSuite::prj_unlock_env(prj)
+  # Unlock project environment
+  RSuite::prj_unlock_env(prj)
 
-   # Check if lock file was removed
-   expect_false(file.exists(params$lock_path))
+  # Check if lock file was removed
+  expect_false(file.exists(params$lock_path))
 })
 
 
 test_that_managed("Unlocking not unlock environment", {
-   # Prepare project
-   prj <- init_lock_test_prj()
-   params <- prj$load_params()
+  # Prepare project
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
+  params <- prj$load_params()
 
-   # Unlock project environment
-   expect_log_message(RSuite::prj_unlock_env(prj),
-                      regexp = "The project environment is not locked")
+  # Unlock project environment
+  expect_log_message(RSuite::prj_unlock_env(prj),
+                     regexp = "The project environment is not locked")
 })
 
 
 test_that_managed("Add new dependency, lock updating", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package and install deps
@@ -140,7 +149,7 @@ test_that_managed("Add new dependency, lock updating", {
 
 
 test_that_managed("Update dependency, no relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package and install deps
@@ -159,7 +168,7 @@ test_that_managed("Update dependency, no relocking", {
 
 
 test_that_managed("Update dependency, relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package and install deps
@@ -181,7 +190,7 @@ test_that_managed("Update dependency, relocking", {
 
 
 test_that_managed("Remove dependency, no relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package and install deps
@@ -201,7 +210,7 @@ test_that_managed("Remove dependency, no relocking", {
 
 
 test_that_managed("Remove dependency, relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package and install deps
@@ -224,7 +233,7 @@ test_that_managed("Remove dependency, relocking", {
 
 
 test_that_managed("Add and Remove dependency, relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package with dependency to remove and install deps
@@ -247,7 +256,7 @@ test_that_managed("Add and Remove dependency, relocking", {
 
 
 test_that_managed("Add and Update dependency, relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package with dependency to update and install deps
@@ -275,7 +284,7 @@ test_that_managed("Add and Update dependency, relocking", {
 
 
 test_that_managed("Remove and Update dependency, relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package with dependency to update
@@ -302,7 +311,7 @@ test_that_managed("Remove and Update dependency, relocking", {
 
 
 test_that_managed("Add, Remove and Update dependency, relocking", {
-  prj <- init_lock_test_prj()
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestProjLock"))
   params <- prj$load_params()
 
   # Create package with dependency to update

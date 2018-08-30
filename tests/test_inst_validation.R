@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if package install validations works properly")
+context("Testing if package install validations works properly [test_inst_validation]")
 
 library(RSuite)
 library(testthat)
@@ -15,11 +15,9 @@ test_that_managed("Post-install R version check works", {
   skip_if_not(.Platform$pkgType == "win.binary")
   skip_if_not(RSuite:::current_rver() == "3.4")
   skip_if(httr::http_error("https://mran.microsoft.com/snapshot/2017-01-08/bin/windows/contrib/3.4/colorspace_1.3-2.zip"))
-  
-  prj <- init_test_project(repo_adapters = c("Dir", "MRAN[2017-01-08]"))
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
 
-  
+  prj <- init_test_project(repo_adapters = c("Dir", "MRAN[2017-01-08]")) # uses BaseTestProjectTemplate with logging 0.7-103
+
   # prj_config_set_rversion("3.4", prj = prj)
   create_test_master_script(prj = prj, code = "library(colorspace)")
 
@@ -31,8 +29,7 @@ test_that_managed("Post-install R version check works", {
 })
 
 test_that_managed("Post building docs imports in NAMESPACE shoud get fixed", {
-  prj <- init_test_project(repo_adapters = "Dir")
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = "Dir") # uses BaseTestProjectTemplate with logging 0.7-103
   create_package_deploy_to_lrepo(name = "TestPackage1", prj = prj)
 
   create_test_package("TestPackage2", prj, imps = "logging, TestPackage1")
@@ -45,8 +42,7 @@ test_that_managed("Post building docs imports in NAMESPACE shoud get fixed", {
 })
 
 test_that_managed("Post building docs declared imports should confirm to NAMESPACE", {
-  prj <- init_test_project(repo_adapters = "Dir")
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = "Dir")  # uses BaseTestProjectTemplate with logging 0.7-103
 
   create_test_package("TestPackage1", prj)
   set_test_package_ns_imports("TestPackage1", prj, c("logging", "TestPackage"))
@@ -58,8 +54,7 @@ test_that_managed("Post building docs declared imports should confirm to NAMESPA
 })
 
 test_that_managed("Post building docs declared imports should handle names with . properly", {
-  prj <- init_test_project(repo_adapters = "Dir")
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = "Dir")  # uses BaseTestProjectTemplate with logging 0.7-103
   create_package_deploy_to_lrepo(name = "Package.With.Dot.In.Name", prj)
 
   create_test_package("TestPackage", prj, imps = "Package.With.Dot.In.Name")

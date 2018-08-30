@@ -371,13 +371,13 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
     }
 
     arch_url <- repo_info$get_arch_src_url(req$pkg)
-    if (is.null(arch_url) || httr::http_error(arch_url)) {
+    if (is.null(arch_url)) {
       return()
     }
 
     conn <- url(arch_url)
     html <- tryCatch({
-      readLines(conn)
+      suppressWarnings(readLines(conn))
     },
     error = function(e) character(0),
     finally = {

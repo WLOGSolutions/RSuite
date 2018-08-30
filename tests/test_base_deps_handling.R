@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if base dependencies are handled properly")
+context("Testing if base dependencies are handled properly [test_base_deps_handling]")
 
 library(RSuite)
 library(testthat)
@@ -12,9 +12,8 @@ source("R/project_management.R")
 
 
 test_that_managed("Instaling package which requires methods", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage", prj, deps = "R (>= 3.1.0), methods")
 
   RSuite::prj_install_deps(prj)
@@ -23,9 +22,8 @@ test_that_managed("Instaling package which requires methods", {
 })
 
 test_that_managed("Build deps which contains grid", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_master_script(code = "library(grid)", prj = prj)
 
   RSuite::prj_install_deps(prj)

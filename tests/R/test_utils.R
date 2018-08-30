@@ -5,13 +5,13 @@
 # Test supporting tools.
 #----------------------------------------------------------------------------
 
-options(rsuite.cache_path = "~/.rsuite")
+options(rsuite.cache_path = "~/.rsuite/cache")
 options(rsuite.user_templ_path = "~/.rsuite/templates")
 
 .test_env <- new.env()
 assign("cleanup", c(), envir = .test_env)
 
-test_that_managed <- function(desc, ...) {
+eval_managed <- function(desc, expr) {
   tryCatch({
     # setup logging
     root_level <- logging::getLogger()$level
@@ -20,6 +20,10 @@ test_that_managed <- function(desc, ...) {
       logging::setLevel(root_level)
       logging::setLevel(rsuite_level, RSuite::rsuite_getLogger())
     })
+
+    if (!dir.exists(getOption("rsuite.user_templ_path"))) { # to prevent warning
+      dir.create(getOption("rsuite.user_templ_path"), recursive = TRUE, showWarnings = FALSE)
+    }
 
     log_file <- file.path(.get_create_dir("logs"), sprintf("test_%s.log", Sys.Date()))
     cat(sprintf("====> %s <====\n", desc), file = log_file, append = T)
@@ -33,11 +37,15 @@ test_that_managed <- function(desc, ...) {
 
     unlink(get_wspace_dir(), recursive = T, force = T)
 
-    test_that(desc, ...)
+    expr
   }, finally = {
     fire_cleanups()
     logging::removeHandler(handler = "RSuite.tests.file.logger")
   })
+}
+
+test_that_managed <- function(desc, ...) {
+  eval_managed(desc, { test_that(desc, ...) })
 }
 
 fire_cleanups <- function() {
@@ -56,7 +64,7 @@ on_test_exit <- function(cup) {
 get_wspace_dir <- function() { .get_create_dir("wspace") }
 get_data_dir <- function() { .get_create_dir("data") }
 get_wspace_template_dir <- function() { .get_create_dir("wspace/templates")}
-
+get_templ_dir <- function() { .get_create_dir("data/templates") }
 
 .get_create_dir <- function(name) {
   dpath <- file.path(RSuite::prj_init()$path, "tests", name)
@@ -124,60 +132,4 @@ test_that_template <- function(desc, ...) {
     options(rsuite.user_templ_path = unlist(old_option))
   })
   test_that_managed(desc, ...)
-}
-
-
-# used for the lock test project source creation, might be useful in the future
-create_lock_test_prj <- function() {
-  templ_path <- file.path("data", "LockTestProjectTemplate")
-  if (dir.exists(templ_path)) {
-    unlink(templ_path, recursive = TRUE, force = TRUE)
-  }
-
-  unzip(file.path("data", "LockTestProjectTemplate.zip"), exdir = "data")
-
-  build_prj <- RSuite::prj_start("LockTestProjectBuild", skip_rc = TRUE, path = templ_path, tmpl = templ_path)
-  params <- build_prj$load_params()
-  on.exit({
-    unlink(params$prj_path, recursive = TRUE, force = TRUE)
-  },
-  add = TRUE)
-
-
-  dst_rmgr <- RSuite::repo_mng_start("Dir",
-                                     path = normalizePath(file.path(templ_path, "project", "repository")),
-                                     rver = params$r_ver,
-                                     types = params$bin_pkgs_type)
-  RSuite::repo_upload_ext_packages(dst_rmgr,
-                                   pkgs = c("logging", "AddedTestDependency", "TestDependencyToRemove", "TestDependencyToUpdate"),
-                                   prj = build_prj,
-                                   pkg_type = params$bin_pkgs_type)
-
-  # repo_upload_ext_packages builds TestDependencyToUpdate v1.1 we still need v1.0, so ...
-  # ... we remove TestDependencyToUpdate v1.1 and uploading ext packages again
-  src_rmgr <- RSuite::repo_mng_start("Dir",
-                                     path = normalizePath(file.path(params$prj_path, "repository")),
-                                     rver = params$r_ver,
-                                     types = "source")
-  RSuite::repo_mng_remove(src_rmgr,
-                          toremove = data.frame(Package = "TestDependencyToUpdate", Version = "1.1", stringsAsFactors = FALSE),
-                          pkg_type = "source")
-  RSuite::repo_mng_stop(src_rmgr)
-
-  RSuite::repo_upload_ext_packages(dst_rmgr,
-                                   pkgs = c("TestDependencyToUpdate"),
-                                   prj = build_prj,
-                                   pkg_type = params$bin_pkgs_type)
-
-  RSuite::repo_mng_stop(dst_rmgr)
-}
-
-init_lock_test_prj <- function() {
-  prj <- init_test_project(tmpl = file.path("data", "LockTestProjectTemplate"))
-
-  on_test_exit(function() {
-    unlink(file.path(get_wspace_dir(), "LockTestProjectTemplate"), force = T, recursive = T)
-  })
-
-  return(prj)
 }

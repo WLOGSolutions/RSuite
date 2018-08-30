@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if building succeeds for package dependant on stringr (roxygen issue)")
+context("Testing if building succeeds for package dependant on stringr (roxygen issue) [test_stringr_dep_build]")
 
 library(RSuite)
 library(testthat)

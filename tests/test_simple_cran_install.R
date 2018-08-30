@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing simple CRAN installation (dependencies detection, basic deployment scenarios)")
+context("Testing simple CRAN installation (dependencies detection, basic deployment scenarios) [test_simple_cran_install]")
 
 library(RSuite)
 library(testthat)

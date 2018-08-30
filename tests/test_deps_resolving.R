@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if project packages are built regarding dependencies")
+context("Testing if project packages are built regarding dependencies [test_deps_resolving]")
 
 library(RSuite)
 library(testthat)
@@ -11,11 +11,25 @@ source("R/test_utils.R")
 source("R/project_management.R")
 source("R/repo_management.R")
 
+register_project_templ("TestDepsResolving", function(prj) {
+  params <- prj$load_params()
+  create_package_deploy_to_lrepo(name = "TestDep1", prj = prj, ver = "1.0", type = params$bin_pkgs_type)
+  create_package_deploy_to_lrepo(name = "TestDep2", prj = prj, ver = "1.0", type = params$bin_pkgs_type,
+                                 deps = "TestDep1 (>= 1.0)")
+
+  create_package_deploy_to_lrepo(name = "TestDep1", prj = prj, ver = "1.1", type = params$bin_pkgs_type)
+  create_package_deploy_to_lrepo(name = "TestDep2", prj = prj, ver = "1.1", type = params$bin_pkgs_type,
+                                 deps = "TestDep1 (>= 1.1)")
+
+  create_package_deploy_to_lrepo(name = "TestDep3", prj = prj, ver = "1.0", type = params$bin_pkgs_type,
+                                 deps = "TestDep2")
+})
+
+
 
 test_that_managed("Installs dependency sequence TestPackage1 imports TestPackage2", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage1", prj, imps = "logging, TestPackage2")
   set_test_package_ns_imports("TestPackage1", prj, c("logging", "TestPackage2"))
   create_test_package("TestPackage2", prj)
@@ -31,10 +45,9 @@ test_that_managed("Installs dependency sequence TestPackage1 imports TestPackage
 
 
 test_that_managed("Installs dependency sequence src -> bin -> src -> Package", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
   bin_type <- ifelse(.Platform$pkgType != "source", .Platform$pkgType, "binary")
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_package_deploy_to_lrepo(name = "TestPackage1", prj, type = "source")
   create_package_deploy_to_lrepo(name = "TestPackage2", prj, type = bin_type, deps = "TestPackage1")
   create_package_deploy_to_lrepo(name = "TestPackage3", prj, type = "source", deps = "TestPackage2")
@@ -51,136 +64,116 @@ test_that_managed("Installs dependency sequence src -> bin -> src -> Package", {
 
 
 test_that_managed("Test if specific subdependencies versions are handled properly", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestDepsResolving"))
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_package_deploy_to_lrepo(name = "TestDependency", prj, ver = "1.0", type = "source")
-  create_package_deploy_to_lrepo(name = "TestDependency", prj, ver = "1.1", type = "source")
-  create_package_deploy_to_lrepo(name = "TestParentDependency", prj, ver = "1.0",
-                                 deps = "TestDependency (>= 1.0)", type = "source")
-  create_package_deploy_to_lrepo(name = "TestParentDependency", prj, ver = "1.1",
-                                 deps = "TestDependency (>= 1.1)", type = "source")
-
-  create_test_package("TestPackage", prj, deps = c("TestDependency (== 1.0)",
-                                                   "TestParentDependency"))
+  create_test_package("TestPackage", prj, deps = c("TestDep1 (== 1.0)", # should TestDep2 == 1.0
+                                                   "TestDep2"))
 
   RSuite::prj_install_deps(prj)
-  expect_that_packages_installed(names =  c("logging", "TestDependency", "TestParentDependency"),
+  expect_that_packages_installed(names =  c("logging", "TestDep2", "TestDep1"),
                                  prj = prj,
                                  versions = c(NA, "1.0", "1.0"))
 })
 
 test_that_managed("Multiple repositories subdependency in previous repo.", {
   # setup repositories and test project
-  repo_adapter <- init_test_dir_adapter("TestDir")
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  repo_manager <- init_test_manager(prj = prj,
-                                    ra_name = "TestDir")
-  prj <- init_test_project(repo_adapters = c("Dir", sprintf("TestDir[%s]", repo_manager$path)))
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestDepsResolving"))
+  params <- prj$load_params()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  rmgr1 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr1$repo_mgr, c("TestDep1", "logging"),
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  # upload subdependency to first repo
-  create_package_deploy_to_lrepo(name = "TestSubdependency", prj = prj, type = "source")
+  rmgr2 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr2$repo_mgr, "TestDep2",
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  # upload dependency to second repo
-  create_package_deploy_to_repo("TestDependency", prj = prj,
-                                repo_manager = repo_manager$repo_mgr,
-                                deps = "TestSubdependency",
-                                type = "source")
+  RSuite::prj_config_set_repo_adapters(repos = sprintf("Dir[%s]", c(rmgr1$path, rmgr2$path)),
+                                       prj = prj)
 
-  create_test_package("TestPackage", prj, deps = c("TestDependency (== 1.0)",
-                                                   "TestDependency"))
+  create_test_package("TestPackage", prj, deps = "TestDep2") # TestDep2 <- TestDep1
+
 
   RSuite::prj_install_deps(prj)
-  expect_that_packages_installed(names =  c("logging",
-                                            "TestDependency",
-                                            "TestSubdependency"),
+
+
+  expect_that_packages_installed(names =  c("logging", "TestDep2", "TestDep1"),
                                  prj = prj)
 })
 
 
 test_that_managed("Multiple repositories subsubdependency -> subdependency -> dependency  in previous repo.", {
   # setup repositories and test project
-  init_test_dir_adapter("Dir2")
-  init_test_dir_adapter("Dir3")
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  dir2_repo_manager <- init_test_manager(prj = prj,
-                                    ra_name = "Dir2")
-  dir3_repo_manager <- init_test_manager(prj = prj,
-                                    ra_name = "Dir3")
-  prj <- init_test_project(repo_adapters = c("Dir",
-                                             sprintf("Dir2[%s]", dir2_repo_manager$path),
-                                             sprintf("Dir3[%s]", dir3_repo_manager$path)))
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestDepsResolving"))
+  params <- prj$load_params()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  rmgr1 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr1$repo_mgr, c("TestDep1", "logging"),
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  # upload subdependency to first repo
-  create_package_deploy_to_lrepo(name = "TestDependency1", prj = prj, type = "source")
+  rmgr2 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr2$repo_mgr, "TestDep2",
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  # upload dependency to second repo
-  create_package_deploy_to_repo("TestDependency2", prj = prj,
-                                repo_manager = dir2_repo_manager$repo_mgr,
-                                deps = "TestDependency1",
-                                type = "source")
+  rmgr3 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr3$repo_mgr, "TestDep3",
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  # upload dependency to third repo
-  create_package_deploy_to_repo("TestDependency3", prj = prj,
-                                repo_manager = dir3_repo_manager$repo_mgr,
-                                deps = "TestDependency2",
-                                type = "source")
+  RSuite::prj_config_set_repo_adapters(repos = sprintf("Dir[%s]", c(rmgr1$path, rmgr2$path, rmgr3$path)),
+                                       prj = prj)
 
-  create_test_package("TestPackage", prj, deps = c("TestDependency3"))
+  create_test_package("TestPackage", prj, deps = c("TestDep3")) # TestDep3 <- TestDep2 <- TestDep1
+
 
   RSuite::prj_install_deps(prj)
-  expect_that_packages_installed(names =  c("logging",
-                                            "TestDependency1",
-                                            "TestDependency2",
-                                            "TestDependency3"),
+
+
+  expect_that_packages_installed(names =  c("logging", "TestDep1", "TestDep2", "TestDep3"),
                                  prj = prj)
 })
 
 
 test_that_managed("Multiple repositories subdependency in next repo.", {
   # setup repositories and test project
-  repo_adapter <- init_test_dir_adapter("TestDir")
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  repo_manager <- init_test_manager(prj = prj,
-                                    ra_name = "TestDir")
-  prj <- init_test_project(repo_adapters = c("Dir", sprintf("TestDir[%s]", repo_manager$path)))
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestDepsResolving"))
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  rmgr1 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr1$repo_mgr, c("TestDep1", "logging"),
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  # upload subdependency to first repo
-  create_package_deploy_to_repo(name = "TestSubdependency",
-                                repo_manager = repo_manager$repo_mgr,
-                                prj = prj,
-                                type = "source")
+  rmgr2 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr2$repo_mgr, "TestDep2",
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  # upload dependency to second repo
-  create_package_deploy_to_lrepo("TestDependency", prj = prj,
-                                deps = "TestSubdependency",
-                                type = "source")
-  create_test_package("TestPackage", prj, deps = c("TestDependency (== 1.0)",
-                                                   "TestDependency"))
+  RSuite::prj_config_set_repo_adapters(repos = sprintf("Dir[%s]", c(rmgr1$path, rmgr2$path)),
+                                       prj = prj)
+
+  create_test_package("TestPackage", prj, deps = c("TestDep2 (>= 1.0)", # TestDep2 <- TestDep1
+                                                   "TestDep2"))
 
   RSuite::prj_install_deps(prj)
-  expect_that_packages_installed(names =  c("logging",
-                                            "TestDependency",
-                                            "TestSubdependency"),
+
+
+  expect_that_packages_installed(names =  c("logging", "TestDep2", "TestDep1"),
                                  prj = prj)
 })
 
 
 test_that_managed("Multiple repositories unavailable dependency.", {
-  repo_adapter <- init_test_dir_adapter("TestDir")
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  repo_manager <- init_test_manager(prj = prj,
-                                    ra_name = "TestDir")
-  prj <- init_test_project(repo_adapters = c("Dir", sprintf("TestDir[%s]", repo_manager$path)))
+  prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestDepsResolving"))
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
-  create_test_package("TestPackage", prj, deps = c("TestDependency"))
+  rmgr1 <- init_test_manager(prj = prj)
+  RSuite::repo_upload_ext_packages(rmgr1$repo_mgr, "logging",
+                                   prj = prj, pkg_type = params$bin_pkgs_type)
 
-  expect_error(RSuite::prj_install_deps(prj), "Required dependencies are not available: TestDependency")
+  rmgr2 <- init_test_manager(prj = prj)
+
+  RSuite::prj_config_set_repo_adapters(repos = sprintf("Dir[%s]", c(rmgr1$path, rmgr2$path)),
+                                       prj = prj)
+
+
+  create_test_package("TestPackage", prj, deps = c("TestDep1"))
+
+
+  expect_error(RSuite::prj_install_deps(prj), "Required dependencies are not available: TestDep1")
 })

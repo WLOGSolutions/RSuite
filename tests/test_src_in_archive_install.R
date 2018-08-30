@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing installation from source archive")
+context("Testing installation from source archive [test_src_in_archive_install]")
 
 library(RSuite)
 library(testthat)
@@ -17,8 +17,7 @@ test_that_managed("glue in archive version is installed", {
   # CRAN contains in main repository glue 1.3.0 for R3.5 and 1.2.0 for R3.3 & R 3.4
   #  glue 1.1.0 is available only in source archive
 
-  prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   create_test_package("TestPackage1", prj, imps = "glue (== 1.1)")
 
   RSuite::prj_install_deps(prj)

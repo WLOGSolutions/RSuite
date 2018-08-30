@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if specific packages are installing properly (ROracle, H2O)")
+context("Testing if specific packages are installing properly (ROracle, H2O) [test_specific_pkgs_install]")
 
 library(RSuite)
 library(testthat)

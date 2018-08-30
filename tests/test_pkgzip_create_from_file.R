@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if creation of PKGZIP from package file works properly")
+context("Testing if creation of PKGZIP from package file works properly  [test_pkgzip_create_from_file]")
 
 library(RSuite)
 library(testthat)

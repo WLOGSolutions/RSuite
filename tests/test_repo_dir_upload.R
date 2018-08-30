@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if uploading into directory works properly")
+context("Testing if uploading into directory works properly [test_repo_dir_upload]")
 
 library(RSuite)
 library(testthat)

@@ -75,13 +75,12 @@ tmpl_list_registered <- function() {
 #' template in working directory.
 #'
 #' @param name name of the template being created. (type: character(1))
-#'
 #' @param path path to the directory where the template should be created. If
 #'   NULL will use the folder with user template. (type: character(1), default: getwd())
-#'
 #' @param add_prj if TRUE include project template to the template directory
-#'
 #' @param add_pkg if TRUE include package template in the template directory
+#' @param base_tmpl name of the package and/or project template (or path to it) to use for
+#'    template creation. (type: character(1); default: builtin).
 #'
 #' @family in templates management
 #'
@@ -91,7 +90,7 @@ tmpl_list_registered <- function() {
 #'
 #' @export
 #'
-tmpl_start <- function(name, path = getwd(), add_prj = TRUE, add_pkg = TRUE) {
+tmpl_start <- function(name, path = getwd(), add_prj = TRUE, add_pkg = TRUE, base_tmpl = "builtin") {
   assert(is.character(path) && length(path) == 1, "character(1) expected for path")
   assert(dir.exists(path), "Directory %s does not exists", path)
   assert(file.access(path, mode = 2) == 0, "User has no write permission to %s", path)
@@ -117,15 +116,23 @@ tmpl_start <- function(name, path = getwd(), add_prj = TRUE, add_pkg = TRUE) {
     prj_tmpl_path <- file.path(tmpl_path, "project")
     assert(!dir.exists(prj_tmpl_path), "%s template already exists.", prj_tmpl_path)
 
-    builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
-    on.exit({
-      unlink(builtin_temp, recursive = TRUE, force = TRUE)
-    },
-    add = TRUE)
+    prj_base_tmpl_dir <- get_prj_tmpl_dir(base_tmpl) # from 58_templates.R
+    assert(!is.null(prj_base_tmpl_dir) || base_tmpl == "builtin",
+           "Requested to start project template from unknown base template '%s'.", base_tmpl)
 
-    builtin_prj_template <- file.path(builtin_temp, "project")
-    success <- copy_folder(builtin_prj_template, prj_tmpl_path) # from 98_shell.R
-    assert(success, "Failed to create template at %s", prj_tmpl_path)
+    if (is.null(prj_base_tmpl_dir)) {
+      builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
+      on.exit({
+        unlink(builtin_temp, recursive = TRUE, force = TRUE)
+      },
+      add = TRUE)
+      prj_base_tmpl_dir <- file.path(builtin_temp, "project")
+    } else {
+      validate_prj_tmpl_struct(prj_base_tmpl_dir) # from 58_templates.R
+    }
+
+    success <- copy_folder(prj_base_tmpl_dir, prj_tmpl_path) # from 98_shell.R
+    assert(success, "Failed to create project template at %s", prj_tmpl_path)
     pkg_loginfo("%s project template was created successfully", name)
   }
 
@@ -134,15 +141,23 @@ tmpl_start <- function(name, path = getwd(), add_prj = TRUE, add_pkg = TRUE) {
     pkg_tmpl_path <- file.path(tmpl_path, "package")
     assert(!dir.exists(pkg_tmpl_path), "%s folder already exists.", pkg_tmpl_path)
 
-    builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
-    on.exit({
-      unlink(builtin_temp, recursive = TRUE, force = TRUE)
-    },
-    add = TRUE)
+    pkg_base_tmpl_dir <- get_pkg_tmpl_dir(base_tmpl) # from 58_templates.R
+    assert(!is.null(pkg_base_tmpl_dir) || base_tmpl == "builtin",
+           "Requested to start package template from unknown base template '%s'.", base_tmpl)
 
-    builtin_pkg_template <- file.path(builtin_temp, "package")
-    success <- copy_folder(builtin_pkg_template, pkg_tmpl_path) # from 98_shell.R
-    assert(success, "Failed to create template at %s", pkg_tmpl_path)
+    if (is.null(pkg_base_tmpl_dir)) {
+      builtin_temp <- get_builtin_templs_temp_base() # from 58_templates.R
+      on.exit({
+        unlink(builtin_temp, recursive = TRUE, force = TRUE)
+      },
+      add = TRUE)
+      pkg_base_tmpl_dir <- file.path(builtin_temp, "package")
+    } else {
+      validate_pkg_tmpl_struct(pkg_base_tmpl_dir) # from 58_templates.R
+    }
+
+    success <- copy_folder(pkg_base_tmpl_dir, pkg_tmpl_path) # from 98_shell.R
+    assert(success, "Failed to create package template at %s", pkg_tmpl_path)
     pkg_loginfo("%s package template was created successfully", name)
   }
 

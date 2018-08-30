@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if creation of project/package using templates works properly")
+context("Testing if creation of project/package using templates works properly [test_proj_templates]")
 
 library(RSuite)
 library(testthat)

@@ -5,12 +5,82 @@
 # Tools for project management during testing.
 #----------------------------------------------------------------------------
 
-init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject",
-                              tmpl = "builtin") {
+.init_base_test_templ <- function() {
+  templ_dir <- file.path(get_templ_dir(), "BaseTestProjectTemplate")
+  if (dir.exists(templ_dir)) {
+    return(templ_dir)
+  }
+
+  unzip(file.path("data", "BaseTestProjectTemplate.zip"), exdir = get_templ_dir())
+
+  build_prj <- RSuite::prj_start("BaseTestProjectBuild", skip_rc = TRUE, path = templ_dir, tmpl = templ_dir)
+  params <- build_prj$load_params()
+  on.exit({
+    unlink(params$prj_path, recursive = TRUE, force = TRUE)
+  },
+  add = TRUE)
+
+  dst_rmgr <- RSuite::repo_mng_start("Dir",
+                                     path = normalizePath(file.path(templ_dir, "project", "repository")),
+                                     rver = params$r_ver,
+                                     types = params$bin_pkgs_type)
+  RSuite::repo_upload_ext_packages(dst_rmgr,
+                                   pkgs = c("logging"),
+                                   prj = build_prj,
+                                   pkg_type = params$bin_pkgs_type)
+
+  RSuite::repo_mng_stop(dst_rmgr)
+
+  return(templ_dir)
+}
+
+.templ_env <- new.env()
+assign("templates", list(), envir = .templ_env)
+
+register_project_templ <- function(templ_name, init_f) {
+  eval_managed(sprintf("Registering project template %s", templ_name), {
+    .init_base_test_templ()
+
+    base_dir <- get_templ_dir()
+    templ_dir <- file.path(base_dir, templ_name)
+    if (!dir.exists(templ_dir)) {
+      RSuite::tmpl_start(templ_name, path = base_dir, add_pkg = FALSE,
+                         base_tmpl = file.path(base_dir, "BaseTestProjectTemplate"))
+
+      prj <- RSuite::prj_start(paste0(templ_name, "_Build"), skip_rc = T, path = base_dir, tmpl = templ_dir)
+      on.exit({
+        unlink(prj$path, recursive = TRUE, force = TRUE)
+      },
+      add = TRUE)
+
+      init_f(prj)
+
+      unlink(file.path(templ_dir, "project", "repository"), recursive = TRUE, force = TRUE)
+      file.rename(file.path(prj$path, "repository"), file.path(templ_dir, "project", "repository"))
+    }
+
+    templs <- get("templates", envir = .templ_env)
+    templs[[templ_name]] <- templ_dir
+    assign("templates", templs, envir = .templ_env)
+  })
+}
+
+get_project_templ <- function(templ_name) {
+  templs <- get("templates", envir = .templ_env)
+  if (!(templ_name %in% names(templs))) {
+    stop(sprintf("Requested non registered project template: %s", templ_name))
+  }
+  return(templs[[templ_name]])
+}
+
+init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject", tmpl = NULL) {
+  if (is.null(tmpl)) {
+    tmpl <- .init_base_test_templ()
+  }
+
   RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
 
-  prj <- RSuite::prj_start(name, skip_rc = T, path = get_wspace_dir(),
-                           tmpl = tmpl)
+  prj <- RSuite::prj_start(name, skip_rc = T, path = get_wspace_dir(), tmpl = tmpl)
   RSuite::prj_config_set_repo_adapters(repos = repo_adapters, prj = prj)
 
   unlink(file.path(prj$path, "deployment", "libs", "logging"),
@@ -26,13 +96,6 @@ init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject",
     unlink(prj$path, recursive = T, force = T)
   })
   return(prj)
-}
-
-
-deploy_package_to_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
-  loc_repo <- .get_local_repo_path(prj, type)
-  file.copy(file.path("data", pkg_file), loc_repo, overwrite = T)
-  RSuite:::rsuite_write_PACKAGES(loc_repo, type = type)
 }
 
 
@@ -124,7 +187,7 @@ set_test_package_deps <- function(name, prj, deps = NULL, sugs = NULL) {
     if (!is.null(sugs)) {
       pkg_desc$Suggests <- paste(sugs, collapse = ", ")
     }
- 
+
   }
 
   write.dcf(pkg_desc, file = pkg_desc_fname)

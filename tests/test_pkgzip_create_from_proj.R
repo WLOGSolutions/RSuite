@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if creation of PKGZIP from project packages works properly")
+context("Testing if creation of PKGZIP from project packages works properly  [test_pkgzip_create_from_proj]")
 
 library(RSuite)
 library(testthat)
@@ -14,10 +14,9 @@ source("R/repo_management.R")
 
 
 test_that_managed("Create PKGZIP out of project packages (basic)", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   pkgzip <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage", prj, deps = "R (>= 3.1.0), methods")
   RSuite::prj_install_deps(prj)
 
@@ -28,10 +27,9 @@ test_that_managed("Create PKGZIP out of project packages (basic)", {
 })
 
 test_that_managed("Create PKGZIP out of project packages (with pkg selection)", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   pkgzip <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage1", prj, deps = "R (>= 3.1.0), methods")
   create_test_package("TestPackage2", prj, deps = "TestPackage1")
   RSuite::prj_install_deps(prj)
@@ -43,12 +41,11 @@ test_that_managed("Create PKGZIP out of project packages (with pkg selection)", 
 })
 
 test_that_managed("Create PKGZIP out of project packages (with deps)", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   params <- prj$load_params()
 
   pkgzip <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage", prj, deps = "R (>= 3.1.0), methods")
   RSuite::prj_install_deps(prj)
 
@@ -61,10 +58,10 @@ test_that_managed("Create PKGZIP out of project packages (with deps)", {
 
 test_that_managed("Create PKGZIP out of project packages (with filtering)", {
   # first build repository containing TestPackage1 v1.0
-  prj1 <- init_test_project(repo_adapters = c("Dir"), name = "TestPackage1")
+  prj1 <- init_test_project(repo_adapters = c("Dir"),  # uses BaseTestProjectTemplate with logging 0.7-103
+                            name = "TestPackage1")
   pkgzip1 <- init_test_pkgzip()
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj1, type = "source")
   create_package_deploy_to_lrepo("TestPackage1", prj1, type = "source", ver = "1.0")
   RSuite::pkgzip_build_ext_packages("TestPackage1", prj = prj1, pkg_type = "source", path = pkgzip1$path)
   expect_that_pkgzip_contains("TestPackage1", type = "source", pkgzip = pkgzip1)
@@ -73,8 +70,7 @@ test_that_managed("Create PKGZIP out of project packages (with filtering)", {
   RSuite::repo_upload_pkgzip(repo_manager = mgr$repo_mgr, pkgzip = pkgzip1$get_pkgzip_fpath())
 
   # next build project with repository containing TestPackage1 v2.0
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   create_package_deploy_to_lrepo("TestPackage1", prj, type = "source", ver = "2.0")
   create_test_package("TestPackage2", prj, deps = "TestPackage1")
   RSuite::prj_install_deps(prj)
@@ -90,11 +86,10 @@ test_that_managed("Create PKGZIP out of project packages (with filtering)", {
 
 test_that_managed("Create PKGZIP out of project packages (with proj deps)", {
   # first build repository containing TestPackage1 v1.0
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   pkgzip <- init_test_pkgzip()
 
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   create_test_package("TestPackage1", prj)
   create_test_package("TestPackage2", prj, deps = "TestPackage1")
   RSuite::prj_install_deps(prj)

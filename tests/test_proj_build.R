@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if project building works properly")
+context("Testing if project building works properly [test_prj_build]")
 
 library(RSuite)
 library(testthat)
@@ -13,10 +13,8 @@ source("R/repo_management.R")
 
 
 test_that_managed("Handling project with package without NAMESPACE", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   params <- prj$load_params()
-
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
 
   create_test_package("TestPackage", prj)
 

@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if uploading project packages into directory works properly")
+context("Testing if uploading project packages into directory works properly [test_repo_dir_upload_from_proj]")
 
 library(RSuite)
 library(testthat)
@@ -13,10 +13,9 @@ source("R/repo_management.R")
 
 
 test_that_managed("Uploading project packages (basic)", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
   mgr <- init_test_manager(prj)
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage", prj, deps = "R (>= 3.1.0), methods")
   RSuite::prj_install_deps(prj)
 
@@ -26,10 +25,9 @@ test_that_managed("Uploading project packages (basic)", {
 })
 
 test_that_managed("Uploading project packages (with deps)", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
   mgr <- init_test_manager(prj)
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage", prj, deps = "R (>= 3.1.0), methods")
   RSuite::prj_install_deps(prj)
 

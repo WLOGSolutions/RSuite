@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if project structure handling works properly")
+context("Testing if project structure handling works properly [test_proj_struct]")
 
 library(RSuite)
 library(testthat)
@@ -31,8 +31,7 @@ test_that_managed("Updating old project deployment switch", {
 })
 
 test_that_managed("Handling project with package without NAMESPACE", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
+  prj <- init_test_project(repo_adapters = c("Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
 
   create_test_package("TestPackage", prj)
   # remove NAMESPACE

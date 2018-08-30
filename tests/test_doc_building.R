@@ -2,7 +2,7 @@
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #----------------------------------------------------------------------------
-context("Testing if project packages documentation builds properly")
+context("Testing if project packages documentation builds properly [test_doc_building]")
 
 library(RSuite)
 library(testthat)
@@ -12,9 +12,8 @@ source("R/project_management.R")
 
 
 test_that_managed("Simple documentation creation", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_test_package("TestPackage1", prj)
 
   RSuite::prj_install_deps(prj)
@@ -27,9 +26,8 @@ test_that_managed("Simple documentation creation", {
 })
 
 test_that_managed("Documentation creation for package with depends", {
-  prj <- init_test_project(repo_adapters = c("Dir"))
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
 
-  deploy_package_to_lrepo(pkg_file = "logging_0.7-103.tar.gz", prj = prj, type = "source")
   create_package_deploy_to_lrepo(name = "TestPackage1", prj, type = "source")
   create_test_package("TestPackage2", prj, deps = "TestPackage1")
 
