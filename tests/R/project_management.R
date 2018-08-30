@@ -107,7 +107,7 @@ remove_package_from_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
 
 
 create_test_package <- function(name, prj, ver = "1.0", deps = "",
-                                imps = "", tmpl = "builtin") {
+                                imps = "", sysreqs = "", tmpl = "builtin") {
   RSuite::prj_start_package(name, prj = prj, skip_rc = T, tmpl = tmpl)
   pkg_path <- file.path(prj$path, "packages", name)
 
@@ -123,6 +123,10 @@ create_test_package <- function(name, prj, ver = "1.0", deps = "",
     imps <- trimws(imps)
     if (sum(nchar(imps))) {
       pkg_desc$Imports <- paste(imps, collapse = ", ")
+    }
+    sysreqs <- trimws(sysreqs)
+    if (sum(nchar(sysreqs))) {
+      pkg_desc$SystemRequirements <- sysreqs
     }
     write.dcf(pkg_desc, file = pkg_desc_fname)
   }
@@ -147,8 +151,8 @@ create_test_master_script <- function(code, prj) {
 
 
 create_package_deploy_to_lrepo <- function(name, prj, ver = "1.0", type = .Platform$pkgType,
-                                           deps = "", imps = "logging") {
-  pkg_path <- create_test_package(name, prj, ver, deps = deps, imps = imps)
+                                           deps = "", sysreqs = "", imps = "logging") {
+  pkg_path <- create_test_package(name, prj, ver, deps = deps, imps = imps, sysreqs = sysreqs)
   set_test_package_ns_imports(name, prj, unlist(strsplit(imps, ",")))
 
   params <- prj$load_params()
