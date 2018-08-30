@@ -136,6 +136,7 @@ test_that_managed("Multiple repositories subsubdependency -> subdependency -> de
 test_that_managed("Multiple repositories subdependency in next repo.", {
   # setup repositories and test project
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestDepsResolving"))
+  params <- prj$load_params()
 
   rmgr1 <- init_test_manager(prj = prj)
   RSuite::repo_upload_ext_packages(rmgr1$repo_mgr, c("TestDep1", "logging"),
@@ -161,6 +162,7 @@ test_that_managed("Multiple repositories subdependency in next repo.", {
 
 test_that_managed("Multiple repositories unavailable dependency.", {
   prj <- init_test_project(repo_adapters = c("Dir"), tmpl = get_project_templ("TestDepsResolving"))
+  params <- prj$load_params()
 
   rmgr1 <- init_test_manager(prj = prj)
   RSuite::repo_upload_ext_packages(rmgr1$repo_mgr, "logging",
