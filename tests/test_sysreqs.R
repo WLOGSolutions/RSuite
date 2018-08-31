@@ -43,7 +43,7 @@ test_that_managed("Checking system requirements", {
   params <- prj$load_params()
 
   # add system requirements
-  create_test_master_script("library(png)", prj = prj)
+  create_test_master_script("library(webp)", prj = prj)
 
   expect_error(RSuite::sysreqs_check(prj = prj))
 
@@ -61,7 +61,7 @@ test_that_managed("Checking script creation", {
   prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
 
   # add system requirements
-  create_test_master_script("library(png)", prj = prj)
+  create_test_master_script("library(webp)", prj = prj)
 
   RSuite::sysreqs_script(prj = prj)
 
