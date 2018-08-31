@@ -381,12 +381,12 @@ is_binary <- function(file, blocksize = 512) {
 #'
 update_prj_tmpl <- function() {
   templates <- tmpl_list_registered() # from 08_api_tmpl.R
-  templates <- templates[templates$HasProjectTemplate,]
+  templates <- templates[templates$HasProjectTemplate, ]
   dcf_path <- system.file(file.path("rstudio", "templates", "project", "rsuite_project.dcf"),
                           package = "RSuite")
   rsuite_prj_dcf <- read.dcf(dcf_path)
   rsuite_prj_dcf[2, "Fields"] <- paste(templates$Name, collapse = ", ")
-  write.dcf(rsuite_prj_dcf, file = dcf_path)
+  write.dcf(rsuite_prj_dcf, file = dcf_path, width = Inf)
 }
 
 #'
@@ -404,5 +404,5 @@ update_pkg_tmpl <- function() {
                           package = "RSuite")
   rsuite_pkg_dcf <- read.dcf(dcf_path)
   rsuite_pkg_dcf[2, "Fields"] <- paste(templates$Name, collapse = ", ")
-  write.dcf(rsuite_pkg_dcf, file = dcf_path)
+  write.dcf(rsuite_pkg_dcf, file = dcf_path, width = Inf)
 }
