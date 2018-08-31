@@ -94,7 +94,7 @@ if (platform == "unix") {
   }
 }
 if (!(platform %in% names(platform_dict))) {
-  .fatal_error(sprintf("Update of RSuite CLI on '%s' platform is not suported.", platform))
+  .fatal_error(sprintf("Update of RSuite CLI on '%s' platform is not supported.", platform))
 }
 
 platform_desc <- platform_dict[[platform]]
