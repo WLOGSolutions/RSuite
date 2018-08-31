@@ -370,3 +370,39 @@ is_binary <- function(file, blocksize = 512) {
 
   return(length(nontext_chars) / length(block) > 0.3)
 }
+
+#'
+#' Updates R Suite project templates definitions in:
+#'
+#'  inst/rstudio/templates/project/rsuite_project.dcf
+#'
+#' @keywords internal
+#' @noRd
+#'
+update_prj_tmpl <- function() {
+  templates <- tmpl_list_registered() # from 08_api_tmpl.R
+  templates <- templates[templates$HasProjectTemplate,]
+  dcf_path <- system.file(file.path("rstudio", "templates", "project", "rsuite_project.dcf"),
+                          package = "RSuite")
+  rsuite_prj_dcf <- read.dcf(dcf_path)
+  rsuite_prj_dcf[2, "Fields"] <- paste(templates$Name, collapse = ", ")
+  write.dcf(rsuite_prj_dcf, file = dcf_path)
+}
+
+#'
+#' Updates R Suite package templates definitions in:
+#'
+#'  inst/rstudio/templates/project/rsuite_package.dcf
+#'
+#' @keywords internal
+#' @noRd
+#'
+update_pkg_tmpl <- function() {
+  templates <- tmpl_list_registered() # from 08_api_tmpl.R
+  templates <- templates[templates$HasPackageTemplate, ]
+  dcf_path <- system.file(file.path("rstudio", "templates", "project", "rsuite_package.dcf"),
+                          package = "RSuite")
+  rsuite_pkg_dcf <- read.dcf(dcf_path)
+  rsuite_pkg_dcf[2, "Fields"] <- paste(templates$Name, collapse = ", ")
+  write.dcf(rsuite_pkg_dcf, file = dcf_path)
+}
