@@ -35,8 +35,8 @@ test_that_managed("Collecting package system requirements", {
 test_that_managed("Checking system requirements", {
   travis_ci_flag <- as.logical(Sys.getenv("TravisCI", unset = FALSE))
   appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR", unset = FALSE))
-  is_windows <- .Platform$OS.type == "windows"
-  skip_if(is_windows)
+  is_linux <- RSuite:::get_os_type() == "unix"
+  skip_if_not(is_linux)
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
 
   prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
