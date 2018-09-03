@@ -59,7 +59,7 @@ denorm_version <- function(ver) {
 #' @param vers list of versions which can contain blocks of digits separeded with a dot
 #' or dash character (type: character).
 #'
-#' @return list of versiong digit vectors (type: list)
+#' @return list of versions digit vectors (type: list)
 #'
 get_version_numbers <- function(vers) {
   return(strsplit(vers, split = "[.-]"))

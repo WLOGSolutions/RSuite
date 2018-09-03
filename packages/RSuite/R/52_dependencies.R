@@ -324,7 +324,9 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
   stopifnot(is.versions(vers))
   stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
 
-  resolve_in_archive <- function(cr) { cr }
+  resolve_in_archive <- function(cr) {
+    cr
+  }
   if (is.null(all_pkgs)) {
     stopifnot(!missing(repo_info))
     stopifnot(!missing(type))
@@ -334,7 +336,9 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
     all_pkgs <- avail_vers$get_avails()
 
     if (type == "source") {
-      resolve_in_archive <- function(cr) { resolve_deps_in_src_archive(cr, repo_info) }
+      resolve_in_archive <- function(cr) {
+        resolve_deps_in_src_archive(cr, repo_info)
+      }
     }
   } else {
     avail_pkgs <- as.data.frame(all_pkgs, stringsAsFactors = FALSE)
