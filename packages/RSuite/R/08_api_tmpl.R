@@ -230,5 +230,4 @@ tmpl_register <- function(path = NULL, global = FALSE) {
 
   # Update R Suite project and package templates definitions
   update_prj_tmpl() # from 58_templates.R
-  update_pkg_tmpl() # from 58_templates.R
 }

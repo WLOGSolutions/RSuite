@@ -29,27 +29,6 @@ rstudio_prj_start <- function(path, ...) {
 }
 
 #'
-#' Bind to rstudio project creation menu. Creates an R Suite package.
-#' This function will be called when the user invokes the New Project
-#' wizard using the project template defined in the template file at:
-#'
-#'  inst/rstudio/templates/project/rsuite_package.dcf
-#'
-rstudio_prj_start_package <- function(path, ...) {
-  # collect arguments
-  name <- basename(path)
-  path <- dirname(path)
-  args <- list(...)
-
-  # check for template updates
-  update_pkg_tmpl() # from 58_templates.R
-
-  # create project
-  prj <- prj_init(path)
-  prj_start_package(name = name, prj = prj, skip_rc = args$skip_rc, tmpl = args$tmpl)
-}
-
-#'
 #' Detect project base dir in parents of path.
 #'
 #' @keywords internal

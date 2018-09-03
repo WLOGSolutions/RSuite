@@ -1,6 +1,8 @@
 # RSuite 0.33 (2018-08-??)
   * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
     master scripts (and tests) added.
+  * Added R Suite project templates to RStudio project templates. We can now create
+    R Suite projects using "File -> New Project..." in RStudio 
 
 # RSuite 0.32 (2018-08-15)
   * Unregistering repo adapters functionality added.

@@ -388,21 +388,3 @@ update_prj_tmpl <- function() {
   rsuite_prj_dcf[2, "Fields"] <- paste(templates$Name, collapse = ", ")
   write.dcf(rsuite_prj_dcf, file = dcf_path, width = Inf)
 }
-
-#'
-#' Updates R Suite package templates definitions in:
-#'
-#'  inst/rstudio/templates/project/rsuite_package.dcf
-#'
-#' @keywords internal
-#' @noRd
-#'
-update_pkg_tmpl <- function() {
-  templates <- tmpl_list_registered() # from 08_api_tmpl.R
-  templates <- templates[templates$HasPackageTemplate, ]
-  dcf_path <- system.file(file.path("rstudio", "templates", "project", "rsuite_package.dcf"),
-                          package = "RSuite")
-  rsuite_pkg_dcf <- read.dcf(dcf_path)
-  rsuite_pkg_dcf[2, "Fields"] <- paste(templates$Name, collapse = ", ")
-  write.dcf(rsuite_pkg_dcf, file = dcf_path, width = Inf)
-}
