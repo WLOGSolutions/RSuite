@@ -135,7 +135,8 @@ sysreqs_check <- function(prj = NULL) {
   result <- perform(recipe)
 
   assert(length(result$notools) + length(result$nolibs) == 0,
-         "Some system requirements are not satisfied")
+         sprintf("Some system requirements are not satisfied: %s",
+                 paste(c(result$notools, result$nolibs), collapse = ", ")))
 
   pkg_loginfo("All system requirements satisfied.")
 }
