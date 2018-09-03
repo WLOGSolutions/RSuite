@@ -27,8 +27,4 @@ rsuite_default_options <- list(
 
   rsuite_register_rc_adapter(rc_adapter_create_svn(name = "SVN"))
   rsuite_register_rc_adapter(rc_adapter_create_git(name = "GIT"))
-
-  # update inst/rstudio/templates/project/rsuite_project.dcf
-  # so already registered templates are available
-  update_prj_tmpl()
 }

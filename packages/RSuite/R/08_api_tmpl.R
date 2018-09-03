@@ -227,7 +227,4 @@ tmpl_register <- function(path = NULL, global = FALSE) {
   assert(all(success), "Failed to copy %s to %s", path, tmpl_dir)
 
   pkg_loginfo("%s template was registered successfully", path)
-
-  # Update R Suite project and package templates definitions
-  update_prj_tmpl() # from 58_templates.R
 }

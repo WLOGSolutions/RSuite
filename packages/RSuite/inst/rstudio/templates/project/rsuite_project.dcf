@@ -2,12 +2,6 @@ Binding: rstudio_prj_start
 Title: R Suite project
 OpenFiles: R/master.R
 
-Parameter: tmpl
-Widget: SelectInput
-Label: Project Template
-Fields: builtin
-Default: builtin
-
 Parameter: skip_rc
 Widget: CheckboxInput
 Label: Skip Revision Control

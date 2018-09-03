@@ -21,11 +21,8 @@ rstudio_prj_start <- function(path, ...) {
   path <- dirname(path)
   args <- list(...)
 
-  # check for template updates
-  update_prj_tmpl() # from 58_templates.R
-
   # create project
-  prj_start(name = name, path = path, skip_rc = args$skip_rc, tmpl = args$tmpl)
+  prj_start(name = name, path = path, skip_rc = args$skip_rc)
 }
 
 #'
