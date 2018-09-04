@@ -29,6 +29,7 @@ test_that_managed("Deployment zip of project under Git control", {
   })
   
   # commit all changes
+  git2r::config(user.name = "Alice", user.email = "alice@example.org")
   git2r::add(path = "*")
   git2r::commit(message = "init")
   git2r::tag(name = "001", message = "test tag")
