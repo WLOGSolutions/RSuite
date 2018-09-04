@@ -19,11 +19,12 @@ test_that_managed("Deployment zip of project under Git control", {
   
   # create project
   prj <- init_test_project()
-  create_test_package("TestPackage", prj = prj)
+  create_test_package("TestPackage", prj = prj, ver = "0.1")
+  RSuite::prj_install_deps(prj = prj)
   
   oldwd <- getwd()
   setwd(prj_path)
-  on_test_exit({
+  on_test_exit(function() {
     setwd(oldwd)
   })
   
@@ -35,5 +36,5 @@ test_that_managed("Deployment zip of project under Git control", {
   # create zip file (it should detect the tag)
   RSuite::prj_zip(prj = prj, get_wspace_dir())
   
-  expect_true(file.exists("TestProject_0.1_001.zip"))
+  expect_true(file.exists(file.path(get_wspace_dir(), "TestProject_0.1_001.zip")))
 })
