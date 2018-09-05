@@ -1,5 +1,5 @@
 # What is R Suite?
-R Suite was developed by [WLOG Solutions](http://wlogsolutions.com) company to make their development and deployment process robust. R Suite gives answers to the following challenges for any R based software solution:
+R Suite was developed by [WLOG Solutions](https://wlogsolutions.com) company to make their development and deployment process robust. R Suite gives answers to the following challenges for any R based software solution:
 
 * Isolated and reproducible projects with controlled dependencies and configuration.
 * Separation of business, infrastructural and domain logic.
