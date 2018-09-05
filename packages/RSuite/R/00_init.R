@@ -6,8 +6,8 @@
 #----------------------------------------------------------------------------
 
 rsuite_default_options <- list(
-  rsuite.cache_path = "~/.rsuite", # if unset prevents caching repository content and downloaded packages
-  rsuite.user_templ_path = "~/.rsuite/templates" # if unset will prevent using user templates
+  rsuite.cache_path = "", # if unset prevents caching repository content and downloaded packages
+  rsuite.user_templ_path = "" # if unset will prevent using user templates
 )
 
 .onLoad <- function(libpath, pkgname) {
