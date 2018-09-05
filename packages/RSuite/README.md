@@ -68,7 +68,7 @@ RSuite::prj_zip()
 
 This will create zip bundle containing you isolated project environment together with your master scripts and configuration template. Just extract it on your production and run your master scripts (no package installation will be required in the production environment).
 
-For more information check R Suite's [official webpage](http://rsuite.io)!
+For more information check R Suite's [official webpage](https://rsuite.io)!
 
 
 # How to install it

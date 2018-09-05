@@ -13,7 +13,7 @@ The following scenarios are presented:
 
 If you are stuck feel free to contact us:
 
-* through the R Suite website (http://rsuite.io#contact) or 
+* through the R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
 "Gitter R Suite room")
 * directly by sending an email with the description of your problem to
@@ -96,7 +96,7 @@ Before proceeding to the tutorial, let's look at the basic template commands tha
 * `rsuite tmpl register -p path_to_template` - registers a template found under the `path_to_template` path
 * `rsuite tmpl list` - lists all available registered templates
 
-For a more detailed description of the template commands please consider reading the `Template management` section of  the [R Suite CLI reference manual](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md) document.
+For a more detailed description of the template commands please consider reading the `Template management` section of  the [R Suite CLI reference manual](https://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md) document.
 
 # Project repo setup
 R Suite allows you to specify which package repository will be used in your project. By default, R Suite projects use MRAN as it provides the best reproducibility features. However, in some scenarios, it might be necessary to use a different repository like for example using a local repository when working in an internet-less environment.

@@ -1,6 +1,6 @@
 # Reproducible research with R Suite - basic workflow
 
-In this document we present a basic R Suite usage with [R Suite CLI](http://rsuite.io/RSuite_Download.php) tools. It covers:
+In this document we present a basic R Suite usage with [R Suite CLI](https://rsuite.io/RSuite_Download.php) tools. It covers:
 
 * creating project
 * adding custom packages

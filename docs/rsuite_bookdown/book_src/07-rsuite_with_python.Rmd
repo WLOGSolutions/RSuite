@@ -9,7 +9,7 @@ We are using:
 
 * [R v. 3.4.2](http://r-project.org)
 * [Anaconda v. 5.0.1](https://www.anaconda.com/).
-* [R Suite v. 0.18-224](http://rsuite.io)
+* [R Suite v. 0.18-224](https://rsuite.io)
 
 ## Step 1 - create your R Suite project
 
