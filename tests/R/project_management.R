@@ -73,14 +73,15 @@ get_project_templ <- function(templ_name) {
   return(templs[[templ_name]])
 }
 
-init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject", tmpl = NULL) {
+init_test_project <- function(repo_adapters = c("Dir"), name = "TestProject", tmpl = NULL,
+                              skip_rc = T) {
   if (is.null(tmpl)) {
     tmpl <- .init_base_test_templ()
   }
 
   RSuite::prj_load() # load RSuite project not to miss it in .libPaths()
 
-  prj <- RSuite::prj_start(name, skip_rc = T, path = get_wspace_dir(), tmpl = tmpl)
+  prj <- RSuite::prj_start(name, skip_rc = skip_rc, path = get_wspace_dir(), tmpl = tmpl)
   RSuite::prj_config_set_repo_adapters(repos = repo_adapters, prj = prj)
 
   unlink(file.path(prj$path, "deployment", "libs", "logging"),
@@ -107,8 +108,9 @@ remove_package_from_lrepo <- function(pkg_file, prj, type = .Platform$pkgType) {
 
 
 create_test_package <- function(name, prj, ver = "1.0", deps = "",
-                                imps = "", sysreqs = "", tmpl = "builtin") {
-  RSuite::prj_start_package(name, prj = prj, skip_rc = T, tmpl = tmpl)
+                                imps = "", sysreqs = "", tmpl = "builtin",
+                                skip_rc = T) {
+  RSuite::prj_start_package(name, prj = prj, skip_rc = skip_rc, tmpl = tmpl)
   pkg_path <- file.path(prj$path, "packages", name)
 
   pkg_desc_fname <- file.path(pkg_path, "DESCRIPTION")
