@@ -397,6 +397,24 @@ get_os_platform <- function() {
 }
 
 #'
+#' Checks if root is running the current R session on Unix systems
+#'
+#' @return TRUE if root is running the current R session.
+#'   (type: logical(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
+is_root <- function() {
+  if (.Platform$OS.type != "unix") {
+    return(FALSE)
+  }
+
+  home_dir <- Sys.getenv("HOME")
+  return(home_dir == "/root")
+}
+
+#'
 #' Retrieves distribution for the platform: Solaris, Ubuntu, Debian, Fedora, CentOS, RedHat or MacOS.
 #'
 #' @param platform current platform identifier (type: character(1))

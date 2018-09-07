@@ -8,7 +8,7 @@ screencast](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuit
 
 If you are stuck feel free to contact us:
 
-* through R Suite website (http://rsuite.io#contact) or 
+* through R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
   "Gitter R Suite room")
 * directly by sending email with your problem description to

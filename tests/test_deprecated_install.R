@@ -24,7 +24,7 @@ test_that_managed("Handling unavailable deprecated package", {
   params <- prj$load_params()
 
   # Prepare repo
-  remove_package_from_lrepo(pkg_file = "TestDependency_1.1.*", prj = prj, type = params$bin_pkgs_type)
+  remove_package_from_lrepo(pkg_file = "TestDependency_1.1*", prj = prj, type = params$bin_pkgs_type)
 
   # Create package and install deps
   create_test_package("TestPackage", prj, deps = "TestDependency")
@@ -34,7 +34,7 @@ test_that_managed("Handling unavailable deprecated package", {
   # "Create" deprecated dependency
   prj <- init_test_project(name = "TestProject", repo_adapters = c("Dir"), # reinitialize from template
                            tmpl = get_project_templ("TestDeprecatedInstall"))
-  remove_package_from_lrepo(pkg_file = "TestDependency_1.0.*", prj = prj, type = params$bin_pkgs_type)
+  remove_package_from_lrepo(pkg_file = "TestDependency_1.0*", prj = prj, type = params$bin_pkgs_type)
 
   RSuite::prj_install_deps(prj)
   expect_that_packages_installed(c("TestDependency", "logging"), prj = prj, versions = c("1.1", "0.7-103"))

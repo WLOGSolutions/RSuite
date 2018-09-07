@@ -7,7 +7,7 @@ Summary:        RSuite CLI is command line API to RSuite
 
 Vendor:         WLOG Solution <info@wlogsolutions.com>
 License:        MIT
-URL:            http://rsuite.io
+URL:            https://rsuite.io
 Group:          Development/Tools
 Source:		%{name}-%{version}.tar.gz
 BuildArch: 	noarch

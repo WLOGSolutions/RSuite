@@ -4,7 +4,7 @@
 ;; Author: Wit Jakuczun <wit.jakuczun@wlogsolutions.com>
 ;; Version: 0.1
 ;; Keywords: rsuite, R, ess
-;; URL: http://rsuite.io
+;; URL: https://rsuite.io
 
 ;;; Commentary:
 

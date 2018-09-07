@@ -35,14 +35,15 @@ test_that_managed("Collecting package system requirements", {
 test_that_managed("Checking system requirements", {
   travis_ci_flag <- as.logical(Sys.getenv("TravisCI", unset = FALSE))
   appveyor_ci_flag <- as.logical(Sys.getenv("APPVEYOR", unset = FALSE))
-  is_windows <- .Platform$OS.type == "windows"
-  skip_if(is_windows)
+  is_linux <- RSuite:::get_os_type() == "unix"
+  skip_if_not(is_linux)
   skip_if_not(travis_ci_flag || appveyor_ci_flag)
 
   prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
   params <- prj$load_params()
 
-  create_test_master_script("library(png)", prj = prj)
+  # add system requirements
+  create_test_master_script("library(webp)", prj = prj)
 
   expect_error(RSuite::sysreqs_check(prj = prj))
 
@@ -59,12 +60,14 @@ test_that_managed("Checking script creation", {
 
   prj <- init_test_project(repo_adapters = c("Dir")) # png_0.1-7 is in local repo
 
-  create_test_master_script("library(png)", prj = prj)
+  # add system requirements
+  create_test_master_script("library(webp)", prj = prj)
 
   RSuite::sysreqs_script(prj = prj)
 
   install_script <- ifelse(.Platform$OS.type == "windows", "sysreqs_install.cmd", "sysreqs_install.sh")
-  shell(file.path(get_wspace_dir(), "TestProject", install_script))
+  command_function <- ifelse(.Platform$OS.type == "windows", shell, system)
+  command_function(file.path(get_wspace_dir(), "TestProject", install_script))
 
   expect_silent(RSuite::sysreqs_check(prj = prj))
 })

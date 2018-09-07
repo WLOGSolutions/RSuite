@@ -6,6 +6,26 @@
 #----------------------------------------------------------------------------
 
 #'
+#' Bind to rstudio project creation menu. Creates an R Suite project.
+#' This function will be called when the user invokes the New Project
+#' wizard using the project template defined in the template file at:
+#'
+#'  inst/rstudio/templates/project/rsuite_project.dcf
+#'
+#'
+#' @keywords internal
+#' @noRd
+rstudio_prj_start <- function(path, ...) {
+  # collect arguments
+  name <- basename(path)
+  path <- dirname(path)
+  args <- list(...)
+
+  # create project
+  prj_start(name = name, path = path, skip_rc = args$skip_rc)
+}
+
+#'
 #' Detect project base dir in parents of path.
 #'
 #' @keywords internal

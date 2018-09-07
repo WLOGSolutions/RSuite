@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: WLOG Solution <info@wlogsolutions.com>
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.8
-Homepage: http://rsuite.io
+Homepage: https://rsuite.io
 
 Package: rsuitecli
 Architecture: all

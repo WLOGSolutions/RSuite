@@ -1,0 +1,9 @@
+Binding: rstudio_prj_start
+Title: R Suite project
+OpenFiles: R/master.R
+
+Parameter: skip_rc
+Widget: CheckboxInput
+Label: Skip Revision Control
+Position: left
+Default: Off

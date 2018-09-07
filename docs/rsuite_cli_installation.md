@@ -11,13 +11,13 @@ bash script.
 
 To make the start of the journey with R Suite CLI as easy as possible we prepared installation packages for you. Herein we discuss how they can be
 installed on each supported platform. You can download them from [R
-Suite Download](http://rsuite.io/RSuite_Download.php).
+Suite Download](https://rsuite.io/RSuite_Download.php).
 
 ## **Got stuck?**
 
 If you are stuck feel free to contact us:
 
-* through the R Suite website (http://rsuite.io#contact) or 
+* through the R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
   "R Suite room")
 * directly by sending an email with your problem description to
@@ -105,4 +105,4 @@ After R Suite CLI is installed you probably will need to install the R Suite pac
 > rsuite install
 ```
 
-For the full description of how to use R Suite CLI please refer to [R Suite CLI reference manual](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md).
+For the full description of how to use R Suite CLI please refer to [R Suite CLI reference manual](https://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md).

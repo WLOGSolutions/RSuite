@@ -1,7 +1,7 @@
 # CRAN like repository management
 
-Here we present CRAN-alike repository management design patterns with [R Suite's](http://rsuite.io).
-Please check [Reference of instructions on managing the repository with R Suite CLI](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md) for detailed instructions. [R Suite](http://rsuite.io) covers following actions you can do with your repository:
+Here we present CRAN-alike repository management design patterns with [R Suite's](https://rsuite.io).
+Please check [Reference of instructions on managing the repository with R Suite CLI](https://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_reference.md) for detailed instructions. [R Suite](https://rsuite.io) covers following actions you can do with your repository:
 
 * Add project's packages - add packages that you developed in your project (folder `packages`). It is useful when you develop company/team wide packages.
 * Add project's external packages- add external packages from your project. It is useful if you want to archive particular version of external packages that your project depends on

@@ -137,9 +137,9 @@ resolve_prj_deps <- function(repo_infos, params, only_source = FALSE) {
   project_packages <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   prj_dep_vers <- vers.rm(prj_dep_vers, project_packages)
 
-  if (file.exists(params$lock_path)) { # if locked
+  if (file.exists(params$lock_path)) {  # if locked
     # apply lock requirements
-    env_lock_vers <- get_lock_env_vers(params) #from 52_dependencies.R
+    env_lock_vers <- get_lock_env_vers(params) # from 52_dependencies.R
     env_lock_vers <- vers.rm(env_lock_vers, project_packages)
     env_lock_vers <- vers.rm(env_lock_vers, # remove non required locks
                              setdiff(vers.get_names(env_lock_vers), vers.get_names(prj_dep_vers)))

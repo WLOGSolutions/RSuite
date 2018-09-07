@@ -36,7 +36,7 @@ In this document we present a basic R Suite usage. It covers:
 
 If you are stuck feel free to contact us:
 
-* through the R Suite website (http://rsuite.io#contact) or 
+* through the R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
   "Gitter R Suite room")
 * directly by sending an email with the description of your problem to
@@ -349,13 +349,13 @@ logging::setLevel('INFO')
 ## Project environment locking
 RSuite allows the user to lock the project environment. It collects all dependencies' versions and stores them in a lock file to enforce exact dependency versions in the future. To lock the project environment we have to call the following function:
 
-```{r error = TRUE}
+```{r}
 RSuite::prj_lock_env()
 ```
 
 The lock file is in the 'deployment' directory under the 'env.lock' name. It is a dcf file that stores information about packages in the local environment together with their versions. A sample record from the 'env.lock' file is presented below:
 
-```{r error = TRUE}
+```{r}
 cat(readLines("deployment/env.lock"), sep = "\n")
 ```
 

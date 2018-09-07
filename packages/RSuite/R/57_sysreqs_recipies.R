@@ -204,7 +204,8 @@ perform.sysreqs_install_recipe <- function(recipe) {
       assert(grepl("^\\[shell\\] ", install_tool),
              "System libraries install handlers other than [shell] are not supported yet")
       install_tool <- gsub("^\\[shell\\]\\s*", "", install_tool)
-      cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), install_tool))
+      cmd <- sprintf("bash -c '%s'",
+                     gsub(":params", paste(required_syslibs, collapse = " "), install_tool))
 
       pkg_loginfo("Installing system libraries(%s) ...", paste(required_syslibs, collapse = ", "))
       cmd_retcode <- get_cmd_retcode(sprintf("installing system libraries: %s",
