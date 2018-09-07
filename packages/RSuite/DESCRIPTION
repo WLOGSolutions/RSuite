@@ -19,6 +19,7 @@ Description: Supports safe and reproducible solutions development in R. It will 
 URL: http://rsuite.io
 BugReports: https://github.com/WLOGSolutions/RSuite/issues
 License: MIT + file LICENSE
+Encoding: UTF-8
 Depends:
   R (>= 3.2.0)
 Imports: 
