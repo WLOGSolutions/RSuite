@@ -26,7 +26,7 @@ matrix:
 
 before_install:
 - cd packages/RSuite
-- if [ "$TRAVIS_OS_NAME" == "osx" ]; sudo chown -R $(whoami) /usr/local/share/man/man7; then brew install libgit2; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then sudo chown -R $(whoami) /usr/local/share/man/man7; brew install libgit2; fi
 
 addons:
   apt:
