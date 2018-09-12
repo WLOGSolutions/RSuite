@@ -295,12 +295,14 @@ pkg_remove <- function(pkgs, lib_dir) {
                    while (search_item %in% search()) {
                      attch_pkg_path <- rsuite_fullUnifiedPath(system.file(package = pkg))
                      inlib_pkg_path <- rsuite_fullUnifiedPath(file.path(lib_dir, pkg))
-                     if (attch_pkg_path != inlib_pkg_path) {
+                     if (attch_pkg_path != "" && attch_pkg_path != inlib_pkg_path) {
+                       # if attch_pkg_path is empty, package folder was deleted partially
                        # if it's the same package loaded from another location
                        #  there is no point to detach it
                        break
                      }
-                     detach(search_item, unload = TRUE, character.only = TRUE)
+                     detach(search_item, unload = TRUE, character.only = TRUE,
+                            force = TRUE) # force even if dependent packages are loaded
                    }
                  })
   installed <- utils::installed.packages(lib_dir)[, "Package"]
@@ -363,8 +365,13 @@ pkg_install <- function(pkgs, lib_dir, type, repos, rver, check_repos_consistenc
 
   lapply(X = pkgs,
          FUN = function(pkg) {
-           bld_res <- install_package(pkg)
            pkg_name <- gsub("^([^_]+)_.+$", "\\1", basename(pkg))
+           if (majmin_rver(rver) == current_rver()) {
+             # force package unload & remove it completly
+             pkg_remove(pkgs = pkg_name, lib_dir = lib_dir)
+           }
+
+           bld_res <- install_package(pkg)
            pkg_path <- file.path(lib_dir, pkg_name)
            if (bld_res && !dir.exists(pkg_path)) {
              pkg_logwarn("= Restarting build of %s (succeded but no folder created)", basename(pkg))

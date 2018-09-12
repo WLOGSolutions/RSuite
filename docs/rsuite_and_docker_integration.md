@@ -66,7 +66,7 @@ library(shiny)
 runExample(example = "02_text", port = 8888, host = "0.0.0.0")
 ``` 
 
-More information about project management is presented in the [Basic R Suite usage](http://rsuite.io/RSuite_Tutorial.php?article=basic_workflow.md#) document.
+More information about project management is presented in the [Basic R Suite usage](https://rsuite.io/RSuite_Tutorial.php?article=basic_workflow.md#) document.
 
 **Important:** From now on Docker has to be running when issuing R Suite commands.
 

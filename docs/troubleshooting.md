@@ -4,7 +4,7 @@ If R Suite does not work as expected first of all try to increase verbosity of l
 it will give you some hints how to resolve the issue.
 
 If it does not help do not hesitate to contact us through email (rsuite@wlogsolutions.com) or R Suite site
-(http://rsuite.io). We will appreciate if you describe your problem, system you are using and any kind of logs
+(https://rsuite.io). We will appreciate if you describe your problem, system you are using and any kind of logs
 R Suite generated when the problem occurred. It would be ideal if you could send us the zipped project which causes
 issues.
 
@@ -12,7 +12,7 @@ issues.
 
 If you are stuck feel free to contact us:
 
-* through R Suite website (http://rsuite.io#contact) or 
+* through R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
   "Gitter R Suite room")
 * directly by sending an email with your problem description to

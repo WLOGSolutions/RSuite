@@ -15,7 +15,7 @@ In this document basic R Suite usage is presented. It covers:
 
 If you are stuck feel free to contact us:
 
-* through the R Suite website (http://rsuite.io#contact) or 
+* through the R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
   "Gitter R Suite room")
 * directly by sending an email with the description of your problem to

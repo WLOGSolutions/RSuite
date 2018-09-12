@@ -8,7 +8,7 @@ are other options that could fit your needs better.
 
 If you are stuck feel free to contact us:
 
-* through R Suite website (http://rsuite.io#contact) or 
+* through R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite "R Suite room")
 * directly by sending an email with your problem description to [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
@@ -41,7 +41,7 @@ On Windows it is necessary to have Rtools installed. Rtools contains number of u
 ![Installing R Suite with R Suite CLI](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuite_install_with_cli.png "Installing R Suite with R Suite CLI")
 
 If you have R Suite CLI installed (check [R Suite CLI installation
-reference](http://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
+reference](https://rsuite.io/RSuite_Tutorial.php?article=rsuite_cli_installation.md
 "R Suite CLI installation reference.")) already you can use it to
 install latest compatible version of R Suite. Just execute the following
 command in your shell:

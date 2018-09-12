@@ -16,9 +16,10 @@ Maintainer: Walerian Sokolowski <rsuite@wlogsolutions.com>
 Description: Supports safe and reproducible solutions development in R. It will help you with 
   environment separation per project, dependency management, local packages creation and preparing 
   deployment packs for your solutions.
-URL: http://rsuite.io
+URL: https://rsuite.io
 BugReports: https://github.com/WLOGSolutions/RSuite/issues
 License: MIT + file LICENSE
+Encoding: UTF-8
 Depends:
   R (>= 3.2.0)
 Imports: 

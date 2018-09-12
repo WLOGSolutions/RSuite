@@ -36,7 +36,7 @@ In this document we present a basic R Suite usage. It covers:
 
 If you are stuck feel free to contact us:
 
-* through the R Suite website (http://rsuite.io#contact) or 
+* through the R Suite website (https://rsuite.io#contact) or 
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite
   "Gitter R Suite room")
 * directly by sending an email with the description of your problem to
@@ -363,7 +363,7 @@ When dependencies are being installed using ```RSuite::prj_install_deps()``` the
 
 To safely unlock the local project environment we use the following function:
 
-```{r}
+```{r error = TRUE}
 RSuite::prj_unlock_env()
 ```
 The function deletes an existing 'env.lock' file.
