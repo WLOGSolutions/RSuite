@@ -5,24 +5,71 @@
 # Recipies for checking/installing of sysreqs.
 #----------------------------------------------------------------------------
 
+#' Creates the base represantion of the sysreqs_recipe class.
+#' Recipes are used to perform the following tasks:
+#'     - collecting sysreqs
+#'     - installing sysreqs
+#'     - creating sysreqs installation scripts
+#'
+#'
+#' @return object of type sysreqs_recipe
+#'
+#' @keywords internal
+#' @noRd
+#'
 build_sysreqs_recipe <- function() {
   result <- list()
   class(result) <- "sysreqs_recipe"
   return(result)
 }
 
+#' Adds a recipe to a sysreqs_recipe object.
+#'
+#' @param recipe syreqs_recipe object (type: sysreqs_recipe)
+#' @param req_name name of the requirement (type: character(1))
+#' @param sysreq named list with package names and containing system
+#'    requirements as value
+#' @param pkg_name name of the package containg system requirements (type: character(1))
+#'
+#' @keywords internal
+#' @noRd
+#'
 add_recipe <- function(recipe, req_name, sysreq, pkg_name) {
   UseMethod("add_recipe")
 }
 
+
+#' Removes all recipes concerning satisfied system requirements
+#' from a sysreqs_recipte object.
+#'
+#' @param recipe sysreqs_recipe object (type: sysreqs_recipe)
+#'
+#' @keywords internal
+#' @noRd
+#'
 rm_satisfied <- function(recipe) {
   UseMethod("rm_satisfied")
 }
 
+#' Performs(runs) all recipes from the sysreqs_recipe object.
+#'
+#' @param  recipe sysreqs_recipe object (type: sysreqs_recipe)
 perform <- function(recipe) {
   UseMethod("perform")
 }
 
+#' Collects all system requirements recipes and adds them into
+#' a sysreqs_recipe object.
+#'
+#' @param recipe sysreqs_recipe object (type: sysreqs_recipe)
+#' @param sysreqs named list with package names and containing system
+#'    requirements as value
+#'
+#' @return sysreqs_recipe object containing all system requirements recipes (type: sysreqs_recipe)
+#'
+#' @keywords internal
+#' @noRd
+#'
 sysreqs_recipe_collect_all <- function(recipe, sysreqs) {
   for (pkg_name in names(sysreqs)) {
     pkg_sysreqs <- sysreqs[[pkg_name]]
@@ -35,7 +82,14 @@ sysreqs_recipe_collect_all <- function(recipe, sysreqs) {
   return(recipe)
 }
 
-
+#' Creates an object representing the sysreqs_check_recipe class - a specialization
+#' of the sysreqs_recipe class.
+#'
+#' @return object of type sysreqs_check_recipe
+#'
+#' @keywords internal
+#' @noRd
+#'
 build_sysreqs_check_recipe <- function() {
   result <- build_sysreqs_recipe()
   result$tools <- list()
@@ -45,6 +99,12 @@ build_sysreqs_check_recipe <- function() {
   return(result)
 }
 
+#'
+#' Implementation of add_recipe for the sysreqs_check_recipe class.
+#'
+#' @keywords internal
+#' @noRd
+#'
 add_recipe.sysreqs_check_recipe <- function(recipe, req_name, sysreq, pkg_name) {
   check_handler <- sysreq$handlers$check
   if (is.null(check_handler) || check_handler == "[syslib]") {
@@ -68,6 +128,12 @@ add_recipe.sysreqs_check_recipe <- function(recipe, req_name, sysreq, pkg_name) 
   return(recipe)
 }
 
+#'
+#' Implementation of rm_satisfied for the sysreqs_check_recipe class.
+#'
+#' @keywords internal
+#' @noRd
+#'
 rm_satisfied.sysreqs_check_recipe <- function(recipe) {
   for (req_satisfied in names(recipe$satisfied)) {
     who_satisfies <- recipe$satisfied[[req_satisfied]]
@@ -83,6 +149,12 @@ rm_satisfied.sysreqs_check_recipe <- function(recipe) {
   return(recipe)
 }
 
+#'
+#' Implementation of perform for the sysreqs_check_recipe class.
+#'
+#' @keywords internal
+#' @noRd
+#'
 perform.sysreqs_check_recipe <- function(recipe) {
   result <- list()
 
@@ -123,6 +195,14 @@ perform.sysreqs_check_recipe <- function(recipe) {
 }
 
 
+#' Creates an object representing the sysreqs_install_recipe class - a specialization
+#' of the sysreqs_recipe class.
+#'
+#' @return object of type sysreqs_install_recipe
+#'
+#' @keywords internal
+#' @noRd
+#'
 build_sysreqs_install_recipe <- function(prj_path) {
   result <- build_sysreqs_recipe()
   result$install_specs <- list()
@@ -133,6 +213,12 @@ build_sysreqs_install_recipe <- function(prj_path) {
   return(result)
 }
 
+#'
+#' Implementation of add_recipe for the sysreqs_install_recipe class.
+#'
+#' @keywords internal
+#' @noRd
+#'
 add_recipe.sysreqs_install_recipe <- function(recipe, req_name, sysreq, pkg_name) {
   install_handler <- sysreq$handlers$install
   if (is.null(install_handler) || install_handler == "[syslib]") {
@@ -172,6 +258,12 @@ add_recipe.sysreqs_install_recipe <- function(recipe, req_name, sysreq, pkg_name
   return(recipe)
 }
 
+#'
+#' Implementation of rm_satisfied for the sysreqs_install_recipe class.
+#'
+#' @keywords internal
+#' @noRd
+#'
 rm_satisfied.sysreqs_install_recipe <- function(recipe) {
   for (req_satisfied in names(recipe$satisfied)) {
     who_satisfied <- recipe$satisfied[[req_satisfied]]
@@ -187,6 +279,12 @@ rm_satisfied.sysreqs_install_recipe <- function(recipe) {
   return(recipe)
 }
 
+#'
+#' Implementation of perform for the sysreqs_install_recipe class.
+#'
+#' @keywords internal
+#' @noRd
+#'
 perform.sysreqs_install_recipe <- function(recipe) {
   .is_retcode_failure <- function(cmd_ret_code, req_name) {
     return(is.null(cmd_ret_code) || cmd_ret_code > 0)
@@ -269,12 +367,26 @@ perform.sysreqs_install_recipe <- function(recipe) {
 }
 
 
+#' Creates an object representing the sysreqs_script_recipe class - a specialization
+#' of the sysreqs_install_recipe class.
+#'
+#' @return object of type sysreqs_script_recipe
+#'
+#' @keywords internal
+#' @noRd
+#'
 build_sysreqs_script_recipe <- function(prj_path) {
   result <- build_sysreqs_install_recipe(prj_path)
   class(result) <- c("sysreqs_script_recipe", class(result))
   return(result)
 }
 
+#'
+#' Implementation of perform for the sysreqs_script_recipe class.
+#'
+#' @keywords internal
+#' @noRd
+#'
 perform.sysreqs_script_recipe <- function(recipe) {
   plat_desc <- get_platform_desc()
   if (plat_desc$name == "Windows") {
@@ -287,6 +399,19 @@ perform.sysreqs_script_recipe <- function(recipe) {
   return(script_fpath)
 }
 
+
+#'
+#' Creates a cmd script to update the system to satisfy project requirements.
+#'
+#' @param recipe object of type sysreqs_script_recipe
+#' @param plat_desc named list content:
+#' \describe{
+#'   \item{name}{One of Windows, MacOS, RedHat, Debian (type: character)}
+#'   \item{distrib}{Distribution e.g. for Debian: Debian, Ubuntu; for RedHat: CentOS, RedHat, Fedora (type: character(1))}
+#'   \item{release}{Distribution release e.g. for Debian: squeeze, wheezy, jessie (type: character(1))}
+#'   \item{sysreq_type}{One of Windows, Pkg, RPM, DEB (type: character(1))}
+#'   \item{build}{True if build environment is required (type: logical(1))}
+#' }
 build_win_script <- function(recipe, plat_desc) {
   script_lines <- c("@echo off",
                     "",
@@ -363,6 +488,18 @@ build_win_script <- function(recipe, plat_desc) {
   return(script_fpath)
 }
 
+#'
+#' Creates a bash script to update the system to satisfy project requirements.
+#'
+#' @param recipe object of type sysreqs_script_recipe
+#' @param plat_desc named list content:
+#' \describe{
+#'   \item{name}{One of Windows, MacOS, RedHat, Debian (type: character)}
+#'   \item{distrib}{Distribution e.g. for Debian: Debian, Ubuntu; for RedHat: CentOS, RedHat, Fedora (type: character(1))}
+#'   \item{release}{Distribution release e.g. for Debian: squeeze, wheezy, jessie (type: character(1))}
+#'   \item{sysreq_type}{One of Windows, Pkg, RPM, DEB (type: character(1))}
+#'   \item{build}{True if build environment is required (type: logical(1))}
+#' }
 build_bash_script <- function(recipe, plat_desc) {
   script_lines <- c("#!/bin/bash",
                     "",
