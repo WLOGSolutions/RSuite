@@ -19,8 +19,8 @@
 (defvar rsuite/docker-platforms
   (list "ubuntu" "centos" "debian")
   "Docker platforms supported by R Suite.")
-(defconst rsuite/buffer "rsuite" "Buffer for rsuite output.")
-(defconst rsuite/err_buffer "rsuite:error" "Buffer for rsuite error output.")
+(defconst rsuite/buffer "*rsuite*" "Buffer for rsuite output.")
+(defconst rsuite/err_buffer "*rsuite:error*" "Buffer for rsuite error output.")
 (defconst rsuite/cli "rsuite" "Path to RSuite CLI.")
 
 (defun run-async-rsuite (args)
@@ -245,15 +245,15 @@ If file exists it is opened.  Otherwise it is created and filled with R Suite in
   (interactive)
   (let ((m_path nil)
 	(m_name nil))
-    (setq m_path (concat (file-name-as-directory (rsuite-detect-prj-path)) "/R/"))
-    (setq m_name (read-file-name "Master" m_path "master.R"))
+    (setq m_path (concat (file-name-as-directory (rsuite-detect-prj-path)) "R/"))
+    (setq m_name (read-file-name "Master " m_path "master.R"))
     (if (file-exists-p m_name)
 	(progn
 	  (find-file m_name)
 	  (goto-char (point-max))
 	  )
-      (progn
-	(write-region
+      (progn	
+	(append-to-file
 	 "# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
 script_path <- (function() {
   args <- commandArgs(trailingOnly = FALSE)
