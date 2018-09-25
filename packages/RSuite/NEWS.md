@@ -5,6 +5,8 @@
     R Suite projects using "File -> New Project..." in RStudio 
   * Caching of in-src-archive packages list implemented.
   * Got rid of subprocess in favor to processx package.
+  * Adding packages from BioConductor into repository implemented together with
+    building PKGZIP out of such packages.
 
 # RSuite 0.32 (2018-08-15)
   * Unregistering repo adapters functionality added.
