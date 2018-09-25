@@ -1,4 +1,4 @@
-# RSuite 0.33 (2018-09-??)
+# RSuite 0.33 (2018-09-25)
   * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
     master scripts (and tests) added.
   * Added R Suite project templates to RStudio project templates. We can now create

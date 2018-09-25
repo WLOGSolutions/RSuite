@@ -15,4 +15,11 @@ There were no ERRORs, WARNINGs or NOTEs.
 No issues detected
 
 ## Previous submission comments
-* Solaris support added
+  * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
+    master scripts (and tests) added.
+  * Added R Suite project templates to RStudio project templates. We can now create
+    R Suite projects using "File -> New Project..." in RStudio 
+  * Caching of in-src-archive packages list implemented.
+  * Got rid of subprocess in favor to processx package.
+  * Adding packages from BioConductor into repository implemented together with
+    building PKGZIP out of such packages.
