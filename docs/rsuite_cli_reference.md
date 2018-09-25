@@ -669,7 +669,7 @@ You can also specify following options to github:
 * `--filter-repo` which takes as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
   versions are present in the repository. The parameter should be used together with --with-deps.
 
-## Building PKGZIP containing package from GitHub
+## Building PKGZIP containing package from BioConductor
 
 If you want to create PKGZIP out of available on BioConductor repository call following command:
 
