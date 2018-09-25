@@ -1,6 +1,8 @@
-VERSION 0.33 (2018-08-??)
-  * installation of RSuite fixed to user not only package available on CRAN:
+VERSION 0.33 (2018-09-??)
+  * installation of RSuite fixed to use not only package available on CRAN:
     it considers also user provided package and WLOG S3 repository.
+  * `docker exec` fixed to properly handle passed command.
+  * -h option added to main script as shortcut for help.
 
 VERSION 0.32 (2018-08-15)
   * Handling of errors in running docker commands fixed.

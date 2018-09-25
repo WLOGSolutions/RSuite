@@ -74,22 +74,20 @@ get_docker_rsuite_image <- function(rver, platform) {
 #' Raises error if command failes.
 #'
 exec_docker_cmd <- function(args, cmd_desc) {
-  .log_single_out <- function(out_arr, desc) {
-    lines <- c()
-    for (single_out in out_arr) {
-      for (line in single_out) {
-        if (nchar(line) > 0) {
-          logdebug("%s> %s", desc, line)
-          lines <- c(lines, line)
-        }
-      }
-    }
+  .log_single_out <- function(out_lines, desc) {
+    lines <- unlist(lapply(out_lines, function(ln) {
+      if (nchar(ln) == 0) return()
+      logdebug("%s> %s", desc, ln)
+      return(ln)
+    }))
     return(lines)
   }
 
   docker_cmd <- get_docker_cmd()
   logdebug("running: %s", paste(c(docker_cmd, args), collapse = " "))
-  con <- subprocess::spawn_process(command = docker_cmd, arguments = args)
+
+  proc <- processx::process$new(command = docker_cmd, args = args,
+                                stdout = "|", stderr = "|", cleanup = TRUE)
 
   result <- list(
     out_lines = c(),
@@ -97,18 +95,20 @@ exec_docker_cmd <- function(args, cmd_desc) {
     ret_code = NA
   )
   tryCatch({
-    while (subprocess::process_state(con) == "running") {
-      out_arr <- subprocess::process_read(con, subprocess::PIPE_BOTH, timeout = 3000)
+    repeat {
+      proc$poll_io(timeout = 3000)
 
-      out_lines <- .log_single_out(out_arr$stdout, "out")
+      out_lines <- .log_single_out(proc$read_output_lines(), "out")
       result$out_lines <- c(result$out_lines, out_lines)
 
-      err_lines <- .log_single_out(out_arr$stderr, "err")
+      err_lines <- .log_single_out(proc$read_error_lines(), "err")
       result$err_lines <- c(result$err_lines, err_lines)
+
+      if (!proc$is_alive()) break;
     }
   },
   finally = {
-    result$ret_code <- subprocess::process_return_code(con)
+    result$ret_code <- proc$get_exit_status()
     logdebug("return code: %s", result$ret_code)
   })
 

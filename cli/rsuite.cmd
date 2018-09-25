@@ -42,6 +42,7 @@ set cmd="%1"
 
 if %cmd%=="" goto help
 if %cmd%=="help" goto help
+if %cmd%=="-h" goto help
 
 if %cmd%=="update" (
     Rscript.exe --no-init-file "%base_dir%/R/cmd_update.R" %*
@@ -138,7 +139,7 @@ exit /B 3
     echo        version
     echo            Show RSuite CLI version.
     echo.
-    echo        help
+    echo        help (-h)
     echo            Show this message and exit.
     echo.
     echo Call 'rsuite [command] help' to get information on acceptable [args].

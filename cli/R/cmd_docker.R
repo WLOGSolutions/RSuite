@@ -418,7 +418,8 @@ sub_commands <- list(
       stopifnot(length(cont_infos) == 1)
       cont_name <- names(cont_infos)
 
-      exec_output <- exec_docker_cmd(c("exec", cont_name, opts$cmd), "Running command in container")
+      cmd_args <- RSuite:::split_cmd(opts$cmd)
+      exec_output <- exec_docker_cmd(c("exec", cont_name, cmd_args), "Running command in container")
       cat(exec_output$out_lines, sep = "\n")
     }
   ),

@@ -48,6 +48,7 @@ handle_subcommands <- function(sub_commands, cmd_help) {
       rsuite_libloc <- NULL
     }
     tryCatch({
+      .libPaths(c(rsuite_libloc, .libPaths()))
       suppressWarnings({
         suppressPackageStartupMessages(library(RSuite, lib.loc = rsuite_libloc))
       })

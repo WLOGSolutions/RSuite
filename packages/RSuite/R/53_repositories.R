@@ -35,6 +35,27 @@
                               tp
                             }
                           }))
+
+  get_archsrc_cache_fpath <- function(pkg_name) {
+    if (!("source" %in% types)) {
+      return()
+    }
+
+    repos_cache_dir <- get_cache_dir("repos_cache") # from 98_shell.R
+    if (is.null(repos_cache_dir)) {
+      return()
+    }
+
+    contrib_url <- rsuite_contrib_url(path, "source", rver = rver)
+    if (grepl("^file://", contrib_url)) {
+      return()
+    }
+
+    cache_file <- paste0(utils::URLencode(contrib_url, TRUE), "_srcarch_", pkg_name, ".rds")
+    cache_fpath <- file.path(repos_cache_dir, cache_file)
+    return(cache_fpath)
+  }
+
   res <- list(
     path = path,
     types = types,
@@ -60,6 +81,36 @@
         return(NULL)
       }
       return(sprintf("%s/00Archive/%s", rsuite_contrib_url(path, "source", rver = rver), pkg_name))
+    },
+    get_arch_src_cache = function(pkg_name) {
+      cache_fpath <- get_archsrc_cache_fpath(pkg_name)
+      if (is.null(cache_fpath)) {
+        return(NULL)
+      }
+      if (!file.exists(cache_fpath) || .is_cache_too_old(cache_fpath)) {
+        return(NULL)
+      }
+
+      cache <- tryCatch({
+        readRDS(cache_fpath)
+      },
+      error = function(e) NULL)
+
+      return(cache)
+    },
+    set_arch_src_cache = function(pkg_name, avails) {
+      stopifnot(is.data.frame(avails)
+                && all(c("Package", "Version", "File", "Repository") %in% colnames(avails)))
+
+      cache_fpath <- get_archsrc_cache_fpath(pkg_name)
+      if (!is.null(cache_fpath)) {
+        tryCatch({
+          saveRDS(avails, file = cache_fpath)
+        },
+        error = function(e) {
+          print(e)
+        })
+      }
     }
   )
   class(res) <- "rsuite_repo_info"
@@ -299,18 +350,10 @@ get_curl_available_packages <- function(contrib_url) {
     names(curl2cfile) <- c(noncache_curl, cache_curl)
   }
 
-  too_old <- function(fpath) {
-    if (!file.exists(fpath)) {
-      return(TRUE)
-    }
-    mtime <- file.mtime(fpath)
-    age_days <- as.double(difftime(Sys.time(), mtime, units = "days"))
-    return(age_days < 0.0 || age_days >= 7.0)
-  }
   pkgs_raw <- lapply(X = names(curl2cfile),
                      FUN = function(curl) {
                        cfile <- curl2cfile[[curl]]
-                       if (file.exists(cfile) && !too_old(cfile)) {
+                       if (file.exists(cfile) && !.is_cache_too_old(cfile)) {
                          # try to read it from cache
                          pkgs <- tryCatch({
                            readRDS(cfile)
@@ -360,6 +403,24 @@ get_curl_available_packages <- function(contrib_url) {
   }
   pkgs <- do.call("rbind", pkgs_raw)
   return(pkgs)
+}
+
+#'
+#' Checks if cache file is too old.
+#'
+#' @param fpath cache file path to check.
+#' @return FALSE if cache is still useable
+#'
+#' @keywords internal
+#' @noRd
+#'
+.is_cache_too_old <- function(fpath) {
+  if (!file.exists(fpath)) {
+    return(TRUE)
+  }
+  mtime <- file.mtime(fpath)
+  age_days <- as.double(difftime(Sys.time(), mtime, units = "days"))
+  return(age_days < 0.0 || age_days >= 7.0)
 }
 
 #'

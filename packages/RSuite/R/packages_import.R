@@ -10,7 +10,7 @@
 #' @import roxygen2
 #' @import git2r
 #' @import jsonlite
-#' @import subprocess
+#' @import processx
 #' @importFrom stats aggregate
 #' @importFrom httr http_error
 NULL

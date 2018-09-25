@@ -5,6 +5,43 @@
 # Tools for running shell command.
 #----------------------------------------------------------------------------
 
+
+#'
+#' Splits command onto arguments.
+#'
+#' @param cmd command to split. (type: character(1))
+#' @return character(N) containing arguments.
+#'
+#' @keywords internal
+#' @noRd
+#'
+split_cmd <- function(cmd) {
+  args <- c()
+  quote_arg <- NULL
+  for (t in unlist(strsplit(cmd, "\\s+"))) {
+    if (!is.null(quote_arg)) {
+      if (grepl("[\"']$", t)) {
+        args <- c(args, paste(quote_arg, substring(t, 1, nchar(t) - 1)))
+        quote_arg <- NULL
+      } else {
+        quote_arg <- paste(quote_arg, t)
+      }
+    } else {
+      if (!grepl("^[\"']", t)) {
+        args <- c(args, t)
+      } else if (grepl("[\"']$", t)) {
+        args <- c(args, substring(t, 2, last = nchar(t) - 1))
+      } else {
+        quote_arg <- substring(t, 2)
+      }
+    }
+  }
+  if (!is.null(quote_arg)) {
+    args <- c(args, quote_arg)
+  }
+  return(args)
+}
+
 #'
 #' Runs command and collects it's return code using subprocess library.
 #'
@@ -22,61 +59,38 @@
 #' @noRd
 #'
 get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
-  .log_single_out <- function(desc, out_arr, log_fun) {
-    for (single_out in out_arr) {
-      for (line in single_out) {
-        if (nchar(line) > 0) {
-          log_fun("%s output: %s", desc, line)
-        }
-      }
-    }
-  }
-  .split_cmd <- function(cmd) {
-    args <- c()
-    quote_arg <- NULL
-    for (t in unlist(strsplit(cmd, "\\s+"))) {
-      if (!is.null(quote_arg)) {
-        if (grepl("[\"']$", t)) {
-          args <- c(args, paste(quote_arg, substring(t, 1, nchar(t) - 1)))
-          quote_arg <- NULL
-        } else {
-          quote_arg <- paste(quote_arg, t)
-        }
-      } else {
-        if (grepl("^[\"']", t)) {
-          quote_arg <- substring(t, 2)
-        } else {
-          args <- c(args, t)
-        }
-      }
-    }
-    if (!is.null(quote_arg)) {
-      args <- c(args, quote_arg)
-    }
-    return(args)
-  }
-
   log_fun <- if (log_debug) {
     pkg_logdebug
   } else {
     pkg_logfinest
   }
+
+  .log_single_out <- function(lines) {
+    lapply(lines, function(ln) {
+      if (nchar(ln) > 0) {
+        log_fun("%s output: %s", desc, ln)
+      }
+    })
+  }
+
   full_cmd <- sprintf(cmd, ...)
   log_fun("%s cmd: %s", desc, cmd)
 
-  args <- .split_cmd(full_cmd)
+  args <- split_cmd(full_cmd)
   cmd_path <- Sys.which(args[1])
   assert(file.exists(cmd_path), "Command %s is not available", cmd)
-  con <- spawn_process(command = cmd_path, arguments = args[2:length(args)])
+  p <- processx::process$new(command = cmd_path, args = args[2:length(args)],
+                             stdout = "|", stderr = "|", cleanup = TRUE)
   tryCatch({
-    while (process_state(con) == "running") {
-      out_arr <- process_read(con, PIPE_BOTH, timeout = 3000)
-      .log_single_out(desc, out_arr$stdout, log_fun)
-      .log_single_out(desc, out_arr$stderr, log_fun)
+    repeat {
+      p$poll_io(timeout = 3000)
+      .log_single_out(p$read_output_lines())
+      .log_single_out(p$read_error_lines())
+      if (!p$is_alive()) break;
     }
   },
   finally = {
-    ret_code <- process_return_code(con)
+    ret_code <- p$get_exit_status()
   })
   return(ret_code)
 }

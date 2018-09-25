@@ -28,7 +28,7 @@ Imports:
   roxygen2, 
   git2r,
   jsonlite,
-  subprocess,
+  processx,
   httr
 Suggests: 
   knitr, 

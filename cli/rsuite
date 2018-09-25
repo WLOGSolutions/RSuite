@@ -13,6 +13,8 @@ basedir=$("$rscript_path" --no-init-file -e "cat(normalizePath('$basedir'))")
 cmd="$1"
 if [ -z "$cmd" ]; then
 	cmd="help";
+elif [ "$cmd" == "-h" ]; then
+	cmd="help"
 fi
 
 if [ "$OS" == "Windows_NT" ]; then
@@ -88,7 +90,7 @@ case "$cmd" in
 		echo "       version"
 		echo "           Show RSuite CLI version."
 		echo ""
-		echo "       help"
+		echo "       help (-h)"
 		echo "           Show this message and exit."
 		echo ""
 		echo "Call 'rsuite [command] help' to get information on acceptable [args]."
