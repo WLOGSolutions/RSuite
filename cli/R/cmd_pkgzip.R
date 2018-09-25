@@ -157,6 +157,48 @@ sub_commands <- list(
                                           skip_build_steps = unlist(strsplit(opts$skip_build_steps, ",")),
                                           keep_sources = opts$keep_sources)
     }
+  ),
+  bioc = list(
+    help = "Create PKGZIP out of package build from BioConductor.",
+    options = c(
+      make_option(c("-r", "--repo"), dest = "repo",
+                  help = "Repository to upload from in form [username:password@][release/]repo[#revision]."),
+      make_option(c("-b", "--binary"), dest = "binary", type="logical", default=(.Platform$pkgType != "source"),
+                  help = "Build and upload binary package (default: %default)"),
+      make_option(c("--filter-repo"), dest = "filter_repo",
+                  help = paste("Url to repository. If passed will not include dependencies into PKGZIP",
+                               "which satisfying versions are present in the repository.",
+                               "The parameter should be used together with --with-deps.",
+                               sep = "\n\t\t")),
+      make_option(c("--skip-build-steps"), dest = "skip_build_steps", default=as.character(NULL),
+                  help = paste("Comma separated list of steps to skip while building the package.",
+                               "Following values are accepted:",
+                               "\t specs - not process specifics",
+                               "\t docs  - do not build documentation with roxygen",
+                               "\t imps  - do not perform imports validation",
+                               "\t tests - do not run package tests",
+                               "\t rcpp_attribs - do not run Rcpp attributes compilation on the package",
+                               "\t vignettes - do not run vignettes building",
+                               "(default: %default)",
+                               sep = "\n\t\t")),
+      make_option(c("--keep-sources"), dest = "keep_sources", action="store_true", default=FALSE,
+                  help = "If passed will not remove temporary project used to build the package (default: %default)"),
+      .common_options
+    ),
+    run = function(opts) {
+      if (is.null(opts$repo)) {
+        stop("--repo option is required")
+      }
+
+      pkg_type <- .get_pkg_type(opts$binary)
+      RSuite::pkgzip_build_bioc_package(repo = opts$repo,
+                                        pkg_type = pkg_type,
+                                        path = opts$path,
+                                        with_deps = FALSE,
+                                        filter_repo = opts$filter_repo,
+                                        skip_build_steps = unlist(strsplit(opts$skip_build_steps, ",")),
+                                        keep_sources = opts$keep_sources)
+    }
   )
 )
 
