@@ -62,256 +62,296 @@ ARGS is a string of arguments forwarded to rsuite cli."
       (setq rsuite/verbose nil)
     (setq rsuite/verbose 1)))
 
-(defun rsuite-proj-start ()
+(defun rsuite-call-within-dir (fun &optional projdir)
+  "Runs fun within given projdir or in detected directory."
+  
+  (if projdir
+      (let ((olddir default-directory))
+	(cd projdir)
+	(funcall fun)
+	(cd olddir))
+    (funcall fun)))
+
+(defun rsuite-proj-start (&optional dir)
   "Start project."
   (interactive)
   (let ((proj_path nil)
 	(proj_name nil)
-	(proj_tmpl nil))
-    
-    (setq proj_path (read-directory-name "Project path: "))
+	(proj_tmpl nil))    
+    (setq proj_path (read-directory-name "Project path: " dir))
     (setq proj_name (read-string (concat "Give project name: " proj_path)))
     (setq proj_tmpl (ivy-read "Give project template: " (rsuite-get-templates)))
     (cd proj_path)
     (if (> (length proj_tmpl) 0)
 	(run-sync-rsuite (concat "proj start --name=" proj_name " --tmpl=" proj_tmpl))
       (run-sync-rsuite (concat "proj start --name=" proj_name)))
-      
+    
     (dired (concat proj_path "/" proj_name))))
 
-(defun rsuite-proj-pkg-start ()
+(defun rsuite-proj-pkg-start (&optional projdir)
   "Start package."
   (interactive)
-  (let ((pkg_name nil)
-	(pkg_tmpl nil))
-    (setq pkg_name (read-string "Give package name: "))
-    (setq pkg_tmpl (ivy-read "Give package template: " (rsuite-get-templates)))
-    (if (> (length pkg_tmpl) 0)
-	(run-async-rsuite (concat "proj pkgadd --name=" pkg_name " --tmpl=" pkg_tmpl))
-      (run-async-rsuite (concat "proj pkgadd --name=" pkg_name)))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((pkg_name nil)
+				  (pkg_tmpl nil))
+			      (setq pkg_name (read-string "Give package name: "))
+			      (setq pkg_tmpl (ivy-read "Give package template: " (rsuite-get-templates)))
+			      (if (> (length pkg_tmpl) 0)
+				  (run-async-rsuite (concat "proj pkgadd --name=" pkg_name " --tmpl=" pkg_tmpl))
+				(run-async-rsuite (concat "proj pkgadd --name=" pkg_name)))))
+			  projdir))
 
-(defun rsuite-proj-build ()
+(defun rsuite-proj-build (&optional projdir)
   "Build current project."
   (interactive)
-  (run-async-rsuite "proj build"))
+  (rsuite-call-within-dir (lambda ()
+			    (run-async-rsuite "proj build"))
+			  projdir))
 
-(defun rsuite-proj-depsinst ()
+(defun rsuite-proj-depsinst (&optional projdir)
   "Install dependencies."
   (interactive)
-  (run-async-rsuite "proj depsinst"))
+  (rsuite-call-within-dir (lambda ()
+			    (run-async-rsuite "proj depsinst"))
+			  projdir))
 
-(defun rsuite-proj-lock ()
+(defun rsuite-proj-lock (&optional projdir)
   "Lock current version of packages."
   (interactive)
-  (run-async-rsuite "proj lock"))
+  (rsuite-call-within-dir (lambda ()
+			    (run-async-rsuite "proj lock"))
+			  projdir))
 
-(defun rsuite-proj-unlock ()
+(defun rsuite-proj-unlock (&optional projdir)
   "Release lock of current version of packages."
   (interactive)
-  (run-async-rsuite "proj lock"))
+  (rsuite-call-within-dir (lambda ()
+			    (run-async-rsuite "proj unlock"))
+			  projdir))
 
-(defun rsuite-proj-test ()
+(defun rsuite-proj-test (&optional projdir)
   "Run project test."
-  (run-async-rsuite "proj test"))
+  (rsuite-call-within-dir (lambda ()
+			    (run-async-rsuite "proj test"))
+			  projdir))
 
-(defun rsuite-proj-zip ()
+(defun rsuite-proj-zip (&optional projdir)
   "Make deployment."
   (interactive)
-  (let ((version nil) (path nil))
-    (setq version (read-string "Version: "))
-    (setq path (read-directory-name "Path: "))
-    (if (> (length version) 0)
-	(run-async-rsuite (concat "proj zip --version=" version " --path=" path))
-      (run-async-rsuite (concat "proj zip --path=" path)))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((version nil) (path nil))
+			      (setq version (read-string "Version: "))
+			      (setq path (read-directory-name "Path: "))
+			      (if (> (length version) 0)
+				  (run-async-rsuite (concat "proj zip --version=" version " --path=" path))
+				(run-async-rsuite (concat "proj zip --path=" path)))
+			      ))
+			  projdir))
 
-(defun rsuite-docker-zip-image ()
+(defun rsuite-docker-zip-image (&optional projdir)
   "Make deployment zip using docker and custom base image."
   (interactive)
-  (let ((rver nil)
-	(image nil)
-	(version nil)
-	(path nil)
-	(rcmd "docker zip"))
-    (setq version (read-string "Version: "))
-    (setq path (read-directory-name "Path: "))
-    (setq image (read-string "Image: "))
-    (setq rver (read-string "RVer: "))
-    (setq rcmd (concat rcmd
-		       " --dest=" path
-		       " --rver=" rver
-		       " --image=" image))
-    (if (> (length version) 0)
-	(run-async-rsuite (concat rcmd
-			    " --version=" version))
-      (run-async-rsuite rcmd))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((rver nil)
+				  (image nil)
+				  (version nil)
+				  (path nil)
+				  (rcmd "docker zip"))
+			      (setq version (read-string "Version: "))
+			      (setq path (read-directory-name "Path: "))
+			      (setq image (read-string "Image: "))
+			      (setq rver (read-string "RVer: "))
+			      (setq rcmd (concat rcmd
+						 " --dest=" path
+						 " --rver=" rver
+						 " --image=" image))
+			      (if (> (length version) 0)
+				  (run-async-rsuite (concat rcmd
+							    " --version=" version))
+				(run-async-rsuite rcmd))))
+			  projdir))
 
-(defun rsuite-docker-zip-platform ()
+(defun rsuite-docker-zip-platform (&optional projdir)
   "Make deployment zip using docker and image of one of the supported OSs."
   (interactive)
-  (let ((platform nil)
-	(version nil)
-	(path nil)
-	(rcmd "docker zip"))
-    (setq version (read-string "Version: "))
-    (setq path (read-directory-name "Path: "))
-    (setq platform (ivy-read
-		    "Platform: "
-		    rsuite/docker-platforms))
-    (setq rcmd (concat rcmd
-		       " --dest=" path
-		       " --platform=" platform))
-    (if (> (length version) 0)
-	(run-async-rsuite (concat rcmd
-			    " --version=" version))
-      (run-async-rsuite rcmd))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((platform nil)
+				  (version nil)
+				  (path nil)
+				  (rcmd "docker zip"))
+			      (setq version (read-string "Version: "))
+			      (setq path (read-directory-name "Path: " projdir))
+			      (setq platform (ivy-read
+					      "Platform: "
+					      rsuite/docker-platforms))
+			      (setq rcmd (concat rcmd
+						 " --dest=" path
+						 " --platform=" platform))
+			      (if (> (length version) 0)
+				  (run-async-rsuite (concat rcmd
+							    " --version=" version))
+				(run-async-rsuite rcmd))))
+			  projdir))
 
-(defun rsuite-docker-image-platform ()
+(defun rsuite-docker-image-platform (&optional projdir)
   "Make deployment docker image for supported OSs."
   (interactive)
-  (let ((platform nil)
-	(version nil)
-	(tag nil)
-	(rcmd "docker img"))
-    
-    (setq version (read-string "Version: "))
-    (setq tag (read-string "Tag: "))
-    (setq platform (ivy-read
-		    "Platform: "
-		    rsuite/docker-platforms))
-    (setq rcmd (concat rcmd
-		       " --tag=" tag
-		       " --platform=" platform))
-    (if (> (length version) 0)
-	(run-async-rsuite (concat rcmd
-			    " --version=" version))
-      (run-async-rsuite rcmd))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((platform nil)
+				  (version nil)
+				  (tag nil)
+				  (rcmd "docker img"))
+			      
+			      (setq version (read-string "Version: "))
+			      (setq tag (read-string "Tag: "))
+			      (setq platform (ivy-read
+					      "Platform: "
+					      rsuite/docker-platforms))
+			      (setq rcmd (concat rcmd
+						 " --tag=" tag
+						 " --platform=" platform))
+			      (if (> (length version) 0)
+				  (run-async-rsuite (concat rcmd
+							    " --version=" version))
+				(run-async-rsuite rcmd))))
+			  projdir))
 
-(defun rsuite-docker-image-image ()
+
+(defun rsuite-docker-image-image (&optional projdir)
   "Make deployment docker image using custom base image."
   (interactive)
-  (let ((image nil)
-	(version nil)
-	(tag nil)
-	(rcmd "docker img"))
-    
-    (setq version (read-string "Version: "))
-    (setq tag (read-string "Tag: "))
-    (setq image (read-string "Image: "))
-    (setq rcmd (concat rcmd
-		       " --tag=" tag
-		       " --image=" image))
-    (if (> (length version) 0)
-	(run-async-rsuite (concat rcmd
-			    " --version=" version))
-      (run-async-rsuite rcmd))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((image nil)
+				  (version nil)
+				  (tag nil)
+				  (rcmd "docker img"))
+			      
+			      (setq version (read-string "Version: "))
+			      (setq tag (read-string "Tag: "))
+			      (setq image (read-string "Image: "))
+			      (setq rcmd (concat rcmd
+						 " --tag=" tag
+						 " --image=" image))
+			      (if (> (length version) 0)
+				  (run-async-rsuite (concat rcmd
+							    " --version=" version))
+				(run-async-rsuite rcmd))))
+			  projdir))
 
-(defun rsuite-docker-image-template ()
+
+(defun rsuite-docker-image-template (&optional projdir)
   "Make deployment docker image using template Dockerfile."
   (interactive)
-  (let ((version nil)
-	(tag nil)
-	(tmpl nil)
-	(rcmd "docker img"))
-    
-    (setq version (read-string "Version: "))
-    (setq tag (read-string "Tag: "))
-    (setq tmpl (read-string "Dockerfile template file: "))
-    (setq rcmd (concat rcmd
-		       " --tag=" tag
-		       " --templ " tmpl))
-    (if (> (length version) 0)
-	(run-async-rsuite (concat rcmd
-			    " --version=" version))
-      (run-async-rsuite rcmd))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((version nil)
+				  (tag nil)
+				  (tmpl nil)
+				  (rcmd "docker img"))
+			      
+			      (setq version (read-string "Version: "))
+			      (setq tag (read-string "Tag: "))
+			      (setq tmpl (read-string "Dockerfile template file: "))
+			      (setq rcmd (concat rcmd
+						 " --tag=" tag
+						 " --templ " tmpl))
+			      (if (> (length version) 0)
+				  (run-async-rsuite (concat rcmd
+							    " --version=" version))
+				(run-async-rsuite rcmd))))
+			  projdir))
 
-(defun rsuite-proj-pack ()
+(defun rsuite-proj-pack (&optional projdir)
   "Pack R Suite project."
   (interactive)
-  (let ((version nil)
-	(path nil)
-	(rcmd "proj pack"))
-    (setq version (read-string "Version: "))
-    (setq path (read-directory-name "Path: "))
-    (setq rcmd (concat rcmd
-		       " --path=" path))
-    (if (> (length version) 0)
-	(run-async-rsuite (concat rcmd
-			    " --version=" version))
-      (run-async-rsuite rcmd))))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((version nil)
+				  (path nil)
+				  (rcmd "proj pack"))
+			      (setq version (read-string "Version: "))
+			      (setq path (read-directory-name "Path: "))
+			      (setq rcmd (concat rcmd
+						 " --path=" path))
+			      (if (> (length version) 0)
+				  (run-async-rsuite (concat rcmd
+							    " --version=" version))
+				(run-async-rsuite rcmd))))
+			  projdir))
 
-(defun rsuite-proj-find-master ()
+(defun rsuite-proj-find-master (&optional projdir)
   "Find existing or new master file.
 If file exists it is opened.  Otherwise it is created and filled with R Suite init lines."
   (interactive)
-  (let ((m_path nil)
-	(m_name nil))
-    (setq m_path (concat (file-name-as-directory (rsuite-detect-prj-path)) "R/"))
-    (setq m_name (read-file-name "Master " m_path "master.R"))
-    (if (file-exists-p m_name)
-	(progn
-	  (find-file m_name)
-	  (goto-char (point-max))
-	  )
-      (progn	
-	(append-to-file
-	 "# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
+  (rsuite-call-within-dir (lambda () 
+			    (let ((m_path nil)
+				  (m_name nil))
+			      (setq m_path (concat (file-name-as-directory (rsuite-detect-prj-path)) "R/"))
+			      (setq m_name (read-file-name "Master " m_path "master.R"))
+			      (if (file-exists-p m_name)
+				  (progn
+				    (find-file m_name)
+				    (goto-char (point-max))
+				    )
+				(progn	
+				  (append-to-file
+				   "# Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)
 script_path <- (function() {
   args <- commandArgs(trailingOnly = FALSE)
-  script_path <- dirname(sub("--file=", "", args[grep("--file=", args)]))
+  script_path <- dirname(sub(\"--file=\", \"\", args[grep(\"--file=\", args)]))
   if (!length(script_path)) {
-    return("R")
+      return(\"R\")
   }
-  if (grepl("darwin", R.version$os)) {
-    base <- gsub("~\\+~", " ", base) # on MacOS ~+~ in path denotes whitespace
+  if (grepl(\"darwin\", R.version$os)) {
+      base <- gsub(\"~\\\\+~\", \" \", base) # on MacOS ~+~ in path denotes whitespace
   }
   return(normalizePath(script_path))
 })()
 
 # Setting .libPaths() to point to libs folder
-source(file.path(script_path, "set_env.R"), chdir = T)
+source(file.path(script_path, \"set_env.R\"), chdir = T)
 
 config <- load_config()
 args <- args_parser()
 
 " nil m_name)
-       (find-file m_name)
-       (goto-char (point-max))))))
+				  (find-file m_name)
+				  (goto-char (point-max))))))
+			  projdir))
 
-(defun rsuite-sysreqs-collect ()
+(defun rsuite-sysreqs-collect (&optional projdir)
   "Collect and display system requirements for R Suite project."
   (interactive)
-  (let ((rcmd "sysreqs collect"))
-          (run-async-rsuite rcmd)))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((rcmd "sysreqs collect"))
+			      (run-async-rsuite rcmd)))
+			  projdir))
 
-(defun rsuite-sysreqs-check ()
+(defun rsuite-sysreqs-check (&optional projdir)
   "Check current system against required requirements for R Suite project."
   (interactive)
-  (let ((rcmd "sysreqs check"))
-    (run-async-rsuite rcmd)))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((rcmd "sysreqs check"))
+			      (run-async-rsuite rcmd)))
+			  projdir))
 
-(defun rsuite-sysreqs-script ()
+(defun rsuite-sysreqs-script (&optional projdir)
   "Collect and display system requirements for R Suite project."
   (interactive)
-  (let ((rcmd "sysreqs script"))
-          (run-async-rsuite rcmd)))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((rcmd "sysreqs script"))
+			      (run-async-rsuite rcmd)))
+			  projdir))
 
-(defun rsuite-sysreqs-install ()
+(defun rsuite-sysreqs-install (&optional projdir)
   "Install system requirements for R Suite project."
   (interactive)
-  (let ((rcmd "sysreqs install"))
-          (run-async-rsuite rcmd)))
+  (rsuite-call-within-dir (lambda ()
+			    (let ((rcmd "sysreqs install"))
+			      (run-async-rsuite rcmd)))
+			  projdir))
 
-;; ;; a simple major mode, mymath-mode
 
-;; (defvar rsuite-highlights
-;;   '(("INFO" . font-lock-constant-face)
-;;     ("WARNING\\|ERROR" . font-lock-warning-face)))
-
-;; (define-derived-mode rsuite-mode fundamental-mode "rsuite"
-;;   "major mode for rsuite output."
-;;   (setq font-lock-defaults '(rsuite-highlights)))
-
-;; (provide 'rsuite-mode)
+;; Load projects management functions
+(require 'rsuite-projects)
 
 (provide 'rsuite)
 ;;; rsuite.el ends here
