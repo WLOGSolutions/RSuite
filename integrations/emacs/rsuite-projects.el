@@ -1,6 +1,3 @@
-
-
-
 ;;; rsuite-projects.el --- Emacs for R Suite
 
 ;; Copyright (c) WLOG Solutions
@@ -15,9 +12,15 @@
 
 ;;; Code:
 
-(require 'tablist)
 (require 's)
 (require 'dash)
+(require 'tablist)
+
+(require 'rsuite-group)
+
+(defgroup rsuite-projects nil
+  "R Suite projects management customization group."
+  :group 'rsuite)
 
 (defcustom rsuite-projects-default-sort-key '("Project" . nil)
   "Sort key for R Suite projects.
@@ -40,13 +43,6 @@ and FLIP is a boolean to specify the sort order."
   :group 'rsuite-projects
   :type 'string)
 
-  (define-derived-mode rsuite-projects-mode tabulated-list-mode "R Suite Projects Menu"
-    "Major mode for handling a list of R Suite projects."
-    (setq tabulated-list-format [("Version" 10 t)("R Version" 10 t)("Name" 30 t)("Path" 60 t)])
-    (setq tabulated-list-padding 2)
-    (add-hook 'tabulated-list-revert-hook 'rsuite-projects-entries-refresh nil t)
-    (tabulated-list-init-header)
-    (tablist-minor-mode))
 
 (defun get-string-from-file (filePath)
   "Return filePath's file content."
@@ -114,52 +110,79 @@ and FLIP is a boolean to specify the sort order."
 
 (defun rsuite-proj-build-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-proj-build))
+  (rsuite-call-wrapper 'rsuite-proj-build))
 
 (defun rsuite-proj-depsinst-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-proj-depsinst))
+  (rsuite-call-wrapper 'rsuite-proj-depsinst))
 
 (defun rsuite-proj-lock-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-proj-lock))
+  (rsuite-call-wrapper 'rsuite-proj-lock))
 
 (defun rsuite-proj-unlock-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-proj-unlock))
+  (rsuite-call-wrapper 'rsuite-proj-unlock))
 
 (defun rsuite-proj-pkg-start-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-proj-pkg-start))
+  (rsuite-call-wrapper 'rsuite-proj-pkg-start))
 
 (defun rsuite-proj-zip-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-proj-zip))
+  (rsuite-call-wrapper 'rsuite-proj-zip))
 
 (defun rsuite-docker-zip-platform-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-docker-zip-platform))
+  (rsuite-call-wrapper 'rsuite-docker-zip-platform))
 
 (defun rsuite-docker-zip-platform-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-docker-zip-platform))
+  (rsuite-call-wrapper 'rsuite-docker-zip-platform))
 
 (defun rsuite-docker-zip-image-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-docker-zip-image))
+  (rsuite-call-wrapper 'rsuite-docker-zip-image))
 
 (defun rsuite-docker-image-platform-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-docker-image-platform))
+  (rsuite-call-wrapper 'rsuite-docker-image-platform))
 
 (defun rsuite-docker-image-image-wrapper ()
   (interactive)
-  (rsuite-call-item 'rsuite-docker-image-image))
+  (rsuite-call-wrapper 'rsuite-docker-image-image))
 
-(defvar rsuite-projects-mode-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "b" 'rsuite-proj-build-item)
-    map)
-  "Keymap for `rsuite-projects-mode'.")
+(defun rsuite-sysreqs-collect-wrapper ()
+  (interactive)
+  (rsuite-call-wrapper 'rsuite-sysreqs-collect))
+
+(defun rsuite-sysreqs-check-wrapper ()
+  (interactive)
+  (rsuite-call-wrapper 'rsuite-sysreqs-check))
+
+(defun rsuite-sysreqs-script-wrapper ()
+  "Collect and display system requirements for R Suite project."
+  (interactive)
+  (rsuite-call-wrapper 'rsuite-sysreqs-script))
+
+(defun rsuite-sysreqs-install-wrapper ()
+  (interactive)
+  (rsuite-call-wrapper 'rsuite-sysreqs-install))
+
+;; (defvar rsuite-projects-mode-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map "b" 'rsuite-proj-build-wrapper)
+;;     (define-key map "l" 'rsuite-proj-lock-wrapper)
+;;     (define-key map "z" 'rsuite-proj-zip-wrapper)
+;;     map)
+;;   "Keymap for `rsuite-projects-mode'.")
+
+(define-derived-mode rsuite-projects-mode tabulated-list-mode "R Suite Projects"
+  "Major mode for handling a list of R Suite projects."
+  (setq tabulated-list-format [("Version" 10 t)("R Version" 10 t)("Name" 30 t)("Path" 60 t)])
+  (setq tabulated-list-padding 2)
+  (add-hook 'tabulated-list-revert-hook 'rsuite-projects-entries-refresh nil t)
+  (tabulated-list-init-header)
+  (tablist-minor-mode))
 
 (provide 'rsuite-projects)

@@ -15,8 +15,13 @@
 (require 'dired)
 (require 'ivy)
 
-(defvar rsuite/verbose nil "Make rsuite verbose.")
-(defvar rsuite/docker-platforms
+(require 'rsuite-group)
+
+(defcustom rsuite/verbose nil "Make rsuite verbose."
+  :group 'rsuite
+  :type 'boolean)
+
+(defconst rsuite/docker-platforms
   (list "ubuntu" "centos" "debian")
   "Docker platforms supported by R Suite.")
 (defconst rsuite/buffer "*rsuite*" "Buffer for rsuite output.")
