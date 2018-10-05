@@ -1,4 +1,4 @@
-;;; rsuite-projects.el --- Emacs for R Suite
+;;; rsuite-group.el --- Emacs for R Suite
 
 ;; Copyright (c) WLOG Solutions
 ;; Author: Wit Jakuczun <wit.jakuczun@wlogsolutions.com>
@@ -8,7 +8,7 @@
 
 ;;; Commentary:
 
-;; This package provides functions and mode for managind R Suite projects.
+;; This package provides R Suite's customisation group.
 
 ;;; Code:
 
