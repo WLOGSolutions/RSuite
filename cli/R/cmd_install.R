@@ -154,7 +154,9 @@ tryCatch({
                           repos = c(Local = paste0("file:///", tmp_dir), CRAN = cran_path),
                           quiet = !opts$verbose,
                           verbose = opts$verbose)
-}, finally = {setwd(wd)})
+}, finally = {
+  setwd(wd)
+})
 
 if (!(rsuite_pkg %in% installed.packages()[, "Package"])) {
   .fatal_error(sprintf("Failed to install %s", rsuite_pkg))

@@ -10,7 +10,7 @@
 #' @import roxygen2
 #' @import git2r
 #' @import jsonlite
-#' @import subprocess
+#' @import processx
 #' @importFrom stats aggregate
 #' @importFrom httr http_error
 NULL
@@ -66,6 +66,7 @@ NULL
 #'   \item{\code{\link{repo_upload_ext_packages}}}{Uploads external packages into a managed repository.}
 #'   \item{\code{\link{repo_upload_pkgzip}}}{Uploads PKGZIP into a managed repository.}
 #'   \item{\code{\link{repo_upload_github_package}}}{Loads package from a GitHub repository.}
+#'   \item{\code{\link{repo_upload_bioc_package}}}{Loads package from a BioConductor repository.}
 #' }
 #'
 #' @section PKGZIP building:
@@ -79,6 +80,7 @@ NULL
 #'   \item{\code{\link{pkgzip_build_package_files}}}{Builds PKGZIP out of passed package files.}
 #'   \item{\code{\link{pkgzip_build_ext_packages}}}{Builds PKGZIP out of passed external packages.}
 #'   \item{\code{\link{pkgzip_build_github_package}}}{Builds PKGZIP out of a package on GitHub.}
+#'   \item{\code{\link{pkgzip_build_bioc_package}}}{Builds PKGZIP out of a package on BioConductor.}
 #' }
 #'
 #' @section RSuite miscellaneous:

@@ -109,7 +109,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
 
     # this type = "source" does not matter, it is passed just to prevent complaining
     #  on windows that "both" type cannot be used with repos = NULL
-    pkg_install(pkg_file,
+    pkg_install(pkg_file, # from 50_pkg_deployment.R
                 lib_dir = params$lib_path,
                 type = "source",
                 repos = NULL,

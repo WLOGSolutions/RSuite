@@ -576,7 +576,7 @@ _rsuite() {
 			return 0
 			;;
 		*)
-			opts="update install proj sysreqs repo pkgzip docker version tmpl help"
+			opts="update install proj sysreqs repo pkgzip docker version tmpl help -h"
 			;;
 
 	esac

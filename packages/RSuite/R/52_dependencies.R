@@ -374,31 +374,37 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
       return()
     }
 
-    arch_url <- repo_info$get_arch_src_url(req$pkg)
-    if (is.null(arch_url)) {
-      return()
+    avails <- repo_info$get_arch_src_cache(req$pkg)
+    if (is.null(avails)) {
+      arch_url <- repo_info$get_arch_src_url(req$pkg)
+      if (is.null(arch_url)) {
+        return()
+      }
+
+      conn <- url(arch_url)
+      html <- tryCatch({
+        suppressWarnings(readLines(conn))
+      },
+      error = function(e) character(0),
+      finally = {
+        close(conn)
+      })
+
+      ahref_re <- sprintf("^.*<a href=\"(%s_(.+)[.]tar[.]gz)\".+$", req$pkg)
+      html <- html[grepl(ahref_re, html)]
+      if (length(html) == 0) {
+        return()
+      }
+
+      avails <- data.frame(Package = req$pkg,
+                           Version = gsub(ahref_re, "\\2", html),
+                           File = gsub(ahref_re, "\\1", html),
+                           Repository = arch_url,
+                           stringsAsFactors = FALSE)
+
+      repo_info$set_arch_src_cache(req$pkg, avails)
     }
 
-    conn <- url(arch_url)
-    html <- tryCatch({
-      suppressWarnings(readLines(conn))
-    },
-    error = function(e) character(0),
-    finally = {
-      close(conn)
-    })
-
-    ahref_re <- sprintf("^.*<a href=\"(%s_(.+)[.]tar[.]gz)\".+$", req$pkg)
-    html <- html[grepl(ahref_re, html)]
-    if (length(html) == 0) {
-      return()
-    }
-
-    avails <- data.frame(Package = req$pkg,
-                         Version = gsub(ahref_re, "\\2", html),
-                         File = gsub(ahref_re, "\\1", html),
-                         Repository = arch_url,
-                         stringsAsFactors = FALSE)
     avails$NVersion <- norm_version(avails$Version)
     if (!is.na(req$vmin)) {
       avails <- avails[avails$NVersion >= req$vmin, ]
@@ -423,7 +429,7 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
 
   dloads <- pkg_download(avail_pkgs = avail_pkgs, dest_dir = dload_dir)
   avails <- get_package_files_info(dloads$Path)
-  found_vers <- vers.add_avails(missing_vers, avails)
+  found_vers <- vers.collect(pkgs = avails)
 
   next_cr <- vers.check_against(missing_vers, found_vers)
   return(check_res.union(cr, next_cr))

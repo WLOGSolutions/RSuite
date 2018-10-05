@@ -454,6 +454,144 @@ pkgzip_build_github_package <- function(repo, ...,
                                         filter_repo = NULL,
                                         skip_build_steps = NULL,
                                         keep_sources = FALSE) {
+  .pkgzip_build_srcrepo_package("github", repo, ...,
+                                prj = prj,
+                                pkg_type = pkg_type,
+                                path = path,
+                                with_deps = with_deps,
+                                filter_repo = filter_repo,
+                                skip_build_steps = skip_build_steps,
+                                keep_sources = keep_sources)
+}
+
+#'
+#' Builds PKGZIP out of a package on Bioconductor
+#'
+#' Loads package from the Bioconductor repository, packages it into package file and builds
+#' a PKGZIP out of it. It uses the project to detect repositories to look for dependencies
+#' and to detect rversion if required.
+#'
+#' @details
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to control logs
+#' verbosity.
+#'
+#' @param repo repository address in format [username:password@][release/]repo[#revision]. See
+#'   \code{devtools::install_bioc} for more information.
+#' @param ... Bioconductor specific parameters passed to \code{devtools::install_bioc}.
+#' @param prj project object to use. If not passed will init project from
+#'   working directory. (type: rsuite_project, default: NULL)
+#' @param pkg_type type of packages to build (type: character, default: platform default)
+#' @param path folder path to put output zip into. The folder must exist.
+#'    (type: character: default: \code{getwd()})
+#' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
+#'    (type: logical, default: FALSE)
+#' @param filter_repo repository address to not include dependencies available in.
+#'     If NULL will not filter dependencies. Will be omitted if with_deps is FALSE.
+#'     (type: character(1), default: NULL)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
+#'   \item{vignettes}{Build package vignettes}
+#' }
+#' (type: character(N), default: NULL).
+#' @param keep_sources if TRUE downloaded package sources will not be removed
+#'   after building. (type: logical, default: FALSE)
+#'
+#' @return created pkgzip file path (invisible).
+#'
+#' @family in PKGZIP building
+#'
+#' @examples
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#'   # build PKGZIP with logging package from cran repository
+#'   pkgzip_fpath <- pkgzip_build_bioc_package("BiocGenerics", prj = prj, path = tempdir())
+#'
+#'   # list content of pkgzip created
+#'   unzip(pkgzip_fpath, list = TRUE)
+#' }
+#'
+#' @export
+#'
+pkgzip_build_bioc_package <- function(repo, ...,
+                                      prj = NULL,
+                                      pkg_type = .Platform$pkgType,
+                                      path = getwd(),
+                                      with_deps = FALSE,
+                                      filter_repo = NULL,
+                                      skip_build_steps = NULL,
+                                      keep_sources = FALSE) {
+  .pkgzip_build_srcrepo_package("bioc", repo, ...,
+                                prj = prj,
+                                pkg_type = pkg_type,
+                                path = path,
+                                with_deps = with_deps,
+                                filter_repo = filter_repo,
+                                skip_build_steps = skip_build_steps,
+                                keep_sources = keep_sources)
+}
+
+#'
+#' Builds PKGZIP out of a package on source repository of provided type.
+#'
+#' Loads package from the source repository, packages it into package file and builds
+#' a PKGZIP out of it. It uses the project to detect repositories to look for dependencies
+#' and to detect rversion if required.
+#'
+#' @param repo src repository specific reference. see apropriate devtools::<type>_install
+#'   documentation. (type: character)
+#' @param srcrepo_type type of src repository (one of: github, git, svn, bioc, bitbucket, url).
+#' @param ... src repository specific parameters. see apropriate devtools::<type>_install
+#'   documentation.
+#' @param prj project object to use. If not passed will init project from
+#'   working directory. (type: rsuite_project, default: NULL)
+#' @param pkg_type type of packages to build (type: character, default: platform default)
+#' @param path folder path to put output zip into. The folder must exist.
+#'    (type: character: default: \code{getwd()})
+#' @param with_deps If TRUE will include dependencies pkgs dependencies into final zip.
+#'    (type: logical, default: FALSE)
+#' @param filter_repo repository address to not include dependencies available in.
+#'     If NULL will not filter dependencies. Will be omitted if with_deps is FALSE.
+#'     (type: character(1), default: NULL)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
+#'   \item{vignettes}{Build package vignettes}
+#' }
+#' (type: character(N), default: NULL).
+#' @param keep_sources if TRUE downloaded package sources will not be removed
+#'   after building. (type: logical, default: FALSE)
+#'
+#' @return created pkgzip file path (invisible).
+#'
+#' @keywords internal
+#' @noRd
+#'
+.pkgzip_build_srcrepo_package <- function(srcrepo_type, repo, ...,
+                                          prj = NULL,
+                                          pkg_type = .Platform$pkgType,
+                                          path = getwd(),
+                                          with_deps = FALSE,
+                                          filter_repo = NULL,
+                                          skip_build_steps = NULL,
+                                          keep_sources = FALSE) {
+  assert(is_nonempty_char1(srcrepo_type), "Non empty character(1) expected for srcrepo_type")
   assert(is_nonempty_char1(repo), "Non empty character(1) expected for repo")
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
@@ -496,7 +634,7 @@ pkgzip_build_github_package <- function(repo, ...,
   prj_config_set_rversion(rver = params$r_ver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
 
-  pkg_info <- get_srcrepo_package(bld_prj, "github", repo, ...)
+  pkg_info <- get_srcrepo_package(bld_prj, srcrepo_type, repo, ...)
 
   bld_params <- bld_prj$load_params()
 

@@ -524,6 +524,24 @@ You can also specify following options to addgithub:
 * `--rver` which takes R version number to target built package for (important for binary packages).
 * `--with-deps` If passed will upload also dependencies which are not currently present in the repository.
 
+## Adding package from BioConductor to repository
+
+If you want to add package available on BioConductor repository you can achieve it calling following command:
+
+```bash
+rsuite repo addbioc -d /path/to/your/repository -r PackageName
+```
+
+R Suite CLI will download sources, build package and add it to specified repository.
+
+BioConductor repository can be specified in format `[username:password@][release/]repo[#revision]`. 
+
+You can also specify following options to addbioc:
+
+* `-b` (short for `--binary`) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what 
+  kind of package will be added to the repository: system specific binary of source.
+* `--rver` which takes R version number to target built package for (important for binary packages).
+
 ## List contents of repository
 
 You can list packages available on the repository with following command:
@@ -651,6 +669,24 @@ You can also specify following options to github:
 * `--filter-repo` which takes as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
   versions are present in the repository. The parameter should be used together with --with-deps.
 
+## Building PKGZIP containing package from BioConductor
+
+If you want to create PKGZIP out of available on BioConductor repository call following command:
+
+```bash
+rsuite pkgzip bioc -r PackageName
+```
+
+R Suite CLI will download sources, build package and add create PKGZIP out of it.
+
+GitHub repository can be specified in format `[username:password@][release/]repo[#revision]`. 
+
+You can also specify following options to github:
+
+* `-b` (short for `--binary`) which takes as parameter logical value (T/F/TRUE/FALSE). It specifies what kind of package will 
+  be included in PKGZIP: system specific binary of source.
+* `--filter-repo` which takes as parameter url to repository. If passed will not include dependencies into PKGZIP which satisfying 
+  versions are present in the repository. The parameter should be used together with --with-deps.
 
 # Docker integration
 

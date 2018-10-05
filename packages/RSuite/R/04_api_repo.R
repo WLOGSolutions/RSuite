@@ -776,7 +776,137 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
                                        with_deps = FALSE,
                                        skip_build_steps = NULL,
                                        keep_sources = FALSE) {
+  .repo_upload_srcrepo_package(repo_manager, "github", repo, ...,
+                               prj = prj,
+                               pkg_type = pkg_type,
+                               with_deps = with_deps,
+                               skip_build_steps = skip_build_steps,
+                               keep_sources = keep_sources)
+}
+
+#'
+#' Loads package from the Bioconductor repository.
+#'
+#' It will download Bioconductor repository, build package into package file and will
+#' upload it into the repository. It will search dependencies in provided
+#' project's repositories.
+#'
+#' @details
+#' Logs all messages onto rsuite logger. Use \code{logging::setLevel} to
+#' control logs verbosity.
+#'
+#' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
+#' @param repo repository address in format [username:password@][release/]repo[#revision]. See
+#'   \code{devtools::install_bioc} for more information.
+#' @param ... Bioconductor specific parameters passed to \code{devtools::install_bioc}.
+#' @param prj project object to use. If not passed will init project from
+#'   working directory. (type: rsuite_project, default: NULL)
+#' @param pkg_type type of packages to upload (type: character, default: platform default)
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into the
+#'    repository. Packages in repository satisfying pkgs requirements will not be
+#'    included. (type: logical, default: FALSE)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
+#'   \item{vignettes}{Build package vignettes}
+#' }
+#' (type: character(N), default: NULL).
+#' @param keep_sources if TRUE downloaded package sources will not be removed
+#'   after building. (type: logical, default: FALSE)
+#'
+#' @family in repository management
+#'
+#' @examples
+#' \donttest{
+#'   # create exemplary project base folder
+#'   prj_base <- tempfile("example_")
+#'   dir.create(prj_base, recursive = TRUE, showWarnings = FALSE)
+#'
+#'   # start project
+#'   prj <- prj_start("my_project", skip_rc = TRUE, path = prj_base)
+#'
+#'   # set it to use in project repository and CRAN
+#'   prj_config_set_repo_adapters(c("Dir", "CRAN"), prj = prj)
+#'
+#'   # start managing in project repository
+#'   rmgr <- repo_mng_start("Dir", prj = prj, ix = 1)
+#'
+#'   # upload logging package from cran repository
+#'   repo_upload_bioc_package(rmgr, repo = "BiocGenerics",
+#'                            prj = prj, pkg_type = "source")
+#'
+#'   # list available packages
+#'   repo_mng_list(rmgr, pkg_type = "source")
+#'
+#'   # stop repository management
+#'   repo_mng_stop(rmgr)
+#' }
+#'
+#' @export
+#'
+repo_upload_bioc_package <- function(repo_manager, repo, ...,
+                                     prj = NULL,
+                                     pkg_type = .Platform$pkgType,
+                                     with_deps = FALSE,
+                                     skip_build_steps = NULL,
+                                     keep_sources = FALSE) {
+  .repo_upload_srcrepo_package(repo_manager, "bioc", repo, ...,
+                               prj = prj,
+                               pkg_type = pkg_type,
+                               with_deps = with_deps,
+                               skip_build_steps = skip_build_steps,
+                               keep_sources = keep_sources)
+}
+
+#'
+#' Loads package from the source repository of specified type.
+#'
+#' It will download source repository, build package into package file and will
+#' upload it into the repository. It will search dependencies in provided
+#' project's repositories.
+#'
+#' @param repo_manager repo manager to use for uploading. (type: rsuite_repo_manager)
+#' @param srcrepo_type type of src repository (one of: github, git, svn, bioc, bitbucket, url).
+#' @param repo src repository specific reference. see apropriate devtools::<type>_install
+#'   documentation. (type: character)
+#' @param ... src repository specific parameters. see apropriate devtools::<type>_install
+#'   documentation.
+#' @param prj project object to use. If not passed will init project from
+#'   working directory. (type: rsuite_project, default: NULL)
+#' @param pkg_type type of packages to upload (type: character, default: platform default)
+#' @param with_deps If TRUE will include pkgs dependencies while uploading into the
+#'    repository. Packages in repository satisfying pkgs requirements will not be
+#'    included. (type: logical, default: FALSE)
+#' @param skip_build_steps character vector with steps to skip while building
+#'    project packages. Can contain following entries:
+#' \describe{
+#'   \item{specs}{Process packages specifics}
+#'   \item{docs}{Try build documentation with roxygen}
+#'   \item{imps}{Perform imports validation}
+#'   \item{tests}{Run package tests}
+#'   \item{rcpp_attribs}{Run rppAttribs on the package}
+#'   \item{vignettes}{Build package vignettes}
+#' }
+#' (type: character(N), default: NULL).
+#' @param keep_sources if TRUE downloaded package sources will not be removed
+#'   after building. (type: logical, default: FALSE)
+#'
+#' @keywords internal
+#' @noRd
+#'
+.repo_upload_srcrepo_package <- function(repo_manager, srcrepo_type, repo, ...,
+                                         prj = NULL,
+                                         pkg_type = .Platform$pkgType,
+                                         with_deps = FALSE,
+                                         skip_build_steps = NULL,
+                                         keep_sources = FALSE) {
   assert(is_repo_manager(repo_manager), "Repo manager expected for repo_manager")
+  assert(is_nonempty_char1(srcrepo_type), "Non empty character(1) expected for srcrepo_type")
   assert(is_nonempty_char1(repo), "Non empty character(1) expected for repo")
   assert(is_nonempty_char1(pkg_type), "Non empty character(1) expected for pkg_type")
   assert(is.logical(with_deps), "logical expected for with_deps")
@@ -813,7 +943,7 @@ repo_upload_github_package <- function(repo_manager, repo, ...,
   prj_config_set_rversion(rver = mgr_info$rver, prj = bld_prj)
   prj_config_set_repo_adapters(make_detached_repos(params), prj = bld_prj)
 
-  pkg_info <- get_srcrepo_package(bld_prj, "github", repo, ...)
+  pkg_info <- get_srcrepo_package(bld_prj, srcrepo_type, repo, ...)
 
   unlink(list.files(bld_prj$load_params()$script_path, # not to include default packages
                     pattern = ".+[.]R$", full.names = TRUE),

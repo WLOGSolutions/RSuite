@@ -12,7 +12,7 @@
 #'    loaded project will be used or the default whichever exists. Will init the
 #'    default project from working directory if no default project exists.
 #'    (type: rsuite_project, default: NULL)
-#' @return named list with named with package names and containing system
+#' @return named list with package names and containing system
 #'    requirements as value.
 #'
 #' @family in SYSREQS

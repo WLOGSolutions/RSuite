@@ -64,7 +64,7 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   } else {
     success <- file.copy(from = bundle, to = bld_params$pkgs_path, recursive = TRUE)
     assert(success, "Failed to retrieve downloaded package source")
-    bundle_path <- bundle
+    bundle_path <- file.path(bld_params$pkgs_path, basename(bundle))
   }
 
   source <- tryCatch({
