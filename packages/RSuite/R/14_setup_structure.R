@@ -339,3 +339,27 @@ detect_rc_adapter <- function(prj_dir) {
     }
   }
 }
+
+#'
+#' Detects if script is started under Jenkins CI
+#'
+#' @return boolean
+#'
+#' @keywords internal
+#' @noRd
+#'
+is_under_ci <- function() {
+  job_name <- Sys.getenv("JOB_NAME")
+  return(job_name != "")
+}
+
+#'
+#' Detects Jenkins CI build number
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_build_number <- function() {
+  build_number <- Sys.getenv("BUILD_NUMBER")
+  return(build_number)
+}

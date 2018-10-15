@@ -76,6 +76,10 @@ detect_zip_version <- function(params, zip_ver) {
 #' @noRd
 #'
 detect_consistent_revision <- function(params) {
+  if (is_under_ci()) {
+    return(get_build_number())
+  }
+
   rc_adapter <- detect_rc_adapter(params$prj_path)
   if (is.null(rc_adapter)) {
     return(NULL)

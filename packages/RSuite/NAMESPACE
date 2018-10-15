@@ -70,3 +70,5 @@ import(processx)
 import(roxygen2)
 importFrom(httr,http_error)
 importFrom(stats,aggregate)
+
+import(httr)
