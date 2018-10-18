@@ -47,6 +47,15 @@ detect_zip_version <- function(params, zip_ver) {
     zip_ver <- denorm_version(max(norm_version(pkg_vers)))
   }
 
+  build_number <- detect_ci_build_number()
+  if (!is.null(build_number)) {
+    assert(grepl("^\\d+$", build_number),
+           paste0("CI build number detected(%s) is invalid:",
+                  " it must contain digits only as it is appended to project packages version numbers."),
+           build_number)
+    return(list(ver = paste0(zip_ver, "_", build_number), rev = build_number))
+  }
+
   revision <- detect_consistent_revision(params)
   if (!is.null(revision)) {
     assert(grepl("^\\d+$", revision),
@@ -65,6 +74,24 @@ detect_zip_version <- function(params, zip_ver) {
 }
 
 #'
+#' Detects CI project build number.
+#'
+#' @return ci build number detected (type: character)
+#'
+#' @keywords internal
+#' @noRd
+#'
+detect_ci_build_number <- function() {
+  ci_adapter <- detect_ci_adapter()
+  if (is.null(ci_adapter)) {
+    return(NULL)
+  }
+
+  ci_ver <- ci_adapter_get_version(ci_adapter)
+  return(ci_ver)
+}
+
+#'
 #' Detects revision of the project and checks if it is consistent:
 #' project does not have changes and project revision is latest.
 #'
@@ -76,10 +103,6 @@ detect_zip_version <- function(params, zip_ver) {
 #' @noRd
 #'
 detect_consistent_revision <- function(params) {
-  if (is_under_ci()) {
-    return(get_build_number())
-  }
-
   rc_adapter <- detect_rc_adapter(params$prj_path)
   if (is.null(rc_adapter)) {
     return(NULL)

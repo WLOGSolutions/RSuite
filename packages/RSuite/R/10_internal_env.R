@@ -15,6 +15,7 @@ internal_env <- new.env()
 assign("loaded_prj", NULL, envir = internal_env)
 assign("prj_reg", list(), envir = internal_env)
 assign("repo_adapter_reg", list(), envir = internal_env)
+assign("ci_adapter_reg", list(), envir = internal_env)
 assign("rc_adapter_reg", list(), envir = internal_env)
 
 #'
@@ -178,12 +179,50 @@ reg_rc_adapter_names <- function() {
 }
 
 #'
-#' Return repo adapter under the name.
+#' Return rc adapter under the name.
 #'
 #' @keywords internal
 #' @noRd
 #'
 find_rc_adapter <- function(name) {
   reg <- get("rc_adapter_reg", envir = internal_env)
+  return(reg[[name]])
+}
+
+#'
+#' Register ci_adapter in internal environment under name.
+#'
+#' @param name name of adapter to (un)register.
+#' @param ci_adapter adapter to register. if NULL unregister it.
+#'
+#' @keywords internal
+#' @noRd
+#'
+reg_ci_adapter <- function(name, ci_adapter) {
+  stopifnot(is.null(ci_adapter) || is_ci_adapter(ci_adapter))
+
+  reg <- get("ci_adapter_reg", envir = internal_env)
+  reg[[name]] <- ci_adapter
+  assign("ci_adapter_reg", reg, envir = internal_env)
+}
+
+#'
+#' Get all registered ci adapter names.
+#'
+#' @keywords internal
+#' @noRd
+#'
+reg_ci_adapter_names <- function() {
+  names(get("ci_adapter_reg", envir = internal_env))
+}
+
+#'
+#' Return ci adapter under the name.
+#'
+#' @keywords internal
+#' @noRd
+#'
+find_ci_adapter <- function(name) {
+  reg <- get("ci_adapter_reg", envir = internal_env)
   return(reg[[name]])
 }

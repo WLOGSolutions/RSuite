@@ -341,25 +341,20 @@ detect_rc_adapter <- function(prj_dir) {
 }
 
 #'
-#' Detects if script is started under Jenkins CI
+#' Detects which CI system has triggered current build process.
 #'
-#' @return boolean
+#' @return ci_adapter or NULL
 #'
 #' @keywords internal
 #' @noRd
 #'
-is_under_ci <- function() {
-  job_name <- Sys.getenv("JOB_NAME")
-  return(job_name != "")
-}
+detect_ci_adapter <- function() {
+  for (ci_name in reg_ci_adapter_names()) {
+    ci_adapter <- find_ci_adapter(ci_name)
+    stopifnot(!is.null(ci_adapter))
 
-#'
-#' Detects Jenkins CI build number
-#'
-#' @keywords internal
-#' @noRd
-#'
-get_build_number <- function() {
-  build_number <- Sys.getenv("BUILD_NUMBER")
-  return(build_number)
+    if (ci_adapter_is_building(ci_adapter)) {
+      return(ci_adapter)
+    }
+  }
 }

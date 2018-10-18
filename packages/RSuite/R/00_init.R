@@ -25,6 +25,8 @@ rsuite_default_options <- list(
   rsuite_register_repo_adapter(repo_adapter_create_s3(name = "S3"))
   rsuite_register_repo_adapter(repo_adapter_create_dir(name = "Dir"))
 
+  rsuite_register_ci_adapter(ci_adapter_create_jenkins(name = "Jenkins"))
+
   rsuite_register_rc_adapter(rc_adapter_create_svn(name = "SVN"))
   rsuite_register_rc_adapter(rc_adapter_create_git(name = "GIT"))
 }

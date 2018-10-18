@@ -241,6 +241,75 @@ rsuite_get_rc_adapter_names <- function() {
 }
 
 #'
+#' Registers CI (continuous integration) adapter to use for projects.
+#'
+#' @param ci_adapter object complying rsuite_ci_adapter signature.
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' ci_adapter <- ci_adapter_create_base("Own") # create your custom adapter
+#' class(ci_adapter) <- c("ci_adapter_own", class(ci_adapter))
+#'
+#' # register it
+#' rsuite_register_ci_adapter(ci_adapter)
+#'
+#' # unregister it
+#' rsuite_unregister_ci_adapter("Own")
+#'
+#' @export
+#'
+rsuite_register_ci_adapter <- function(ci_adapter) {
+  assert(!is.null(ci_adapter) && is_ci_adapter(ci_adapter),
+         "CI adapter object expected for ci_adapter")
+  assert(is.null(find_ci_adapter(ci_adapter$name)),
+         "CI adapter '%s' is already registered", ci_adapter$name)
+
+  reg_ci_adapter(ci_adapter$name, ci_adapter)
+}
+
+#'
+#' Unregisters CI (continuous integration) adapter.
+#'
+#' @param name CI adapter name to unregister.
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' ci_adapter <- ci_adapter_create_base("Own") # create your custom adapter
+#' class(ci_adapter) <- c("ci_adapter_own", class(ci_adapter))
+#'
+#' # register it
+#' rsuite_register_ci_adapter(ci_adapter)
+#'
+#' # unregister it
+#' rsuite_unregister_ci_adapter("Own")
+#'
+#' @export
+#'
+rsuite_unregister_ci_adapter <- function(name) {
+  assert(!is.null(name) && is.character(name) && length(name) == 1 && nchar(name) > 0,
+         "Non empty character(1) required for name")
+  reg_ci_adapter(name, NULL)
+}
+
+#'
+#' Gets all names of known CI (continuous integration) adapters.
+#'
+#' @return names of registered ci adapters as character vector.
+#'
+#' @family miscellaneous
+#'
+#' @examples
+#' rsuite_get_ci_adapter_names()
+#'
+#' @export
+#'
+rsuite_get_ci_adapter_names <- function() {
+  reg_ci_adapter_names()
+}
+
+#'
 #' Retrieves information on current OS.
 #'
 #' @return named list with following items
