@@ -85,3 +85,23 @@ test_that_managed("Deployment zip of project under SVN control", {
 
   expect_true(file.exists(file.path(prj_path, "TestProject_0.1_1.zip")))
 })
+
+
+test_that_managed("Deployment zip of project under Jenkins CI", {
+  # create test project
+  prj_path <- file.path(get_wspace_dir(), "TestProject")
+  prj <- init_test_project(skip_rc = TRUE)
+  create_test_package("TestPackage", prj = prj, ver = "0.1")
+  RSuite::prj_install_deps(prj = prj)
+
+  # emulate running Jenkins job: set JOB_NAME and BUILD_NUMBER environment variables
+  Sys.setenv(JOB_NAME = "TestProjectJob", BUILD_NUMBER = "7")
+  on_test_exit(function() {
+    Sys.unsetenv(c("JOB_NAME", "BUILD_NUMBER"))
+  })
+
+  # create zip file (it should detect BUILD_NUMBER from environment variable)
+  RSuite::prj_zip(prj = prj, prj_path)
+
+  expect_true(file.exists(file.path(prj_path, "TestProject_0.1_7.zip")))
+})
