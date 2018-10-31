@@ -43,11 +43,18 @@ pkg_download <- function(avail_pkgs, dest_dir) {
     add = TRUE)
 
     build_result <- run_rscript(c("load(%s)",
-                                  "remote_paths <- download.packages(pkgs$Package, available = pkgs, %s)",
+                                  "remote_paths <- matrix(character(), 0L, 2L)",
+                                  paste0("for (p in pkgs$Package) ",
+                                         "tryCatch({",
+                                         "res <- download.packages(p, available = pkgs, %s); ",
+                                         "remote_paths <- rbind(remote_paths, res)}, ",
+                                         "warning = function(w) {}, ",
+                                         "error = function(e) {})"),
                                   "save(remote_paths, %s)"),
                                 rscript_arg("file", in_file),
                                 paste(common_args, collapse = ", "),
                                 rscript_arg("file", ou_file))
+
     if (!is.null(build_result)) {
       if (build_result == FALSE) {
         pkg_logwarn("Downloading aborted")
@@ -59,7 +66,6 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 
     remote_paths <- NULL # just to prevent warning: set in load below
     load(ou_file)
-    # TODO: check if packages indeed download. Remove if not
 
     remote_paths <- as.data.frame(remote_paths, stringsAsFactors = FALSE)
     colnames(remote_paths) <- c("Package", "Path")
