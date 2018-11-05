@@ -66,9 +66,11 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
     pkg_loginfo("Will use following roclets for documentation building: %s", paste(roclets, collapse = ", "))
   }
 
-  doc_res <- run_rscript("devtools::document(%s, %s)",
+  doc_res <- run_rscript(c("devtools::document(%s, %s)",
+                           "devtools::clean_dll(%s)"),
                          rscript_arg("pkg", pkg_path),
                          rscript_arg("roclets", roclets),
+                         rscript_arg("path", pkg_path),
                          rver = rver, ex_libpath = c(libpath, sboxpath))
   if (!is.null(doc_res)) {
     if (doc_res == FALSE) {
