@@ -67,9 +67,19 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
   }
 
   doc_res <- run_rscript(c("devtools::document(%s, %s)",
-                           "devtools::clean_dll(%s)"),
+                           "if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') < 0) {",
+                           "  devtools::unload(%s)",
+                           "  devtools::clean_dll(%s)",
+                           " } else {",
+                           "  devtools::unload(%s)",
+                           "  devtools::clean_dll(%s)",
+                           "}"),
+
                          rscript_arg("pkg", pkg_path),
                          rscript_arg("roclets", roclets),
+                         rscript_arg("pkg", pkg_path), # devtools version < 2.0.0
+                         rscript_arg("pkg", pkg_path),
+                         rscript_arg("path", pkg_path), # devtools version >= 2.0.0
                          rscript_arg("path", pkg_path),
                          rver = rver, ex_libpath = c(libpath, sboxpath))
   if (!is.null(doc_res)) {

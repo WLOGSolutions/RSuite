@@ -150,6 +150,9 @@ tryCatch({
   tools::write_PACKAGES(dir = src_dir, type = "source")
 
   # install RSuite from local repository, dependencies (and other packages) are from CRAN
+  if (.Platform$OS.type == "windows") {
+    options(install.packages.compile.from.source = "never")
+  }
   utils::install.packages(pkgs,
                           repos = c(Local = paste0("file:///", tmp_dir), CRAN = cran_path),
                           quiet = !opts$verbose,

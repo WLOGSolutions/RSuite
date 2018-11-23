@@ -1,3 +1,10 @@
+# RSuite 0.34 (2018-11-??)
+  * Adapters for CI building presented. Deployment package is tagged with CI build 
+    number instead of RC version.
+  * Building of C++ packages fixed. After building documentation it clears created
+    binaries so while building package for real they do not interfer with x64/x86 
+    compiler versions.
+
 # RSuite 0.33 (2018-09-25)
   * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
     master scripts (and tests) added.
