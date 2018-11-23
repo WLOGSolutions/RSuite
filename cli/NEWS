@@ -2,6 +2,10 @@ VERSION 0.34 (2018-11-??)
   * Then installing RSuite on Windows it prevents installing source packages
     if they are available in newer version (e.g. processx). It works much
     smoother for older R versions.
+  * install if passed RSuite installation package uses it instead of one
+    available on CRAN
+  * install --cran option added not to use default S3 repository. That is
+    important for connection-less environment.
 
 VERSION 0.33 (2018-09-25)
   * installation of RSuite fixed to use not only package available on CRAN:
