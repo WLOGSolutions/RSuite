@@ -256,6 +256,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   on.exit(unlink(ou_file, force = TRUE), add = TRUE)
 
   bld_res <- run_rscript(c("library(devtools)",
+                           "library(rstudioapi)", # this is required for devtools >= 2.0.1
                            ".libPaths(%s)",
                            "setwd(%s)", # to prevent loading .Rprofile by R CMD
                            rcpp_attribs_skip_cmd,

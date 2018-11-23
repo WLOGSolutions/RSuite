@@ -71,7 +71,6 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
                            "  devtools::unload(%s)",
                            "  devtools::clean_dll(%s)",
                            " } else {",
-                           "  devtools::unload(%s)",
                            "  devtools::clean_dll(%s)",
                            "}"),
 
@@ -80,7 +79,6 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
                          rscript_arg("pkg", pkg_path), # devtools version < 2.0.0
                          rscript_arg("pkg", pkg_path),
                          rscript_arg("path", pkg_path), # devtools version >= 2.0.0
-                         rscript_arg("path", pkg_path),
                          rver = rver, ex_libpath = c(libpath, sboxpath))
   if (!is.null(doc_res)) {
     if (doc_res == FALSE) {

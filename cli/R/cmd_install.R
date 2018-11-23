@@ -103,6 +103,8 @@ tryCatch({
       pkg_url <- sprintf("%s/%s", rsuite_avails$Repository, paste(rsuite_avails$File, collapse = " "))
       .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
     }
+
+    opts$package <- dloaded[1, 2]
   } else {
     message(sprintf("Installing RSuite package from %s ...", opts$package))
     if (!file.copy(from = opts$package, to = src_dir)) {
@@ -110,7 +112,8 @@ tryCatch({
     }
   }
 
-  pkgs <- c("RSuite")
+
+  to_install_pkgs <- c()
 
   if (opts$rstudio_addin || length(argv$args) != 0) {
     rstudio_pkgs <- c()
@@ -144,17 +147,40 @@ tryCatch({
       .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
     }
 
-    pkgs <- c(pkgs, rstudio_pkgs)
+    to_install_pkgs <- c(to_install_pkgs, rstudio_pkgs)
   }
 
   tools::write_PACKAGES(dir = src_dir, type = "source")
 
-  # install RSuite from local repository, dependencies (and other packages) are from CRAN
+  # detect RSuite dependencies
+  rsuite_avail_pkgs <- data.frame(available.packages(paste0("file:///", src_dir)), stringsAsFactors = FALSE)
+  rsuite_avail_pkgs <- rsuite_avail_pkgs[rsuite_avail_pkgs$Package == rsuite_pkg, ]
+  rsuite_deps <- unlist(lapply(c(rsuite_avail_pkgs$Depends,
+                                 rsuite_avail_pkgs$Imports,
+                                 rsuite_avail_pkgs$LinkingTo),
+                               function(dstr) {
+                                 if (is.na(dstr)) return(NULL)
+                                 trimws(gsub("\\(.+\\)", "", unlist(strsplit(dstr, ","))))
+                               }))
+  rsuite_deps <- rsuite_deps[rsuite_deps != "R"]
+  rsuite_deps <- rsuite_deps[!(rsuite_deps %in% utils::installed.packages()[, "Package"])]
+  to_install_pkgs <- c(rsuite_deps)
+
+  # install dependencies (and rstudio_pkgs) from CRAN
   if (.Platform$OS.type == "windows") {
     options(install.packages.compile.from.source = "never")
   }
-  utils::install.packages(pkgs,
-                          repos = c(Local = paste0("file:///", tmp_dir), CRAN = cran_path),
+
+  if (length(to_install_pkgs) > 0) {
+    utils::install.packages(to_install_pkgs,
+                            repos = c(Local = paste0("file:///", tmp_dir), CRAN = cran_path),
+                            quiet = !opts$verbose,
+                            verbose = opts$verbose)
+  }
+
+  # installing RSuite itself
+  utils::install.packages(opts$package,
+                          repos = NULL,
                           quiet = !opts$verbose,
                           verbose = opts$verbose)
 }, finally = {
