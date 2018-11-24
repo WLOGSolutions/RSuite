@@ -103,7 +103,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
         },
         silent = TRUE)
 
-        dload_failed_pkgs <- setdiff(to_dload_pkgs$Package, dloaded$Package)
+        dload_failed_pkgs <- setdiff(to_dload_pkgs$Package, dloaded_pkgs$Package)
         assert(length(dload_failed_pkgs) == 0,
                "Failed to download packages: %s", paste(dload_failed_pkgs, collapse = ", "))
       } else {
