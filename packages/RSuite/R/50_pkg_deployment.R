@@ -211,9 +211,13 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
 
   if ("rcpp_attribs" %in% skip_build_steps) {
     pkg_loginfo("Skipping Rcpp attributes compilation")
-    rcpp_attribs_skip_cmd <- paste("assignInNamespace('compile_rcpp_attributes',",
-                                   " function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )},",
-                                   "'devtools')")
+    # if devtools version is below 2.0.0 we need to Skip Rcpp attributes inside devtools
+    # for devtools > 2.0.1 it uses pkgbuild package which does not build Rcpp attributes by defailt
+    rcpp_attribs_skip_cmd <- paste("if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') < 0) {",
+                                   "  assignInNamespace('compile_rcpp_attributes',",
+                                   "    function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )},",
+                                   "    'devtools')",
+                                   "}")
   } else {
     rcpp_attribs_skip_cmd <- c()
   }
