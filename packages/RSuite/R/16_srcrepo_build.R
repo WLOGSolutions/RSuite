@@ -36,7 +36,9 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   stopifnot(!is.null(remote_builder_name))
 
   remotes_pkg <- "devtools"
-  if (compareVersion(as.character(packageVersion("devtools")), "2.0.0") >= 0) {
+
+  devtools_ver <- as.character(utils::packageVersion("devtools"))
+  if (utils::compareVersion(devtools_ver, "2.0.0") >= 0) {
     # after version 2.0.0 remotes related functionality was moved to remotes package
     remotes_pkg <- "remotes"
   }

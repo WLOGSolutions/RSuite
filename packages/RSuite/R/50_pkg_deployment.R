@@ -89,7 +89,8 @@ pkg_download <- function(avail_pkgs, dest_dir) {
       cache_exists <- file.exists(remote_pkgs$CacheFile)
       if (!all(cache_exists)) {
         # Cache files which are not present in cache
-        remote_paths <- do_dload(remote_pkgs[!cache_exists, ])
+        to_dload_pkgs <- remote_pkgs[!cache_exists, ]
+        remote_paths <- do_dload(to_dload_pkgs)
         dloaded_pkgs <- merge(remote_paths, remote_pkgs, by = "Package", all = FALSE)
 
         try({
@@ -101,6 +102,10 @@ pkg_download <- function(avail_pkgs, dest_dir) {
           })
         },
         silent = TRUE)
+
+        dload_failed_pkgs <- setdiff(to_dload_pkgs$Package, dloaded$Package)
+        assert(length(dload_failed_pkgs) == 0,
+               "Failed to download packages: %s", paste(dload_failed_pkgs, collapse = ", "))
       } else {
         # All files are cached: available locally
         remote_paths <- data.frame()
@@ -108,13 +113,17 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 
       if (any(cache_exists)) {
         local_pkgs <- remote_pkgs[cache_exists, ]
-        local_pkgs$Repository <-
-          path2local_url(dirname(remote_pkgs$CacheFile[cache_exists])) # from 99_rpatches.R
+        local_pkgs$Repository <- path2local_url(dirname(local_pkgs$CacheFile)) # from 99_rpatches.R
+        local_pkgs$CacheFile <- NULL # ret rid of extra column
         pkg_logdebug(sprintf("Will use '%s' from cached %s", local_pkgs$Package, local_pkgs$File))
       }
     } else {
       # Caching is off: just download them
       remote_paths <- do_dload(remote_pkgs)
+
+      dload_failed_pkgs <- setdiff(remote_pkgs$Package, remote_paths$Package)
+      assert(length(dload_failed_pkgs) == 0,
+             "Failed to download packages: %s", paste(dload_failed_pkgs, collapse = ", "))
     }
 
     dloaded <- rbind(dloaded, remote_paths)
@@ -132,10 +141,6 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 
     dloaded <- rbind(dloaded, local_paths[, c("Package", "Path")])
   }
-
-  assert(all(avail_pkgs$Package %in% dloaded$Package),
-         "Failed to download packages: %s",
-         paste(setdiff(avail_pkgs$Package, dloaded$Package), collapse = ", "))
 
   return(dloaded)
 }
