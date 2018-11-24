@@ -4,6 +4,8 @@
   * Building of C++ packages fixed. After building documentation it clears created
     binaries so while building package for real they do not interfer with x64/x86 
     compiler versions.
+  * Adapted to devtools 2.0.1. It had fundamental changes: functionalities are 
+    delegated to pkgbuild, pkgload and remotes packages.
 
 # RSuite 0.33 (2018-09-25)
   * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
