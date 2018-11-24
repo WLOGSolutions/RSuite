@@ -291,12 +291,21 @@ collect_dir_script_deps <- function(dir, recursive = TRUE) {
     FUN = function(sf){
       lns <- readLines(sf)
 
+      lns <- gsub("\\\\[\"']", " ", lns) # first remove escaped " and '
+      lns <- gsub("\"[^\"]*#[^\"]*\"", "", lns) # remove texts containing #: they cannot contain evaluated code
+      lns <- gsub("#.+$", "", lns) # got rid of commends
+
       loads <- lns[grepl("^\\s*(require|library)\\((.+)\\)", lns)]
       loads <- gsub("\\s+", "", loads) # remove extra spaces
       explicit_pkgs <- gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
 
-      uses <- lns[grepl("^\\s*([^#]*[^A-Za-z0-9.#])?([A-Za-z0-9.]+)\\s*:::?.+$", lns)]
-      implicit_pkgs <- gsub("^(.*[^A-Za-z0-9.])?([A-Za-z0-9.]+)\\s*:::?.+$", "\\2", uses)
+      notext_lns <- gsub("\"[^\"]*\"", "", lns) # remove texts surrounded with "
+      notext_lns <- gsub("'[^']*'", "", notext_lns) # remove texts surrounded with '
+      notext_lns <- gsub("\\s+", "", notext_lns)
+
+      tokens <- unlist(strsplit(notext_lns, "[(,]"))
+      use_toks <- tokens[grepl("^([A-Za-z0-9.]+)\\s*:::?.+$", tokens)]
+      implicit_pkgs <- gsub("^([A-Za-z0-9.]+)\\s*:::?.+$", "\\1", use_toks)
 
       return(c(explicit_pkgs, implicit_pkgs))
     }))

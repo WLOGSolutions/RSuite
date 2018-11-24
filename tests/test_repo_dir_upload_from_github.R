@@ -13,6 +13,9 @@ source("R/repo_management.R")
 
 
 test_that_managed("Uploading GitHub (basic)", {
+  roxygen2_v610_available <- (compareVersion(as.character(packageVersion("roxygen2")), "6.1.0") >= 0)
+  skip_if_not(roxygen2_v610_available, "roxygen2 >= 6.1.0 required to build rAzureBatch")
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   mgr <- init_test_manager(prj)
   RSuite::prj_config_set_repo_adapters(c("CRAN", sprintf("Dir[%s]", mgr$path)), prj = prj)
@@ -25,6 +28,9 @@ test_that_managed("Uploading GitHub (basic)", {
 })
 
 test_that_managed("Uploading GitHub (with deps)", {
+  roxygen2_v610_available <- (compareVersion(as.character(packageVersion("roxygen2")), "6.1.0") >= 0)
+  skip_if_not(roxygen2_v610_available, "roxygen2 >= 6.1.0 required to build rAzureBatch")
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   mgr <- init_test_manager(prj)
   RSuite::prj_config_set_repo_adapters(c("CRAN", sprintf("Dir[%s]", mgr$path)), prj = prj)

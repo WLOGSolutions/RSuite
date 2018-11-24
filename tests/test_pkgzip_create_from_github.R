@@ -13,6 +13,9 @@ source("R/pkgzip_management.R")
 
 
 test_that_managed("Create PKGZIP out of sources on GitHub (basic)", {
+  roxygen2_v610_available <- (compareVersion(as.character(packageVersion("roxygen2")), "6.1.0") >= 0)
+  skip_if_not(roxygen2_v610_available, "roxygen2 >= 6.1.0 required to build rAzureBatch")
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   pkgzip <- init_test_pkgzip()
 
@@ -23,6 +26,9 @@ test_that_managed("Create PKGZIP out of sources on GitHub (basic)", {
 })
 
 test_that_managed("Create PKGZIP out of sources on GitHub (with deps)", {
+  roxygen2_v610_available <- (compareVersion(as.character(packageVersion("roxygen2")), "6.1.0") >= 0)
+  skip_if_not(roxygen2_v610_available, "roxygen2 >= 6.1.0 required to build rAzureBatch")
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   pkgzip <- init_test_pkgzip()
 

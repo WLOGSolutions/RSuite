@@ -66,7 +66,8 @@ pkg_build_docs <- function(pkg_name, pkg_path, rver, libpath, sboxpath) {
     pkg_loginfo("Will use following roclets for documentation building: %s", paste(roclets, collapse = ", "))
   }
 
-  doc_res <- run_rscript(c("devtools::document(%s, %s)",
+  doc_res <- run_rscript(c("library(methods)", # devtools 2.0.1 requires methods to be loaded before
+                           "devtools::document(%s, %s)",
                            "if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') < 0) {",
                            "  devtools::unload(%s)",
                            "  devtools::clean_dll(%s)",

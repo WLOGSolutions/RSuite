@@ -31,34 +31,53 @@ test_that_managed("Build deps which contains library(grid) in master script whic
   expect_that_packages_installed(c("logging"), prj)
 })
 
-test_that_managed("Build deps which contains library(colorspace) in master script", {
-  prj <- init_test_project(repo_adapters = c("CRAN", "Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
-
-  create_test_master_script(code = "library(colorspace)", prj = prj)
-
-  RSuite::prj_install_deps(prj)
-
-  expect_that_packages_installed(c("colorspace", "logging"), prj)
+register_project_templ("TestBaseDepsInstall", function(prj) {
+  params <- prj$load_params()
+  create_package_deploy_to_lrepo(name = "TestDependency", prj = prj, type = params$bin_pkgs_type)
 })
 
-test_that_managed("Build deps which contains # library(colorspace) in master script", {
-  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
+test_that_managed("Build deps which contains library(TestDependency) in master script", {
+  prj <- init_test_project(repo_adapters = c("Dir"),
+                           tmpl = get_project_templ("TestBaseDepsInstall"))
 
-  create_test_master_script(code = "   # library(colorspace)", prj = prj)
+  create_test_master_script(code = "library(TestDependency)", prj = prj)
 
   RSuite::prj_install_deps(prj)
 
-  expect_that_packages_installed(c("logging"), prj)
+  expect_that_packages_installed(c("TestDependency", "logging"), prj)
 })
 
-test_that_managed("Build deps which contains colorspace::coords in master script", {
-  prj <- init_test_project(repo_adapters = c("CRAN", "Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
+test_that_managed("Build deps which contains library(\"TestDependency\") in master script", {
+  prj <- init_test_project(repo_adapters = c("Dir"),
+                           tmpl = get_project_templ("TestBaseDepsInstall"))
 
-  create_test_master_script(code = "colorspace::coords", prj = prj)
+  create_test_master_script(code = "library(\"TestDependency\")", prj = prj)
 
   RSuite::prj_install_deps(prj)
 
-  expect_that_packages_installed(c("colorspace", "logging"), prj)
+  expect_that_packages_installed(c("TestDependency", "logging"), prj)
+})
+
+test_that_managed("Build deps which contains TestDependency::something in master script", {
+  prj <- init_test_project(repo_adapters = c("Dir"),
+                           tmpl = get_project_templ("TestBaseDepsInstall"))
+
+  create_test_master_script(code = "TestDependency::something", prj = prj)
+
+  RSuite::prj_install_deps(prj)
+
+  expect_that_packages_installed(c("TestDependency", "logging"), prj)
+})
+
+test_that_managed("Build deps which contains TestDependency:::something in master script", {
+  prj <- init_test_project(repo_adapters = c("Dir"),
+                           tmpl = get_project_templ("TestBaseDepsInstall"))
+
+  create_test_master_script(code = "TestDependency:::something", prj = prj)
+
+  RSuite::prj_install_deps(prj)
+
+  expect_that_packages_installed(c("TestDependency", "logging"), prj)
 })
 
 test_that_managed("Build deps which contains package.with.dot::some_fun() in master script", {
@@ -80,6 +99,22 @@ test_that_managed("Build deps which contains commented implicit deps in master s
                                          "something at the beginning of line   # colorspace::coords",
                                          "# colorspace::coords",
                                          "something # package.with.dot:::some_fun",
+                                         sep = "\n"),
+                            prj = prj)
+
+
+  RSuite::prj_install_deps(prj)
+
+  expect_that_packages_installed(c("logging"), prj)
+})
+
+test_that_managed("Build deps which contains dep references in strings", {
+  prj <- init_test_project(repo_adapters = c("Dir")) # uses BaseTestProjectTemplate with logging 0.7-103
+
+  create_test_master_script(code = paste(" some code \" some test with \\\" inside library(colorspace)\"",
+                                         "'colorspace::coords'",
+                                         "and some more code 'some text \" colorspace::coords'",
+                                         " \" probably some Rcpp code package.with.dot:::some_fun \" ",
                                          sep = "\n"),
                             prj = prj)
 
