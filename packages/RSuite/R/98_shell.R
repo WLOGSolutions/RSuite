@@ -86,11 +86,14 @@ get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
                              stdout = "|", stderr = "|", cleanup = TRUE)
   tryCatch({
     repeat {
-      p$poll_io(timeout = 3000)
+      p$poll_io(timeout = 1000)
       .log_single_out(p$read_output_lines())
       .log_single_out(p$read_error_lines())
-      if (!p$is_alive()) break;
+      if (!p$is_alive()) break
     }
+    p$poll_io(timeout = 1000)
+    .log_single_out(p$read_output_lines())
+    .log_single_out(p$read_error_lines())
   },
   finally = {
     ret_code <- p$get_exit_status()
@@ -238,7 +241,7 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
     FALSE
   },
   finally = {
-    ret_code <- p$get_exit_status()
+    log_fun("> retcode: %s", p$get_exit_status())
   })
 
   return(result)
