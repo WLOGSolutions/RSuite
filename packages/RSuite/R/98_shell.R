@@ -66,8 +66,11 @@ get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
   }
 
   .log_single_out <- function(lines) {
+    lines <- unlist(strsplit(lines, "\n"))
+    lines <- gsub("^.*\r", "", lines)
+
     lapply(lines, function(ln) {
-      if (nchar(ln) > 0) {
+      if (nchar(ln, type = "bytes") > 0) {
         log_fun("%s output: %s", desc, ln)
       }
     })
@@ -193,7 +196,7 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
 
   .log_single_out <- function(lines, envir) {
     lines <- unlist(strsplit(lines, "\n"))
-    lines <- lines[!grepl("\r$", lines)]
+    lines <- gsub("^.*\r", "", lines)
 
     lapply(lines, function(ln) {
       if (nchar(ln, type = "bytes") == 0) {
