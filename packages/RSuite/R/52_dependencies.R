@@ -284,7 +284,7 @@ collect_mscs_direct_deps <- function(params) {
 #' @noRd
 #'
 collect_dir_script_deps <- function(dir, recursive = TRUE) {
-  script_files <- list.files(path = dir, pattern = "*.(r|R|Rmd)$",
+  script_files <- list.files(path = dir, pattern = "*[.](r|R|Rmd)$",
                              recursive = recursive, full.names = TRUE)
   pkgs <- unlist(lapply(
     X = script_files,

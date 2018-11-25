@@ -235,7 +235,7 @@ zip_folder <- function(wspace, zip_file_path) {
   }
 
   if (zip_res == FALSE) {
-    pkg_logwarn("Zip building aborted for")
+    pkg_logwarn("Zip building aborted for %s", zip_file_path)
   } else {
     pkg_logwarn("Zip building failed: %s", zip_res)
   }

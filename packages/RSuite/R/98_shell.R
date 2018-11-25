@@ -203,17 +203,21 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
         break
       }
 
+      ln <- trimws(ln, which = "right")
+      log_fun("> %s", ln)
+
       if (grepl("^~ error:", ln)) {
         ok <- sub("^~ error:", "", ln)
       } else if (ln == "~ done") {
         ok <- NULL
-      } else {
-        log_fun("> %s", ln)
       }
     }
     ok
   },
-  error = function(e) FALSE,
+  error = function(e) {
+    log_fun("Error while running script: %s", e)
+    FALSE
+  },
   finally = {
     close(con)
   })
