@@ -35,14 +35,22 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
            NULL)
   stopifnot(!is.null(remote_builder_name))
 
-  remote_builder <- get_pkg_intern("devtools", remote_builder_name) # from 99_rpatches.R
+  remotes_pkg <- "devtools"
+
+  devtools_ver <- as.character(utils::packageVersion("devtools"))
+  if (utils::compareVersion(devtools_ver, "2.0.0") >= 0) {
+    # after version 2.0.0 remotes related functionality was moved to remotes package
+    remotes_pkg <- "remotes"
+  }
+
+  remote_builder <- get_pkg_intern(remotes_pkg, remote_builder_name) # from 99_rpatches.R
   assert(!is.null(remote_builder),
          "Source repository '%s' handler is not available",
          srcrepo_type)
   remote <- remote_builder(srcrepo, ...)
 
   bundle <- tryCatch({
-    remote_download <- get_pkg_intern("devtools", "remote_download") # from 99_rpatches.R
+    remote_download <- get_pkg_intern(remotes_pkg, "remote_download") # from 99_rpatches.R
     remote_download(remote, quiet = FALSE)
   },
   error = function(e) NULL)
@@ -56,7 +64,7 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   bld_params <- bld_prj$load_params()
   if (!file.info(bundle)$isdir) {
     bundle_path <- tryCatch({
-      decompress <- get_pkg_intern("devtools", "decompress") # from 99_rpatches.R
+      decompress <- get_pkg_intern(remotes_pkg, "decompress") # from 99_rpatches.R
       decompress(bundle, bld_params$pkgs_path)
     },
     error = function(e) NULL)
@@ -68,7 +76,7 @@ get_srcrepo_package <- function(bld_prj, srcrepo_type, srcrepo, ...) {
   }
 
   source <- tryCatch({
-    source_pkg <- get_pkg_intern("devtools", "source_pkg") # from 99_rpatches.R
+    source_pkg <- get_pkg_intern(remotes_pkg, "source_pkg") # from 99_rpatches.R
     source_pkg(bundle_path, subdir = remote$subdir)
   },
   error = function(e) NULL)

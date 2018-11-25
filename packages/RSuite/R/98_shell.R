@@ -66,8 +66,11 @@ get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
   }
 
   .log_single_out <- function(lines) {
+    lines <- unlist(strsplit(lines, "\n"))
+    lines <- gsub("^.*\r", "", lines)
+
     lapply(lines, function(ln) {
-      if (nchar(ln) > 0) {
+      if (nchar(ln, type = "bytes") > 0) {
         log_fun("%s output: %s", desc, ln)
       }
     })
@@ -83,11 +86,14 @@ get_cmd_retcode <- function(desc, cmd, ..., log_debug = FALSE) {
                              stdout = "|", stderr = "|", cleanup = TRUE)
   tryCatch({
     repeat {
-      p$poll_io(timeout = 3000)
+      p$poll_io(timeout = 1000)
       .log_single_out(p$read_output_lines())
       .log_single_out(p$read_error_lines())
-      if (!p$is_alive()) break;
+      if (!p$is_alive()) break
     }
+    p$poll_io(timeout = 1000)
+    .log_single_out(p$read_output_lines())
+    .log_single_out(p$read_error_lines())
   },
   finally = {
     ret_code <- p$get_exit_status()
@@ -189,33 +195,53 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
     script <- gsub("\\\\([tn])", "\\\\\\\\\\1", script)
   }
 
-  rscript_cmd <- paste(cmd0, "--no-init-file", "--no-site-file", "-e", shQuote(script), "2>&1")
   log_fun <- if (log_debug) pkg_logdebug else pkg_logfinest
-  log_fun("> cmd: %s", rscript_cmd)
 
-  con <- pipe(rscript_cmd, open = "rt")
+  .log_single_out <- function(lines, envir) {
+    lines <- unlist(strsplit(lines, "\n"))
+    lines <- gsub("^.*\r", "", lines)
 
-  result <- tryCatch({
-    ok <- FALSE
-    while (TRUE) {
-      ln <- readLines(con, n = 1, skipNul = TRUE)
-      if (!length(ln)) {
-        break
+    lapply(lines, function(ln) {
+      if (nchar(ln, type = "bytes") == 0) {
+        return()
       }
 
+      log_fun("> %s", ln)
       if (grepl("^~ error:", ln)) {
-        ok <- sub("^~ error:", "", ln)
+        envir$ok <- sub("^~ error:", "", ln)
       } else if (ln == "~ done") {
-        ok <- NULL
-      } else {
-        log_fun("> %s", ln)
+        envir$ok <- NULL
       }
+    })
+  }
+
+  params <- c("--no-init-file", "--no-site-file", "-e")
+  log_fun("> cmd: %s", paste(c(cmd0, params, shQuote(script)), collapse = " "))
+
+  p <- processx::process$new(command = cmd0, args = c(params, script),
+                             stdout = "|", stderr = "|", cleanup = TRUE)
+  result <- tryCatch({
+    envir <- new.env(parent = emptyenv())
+    envir$ok <- FALSE
+    repeat {
+      p$poll_io(timeout = 1000)
+      .log_single_out(p$read_output_lines(), envir)
+      .log_single_out(p$read_error_lines(), envir)
+      if (!p$is_alive()) break
     }
-    ok
+    # try one more time to get all the output
+    p$poll_io(timeout = 1000)
+    .log_single_out(p$read_output_lines(), envir)
+    .log_single_out(p$read_error_lines(), envir)
+
+    envir$ok
   },
-  error = function(e) FALSE,
+  error = function(e) {
+    log_fun("Error while running script: %s", e)
+    FALSE
+  },
   finally = {
-    close(con)
+    log_fun("> retcode: %s", p$get_exit_status())
   })
 
   return(result)

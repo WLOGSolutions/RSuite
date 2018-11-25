@@ -148,7 +148,7 @@ run_incont_cmd <- function(cont_name, cmd) {
   cmd_desc <- sprintf("[%s] Running command '%s'", cont_name, cmd)
   loginfo("%s ...", cmd_desc)
 
-  result <- exec_docker_cmd(c("exec", "-i", cont_name, "sh", "-c", shQuote(cmd)), cmd_desc)
+  result <- exec_docker_cmd(c("exec", "-i", cont_name, "sh", "-c", cmd), cmd_desc)
   .error_if(result$ret_code != 0,
             base_msg = sprintf("%s failed", cmd_desc),
             ext_errs = result$err_lines)

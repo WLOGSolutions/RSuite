@@ -13,6 +13,13 @@ source("R/repo_management.R")
 
 
 test_that_managed("Uploading GitHub (basic)", {
+  roxygen2_v610_available <- (compareVersion(as.character(packageVersion("roxygen2")), "6.1.0") >= 0)
+  skip_if_not(roxygen2_v610_available, "roxygen2 >= 6.1.0 required to build rAzureBatch")
+
+  rver_33up_for_macos <- (compareVersion(paste0(R.version$major, ".", R.version$minor), "3.3.0") >= 0
+                          || !grepl("darwin", R.version$os))
+  skip_if_not(rver_33up_for_macos, "R >= 3.3 required to build rAzureBatch on MacOS")
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   mgr <- init_test_manager(prj)
   RSuite::prj_config_set_repo_adapters(c("CRAN", sprintf("Dir[%s]", mgr$path)), prj = prj)
@@ -25,6 +32,13 @@ test_that_managed("Uploading GitHub (basic)", {
 })
 
 test_that_managed("Uploading GitHub (with deps)", {
+  roxygen2_v610_available <- (compareVersion(as.character(packageVersion("roxygen2")), "6.1.0") >= 0)
+  skip_if_not(roxygen2_v610_available, "roxygen2 >= 6.1.0 required to build rAzureBatch")
+
+  rver_33up_for_macos <- (compareVersion(paste0(R.version$major, ".", R.version$minor), "3.3.0") >= 0
+                          || !grepl("darwin", R.version$os))
+  skip_if_not(rver_33up_for_macos, "R >= 3.3 required to build rAzureBatch on MacOS")
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   mgr <- init_test_manager(prj)
   RSuite::prj_config_set_repo_adapters(c("CRAN", sprintf("Dir[%s]", mgr$path)), prj = prj)

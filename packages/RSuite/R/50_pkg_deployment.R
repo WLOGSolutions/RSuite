@@ -79,26 +79,33 @@ pkg_download <- function(avail_pkgs, dest_dir) {
     # check/build download cache
     dload_cache_dir <- get_cache_dir("dload_cache") # from 98_shell.R
     if (!is.null(dload_cache_dir)) {
-      cache_files <- file.path(dload_cache_dir,
-                               vapply(X = remote_pkgs$Repository,
-                                      FUN = function(repo) utils::URLencode(repo, TRUE),
-                                      FUN.VALUE = ""),
-                               remote_pkgs$File)
-      cache_exists <- file.exists(cache_files)
+      remote_pkgs$CacheFile <-
+        file.path(dload_cache_dir,
+                  vapply(X = remote_pkgs$Repository,
+                         FUN = function(repo) utils::URLencode(repo, TRUE),
+                         FUN.VALUE = ""),
+                  remote_pkgs$File)
 
+      cache_exists <- file.exists(remote_pkgs$CacheFile)
       if (!all(cache_exists)) {
         # Cache files which are not present in cache
-        remote_paths <- do_dload(remote_pkgs[!cache_exists, ])
+        to_dload_pkgs <- remote_pkgs[!cache_exists, ]
+        remote_paths <- do_dload(to_dload_pkgs)
+        dloaded_pkgs <- merge(remote_paths, remote_pkgs, by = "Package", all = FALSE)
 
         try({
           # cache them
           suppressWarnings({
-            lapply(X = unique(dirname(cache_files[!cache_exists])),
+            lapply(X = unique(dirname(dloaded_pkgs$CacheFile)),
                    FUN = function(dir_path) dir.create(dir_path, recursive = TRUE, showWarnings = FALSE))
-            file.copy(from = remote_paths$Path, to = cache_files[!cache_exists], overwrite = TRUE)
+            file.copy(from = dloaded_pkgs$Path, to = dloaded_pkgs$CacheFile, overwrite = TRUE)
           })
         },
         silent = TRUE)
+
+        dload_failed_pkgs <- setdiff(to_dload_pkgs$Package, dloaded_pkgs$Package)
+        assert(length(dload_failed_pkgs) == 0,
+               "Failed to download packages: %s", paste(dload_failed_pkgs, collapse = ", "))
       } else {
         # All files are cached: available locally
         remote_paths <- data.frame()
@@ -106,12 +113,17 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 
       if (any(cache_exists)) {
         local_pkgs <- remote_pkgs[cache_exists, ]
-        local_pkgs$Repository <- path2local_url(dirname(cache_files[cache_exists])) # from 99_rpatches.R
+        local_pkgs$Repository <- path2local_url(dirname(local_pkgs$CacheFile)) # from 99_rpatches.R
+        local_pkgs$CacheFile <- NULL # ret rid of extra column
         pkg_logdebug(sprintf("Will use '%s' from cached %s", local_pkgs$Package, local_pkgs$File))
       }
     } else {
       # Caching is off: just download them
       remote_paths <- do_dload(remote_pkgs)
+
+      dload_failed_pkgs <- setdiff(remote_pkgs$Package, remote_paths$Package)
+      assert(length(dload_failed_pkgs) == 0,
+             "Failed to download packages: %s", paste(dload_failed_pkgs, collapse = ", "))
     }
 
     dloaded <- rbind(dloaded, remote_paths)
@@ -129,10 +141,6 @@ pkg_download <- function(avail_pkgs, dest_dir) {
 
     dloaded <- rbind(dloaded, local_paths[, c("Package", "Path")])
   }
-
-  assert(all(avail_pkgs$Package %in% dloaded$Package),
-         "Failed to download packages: %s",
-         paste(setdiff(avail_pkgs$Package, dloaded$Package), collapse = ", "))
 
   return(dloaded)
 }
@@ -208,9 +216,13 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
 
   if ("rcpp_attribs" %in% skip_build_steps) {
     pkg_loginfo("Skipping Rcpp attributes compilation")
-    rcpp_attribs_skip_cmd <- paste("assignInNamespace('compile_rcpp_attributes',",
-                                   " function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )},",
-                                   "'devtools')")
+    # if devtools version is below 2.0.0 we need to Skip Rcpp attributes inside devtools
+    # for devtools > 2.0.1 it uses pkgbuild package which does not build Rcpp attributes by defailt
+    rcpp_attribs_skip_cmd <- paste("if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') < 0) {",
+                                   "  assignInNamespace('compile_rcpp_attributes',",
+                                   "    function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )},",
+                                   "    'devtools')",
+                                   "}")
   } else {
     rcpp_attribs_skip_cmd <- c()
   }
@@ -253,6 +265,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   on.exit(unlink(ou_file, force = TRUE), add = TRUE)
 
   bld_res <- run_rscript(c("library(devtools)",
+                           "library(rstudioapi)", # this is required for devtools >= 2.0.1
                            ".libPaths(%s)",
                            "setwd(%s)", # to prevent loading .Rprofile by R CMD
                            rcpp_attribs_skip_cmd,
