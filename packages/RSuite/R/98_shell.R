@@ -192,6 +192,9 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
   log_fun <- if (log_debug) pkg_logdebug else pkg_logfinest
 
   .log_single_out <- function(lines, envir) {
+    lines <- unlist(strsplit(lines, "\n"))
+    lines <- lines[!grepl("\r$", lines)]
+
     lapply(lines, function(ln) {
       if (nchar(ln, type = "bytes") == 0) {
         return()
