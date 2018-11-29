@@ -37,5 +37,5 @@ test_that_managed("Documentation creation for package with depends", {
   RSuite::prj_build(prj)
   expect_that_packages_installed(c("TestPackage2", "TestPackage1", "logging"), prj)
 
-  expect_that_has_docs(c("TestPackage1_getLogger"), "TestPackage2", prj)
+  expect_that_has_docs(c("TestPackage2_getLogger"), "TestPackage2", prj)
 })
