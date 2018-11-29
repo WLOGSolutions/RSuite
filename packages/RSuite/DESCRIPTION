@@ -24,6 +24,7 @@ Depends:
   R (>= 3.2.0)
 Imports: 
   logging,
+  methods,
   devtools,
   roxygen2, 
   git2r,
