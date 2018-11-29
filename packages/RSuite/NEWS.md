@@ -6,6 +6,7 @@
     compiler versions.
   * Adapted to devtools 2.0.1. It had fundamental changes: functionalities are 
     delegated to pkgbuild, pkgload and remotes packages.
+  * Detecting MRAN date while no connection to internet fixed not to fail.
 
 # RSuite 0.33 (2018-09-25)
   * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in

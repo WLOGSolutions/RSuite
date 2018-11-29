@@ -75,7 +75,7 @@ repo_adapter_create_manager.rsuite_repo_adapter_mran <- function(repo_adapter, .
 #' @keywords internal
 #' @noRd
 #'
-get_latest_mran_date <- function(days_back_thresh = 14) {
+get_latest_mran_repo <- function(days_back_thresh = 14) {
   # find available MRAN snapshot
   mran_repo_adapter <- repo_adapter_create_mran("MRAN")
   mran_date <- Sys.Date()
@@ -85,9 +85,22 @@ get_latest_mran_date <- function(days_back_thresh = 14) {
 
   while (Sys.Date() - mran_date != days_back_thresh) {
     pkg_logdebug("Checking repo url %s.", mran_url)
-    if (!httr::http_error(mran_url)) {
-      found_mran <- TRUE
-      break
+    check_res <- tryCatch({
+      if (!httr::http_error(mran_url)) {
+        found_mran <- TRUE
+        break
+      }
+      TRUE
+    },
+    error = function(e) {
+      pkg_logfinest("Failed to detect if MRAN under %s is responding: %s", mran_url, e)
+      FALSE
+    })
+
+    if (!check_res) {
+      # probably no network at all: faling back to CRAN
+      pkg_loginfo("Could not access MRAN network: will use CRAN repository")
+      return("CRAN")
     }
 
     mran_date <- mran_date - 1
@@ -96,8 +109,8 @@ get_latest_mran_date <- function(days_back_thresh = 14) {
 
   if (!found_mran) {
     pkg_logwarn("Couldn't find working MRAN repo within last %s days.", days_back_thresh)
-    return(Sys.Date())
+    return(sprintf("MRAN[%s]", Sys.Date()))
   }
 
-  return(mran_date)
+  return(sprintf("MRAN[%s]", mran_date))
 }
