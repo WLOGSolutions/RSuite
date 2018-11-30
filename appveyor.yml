@@ -8,7 +8,8 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
-  ps: Bootstrap
+  - cmd: echo %RTOOLS_VERSION%
+  - ps: Bootstrap
 
 cache:
   - C:\RLibrary_20181125
@@ -17,7 +18,6 @@ cache:
 
 environment:
   USE_RTOOLS: true
-  RTOOLS_VERSION: 35
   WARNINGS_ARE_ERRORS: 1
 
   matrix:
