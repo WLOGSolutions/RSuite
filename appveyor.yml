@@ -6,18 +6,6 @@ init:
         $ErrorActionPreference = "Stop"
         Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
-
-environment:
-  USE_RTOOLS: true
-  RTOOLS_VERSION: 35
-  WARNINGS_ARE_ERRORS: 1
-
-  matrix:
-  - R_VERSION: devel
-  - R_VERSION: oldrel
-  - R_VERSION: release
-  - R_VERSION: 3.3.0
-
         
 install:
   - cmd: echo %RTOOLS_VERSION%
@@ -27,6 +15,17 @@ cache:
   - C:\RLibrary_20181125
 
 # Adapt as necessary starting from here
+
+environment:
+  global:
+     USE_RTOOLS: true
+     RTOOLS_VERSION: 35
+     WARNINGS_ARE_ERRORS: 1
+
+  matrix:
+  - R_VERSION: release
+  - R_VERSION: 3.3.0
+
 
 build_script:
   - cmd: >-
