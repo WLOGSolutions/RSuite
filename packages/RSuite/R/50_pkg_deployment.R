@@ -308,8 +308,22 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
 #' @noRd
 #'
 pkg_remove <- function(pkgs, lib_dir) {
-  void <- lapply(X = pkgs,
+  to_remove <- lapply(X = pkgs,
                  FUN = function(pkg) {
+                   res <- TRUE
+
+                   if (depends_on_Rcpp(lib_dir, pkg)) {
+                     dll_path <- get_dll_path(lib_dir, pkg)
+
+                     if (is_dll_loaded(dll_path)) {
+                       library.dynam.unload(pkg, file.path(lib_dir, pkg))
+                     }
+
+                     if (unlink(dll_path, force = TRUE)) {
+                       res <- FALSE
+                     }
+                   }
+
                    search_item <- paste("package", pkg, sep = ":")
                    while (search_item %in% search()) {
                      attch_pkg_path <- rsuite_fullUnifiedPath(system.file(package = pkg))
@@ -320,12 +334,16 @@ pkg_remove <- function(pkgs, lib_dir) {
                        #  there is no point to detach it
                        break
                      }
+
                      detach(search_item, unload = TRUE, character.only = TRUE,
                             force = TRUE) # force even if dependent packages are loaded
                    }
+
+                   return(res)
                  })
+
   installed <- utils::installed.packages(lib_dir)[, "Package"]
-  to_remove <- intersect(pkgs, installed)
+  to_remove <- intersect(pkgs[unlist(to_remove)], installed)
   try (expr = suppressMessages(utils::remove.packages(to_remove, lib = lib_dir)))
 }
 
@@ -544,7 +562,7 @@ get_specific_args <- function(pkg_file, spec_desc) {
 #'
 #' Retrieves R version package is built for.
 #'
-#' @param lib_dir path there package is installed. (type: character)
+#' @param lib_dir path where package is installed. (type: character)
 #' @param pkg_name name of package to get information for. (type: character)
 #'
 #' @return R version number the packages is built for.
@@ -560,4 +578,63 @@ get_package_build_rver <- function(lib_dir, pkg_name) {
   }
   pkg_rver <- installed[pkg_name == installed$Package, "Built"][1]
   return(pkg_rver)
+}
+
+#'
+#' Determines if package depends on Rcpp package.
+#'
+#' @param lib_dir path where package is installed. (type: character)
+#' @param pkg_name name of package to get information for. (type: character)
+#'
+#' @return value indicating if package depends on Rcpp package.
+#'
+#' @keywords internal
+#' @noRd
+#'
+depends_on_Rcpp <- function(lib_dir, pkg_name) {
+  installed <- data.frame(utils::installed.packages(lib.loc = lib_dir),
+                          stringsAsFactors = FALSE)[, c("Package", "LinkingTo")]
+  linking_to <- installed[installed$Package == pkg_name, "LinkingTo"][1]
+  return(!is.na(linking_to) && startsWith(linking_to, "Rcpp"))
+}
+
+#'
+#' Creates absolute path to package dll.
+#'
+#' @param lib_dir path where package is installed. (type: character)
+#' @param pkg_name name of package to get information for. (type: character)
+#'
+#' @return absolute path to package dll.
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_dll_path <- function(lib_dir, pkg_name) {
+  dll_name <- paste0(pkg_name, .Platform$dynlib.ext)
+  lib_dir <- normalizePath(lib_dir, "/", TRUE)
+  dll_path <- ifelse(nzchar(.Platform$r_arch),
+                     file.path(lib_dir, pkg_name, "libs", .Platform$r_arch, dll_name),
+                     file.path(lib_dir, pkg_name, "libs", dll_name))
+
+  return(dll_path)
+}
+
+#'
+#' Checks if specified dll is loaded.
+#'
+#' @param dll_path absolute path to dll file. (type: character)
+#'
+#' @return value indicating if dll is loaded.
+#'
+#' @keywords internal
+#' @noRd
+#'
+is_dll_loaded <- function(dll_path) {
+  for (item in getLoadedDLLs()) {
+    if (item[["path"]] == dll_path) {
+      return(TRUE)
+    }
+  }
+
+  return(FALSE)
 }
