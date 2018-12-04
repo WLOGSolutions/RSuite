@@ -78,6 +78,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
   }
 
   # Adding packages to repo
+  failed <- c()
   for (pkg_dir in names(prj_packages)) {
     pkg_name <- prj_packages[[pkg_dir]]
 
@@ -98,28 +99,40 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
         next # Failed to build package
       }
       rsuite_write_PACKAGES(contrib_url, build_type)
-      save_package_m5sums(pkg_dir, params, build_type) # from 55_pkg_source_md5.R - for later checks
-    } else {
+    } else if (!(pkg_name %in% utils::installed.packages(params$lib_path)[, "Package"])) {
       pkg_file <- file.path(contrib_url, get_package_build_name(pkg_path, build_type))
       pkg_loginfo("... not changed; installing previously built %s.", pkg_file)
+    } else {
+      pkg_loginfo("... not changed; keeping previously installed package.")
+      next
     }
 
     # remove package if installed
-    pkg_remove(pkg_name, lib_dir = params$lib_path)
+    rm_res <- pkg_remove(pkg_name, lib_dir = params$lib_path)
+    if (!rm_res) {
+      failed <- c(failed, pkg_name)
+      next
+    }
 
-    # if package wasn't installed or removed successfuly
-    if (!pkg_name %in% utils::installed.packages(params$lib_path)[, "Package"]) {
-      # this type = "source" does not matter, it is passed just to prevent complaining
-      #  on windows that "both" type cannot be used with repos = NULL
-      pkg_install(pkg_file, # from 50_pkg_deployment.R
-                  lib_dir = params$lib_path,
-                  type = "source",
-                  repos = NULL,
-                  rver = params$r_ver)
+    # this type = "source" does not matter, it is passed just to prevent complaining
+    #  on windows that "both" type cannot be used with repos = NULL
+    pkg_install(pkg_file, # from 50_pkg_deployment.R
+                lib_dir = params$lib_path,
+                type = "source",
+                repos = NULL,
+                rver = params$r_ver)
+
+    if (!(pkg_name %in% utils::installed.packages(params$lib_path)[, "Package"])) {
+      failed <- c(failed, pkg_name)
+      next
+    }
+
+    if (any(rebuild) || has_changed) {
+      # if was successfully installed after rebuilding: save md5 for later build processes
+      save_package_m5sums(pkg_dir, params, build_type) # from 55_pkg_source_md5.R
     }
   }
 
-  failed <- setdiff(prj_packages, utils::installed.packages(params$lib_path)[, "Package"])
   assert(!length(failed),
          "Failed to install project packages: %s", paste(failed, collapse = ", "))
 

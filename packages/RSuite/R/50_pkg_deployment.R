@@ -304,23 +304,26 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
 #' @param pkgs packages to remove  (type: character).
 #' @param lib_dir directory to reinstall packages in (type: character).
 #'
+#' @return logical vertor of same size as pkgs with FALSE on positions
+#'  which failed to remove.
+#'
 #' @keywords internal
 #' @noRd
 #'
 pkg_remove <- function(pkgs, lib_dir) {
   to_remove <- lapply(X = pkgs,
                  FUN = function(pkg) {
-                   res <- TRUE
-
-                   if (depends_on_Rcpp(lib_dir, pkg)) {
-                     dll_path <- get_dll_path(lib_dir, pkg)
-
-                     if (is_dll_loaded(dll_path)) {
+                   dll_path <- get_package_dll_path(lib_dir, pkg)
+                   if (!is.null(dll_path)) {
+                     loaded_paths <- vapply(getLoadedDLLs(),
+                                            FUN = function(dl) dl[["path"]],
+                                            FUN.VALUE = "")
+                     if (dll_path %in% loaded_paths) {
                        library.dynam.unload(pkg, file.path(lib_dir, pkg))
                      }
 
-                     if (unlink(dll_path, force = TRUE)) {
-                       res <- FALSE
+                     if (unlink(dll_path, force = TRUE) != 0) {
+                       return(FALSE)
                      }
                    }
 
@@ -339,12 +342,20 @@ pkg_remove <- function(pkgs, lib_dir) {
                             force = TRUE) # force even if dependent packages are loaded
                    }
 
-                   return(res)
+                   return(TRUE)
                  })
+  to_remove <- unlist(to_remove)
 
   installed <- utils::installed.packages(lib_dir)[, "Package"]
-  to_remove <- intersect(pkgs[unlist(to_remove)], installed)
-  try (expr = suppressMessages(utils::remove.packages(to_remove, lib = lib_dir)))
+  locked_pkgs <- intersect(pkgs[!to_remove], installed)
+
+  remove_pkgs <- intersect(pkgs[to_remove], installed)
+  try (expr = suppressMessages(utils::remove.packages(remove_pkgs, lib = lib_dir)))
+
+  still_installed <- utils::installed.packages(lib_dir)[, "Package"]
+  failed_pkgs <- c(locked_pkgs, intersect(remove_pkgs, still_installed))
+
+  return(!(pkgs %in% failed_pkgs))
 }
 
 
@@ -580,61 +591,27 @@ get_package_build_rver <- function(lib_dir, pkg_name) {
   return(pkg_rver)
 }
 
-#'
-#' Determines if package depends on Rcpp package.
-#'
-#' @param lib_dir path where package is installed. (type: character)
-#' @param pkg_name name of package to get information for. (type: character)
-#'
-#' @return value indicating if package depends on Rcpp package.
-#'
-#' @keywords internal
-#' @noRd
-#'
-depends_on_Rcpp <- function(lib_dir, pkg_name) {
-  installed <- data.frame(utils::installed.packages(lib.loc = lib_dir),
-                          stringsAsFactors = FALSE)[, c("Package", "LinkingTo")]
-  linking_to <- installed[installed$Package == pkg_name, "LinkingTo"][1]
-  return(!is.na(linking_to) && startsWith(linking_to, "Rcpp"))
-}
 
 #'
-#' Creates absolute path to package dll.
+#' Creates absolute path to package dll if package has one.
 #'
 #' @param lib_dir path where package is installed. (type: character)
 #' @param pkg_name name of package to get information for. (type: character)
 #'
-#' @return absolute path to package dll.
+#' @return absolute path to package dll or NULL if it does not have internal dlls.
 #'
 #' @keywords internal
 #' @noRd
 #'
-get_dll_path <- function(lib_dir, pkg_name) {
+get_package_dll_path <- function(lib_dir, pkg_name) {
   dll_name <- paste0(pkg_name, .Platform$dynlib.ext)
   lib_dir <- normalizePath(lib_dir, "/", TRUE)
   dll_path <- ifelse(nzchar(.Platform$r_arch),
                      file.path(lib_dir, pkg_name, "libs", .Platform$r_arch, dll_name),
                      file.path(lib_dir, pkg_name, "libs", dll_name))
-
+  if (!file.exists(dll_path)) {
+    return(NULL)
+  }
   return(dll_path)
 }
 
-#'
-#' Checks if specified dll is loaded.
-#'
-#' @param dll_path absolute path to dll file. (type: character)
-#'
-#' @return value indicating if dll is loaded.
-#'
-#' @keywords internal
-#' @noRd
-#'
-is_dll_loaded <- function(dll_path) {
-  for (item in getLoadedDLLs()) {
-    if (item[["path"]] == dll_path) {
-      return(TRUE)
-    }
-  }
-
-  return(FALSE)
-}
