@@ -7,17 +7,9 @@ init:
         Invoke-WebRequest http://raw.github.com/krlmlr/r-appveyor/master/scripts/appveyor-tool.ps1 -OutFile "..\appveyor-tool.ps1"
         Import-Module '..\appveyor-tool.ps1'
 
-install:
-  - cmd: echo %RTOOLS_VERSION%
-  - ps: Bootstrap
-
-cache:
-  - C:\RLibrary_20181125
-
-# Adapt as necessary starting from here
-
 environment:
   USE_RTOOLS: true
+  RTOOLS_VERSION: 35
   WARNINGS_ARE_ERRORS: 1
 
   matrix:
@@ -26,6 +18,15 @@ environment:
   - R_VERSION: release
   - R_VERSION: 3.3.0
 
+        
+install:
+  - cmd: echo %RTOOLS_VERSION%
+  - ps: Bootstrap
+
+cache:
+  - C:\RLibrary_20181125
+
+# Adapt as necessary starting from here
 
 build_script:
   - cmd: >-
