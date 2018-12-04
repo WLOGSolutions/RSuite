@@ -17,7 +17,7 @@ test_that_managed("glue in archive version is installed", {
   # CRAN contains in main repository glue 1.3.0 for R3.5 and 1.2.0 for R3.3 & R 3.4
   #  glue 1.1.0 is available only in source archive
 
-  prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))  # uses BaseTestProjectTemplate with logging 0.7-103
+  prj <- init_test_project(repo_adapters = c("Dir", "CRAN"))  # uses BaseTestProjectTemplate with logging 0.7-103
   create_test_package("TestPackage1", prj, imps = "glue (== 1.1)")
 
   RSuite::prj_install_deps(prj)
