@@ -96,6 +96,7 @@ build_install_prj_packages <- function(params, build_type, skip_build_steps = NU
                             sboxpath = params$sbox_path,
                             skip_build_steps = skip_build_steps)
       if (is.null(pkg_file)) {
+        failed <- c(failed, pkg_name)
         next # Failed to build package
       }
       rsuite_write_PACKAGES(contrib_url, build_type)
