@@ -218,13 +218,17 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
     pkg_loginfo("Skipping Rcpp attributes compilation")
     # if devtools version is below 2.0.0 we need to Skip Rcpp attributes inside devtools
     # for devtools > 2.0.1 it uses pkgbuild package which does not build Rcpp attributes by defailt
-    rcpp_attribs_skip_cmd <- paste("if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') < 0) {",
-                                   "  assignInNamespace('compile_rcpp_attributes',",
-                                   "    function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )},",
-                                   "    'devtools')",
-                                   "}")
+    rcpp_attribs_handle_cmd <- paste(
+      "if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') < 0) {",
+      "  assignInNamespace('compile_rcpp_attributes',",
+      "    function(pkg) { cat('Skipping Rcpp::compileAttributes\\n' )},",
+      "    'devtools')",
+      "}")
   } else {
-    rcpp_attribs_skip_cmd <- c()
+    rcpp_attribs_handle_cmd <- paste(
+      "if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') >= 0) {",
+      sprintf("pkgbuild:::compile_rcpp_attributes(%s)", rscript_arg("path", pkg_path)),
+      "}")
   }
 
   vign_cleanup <- NULL
@@ -242,8 +246,8 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   if ("tests" %in% skip_build_steps) {
     pkg_loginfo("Skipping package testing")
   } else if (devtools::uses_testthat(pkg = pkg_path)) {
-    # it roughly builds package before testing, so skiping Rcpp here also required
-    test_res <- run_rscript(c(rcpp_attribs_skip_cmd,
+    # it roughly builds package before testing, so skiping Rcpp attribs handling here also required
+    test_res <- run_rscript(c(rcpp_attribs_handle_cmd,
                               "test_results <- devtools::test(%s)",
                               "if (!testthat:::all_passed(test_results)) { stop('Tests failed') }"),
                             rscript_arg("pkg", pkg_path),
@@ -268,7 +272,7 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
                            "library(rstudioapi)", # this is required for devtools >= 2.0.1
                            ".libPaths(%s)",
                            "setwd(%s)", # to prevent loading .Rprofile by R CMD
-                           rcpp_attribs_skip_cmd,
+                           rcpp_attribs_handle_cmd,
                            "ou_path <- build(%s, vignettes = FALSE)",
                            "save(ou_path, %s)"),
                          rscript_arg("new", libpath),
@@ -354,6 +358,10 @@ pkg_remove <- function(pkgs, lib_dir) {
 
   still_installed <- utils::installed.packages(lib_dir)[, "Package"]
   failed_pkgs <- c(locked_pkgs, intersect(remove_pkgs, still_installed))
+
+  if (length(failed_pkgs) > 0) {
+    pkg_logwarn("Could not remove installed package(s): %s", failed_pkgs)
+  }
 
   return(!(pkgs %in% failed_pkgs))
 }

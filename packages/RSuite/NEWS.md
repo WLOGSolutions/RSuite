@@ -1,11 +1,12 @@
-# RSuite 0.34 (2018-11-??)
+# RSuite 0.34 (2018-12-??)
   * Adapters for CI building presented. Deployment package is tagged with CI build 
     number instead of RC version.
   * Building of C++ packages fixed. After building documentation it clears created
     binaries so while building package for real they do not interfer with x64/x86 
     compiler versions.
   * Adapted to devtools 2.0.1. It had fundamental changes: functionalities are 
-    delegated to pkgbuild, pkgload and remotes packages.
+    delegated to pkgbuild, pkgload and remotes packages. Rcpp attributes are not
+    rebuild by default with pkgbuild: enforces rebuilding if step not skiped.
   * Detecting MRAN date while no connection to internet fixed not to fail.
 
 # RSuite 0.33 (2018-09-25)
