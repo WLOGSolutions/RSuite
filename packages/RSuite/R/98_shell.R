@@ -218,32 +218,32 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
   params <- c("--no-init-file", "--no-site-file", "-e")
   log_fun("> cmd: %s", paste(c(cmd0, params, shQuote(script)), collapse = " "))
 
-  p <- tryCatch({
-    processx::process$new(command = cmd0, args = c(params, script),
+  p <- processx::process$new(command = cmd0, args = c(params, script),
                              stdout = "|", stderr = "|", cleanup = TRUE)
-    }, error = function(e) {
-      log_fun("> failed to start cmd: %s", e)
-      return(NULL)
-    })
-  if (is.null(p)) {
-    return(FALSE)
-  }
   log_fun("> cmd started")
   
   result <- tryCatch({
     envir <- new.env(parent = emptyenv())
     envir$ok <- FALSE
     repeat {
+      log_fun("> cmd before poll")
       p$poll_io(timeout = 1000)
+      log_fun("> cmd after poll")
       .log_single_out(p$read_output_lines(), envir)
+      log_fun("> cmd adter output reading")
       .log_single_out(p$read_error_lines(), envir)
+      log_fun("> cmd after error reading")
       if (!p$is_alive()) break
     }
     # try one more time to get all the output
+    log_fun("> cmd before last poll")
     p$poll_io(timeout = 1000)
+    log_fun("> cmd after last poll")
     .log_single_out(p$read_output_lines(), envir)
+    log_fun("> cmd after last output read")
     .log_single_out(p$read_error_lines(), envir)
-
+    log_fun("> cmd after last error read")
+    
     envir$ok
   },
   error = function(e) {
@@ -251,6 +251,7 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
     FALSE
   },
   finally = {
+    log_fun("> cmd before getting process status")
     log_fun("> retcode: %s", p$get_exit_status())
   })
 
