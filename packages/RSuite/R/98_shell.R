@@ -218,8 +218,18 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
   params <- c("--no-init-file", "--no-site-file", "-e")
   log_fun("> cmd: %s", paste(c(cmd0, params, shQuote(script)), collapse = " "))
 
-  p <- processx::process$new(command = cmd0, args = c(params, script),
+  p <- tryCatch({
+    processx::process$new(command = cmd0, args = c(params, script),
                              stdout = "|", stderr = "|", cleanup = TRUE)
+    }, error = function(e) {
+      log_fun("> failed to start cmd: %s", e)
+      return(NULL)
+    })
+  if (is.null(p)) {
+    return(FALSE)
+  }
+  log_fun("> cmd started")
+  
   result <- tryCatch({
     envir <- new.env(parent = emptyenv())
     envir$ok <- FALSE
