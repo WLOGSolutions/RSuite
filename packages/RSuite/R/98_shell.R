@@ -204,10 +204,12 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
   log_fun("> cmd: %s", cmd)
 
   con <- pipe(cmd, open = "rt")
+  Sys.sleep(0.5) # wait subprocess to start
+
   result <- tryCatch({
     status <- FALSE
     repeat {
-      ln <- readLines(con, n = 1)
+      ln <- readLines(con, n = 1, skipNul = TRUE)
       if (length(ln) == 0) {
         break
       }
