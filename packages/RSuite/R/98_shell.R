@@ -203,15 +203,27 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
                collapse = " ")
   log_fun("> cmd: %s", cmd)
 
+  start_time <- Sys.time()
   con <- pipe(cmd, open = "rt")
-  Sys.sleep(0.5) # wait subprocess to start
+  Sys.sleep(0.5)
 
   result <- tryCatch({
     status <- FALSE
+    has_output <- FALSE
     repeat {
       ln <- readLines(con, n = 1, skipNul = TRUE)
       if (length(ln) == 0) {
-        break
+        if (has_output || as.numeric(Sys.time() - start_time) > 5) {
+          # if has output already or is waiting for 5 secs alredy - give up
+          break
+        }
+        Sys.sleep(1.0) # wait subprocess to start
+        next
+      }
+      has_output <- TRUE
+      if (nchar(trimws(ln)) == 0) {
+        # nothing interesting to log
+        next
       }
 
       log_fun("> %s", ln)
