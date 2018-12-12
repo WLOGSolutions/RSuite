@@ -163,6 +163,7 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
   full_code <- sprintf(paste0(script_code, collapse = ";"), ...)
 
   cmd0 <- get_rscript_path(rver = ifelse(is.na(rver), current_rver(), rver)) # from 97_rversion.R
+  cmd0 <- rsuite_fullUnifiedPath(cmd0)
 
   # Before unsetting the R_LIBS_USER variable we have to check whether we are
   # going to run a subprocess using a different R version than the one
@@ -188,7 +189,8 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
                            "}, error = function(e) {",
                            "  cat(sprintf('~ error:%%s\\n', e))",
                            "})"),
-                    rscript_arg("new", rsuite_fullUnifiedPath(ex_libpath)), full_code)
+                    rscript_arg("new", rsuite_fullUnifiedPath(ex_libpath)),
+                    full_code)
   if (get_os_platform() %in% c("MacOS", "SunOS")) {
     # On MacOS special characters are interpreted by process, so they have to be twice escaped
     # something alike is happening on SunOS
@@ -197,51 +199,34 @@ run_rscript <- function(script_code, ..., rver = NA, ex_libpath = NULL, log_debu
 
   log_fun <- if (log_debug) pkg_logdebug else pkg_logfinest
 
-  .log_single_out <- function(lines, envir) {
-    lines <- unlist(strsplit(lines, "\n"))
-    lines <- gsub("^.*\r", "", lines)
+  cmd <- paste(c(cmd0, "--no-init-file", "--no-site-file", "-e", shQuote(script), "2>&1"),
+               collapse = " ")
+  log_fun("> cmd: %s", cmd)
 
-    lapply(lines, function(ln) {
-      if (nchar(ln, type = "bytes") == 0) {
-        return()
+  con <- pipe(cmd, open = "rt")
+  result <- tryCatch({
+    status <- FALSE
+    repeat {
+      ln <- readLines(con, n = 1)
+      if (length(ln) == 0) {
+        break
       }
 
       log_fun("> %s", ln)
       if (grepl("^~ error:", ln)) {
-        envir$ok <- sub("^~ error:", "", ln)
+        status <- sub("^~ error:", "", ln)
       } else if (ln == "~ done") {
-        envir$ok <- NULL
+        status <- NULL
       }
-    })
-  }
-
-  params <- c("--no-init-file", "--no-site-file", "-e")
-  log_fun("> cmd: %s", paste(c(cmd0, params, shQuote(script)), collapse = " "))
-
-  p <- processx::process$new(command = cmd0, args = c(params, script),
-                             stdout = "|", stderr = "|", cleanup = TRUE)
-  result <- tryCatch({
-    envir <- new.env(parent = emptyenv())
-    envir$ok <- FALSE
-    repeat {
-      p$poll_io(timeout = 1000)
-      .log_single_out(p$read_output_lines(), envir)
-      .log_single_out(p$read_error_lines(), envir)
-      if (!p$is_alive()) break
     }
-    # try one more time to get all the output
-    p$poll_io(timeout = 1000)
-    .log_single_out(p$read_output_lines(), envir)
-    .log_single_out(p$read_error_lines(), envir)
-
-    envir$ok
+    status
   },
   error = function(e) {
     log_fun("Error while running script: %s", e)
     FALSE
   },
   finally = {
-    log_fun("> retcode: %s", p$get_exit_status())
+    close(con)
   })
 
   return(result)

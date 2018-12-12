@@ -35,7 +35,7 @@ case "$cmd" in
 		;;
 	tmpl)
                 "$rscript_path" --no-init-file "$basedir/R/cmd_tmpl.R" $* || exit 2
-    		;;
+		;;
 	sysreqs)
                 "$rscript_path" --no-init-file "$basedir/R/cmd_sysreqs.R" $* || exit 2
 		;;
@@ -72,7 +72,7 @@ case "$cmd" in
 		echo "           project packages."
 		echo ""
 		echo "       tmpl"
-		echo "	         Use it to manage  project and package templates"
+		echo "         Use it to manage  project and package templates"
 		echo ""
 		echo "       sysreqs"
 		echo "          The command helps you manage R projects system requirements"

@@ -19,13 +19,14 @@ sub_commands <- list(
     options = list(
     ),
     run = function(opts) {
-      RSuite::tmpl_list_registered()
+      tmpl_list <- RSuite::tmpl_list_registered()
+      write.dcf(tmpl_list) # just print as dcf onto console
     }
   ),
   start = list(
     help = "Create template",
     options = list(
-      make_option(c("-n", "--name"), dest = "name",
+      make_option(c("-n", "--name"), dest = "name", default = NULL,
                   help = "Name of the package template to create."),
       make_option(c("-p", "--path"), dest = "path", default = NULL,
                   help = paste("Path to the directory where the project template will be created.",
@@ -44,11 +45,11 @@ sub_commands <- list(
                                sep = "\n\t\t"))
       ),
       run = function(opts) {
-        if (is.na(opts$name) || is.null(opts$name)) {
-          stop("Template name is required. Plesase, provide --name argument.")
+        if (is.null(opts$name)) {
+          stop("Template name is required. Please, provide --name argument.")
         }
 
-        if (is.na(opts$path) || is.null(opts$path)) {
+        if (is.null(opts$path)) {
           opts$path <- getwd()
         }
 

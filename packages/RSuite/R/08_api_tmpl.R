@@ -213,7 +213,7 @@ tmpl_register <- function(path = NULL, global = FALSE) {
   path <- rsuite_fullUnifiedPath(path, short = FALSE)
   if (global) {
     tmpl_dir <- get_global_templ_dir()
-    assert(!is.null(tmpl_dir), "Global template directory error.")
+    assert(!is.null(tmpl_dir), "Global templates directory is not available.")
   } else{
     tmpl_dir <- get_user_templ_base_dir(create = TRUE) # from 58_templates.R
     assert(!is.null(tmpl_dir), "Local templates directory is not defined(rsuite.user_templ_path)")

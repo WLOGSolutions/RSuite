@@ -221,21 +221,10 @@ zip_project <- function(params, version, odir) {
 zip_folder <- function(wspace, zip_file_path) {
   wd <- setwd(wspace)
   tryCatch({
-    zip_exe <- Sys.which('zip')
-    if (nchar(zip_exe) == 0) {
-      zip_res <- run_rscript(c("retcode <- utils::zip(%s, file = '.', zip = 'zip')",
-                               "stopifnot(retcode == 0)"),
-                             rscript_arg("zipfile", zip_file_path),
-                             log_debug = FALSE)
-    } else {
-      zip_res <- FALSE
-      retcode <- get_cmd_retcode("zipping folder",
-                                 paste(shQuote(zip_exe), "-r9X", shQuote(zip_file_path), "."),
-                                 log_debug = FALSE)
-      if (retcode == 0) {
-        zip_res <- NULL
-      }
-    }
+    zip_res <- run_rscript(c("retcode <- utils::zip(%s, file = '.', zip = 'zip')",
+                             "stopifnot(retcode == 0)"),
+                           rscript_arg("zipfile", zip_file_path),
+                           log_debug = FALSE)
   },
   finally = {
     setwd(wd)
