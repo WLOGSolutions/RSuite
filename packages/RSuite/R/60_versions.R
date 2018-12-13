@@ -137,8 +137,8 @@ get_closest_version <- function(ver, type) {
     avails <- avails[avails$Package %in% df$pkg, ]
     avails <- avails[!duplicated(avails[, c("Package", "Version")]), ]
 
-    stopifnot(all(df$pkg %in% avails$Package                                  # present in avails
-                  | (!is.na(df$vmin) & !is.na(df$vmax) && df$vmin > df$vmax))) # or infeasible
+    stopifnot(all( (df$pkg %in% avails$Package)                                # present in avails
+                   | (!is.na(df$vmin) & !is.na(df$vmax) & df$vmin > df$vmax))) # or infeasible
 
     avails$NVersion <- norm_version(avails$Version)
     avails <- merge(x = avails, y = df, by.x = "Package", by.y = "pkg", all.x = FALSE, all.y = TRUE)

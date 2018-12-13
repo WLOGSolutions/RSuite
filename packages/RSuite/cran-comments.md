@@ -11,6 +11,9 @@ There were no ERRORs, WARNINGs or NOTEs.
 No issues detected
 
 ## Previous submission comments
+  * Fixed problem with CRAN's Debian R-devel (2018-12-12) check platform:
+    "length > 1 in coercion to logical" occured to more restrictive logical
+    operations. Verified that && and & are consistently used.
   * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
     master scripts (and tests) fixed not to consider occurence in strings or
     comments.
