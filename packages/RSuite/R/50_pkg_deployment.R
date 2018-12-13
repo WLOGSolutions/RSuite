@@ -622,4 +622,3 @@ get_package_dll_path <- function(lib_dir, pkg_name) {
   }
   return(dll_path)
 }
-

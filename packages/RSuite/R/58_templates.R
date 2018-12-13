@@ -360,7 +360,9 @@ is_binary <- function(file, blocksize = 512) {
   block <- readBin(file, "raw", n = blocksize)
   null_byte <- as.raw(00)
 
-  special_chars <- sapply(c("\n", "\r", "\t", "\f", "\b"), charToRaw)
+  special_chars <- vapply(c("\n", "\r", "\t", "\f", "\b"),
+                          FUN = charToRaw,
+                          FUN.VALUE = raw(1))
   names(special_chars) <- NULL
   text_chars <- c(as.raw(32:127), special_chars)
 

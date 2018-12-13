@@ -1,4 +1,4 @@
-# RSuite 0.34 (2018-12-??)
+# RSuite 0.34 (2018-12-13)
   * Adapters for CI building presented. Deployment package is tagged with CI build 
     number instead of RC version.
   * Building of C++ packages fixed. After building documentation it clears created
