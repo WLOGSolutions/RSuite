@@ -44,7 +44,7 @@ wix311\light.exe -nologo -wx -sw1076 -spdb -ext WixUIExtension -cultures:en-us -
 if NOT ERRORLEVEL 0 goto error
 
 if NOT %nosign% == "nosign" (
-	signtool sign /n WLOG /t http://timestamp.verisign.com/scripts/timstamp.dll RSuiteCLI_v%ver%_x64.msi
+	signtool sign /a /n WLOG /t http://timestamp.verisign.com/scripts/timstamp.dll RSuiteCLI_v%ver%_x64.msi
 	if NOT ERRORLEVEL 0 goto error
 )
 
@@ -58,7 +58,7 @@ wix311\light.exe -nologo -wx -sw1076 -spdb -ext WixUIExtension -cultures:en-us -
 if NOT ERRORLEVEL 0 goto error
 
 if NOT %nosign% == "nosign" (
-	signtool sign /n WLOG /t http://timestamp.verisign.com/scripts/timstamp.dll RSuiteCLI_v%ver%_x86.msi
+	signtool sign /a /n WLOG /t http://timestamp.verisign.com/scripts/timstamp.dll RSuiteCLI_v%ver%_x86.msi
 	if NOT ERRORLEVEL 0 goto error
 )
 
