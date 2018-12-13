@@ -115,7 +115,12 @@ rsuite_update <- function(lib.dir = Sys.getenv("R_LIBS_USER")) {
 #' \donttest{
 #'   repo_adapter <- repo_adapter_create_base("Own") # create your custom adapter
 #'   class(repo_adapter) <- c("repo_adapter_own", class(repo_adapter))
+#'
+#'   # register it
 #'   rsuite_register_repo_adapter(repo_adapter)
+#'
+#'   # unregister it
+#'   rsuite_unregister_repo_adapter("Own")
 #' }
 #'
 #' @export
@@ -140,7 +145,11 @@ rsuite_register_repo_adapter <- function(repo_adapter) {
 #' \donttest{
 #'   repo_adapter <- repo_adapter_create_base("Own") # create your custom adapter
 #'   class(repo_adapter) <- c("repo_adapter_own", class(repo_adapter))
+#'
+#'   # register it
 #'   rsuite_register_repo_adapter(repo_adapter)
+#'
+#'   # unregister it
 #'   rsuite_unregister_repo_adapter("Own")
 #' }
 #'

@@ -1,11 +1,7 @@
 ## Test environments
-* local Windows install, R 3.5.0, R-devel
-* ubuntu 14.04, R 3.2.5
-* debian 8.9, R 3.3.3
-* centos 7.4, R 3.4.2
-* MacOS Sierra 10.12, R 3.5.0
+* local Windows install, R 3.3.0, R 3.5.0, R-devel
 * win-builder (devel and release)
-* Travis-CI: os & osx with devel, release, oldrel, R 3.3.0, R 3.2.5
+* Travis-CI: os & osx with devel, release, oldrel, R 3.3.0
 * AppVeyor: devel, release, oldrel, R 3.3.0
 
 ## R CMD check results
@@ -16,10 +12,15 @@ No issues detected
 
 ## Previous submission comments
   * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
-    master scripts (and tests) added.
-  * Added R Suite project templates to RStudio project templates. We can now create
-    R Suite projects using "File -> New Project..." in RStudio 
-  * Caching of in-src-archive packages list implemented.
-  * Got rid of subprocess in favor to processx package.
-  * Adding packages from BioConductor into repository implemented together with
-    building PKGZIP out of such packages.
+    master scripts (and tests) fixed not to consider occurence in strings or
+    comments.
+  * Adapted to changes in devtools v2.0.x
+  * Proper handling of packages with C/C++ sources and detection if package
+    (dependency or in-project) cannot be reinstalled.
+  * In-project packages if not changed are not reinstalled: much faster 
+    project under development building.
+  * Fixed detection of MRAN available snapshot while starting project using
+    MRAN.
+  * Adapter to CI builders (Jenkins is in-built) are presented: projects 
+    built under CI(Jenkins) will be tagged with build number instead of RC tag.
+  * Running build/install subprocesses are more durable.
