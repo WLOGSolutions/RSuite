@@ -106,6 +106,12 @@ exec_docker_cmd <- function(args, cmd_desc) {
 
       if (!proc$is_alive()) break;
     }
+
+    out_lines <- .log_single_out(proc$read_output_lines(), "out")
+    result$out_lines <- c(result$out_lines, out_lines)
+
+    err_lines <- .log_single_out(proc$read_error_lines(), "err")
+    result$err_lines <- c(result$err_lines, err_lines)
   },
   finally = {
     result$ret_code <- proc$get_exit_status()
