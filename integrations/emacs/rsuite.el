@@ -322,6 +322,28 @@ args <- args_parser()
 				  (goto-char (point-max))))))
 			  projdir))
 
+
+(defun rsuite-proj-run-master (&optional projdir)
+  "Run master file in a given project."
+  (interactive)
+  (rsuite-call-within-dir (lambda ()
+			    (let ((masterfile nil)
+				  (cmd-args nil)
+				  (master-args nil))
+			      (setq masterfile (read-string "Master file: "))
+			      (setq master-args (read-string "args: "))
+			      (setq cmd-args (concat (file-name-as-directory (rsuite-detect-prj-path))
+						     "R/"
+						     (if (> (length masterfile) 0) masterfile
+						       "master.R")
+						     (if (> (length master-args) 0)
+							 master-args
+						       "")))
+			      (async-shell-command (concat "Rscript " cmd-args)
+						   (concat "*rsuite:run:" masterfile "*")
+						   rsuite/err_buffer))
+			    projdir)))
+
 (defun rsuite-sysreqs-collect (&optional projdir)
   "Collect and display system requirements for R Suite project."
   (interactive)
