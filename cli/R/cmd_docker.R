@@ -297,6 +297,63 @@ sub_commands <- list(
       loginfo("Container(s) stopped: %s", paste(cont_names, collapse = " "))
     }
   ),
+  pack = list(
+    help = "Put project package into RSuite build container",
+    options = list(
+      make_option(c("-n", "--name"), dest = "name",
+                  help="Name of RSuite build container to put project package into. (required)"),
+      make_option(c("--version"), dest = "version",
+                  help=paste("Version to use for project pack tagging.",
+                             "(default: use ZipVersion form PARAMETERS and revision from RC)",
+                             sep = "\n\t\t")),
+      make_option(c("--packages"), dest = "pkgs",
+                  help=paste("Comma separated list of project packages to include into project pack.",
+                             "If not passed all project packages will be included.",
+                             sep = "\n\t\t")),
+      make_option(c("--exc-master"), dest = "exc_master", action="store_true", default=FALSE,
+                  help="If passed will exclude master scripts from project pack created. (default: %default)")
+    ),
+    run = function(opts) {
+      if (is.null(opts$name)) {
+        stop("Provide name of container to pack project into with -n (--name) option")
+      }
+
+      cont_infos <- find_rsbuild_infos(opts$name) # from docker_utils.R
+      stopifnot(length(cont_infos) == 1)
+      cont_name <- names(cont_infos)
+
+      prj <- RSuite::prj_init()
+      pkgs <- if (!is.null(opts$packages)) { trimws(unlist(strsplit(opts$packages, ","))) }
+
+      ver_output <- exec_docker_cmd(c("exec", cont_name, "Rscript", "--version"), # from docker_utils.R
+                                    "Detecting R version on the container")
+      rver <- gsub("^.+version (\\d+[.]\\d+).+$", "\\1", ver_output$err_lines)
+
+      pack_fpath <- RSuite::prj_pack(prj = prj, path = tempdir(), pack_ver = opts$version,
+                                     pkgs = pkgs, inc_master = !opts$exc_master,
+                                     rver = rver)
+
+      loginfo("Copying project pack into container %s ...", cont_name)
+      exec_docker_cmd(c("cp", pack_fpath, sprintf("%s:/opt/", cont_name)), # from docker_utils.R
+                      "Copying project pack into container")
+      loginfo("Copying project pack into container %s ... done.", cont_name)
+
+      prj_name <- prj$load_params()$get_safe_project_name()
+
+      clear_code <- paste(sprintf("if (dir.exists('/opt/%s')) {", prj_name),
+                          sprintf("  unlink('/opt/%s', recursive = TRUE, force = TRUE);", prj_name),
+                          sprintf("}"))
+      exec_docker_cmd(c("exec", cont_name, "Rscript", "-e", clear_code),  # from docker_utils.R
+                      "Cleaning old package build")
+
+      run_incont_cmd(cont_name, sprintf("unzip %s", basename(pack_fpath))) # from docker_utils.R
+
+      res <- list(cont_infos = cont_infos,
+                  cont_name = cont_name,
+                  pack_fpath = pack_fpath)
+      return(invisible(res))
+    }
+  ),
   build = list(
     help = "Build project in RSuite build container",
     options = list(
@@ -329,37 +386,16 @@ sub_commands <- list(
         stop("Destination folder for zip does not exist.")
       }
 
-      cont_infos <- find_rsbuild_infos(opts$name) # from docker_utils.R
-      stopifnot(length(cont_infos) == 1)
-      cont_name <- names(cont_infos)
+      pack_res <- sub_commands$pack$run(opts = list(name = opts$name,
+                                                    version = opts$version,
+                                                    packages = opts$packages,
+                                                    exc_master = opts$exc_master))
+      cont_infos <- pack_res$cont_infos
+      cont_name <- pack_res$cont_name
+      pack_fpath <- pack_res$pack_fpath
 
       prj <- RSuite::prj_init()
-      pkgs <- if (!is.null(opts$packages)) { trimws(unlist(strsplit(opts$packages, ","))) }
-
-      ver_output <- exec_docker_cmd(c("exec", cont_name, "Rscript", "--version"), # from docker_utils.R
-                                    "Detecting R version on the container")
-      rver <- gsub("^.+version (\\d+[.]\\d+).+$", "\\1", ver_output$err_lines)
-
-      pack_fpath <- RSuite::prj_pack(prj = prj, path = tempdir(), pack_ver = opts$version,
-                                     pkgs = pkgs, inc_master = !opts$exc_master,
-                                     rver = rver)
-
-      loginfo("Copying project pack into container %s ...", cont_name)
-      exec_docker_cmd(c("cp", pack_fpath, sprintf("%s:/opt/", cont_name)), # from docker_utils.R
-                      "Copying project pack into container")
-      loginfo("Copying project pack into container %s ... done.", cont_name)
-
       prj_name <- prj$load_params()$get_safe_project_name()
-
-      clear_code <- paste(sprintf("if (dir.exists('/opt/%s')) {", prj_name),
-                          sprintf("  to_rem = list.files('/opt/%s', all.file = TRUE, include.dirs = TRUE);", prj_name),
-                          sprintf("  to_rem = to_rem[!(to_rem %%in%% c('deployment', '.', '..'))];"),
-                          sprintf("  unlink(file.path('/opt/%s', to_rem), recursive = TRUE, force = TRUE);", prj_name),
-                          sprintf("}"))
-      exec_docker_cmd(c("exec", cont_name, "Rscript", "-e", paste0('"', clear_code, '"')),  # from docker_utils.R
-                      "Cleaning old package build")
-
-      run_incont_cmd(cont_name, sprintf("unzip %s", basename(pack_fpath))) # from docker_utils.R
 
       cache_fpath <- NULL
       if (!opts$no_cache) {
