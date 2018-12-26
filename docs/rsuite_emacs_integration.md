@@ -31,8 +31,7 @@ remember to adapt next steps to your folder.
 
 We use [use-package](https://github.com/jwiegley/use-package
 "use-package") for managing our Emacs' packages. So first you have to
-install `use-package` package. We recommend using [MELPA
-repository](https://melpa.org/#/getting-started "MELPA repository"). 
+install `use-package` package. We recommend using [MELPA repository](https://melpa.org/#/getting-started "MELPA repository"). 
 
 Having `use-package` you can add the following set of instructions to
 your `~\.emacs.d\init.el` file. Note the keybindings can be customized
@@ -63,7 +62,7 @@ An alternative configuration is to use [Hydra](https://github.com/abo-abo/hydra)
 
 ``` emacs-lisp
 (use-package rsuite
-  :load-path "D:/Workplace/Projects/RSuite/integrations/emacs"
+  :load-path "~/.emacs.d/myscripts"
   :defer 1
   :demand t
   :init
