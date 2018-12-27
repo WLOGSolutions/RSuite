@@ -344,7 +344,7 @@ _rsuite() {
 						fi
 						;;
 					*)
-						retrun 0
+						return 0
 						;;
 
 				esac
