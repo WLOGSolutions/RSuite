@@ -127,10 +127,10 @@ tryCatch({
   }
 
 
-  to_install_pkgs <- c()
+  rstudio_pkgs <- c()
+  rstudio_pkg_files <- c()
 
   if (opts$rstudio_addin || length(argv$args) != 0) {
-    rstudio_pkgs <- c()
     if (opts$rstudio_addin) {
       rstudio_pkgs <- c(rstudio_pkgs, "RSuiteRStudio")
     }
@@ -161,14 +161,14 @@ tryCatch({
       .fatal_error(sprintf("Failed to download RSuite package from %s", pkg_url))
     }
 
-    to_install_pkgs <- c(to_install_pkgs, rstudio_pkgs)
+    rstudio_pkg_files <- dloaded[, 2]
   }
 
   tools::write_PACKAGES(dir = src_dir, type = "source")
 
-  # detect RSuite dependencies
+  # detect RSuite & RSuiteStudio dependencies
   rsuite_avail_pkgs <- data.frame(available.packages(paste0("file:///", src_dir)), stringsAsFactors = FALSE)
-  rsuite_avail_pkgs <- rsuite_avail_pkgs[rsuite_avail_pkgs$Package == rsuite_pkg, ]
+  rsuite_avail_pkgs <- rsuite_avail_pkgs[rsuite_avail_pkgs$Package %in% c(rsuite_pkg, rstudio_pkgs), ]
   rsuite_deps <- unlist(lapply(c(rsuite_avail_pkgs$Depends,
                                  rsuite_avail_pkgs$Imports,
                                  rsuite_avail_pkgs$LinkingTo),
@@ -192,9 +192,11 @@ tryCatch({
                             verbose = opts$verbose)
   }
 
-  # installing RSuite itself
-  utils::install.packages(opts$package,
+  # installing RSuite & RSuiteStudio itself
+  print(c(opts$package, rstudio_pkg_files), collapse = ", ")
+  utils::install.packages(c(opts$package, rstudio_pkg_files),
                           repos = NULL,
+                          type = "source",
                           quiet = !opts$verbose,
                           verbose = opts$verbose)
 }, finally = {
