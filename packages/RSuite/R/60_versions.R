@@ -317,7 +317,7 @@ vers.get_unfeasibles <- function(ver) {
 #' @param pkg_names character vector of packages to exclude from versions.
 #'    (type: character(N))
 #'
-#' @return modified version object.
+#' @return new version object.
 #'
 #' @keywords internal
 #' @noRd
@@ -331,6 +331,32 @@ vers.rm <- function(ver, pkg_names) {
     avails <- NULL
   }
   return(.df2ver(ver$pkgs[!(ver$pkgs$pkg %in% pkg_names), ], avails))
+}
+
+#'
+#' Creates version object containing only provided packages.
+#'
+#' If avail is present in vers they are also filtered to contain provided
+#'    packages.
+#'
+#' @param ver version object.
+#' @param pkg_names character vector of packages to select from versions.
+#'    (type: character(N))
+#'
+#' @return new version object.
+#'
+#' @keywords internal
+#' @noRd
+#'
+vers.select <- function(ver, pkg_names) {
+  stopifnot(is.versions(ver))
+  if (ver$has_avails()) {
+    avails <- ver$get_avails()
+    avails <- avails[avails$Package %in% pkg_names, ]
+  } else {
+    avails <- NULL
+  }
+  return(.df2ver(ver$pkgs[ver$pkgs$pkg %in% pkg_names, ], avails))
 }
 
 #'

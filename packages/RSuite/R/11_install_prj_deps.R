@@ -406,6 +406,30 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
           next
         }
 
+        infeasibles <- vers.get_unfeasibles(check_res.get_missing(tp_cr))
+        if (length(infeasibles) > 0) {
+          pkg_logwarn("Infeasible dependency requerements detected:")
+
+          base_reqs <- vers.get(vers, infeasibles)
+          by(base_reqs, seq_len(nrow(base_reqs)), function(breq) {
+            pkg_logwarn(". %s base %s", breq$pkg, breq$vmin, breq$vmax)
+          })
+
+          othr_pkgs <- setdiff(infeasibles, base_reqs$pkg)
+          if (length(othr_pkgs) > 0) {
+            pkg_logwarn(". %s", othr_pkgs)
+          }
+
+          dependant_pkgs <- setdiff(vers.get_names(check_res.get_missing(tp_cr)), infeasibles)
+          if (length(dependant_pkgs) > 0) {
+            pkg_logwarn(". probably required by %s", dependant_pkgs)
+          }
+
+          stop(sprintf("Infeasible dependency requerements detected for %s",
+                       paste(infeasibles, collapse = ", ")))
+        }
+
+
         all_deps <- vers.union(all_deps,
                                vers.drop_avails(check_res.get_found(tp_cr)),
                                check_res.get_missing(tp_cr))

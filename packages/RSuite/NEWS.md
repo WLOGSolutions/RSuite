@@ -1,3 +1,12 @@
+# RSuite 0.35 (2019-01-??)
+  * Fix in dependecy resolving process. Upper requirements enforse subdependencies
+    version selection not to present version collisions.
+  * Fixed caching of source archive packages. Only needed packages are cached and
+    all proper versions are downloaded.
+  * Dependency resolution process is reporing early if requirements collision is 
+    detected.
+  * Proper RC version detection then building packages for repo in prjpack. 
+
 # RSuite 0.34 (2018-12-13)
   * Adapters for CI building presented. Deployment package is tagged with CI build 
     number instead of RC version.

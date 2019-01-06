@@ -358,12 +358,22 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
   vers_cr <- vers.check_against(vers, avail_vers, extra_reqs)
   vers_cr <- resolve_in_archive(vers_cr)
 
+  if (is.null(extra_reqs)) {
+    extra_reqs <- vers
+  } else {
+    extra_reqs <- vers.union(vers.drop_avails(extra_reqs), vers)
+  }
+
   next_cr <- vers_cr
   while (check_res.has_found(next_cr)) {
     dep_avails <- vers.pick_available_pkgs(check_res.get_found(next_cr))
 
     dep_vers <- vers.from_deps_in_avails(dep_avails)
     dep_vers <- vers.rm_base(dep_vers)
+
+    # enforce previous requirements onto dependencies detected
+    dep_vers <- vers.union(dep_vers,
+                           vers.select(extra_reqs, vers.get_names(dep_vers)))
 
     next_cr <- vers.check_against(dep_vers, avail_vers, extra_reqs)
     next_cr <- resolve_in_archive(next_cr)
@@ -420,6 +430,9 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
     }
     if (!is.na(req$vmax)) {
       avails <- avails[avails$NVersion <= req$vmax, ]
+    } else if (nrow(avails) > 1) {
+      # latest will surely be sufficient
+      avails <- avails[order(avails$NVersion, decreasing = T), ][1, ]
     }
 
     return(avails)
