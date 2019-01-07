@@ -444,17 +444,45 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
     return(cr)
   }
 
+  avails <- dload_src_arch_avail_pkgs(avail_pkgs, repo_info$rver)
+  avails <- avails[avails$Package %in% reqs$pkg, ]
+
+  found_vers <- vers.collect(pkgs = avails)
+
+  next_cr <- vers.check_against(missing_vers, found_vers)
+  return(check_res.union(cr, next_cr))
+}
+
+#' Downloads source archive packages detected.
+#'
+#' @param pkg_avails available packages detected from source archives.
+#' @param rver R version to create repository for
+#'
+#' @return avails containing all packages available in repo post
+#'   download.
+#'
+#' @keywords internal
+#' @noRd
+#'
+dload_src_arch_avail_pkgs <- function(avail_pkgs, rver) {
   dload_dir <- file.path(tempdir(), "src_arch_dload")
   if (!dir.exists(dload_dir)) {
     dir.create(dload_dir, recursive = TRUE, showWarnings = FALSE)
   }
 
-  dloads <- pkg_download(avail_pkgs = avail_pkgs, dest_dir = dload_dir)
-  avails <- get_package_files_info(dloads$Path)
-  found_vers <- vers.collect(pkgs = avails)
+  dload_repo <- repo_manager_dir_create(dload_dir, "source", rver)
+  repo_manager_init(dload_repo)
 
-  next_cr <- vers.check_against(missing_vers, found_vers)
-  return(check_res.union(cr, next_cr))
+  dest_curl <- rsuite_contrib_url(dload_dir, "source", rver = rver)
+  pkg_download(avail_pkgs = avail_pkgs, dest_dir = dest_curl)
+  rsuite_write_PACKAGES(dest_curl, type = "source")
+
+  avails <- suppressWarnings({
+    utils::available.packages(contriburl = path2local_url(dest_curl),
+                              filters = list())
+  })
+  avails <- data.frame(avails, stringsAsFactors = FALSE, row.names = NULL)
+  return(avails)
 }
 
 

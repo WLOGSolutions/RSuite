@@ -6,6 +6,7 @@
   * Dependency resolution process is reporing early if requirements collision is 
     detected.
   * Proper RC version detection then building packages for repo in prjpack. 
+  * Bug fix: packages detected in source archive were not included in pkgzip.
 
 # RSuite 0.34 (2018-12-13)
   * Adapters for CI building presented. Deployment package is tagged with CI build 
