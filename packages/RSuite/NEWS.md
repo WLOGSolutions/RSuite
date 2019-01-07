@@ -1,4 +1,4 @@
-# RSuite 0.35 (2019-01-??)
+# RSuite 0.35 (2019-01-07)
   * Fix in dependecy resolving process. Upper requirements enforse subdependencies
     version selection not to present version collisions.
   * Fixed caching of source archive packages. Only needed packages are cached and

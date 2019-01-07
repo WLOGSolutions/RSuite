@@ -1,4 +1,4 @@
-VERSION 0.35 (2019-01-??)
+VERSION 0.35 (2019-01-07)
   * 'docker pack' command added. It copies project pack into running docker
     RSuite build container.
   * #181: installing RSuiteStudio fixed with 'install' command
