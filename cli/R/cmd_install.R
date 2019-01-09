@@ -193,7 +193,6 @@ tryCatch({
   }
 
   # installing RSuite & RSuiteStudio itself
-  print(c(opts$package, rstudio_pkg_files), collapse = ", ")
   utils::install.packages(c(opts$package, rstudio_pkg_files),
                           repos = NULL,
                           type = "source",

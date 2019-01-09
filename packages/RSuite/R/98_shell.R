@@ -122,14 +122,29 @@ get_cmd_outlines <- function(desc, cmd, ..., log_debug = FALSE) {
   log_fun <- if (log_debug) pkg_logdebug else pkg_logfinest
   log_fun("%s cmd: %s", desc, full_cmd)
 
+  start_time <- Sys.time()
   lines <- character(0)
   con <- pipe(full_cmd, open = "rt")
+  Sys.sleep(0.5)
+
   tryCatch({
-    while (TRUE) {
+    has_output <- FALSE
+    repeat {
       ln <- readLines(con, n = 1, skipNul = TRUE)
-      if (!length(ln) || !nchar(ln)) {
-        break
+      if (length(ln) == 0) {
+        if (has_output || as.numeric(Sys.time() - start_time) > 5) {
+          # if has output already or is waiting for 5 secs alredy - give up
+          break
+        }
+        Sys.sleep(1.0) # wait subprocess to start
+        next
       }
+      has_output <- TRUE
+      if (nchar(trimws(ln)) == 0) {
+        # nothing interesting to log
+        next
+      }
+
       log_fun("%s output: %s", desc, ln)
       lines <- c(lines, ln)
     }
