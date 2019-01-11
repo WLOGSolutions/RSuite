@@ -11,19 +11,11 @@ There were no ERRORs, WARNINGs or NOTEs.
 No issues detected
 
 ## Previous submission comments
-  * Fixed problem with CRAN's Debian R-devel (2018-12-12) check platform:
-    "length > 1 in coercion to logical" occured to more restrictive logical
-    operations. Verified that && and & are consistently used.
-  * Detection of implicit dependencies like <pkg>::<name> or <pkg>:::<name> in
-    master scripts (and tests) fixed not to consider occurence in strings or
-    comments.
-  * Adapted to changes in devtools v2.0.x
-  * Proper handling of packages with C/C++ sources and detection if package
-    (dependency or in-project) cannot be reinstalled.
-  * In-project packages if not changed are not reinstalled: much faster 
-    project under development building.
-  * Fixed detection of MRAN available snapshot while starting project using
-    MRAN.
-  * Adapter to CI builders (Jenkins is in-built) are presented: projects 
-    built under CI(Jenkins) will be tagged with build number instead of RC tag.
-  * Running build/install subprocesses are more durable.
+  * Fix in dependecy resolving process. Upper requirements enforse subdependencies
+    version selection not to present version collisions.
+  * Fixed caching of source archive packages. Only needed packages are cached and
+    all proper versions are downloaded.
+  * Dependency resolution process is reporing early if requirements collision is 
+    detected.
+  * Proper RC version detection then building packages for repo in prjpack. 
+  * Bug fix: packages detected in source archive were not included in pkgzip.

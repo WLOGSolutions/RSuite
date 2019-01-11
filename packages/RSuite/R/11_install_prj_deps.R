@@ -192,6 +192,7 @@ get_loadable_packages <- function(pkgs, ex_liblocs, rver) {
       "installed <- as.data.frame(installed, stringsAsFactors = F)[, c('Package', 'Version', 'Built')]",
       "load(%s)",
       "installed <- installed[installed$Package %%in%% pkgs, ]",
+      "installed <- installed[!duplicated(installed$Package), ]",
       paste0("loadable <- unlist(lapply(",
              "   X = installed$Package,",
              "   FUN = function(pkg) {",
@@ -405,6 +406,30 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
         if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
           next
         }
+
+        infeasibles <- vers.get_unfeasibles(check_res.get_missing(tp_cr))
+        if (length(infeasibles) > 0) {
+          pkg_logwarn("Infeasible dependency requerements detected:")
+
+          base_reqs <- vers.get(vers, infeasibles)
+          by(base_reqs, seq_len(nrow(base_reqs)), function(breq) {
+            pkg_logwarn(". %s base %s", breq$pkg, breq$vmin, breq$vmax)
+          })
+
+          othr_pkgs <- setdiff(infeasibles, base_reqs$pkg)
+          if (length(othr_pkgs) > 0) {
+            pkg_logwarn(". %s", othr_pkgs)
+          }
+
+          dependant_pkgs <- setdiff(vers.get_names(check_res.get_missing(tp_cr)), infeasibles)
+          if (length(dependant_pkgs) > 0) {
+            pkg_logwarn(". probably required by %s", dependant_pkgs)
+          }
+
+          stop(sprintf("Infeasible dependency requerements detected for %s",
+                       paste(infeasibles, collapse = ", ")))
+        }
+
 
         all_deps <- vers.union(all_deps,
                                vers.drop_avails(check_res.get_found(tp_cr)),

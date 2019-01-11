@@ -9,6 +9,7 @@ library(testthat)
 
 source("R/test_utils.R")
 source("R/project_management.R")
+source("R/repo_management.R")
 
 register_project_templ("TestVersionSelection", function(prj) {
   params <- prj$load_params()
