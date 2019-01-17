@@ -1,7 +1,10 @@
-VERSION 0.35 (2019-01-07)
+VERSION 0.35 (2019-01-17)
   * 'docker pack' command added. It copies project pack into running docker
     RSuite build container.
   * #181: installing RSuiteStudio fixed with 'install' command
+  * 'proj zip' has new option --extras which makes it possible to include
+    some external resources into deployment zip.
+  * bash completions fixed to have proper line endings.
 
 VERSION 0.34 (2018-12-13)
   * Then installing RSuite on Windows it prevents installing source packages
