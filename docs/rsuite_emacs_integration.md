@@ -58,6 +58,10 @@ to your needs.
 
 ### Using hydra ###
 
+![Emacs Hydra integration with R Suite exemplary
+screencast](https://github.com/WLOGSolutions/RSuite/blob/master/docs/media/rsuite_emacs_hydra.png
+"Emacs Hydra integration with R Suite")
+
 An alternative configuration is to use [Hydra](https://github.com/abo-abo/hydra) to define keybindings. The exemplary instructions are presented below. It creates three sets of keybindings: (a) project management, (b) docker integration, (c) system requirements management.
 
 ``` emacs-lisp
