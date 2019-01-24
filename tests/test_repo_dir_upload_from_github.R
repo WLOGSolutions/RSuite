@@ -48,5 +48,6 @@ test_that_managed("Uploading GitHub (with deps)", {
   expect_that_packages_available(c("rAzureBatch",
                                    "bitops", "curl", "digest", "httr", "jsonlite", "mime",
                                    "openssl", "R6", "RCurl", "rjson"),
-                                 "source", mgr)
+                                 "source", mgr,
+                                 optional_names = c("askpass", "sys")) # openssl > 1.2.1 imports askpass -> sys
 })

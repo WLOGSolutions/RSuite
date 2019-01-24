@@ -1,3 +1,6 @@
+# RSuite 0.36 (2019-02-??)
+  * #184: detecting declaration of dependencies in scripts with "library (...)".
+  
 # RSuite 0.35 (2019-01-07)
   * Fix in dependecy resolving process. Upper requirements enforse subdependencies
     version selection not to present version collisions.

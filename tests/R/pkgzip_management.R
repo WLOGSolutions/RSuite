@@ -24,7 +24,7 @@ init_test_pkgzip <- function() {
   ))
 }
 
-expect_that_pkgzip_contains <- function(names, type, pkgzip) {
+expect_that_pkgzip_contains <- function(names, type, pkgzip, optional_names = c()) {
   files <- pkgzip$get_pkgzip_fpath()
   cont_path <- file.path(pkgzip$path, "cont")
   expect_success({
@@ -37,6 +37,8 @@ expect_that_pkgzip_contains <- function(names, type, pkgzip) {
                       stringsAsFactors = F)$Package
 
   avail <- avail[order(avail)]
+  names <- c(names, intersect(optional_names, avail))
+
   names <- names[order(names)]
 
   expect_equal(object = avail, expected = names)

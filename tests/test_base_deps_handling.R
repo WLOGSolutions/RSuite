@@ -51,7 +51,7 @@ test_that_managed("Build deps which contains library(\"TestDependency\") in mast
   prj <- init_test_project(repo_adapters = c("Dir"),
                            tmpl = get_project_templ("TestBaseDepsInstall"))
 
-  create_test_master_script(code = "library(\"TestDependency\")", prj = prj)
+  create_test_master_script(code = "library (\"TestDependency\")", prj = prj)
 
   RSuite::prj_install_deps(prj)
 

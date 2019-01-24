@@ -27,11 +27,11 @@ init_test_manager <- function(prj, ra_name = "Dir") {
 init_test_dir_adapter <- function(name) {
   repo_adapter <- RSuite:::repo_adapter_create_dir(name)
   RSuite::rsuite_register_repo_adapter(repo_adapter)
-  
+
   on_test_exit(function() {
     RSuite::rsuite_unregister_repo_adapter(name)
   })
-  
+
   return(repo_adapter)
 }
 
@@ -73,7 +73,7 @@ get_intrepo_manager <- function(prj) {
   return(list(repo_mgr = repo_mgr, path = repo_path, url = sprintf("file:///%s", repo_path)))
 }
 
-expect_that_packages_available <- function(names, type, mgr) {
+expect_that_packages_available <- function(names, type, mgr, optional_names = c()) {
   repo_url <- sprintf("file:///%s", mgr$path)
   avails <- data.frame(available.packages(contriburl = RSuite:::rsuite_contrib_url(repo_url, type), filters = c()),
                        stringsAsFactors = F)$Package
@@ -84,6 +84,7 @@ expect_that_packages_available <- function(names, type, mgr) {
                  paste(not_avail, collapse = ", ")))
 
   unexpect <- setdiff(avails, names)
+  unexpect <- setdiff(unexpect, optional_names)
   expect(length(unexpect) == 0,
          sprintf("Unexpected packages found in rep: %s",
                  paste(unexpect, collapse = ", ")))
