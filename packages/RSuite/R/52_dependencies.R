@@ -295,7 +295,7 @@ collect_dir_script_deps <- function(dir, recursive = TRUE) {
       lns <- gsub("\"[^\"]*#[^\"]*\"", "", lns) # remove texts containing #: they cannot contain evaluated code
       lns <- gsub("#.+$", "", lns) # got rid of commends
 
-      loads <- lns[grepl("^\\s*(require|library)\\((.+)\\)", lns)]
+      loads <- lns[grepl("^\\s*(require|library)\\s*\\((.+)\\)", lns)]
       loads <- gsub("\\s+", "", loads) # remove extra spaces
       explicit_pkgs <- gsub("^(require|library)\\(['\"]?([^,'\"]+)['\"]?(,.+)?\\).*$", "\\2", loads)
 

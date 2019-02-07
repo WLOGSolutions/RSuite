@@ -137,7 +137,11 @@ sub_commands <- list(
       make_option(c("-p", "--path"), dest = "path",
                   help="Directory to put built zip package into (default: current directory)"),
       make_option(c("--version"), dest = "version",
-                  help="Version to use for zip package tagging (default: use ZipVersion form PARAMETERS and revision from RC)")
+                  help="Version to use for zip package tagging (default: use ZipVersion form PARAMETERS and revision from RC)"),
+      make_option(c("--extras"), dest = "extras",
+                  help= paste("Comma separated list extra resources to include into zip package.",
+                              "The resource can folder or file which is put into extras subfolder into zip package.",
+                              sep = "\n\t\t"))
     ),
     run = function(opts) {
       if (is.null(opts$path) || is.na(opts$path)) {
@@ -146,7 +150,44 @@ sub_commands <- list(
       if (is.null(opts$version) || is.na(opts$version)) {
         opts$version <- NULL
       }
-      RSuite::prj_zip(path = opts$path, zip_ver = opts$version)
+
+      # handle extras
+      if (is.null(opts$extras) || is.na(opts$extras)) {
+        opts$extras <- character(0)
+      }
+      extras <- trimws(unlist(strsplit(opts$extras, ",")))
+
+      not_found_extras <- extras[!file.exists(extras)]
+      if (length(not_found_extras) > 0) {
+        stop(sprintf("Extra resources not found: %s", paste(not_found_extras, collapse = ", ")))
+      }
+
+      zip_fpath <- RSuite::prj_zip(path = opts$path, zip_ver = opts$version)
+
+      if (length(extras) > 0) {
+        loginfo("Injecting extras into deployment zip ...")
+        extras_tmp <- tempfile("extras_")
+
+        prj_name <- RSuite::prj_init()$load_params()$project
+        extras_dest <- file.path(extras_tmp, prj_name, "extras")
+        dir.create(extras_dest, recursive = TRUE)
+
+        on.exit(unlink(extras_tmp, recursive = TRUE, force = TRUE))
+
+        success <- file.copy(extras, extras_dest, recursive = TRUE, overwrite = TRUE)
+        failed_extras <- extras[!success]
+        if (length(failed_extras) > 0) {
+          stop(sprintf("Failed to prepare extras for injection: %s", paste(failed_extras, collapse = ", ")))
+        }
+
+        if (!RSuite:::zip_folder(extras_tmp, zip_fpath)) {
+          stop(sprintf("Failed to inject extras into %s", zip_fpath))
+        }
+
+        loginfo("... done")
+      }
+
+      return(invisible(zip_fpath))
     }
   ),
   pack = list(

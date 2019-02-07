@@ -47,5 +47,6 @@ test_that_managed("Create PKGZIP out of sources on GitHub (with deps)", {
   expect_that_pkgzip_contains(c("rAzureBatch",
                                 "bitops", "curl", "digest", "httr", "jsonlite", "mime",
                                 "openssl", "R6", "RCurl", "rjson"),
-                              type = "source", pkgzip = pkgzip)
+                              type = "source", pkgzip = pkgzip,
+                              optional_names = c("askpass", "sys")) # openssl > 1.2.1 imports askpass -> sys
 })
