@@ -1,9 +1,25 @@
 # Binary packages under Linux #
 
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
-**Table of Contents**
+In this document we present a very handy feature of [R Suite](https://rsuite.io) - handling binary packages under Linux.
+We will cover the following topics:
 
-- [Binary packages under Linux](#binary-packages-under-linux)
+* creating local CRAN repos with binary packages
+* setting up R Suite project to install from local CRAN
+
+**Important** This tutorial was tested with R Suite version 0.35-251 and Ubuntu 18.04.
+
+## Got stuck? ##
+
+If you are stuck feel free to contact us:
+
+through the R Suite website (https://rsuite.io#contact) or
+using Gitter R Suite room
+directly by sending an email with the description of your problem to rsuite@wlogsolutions.com.
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
 - [Motivation](#motivation)
 - [Create local CRAN](#create-local-cran)
     - [First step - understand CRAN management under R Suite](#first-step---understand-cran-management-under-r-suite)
@@ -18,14 +34,6 @@
 - [Installing dependencies (fast!)](#installing-dependencies-fast)
 
 <!-- markdown-toc end -->
-
-In this document we present a very handy feature of [R Suite](https://rsuite.io) - handling binary packages under Linux.
-We will cover the following topics:
-
-* creating local CRAN repos with binary packages
-* setting up R Suite project to install from local CRAN
-
-**Important** This tutorial was tested with R Suite version 0.35-251 and Ubuntu 18.04.
 
 # Motivation
 
