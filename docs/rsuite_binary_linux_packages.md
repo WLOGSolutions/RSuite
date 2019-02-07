@@ -1,13 +1,5 @@
 # Binary packages under Linux #
 
-In this document we present a very handy feature of [R Suite](https://rsuite.io) - handling binary packages under Linux.
-We will cover the following topics:
-
-* creating local CRAN repos with binary packages
-* setting up R Suite project to install from local CRAN
-
-**Important** This tutorial was tested with R Suite version 0.35-251 and Ubuntu 
-
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
@@ -27,6 +19,13 @@ We will cover the following topics:
 
 <!-- markdown-toc end -->
 
+In this document we present a very handy feature of [R Suite](https://rsuite.io) - handling binary packages under Linux.
+We will cover the following topics:
+
+* creating local CRAN repos with binary packages
+* setting up R Suite project to install from local CRAN
+
+**Important** This tutorial was tested with R Suite version 0.35-251 and Ubuntu 18.04.
 
 # Motivation
 
@@ -143,7 +142,7 @@ library(shiny)
 
 **Remark** R Suite understands that R Studio is very popular. Each R Suite project is compatible with R Studio - in a project root folder you can find `BinaryCRAN.prj` file - if you click this, R Studio will open the project.
 
-## Install dependencies (long!)##
+## Install dependencies (long!) ##
 
 Now you are ready to install dependencies. **Beware** that it will take a lot of time because of compilation. You install dependencies with the following command:
 
@@ -321,9 +320,9 @@ You should see the following output
 
 As you can see the first repository is your local CRAN. This is **very important** because R Suite checks repositories in an order they were put in `PARAMETERS` file.
 
-But take a look to other messages. You will see somethin similar to the one below
+But take a look to other messages. You will see something similar to the one below
 
-``
+```
 2019-02-07 21:59:31 DEBUG:rsuite:> * installing *binary* package 'xtable' ...
 2019-02-07 21:59:32 DEBUG:rsuite:> * DONE (xtable)
 ```
