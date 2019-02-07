@@ -12,6 +12,63 @@ It helps you with number of tasks like
 
 R Suite supports you in developing you R projects in a standardized way and helps with dependencies control and project consistency management while preparing to deploy on production.
 
+## **Got stuck?**
+
+If you are stuck feel free to contact us:
+
+* through R Suite website (https://rsuite.io#contact) or 
+* using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite "R Suite room")
+* directly by sending an email with your problem description to [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
+- [Requirements](#requirements)
+- [Installing R Suite](#installing-r-suite)
+    - [Updating R Suite CLI](#updating-r-suite-cli)
+- [Project management](#project-management)
+    - [Starting project](#starting-project)
+    - [Creating package](#creating-package)
+    - [Project environment locking](#project-environment-locking)
+    - [Building project local enviroment](#building-project-local-enviroment)
+    - [Building project packages](#building-project-packages)
+    - [Cleaning unused project dependencies](#cleaning-unused-project-dependencies)
+    - [Building deployment package](#building-deployment-package)
+    - [Testing project](#testing-project)
+- [Template management](#template-management)
+    - [Creating custom project and package templates](#creating-custom-project-and-package-templates)
+    - [Registering custom templates](#registering-custom-templates)
+    - [Starting projects/packages using created templates](#starting-projectspackages-using-created-templates)
+- [System requirements management](#system-requirements-management)
+    - [Collecting system requirements](#collecting-system-requirements)
+    - [Checking system against requirements](#checking-system-against-requirements)
+    - [Installing system requirements](#installing-system-requirements)
+    - [Create system update script](#create-system-update-script)
+- [Repository management](#repository-management)
+    - [Initializing repository](#initializing-repository)
+    - [Adding project packages to repository](#adding-project-packages-to-repository)
+    - [Adding in file packages to repository](#adding-in-file-packages-to-repository)
+    - [Adding external packages to repository](#adding-external-packages-to-repository)
+    - [Adding content of PKGZIP to repository](#adding-content-of-pkgzip-to-repository)
+    - [Adding package from GitHub to repository](#adding-package-from-github-to-repository)
+    - [Adding package from BioConductor to repository](#adding-package-from-bioconductor-to-repository)
+    - [List contents of repository](#list-contents-of-repository)
+    - [Remove packages from repository](#remove-packages-from-repository)
+- [Building PKGZIP packages](#building-pkgzip-packages)
+    - [Building PKGZIP containing project packages](#building-pkgzip-containing-project-packages)
+    - [Building PKGZIP containing in file packages](#building-pkgzip-containing-in-file-packages)
+    - [Building PKGZIP containing external packages](#building-pkgzip-containing-external-packages)
+    - [Building PKGZIP containing package from GitHub](#building-pkgzip-containing-package-from-github)
+    - [Building PKGZIP containing package from BioConductor](#building-pkgzip-containing-package-from-bioconductor)
+- [Docker integration](#docker-integration)
+    - [Building project under different platform in docker container](#building-project-under-different-platform-in-docker-container)
+    - [Building docker image for solution](#building-docker-image-for-solution)
+- [Getting help](#getting-help)
+
+<!-- markdown-toc end -->
+
+
 # Requirements
 
 R Suite CLI requires R being available on your machine. Any version will do, but we tested it mostly on v3.2+.

@@ -19,6 +19,28 @@ If you are stuck feel free to contact us:
 * directly by sending an email with the description of your problem to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
   
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
+- [Motivation](#motivation)
+    - [**Default project template:**](#default-project-template)
+    - [**Default package template:**](#default-package-template)
+- [Project repo setup](#project-repo-setup)
+- [Shiny app development](#shiny-app-development)
+- [__PackageName__](#packagename)
+- [Global package definitions and imports](#global-package-definitions-and-imports)
+- [Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)](#detect-proper-scriptpath-you-cannot-use-args-yet-as-they-are-build-with-tools-in-setenvr)
+- [Setting .libPaths() to point to libs folder](#setting-libpaths-to-point-to-libs-folder)
+- [R Markdown configuration](#r-markdown-configuration)
+- [Sample dataframe](#sample-dataframe)
+- [Dataset](#dataset)
+- [Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)](#detect-proper-scriptpath-you-cannot-use-args-yet-as-they-are-build-with-tools-in-setenvr-1)
+- [Setting .libPaths() to point to libs folder](#setting-libpaths-to-point-to-libs-folder-1)
+- [Summary](#summary)
+
+<!-- markdown-toc end -->
+
 
 # Motivation
 The R programming language is a tool used in a large number of different fields and environments. In each of those, users have specific demands. In order to fulfil those needs, R Suite offers the possibility of defining custom project and package templates. It is important to stress that this is an advanced mechanism, which used improperly might result in errors when using other R Suite functionalities. The default built-in templates offered by R Suite have the following file structure:
