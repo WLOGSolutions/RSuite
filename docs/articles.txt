@@ -6,4 +6,4 @@ rsuite_cli_reference.md: R Suite CLI reference manual
 rsuite_emacs_integration.md: Integration with Emacs
 rsuite_and_docker_integration.md: R Suite and Docker
 rsuite_templates.md: R Suite templates
-rsuite_binary_packages.md: R Suite binary packages for Linux (and local CRAN management)
+rsuite_binary_linux_packages.md: R Suite binary packages for Linux (and local CRAN management)
