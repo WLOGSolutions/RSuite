@@ -117,7 +117,7 @@ pkg_download <- function(avail_pkgs, dest_dir) {
         local_pkgs <- remote_pkgs[cache_exists, ]
         local_pkgs$Repository <- path2local_url(dirname(local_pkgs$CacheFile)) # from 99_rpatches.R
         local_pkgs$CacheFile <- NULL # ret rid of extra column
-        pkg_logdebug(sprintf("Will use '%s' from cached %s", local_pkgs$Package, local_pkgs$File))
+        pkg_logdebug("Will use '%s' from cached %s", local_pkgs$Package, local_pkgs$File)
       }
     } else {
       # Caching is off: just download them
