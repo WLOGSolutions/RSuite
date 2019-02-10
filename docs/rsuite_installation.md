@@ -12,6 +12,19 @@ If you are stuck feel free to contact us:
 * using Gitter [R Suite room](https://gitter.im/WLOGSolutions/RSuite "R Suite room")
 * directly by sending an email with your problem description to [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
+- [Requirements](#requirements)
+- [Installation with help of R Suite CLI [Recommended]](#installation-with-help-of-r-suite-cli-recommended)
+- [Basic installation](#basic-installation)
+- [Development version installation](#development-version-installation)
+- [Updating R Suite](#updating-r-suite)
+
+<!-- markdown-toc end -->
+
+
 # Requirements
 
 R Suite depends on number of other R packages. On Linux systems they require

@@ -7,6 +7,26 @@ In this document basic R Suite Docker functionalities are presented. It covers:
 
 **Important** This tutorial was tested with R Suite version 0.30-241.
 
+## Got stuck? ##
+
+If you are stuck feel free to contact us:
+
+through the R Suite website (https://rsuite.io#contact) or
+using Gitter R Suite room
+directly by sending an email with the description of your problem to rsuite@wlogsolutions.com.
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
+- [Motivation](#motivation)
+- [Project preparation](#project-preparation)
+- [Detect proper script_path (you cannot use args yet as they are build with tools in set_env.r)](#detect-proper-scriptpath-you-cannot-use-args-yet-as-they-are-build-with-tools-in-setenvr)
+- [Creating a deployment zip for Ubuntu](#creating-a-deployment-zip-for-ubuntu)
+- [Creating a Docker image containing our R solution](#creating-a-docker-image-containing-our-r-solution)
+    - [R Suite Dockerfile templates](#r-suite-dockerfile-templates)
+
+<!-- markdown-toc end -->
 
 # Motivation
 The goal of Docker is to separate the application from the infrastructure. It allows developers to deploy their applications on different platforms without worrying about hidden dependencies and system settings. But is it the ultimate solution for software developed in R?

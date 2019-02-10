@@ -18,6 +18,21 @@ If you are stuck feel free to contact us:
 * directly by sending an email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
+- [Verbosity of logs](#verbosity-of-logs)
+    - [R Suite logging](#r-suite-logging)
+    - [R Suite CLI logging](#r-suite-cli-logging)
+- [Known issues](#known-issues)
+    - [Windows: user profile folder with local specific characters](#windows-user-profile-folder-with-local-specific-characters)
+    - [Linux: /tmp is mounted with noexec option](#linux-tmp-is-mounted-with-noexec-option)
+    - [R Suite CLI complains about lack of optparse](#r-suite-cli-complains-about-lack-of-optparse)
+
+<!-- markdown-toc end -->
+
+
 # Verbosity of logs
 
 ## R Suite logging

@@ -13,6 +13,26 @@ If you are stuck feel free to contact us:
   "Gitter R Suite room")
 * directly by sending email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
+  
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
+- [Introduction](#introduction)
+    - [**Got stuck?**](#got-stuck)
+- [Installation](#installation)
+    - [Download package](#download-package)
+    - [Make package available to Emacs](#make-package-available-to-emacs)
+        - [Using hydra](#using-hydra)
+- [Reference](#reference)
+    - [Variables](#variables)
+    - [Functions](#functions)
+        - [Utils](#utils)
+        - [Project section](#project-section)
+        - [Docker section](#docker-section)
+
+<!-- markdown-toc end -->
+
 
 # Installation
 

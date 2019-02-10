@@ -22,7 +22,19 @@ If you are stuck feel free to contact us:
   "R Suite room")
 * directly by sending an email with your problem description to
   [rsuite@wlogsolutions.com](mailto:rsuite@wlogsolutions.com).
-  
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+## **Table of Contents** ##
+
+- [Windows installation](#windows-installation)
+- [Debian (Ubuntu) installation](#debian-ubuntu-installation)
+- [RedHat (CentOS, Fedora) installation](#redhat-centos-fedora-installation)
+- [Mac OS installation](#mac-os-installation)
+- [After you installed R Suite CLI](#after-you-installed-r-suite-cli)
+
+<!-- markdown-toc end -->
+
 # Windows installation
 
 For Windows R Suite CLI is provided as MSI packages for both x86 and x64 platforms. You can just download the appropriate MSI and run it.
