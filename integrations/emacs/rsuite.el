@@ -336,6 +336,7 @@ args <- args_parser()
 						     "R/"
 						     (if (> (length masterfile) 0) masterfile
 						       "master.R")
+						     " "
 						     (if (> (length master-args) 0)
 							 master-args
 						       "")))
