@@ -191,7 +191,11 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   } else {
     git2r::head(repo)
   }
-  head_target <- git2r::branch_target(head_branch)
+  if (class(head_branch) == "git_commit") {
+    head_target <- ifelse(isS4(head_branch), head_branch@sha, head_branch$sha)
+  } else {
+    head_target <- git2r::branch_target(head_branch)
+  }
 
   # detect if HEAD commit is tagged
   repo_tags <- git2r::tags(repo)
