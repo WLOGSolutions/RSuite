@@ -1,3 +1,5 @@
+^Meta$
+^doc$
 RSuite.Rproj
 cran-comments.md
 .lintr

@@ -179,6 +179,8 @@ stop_container <- function(cont_name) {
 #'
 #' @param cont_name container name prefix to find. If NULL will return all RSuite build containers.
 #'   If passed should be exactly one container with such name (type: character(1), default: NULL).
+#' @param include_stopped if TRUE will search also for stopped containers
+#'   (type: logical(1), default: FALSE)
 #'
 #' @return list of infos describing RSuite build containers detectected named by their names.
 #' Each info is names list of following content
@@ -186,8 +188,12 @@ stop_container <- function(cont_name) {
 #'   \item{base}{Base image of detected container (type: character(1))}
 #' }
 #'
-find_rsbuild_infos <- function(cont_name = NULL) {
-  output <- exec_docker_cmd(c("ps", "-f", "name=rsbuild-"), "Listing RSuite build containers") # from docker_utils.R
+find_rsbuild_infos <- function(cont_name = NULL, include_stopped = FALSE) {
+  cmd <- c("ps", "-f", "name=rsbuild-")
+  if (any(include_stopped)) {
+    cmd <- c(cmd, "-a")
+  }
+  output <- exec_docker_cmd(cmd, "Listing RSuite build containers") # from docker_utils.R
   infos <- lapply(output$out_lines[-1],
                    function(ln) {
                      toks <- unlist(strsplit(ln, "\\s+"))

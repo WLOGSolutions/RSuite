@@ -49,12 +49,13 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
   writeLines(sprintf("It is a file for testing RW access to %s", bucket_url),
              con = tmp_file)
 
+  file_url <- sprintf("%s/%s", bucket_url, basename(tmp_file))
   tryCatch({
     pkg_logdebug("Uploading file onto %s to test RW permissions ...", bucket_url)
 
     upl_lines <- get_cmd_outlines("aws cp",
                                   "%s s3 --profile=%s cp %s %s",
-                                  aws_cmd, s3_profile, tmp_file, bucket_url)
+                                  aws_cmd, s3_profile, tmp_file, file_url)
     upl_success <- any(grepl("^upload: ", upl_lines))
   },
   finally = {
@@ -65,7 +66,6 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
          "Uploading file onto %s to test RW permissions ... failed. Probably no access.",
          bucket_url)
 
-  file_url <- sprintf("%s/%s", bucket_url, basename(tmp_file))
   pkg_logdebug("Cleanup: removing %s ...", file_url)
 
   cln_lines <- get_cmd_outlines("aws rm", "%s s3 --profile=%s rm %s", aws_cmd, s3_profile, file_url)
@@ -108,7 +108,7 @@ repo_manager_get_info.rsuite_repo_manager_s3 <- function(repo_manager) {
 #'
 repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
   if (missing(types)) {
-    types <- repo_manager$mgr_types
+    types <- repo_manager$types
   }
 
   tmp_file <- tempfile("PACKAGES_")
@@ -117,7 +117,8 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
 
   # detect which types must be initialized
   tryCatch({
-    for (tp in types) {
+    to_check_types <- types
+    for (tp in to_check_types) {
       s3_pkgs_url <- paste0(
         rsuite_contrib_url(repo_manager$bucket_url, type = tp, rver = rver),
         "/PACKAGES")
@@ -140,7 +141,7 @@ repo_manager_init.rsuite_repo_manager_s3 <- function(repo_manager, types, ...) {
 
   if (!length(types)) {
     pkg_loginfo("Repository %s inited already for %s types.",
-                url, paste(inited_types, collapse = ", "))
+                repo_manager$bucket_url, paste(inited_types, collapse = ", "))
     return(FALSE)
   }
 

@@ -286,7 +286,7 @@ sub_commands <- list(
         }
       }
 
-      cont_infos <- find_rsbuild_infos(opts$name) # from docker_utils.h
+      cont_infos <- find_rsbuild_infos(opts$name, include_stopped = TRUE) # from docker_utils.h
       if (length(cont_infos) == 0) {
         loginfo("No containers found.")
         return(invisible())
