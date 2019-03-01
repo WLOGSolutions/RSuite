@@ -44,7 +44,7 @@ repo_manager_s3_create <- function(url, types, rver, s3_profile) {
 
 
   # Create temporary file, upload it and delete. If succeeds bucket is potentially RW.
-  bucket_base <- gsub("^s3://([^/]+)(/.+)?$", "\\1", bucket_url, perl = TRUE)
+  bucket_base <- gsub("^s3://([^/]+)(/.*)?$", "\\1", bucket_url, perl = TRUE)
   tmp_file <- tempfile(paste0(bucket_base, "_rwtest_"), fileext = ".txt")
   writeLines(sprintf("It is a file for testing RW access to %s", bucket_url),
              con = tmp_file)

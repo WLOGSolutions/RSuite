@@ -38,7 +38,7 @@ repo_adapter_get_path.rsuite_repo_adapter_s3 <- function(repo_adapter, params, i
   url <- repo_adapter_get_path.rsuite_repo_adapter_url(repo_adapter, params, ix)
   assert(all(grepl("^https?://[\\w\\d\\._-]+\\.s3\\.amazonaws\\.com(/.*)?$", url, perl = TRUE)),
          paste0("Invalid url specified for %s repository in project PARAMETERS file.",
-                " Amazon S3 url should have <schema>://<bucket>.s3.amazonaws.com/<path> form;",
+                " Amazon S3 url should have <schema>://<bucket>.s3.amazonaws.com[/<path>] form;",
                 " Url does not have required form: %s"),
          repo_adapter$name, url)
   return(url)
