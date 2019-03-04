@@ -172,6 +172,32 @@ git_add_folder <- function(repo, fld_path, git_path_f, up_ignores = c()) {
   }
 }
 
+
+#'
+#' Detects relative path of \code{curr} in \code{parent}
+#'
+#' @return path detected
+#'
+#' @keywords internal
+#' @noRd
+#'
+.get_rel_path <- function(parent, curr) {
+  parent <- gsub("/+$", "", normalizePath(parent, winslash = "/"))
+  curr <- gsub("/+$", "", normalizePath(curr, winslash = "/"))
+
+  rel_path <- c()
+  if (dir.exists(curr)) {
+    rel_path <- c("")
+  }
+
+  while(parent != curr) {
+    rel_path <- c(basename(curr), rel_path)
+    curr <- dirname(curr)
+  }
+
+  return(paste(rel_path, collapse = "/"))
+}
+
 #'
 #' Implementation of rc_adapter_get_version for GIT rc adapted.
 #'
@@ -231,8 +257,14 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
 
   needs_update <- length(diff_working_tree_files) + length(diff_head_files) > 0
 
+  dir_in_repo_path <- .get_rel_path(git2r::workdir(repo), dir)
+  is_under_dir <- function(fname) grepl(sprintf("^%s", dir_in_repo_path), fname)
+
   return(list(
-    has_changes = length(st$staged) + length(st$untracked) + length(st$unstaged) > 0,
+    has_changes =
+      any(is_under_dir(st$staged)) ||
+      any(is_under_dir(st$untracked)) ||
+      any(is_under_dir(st$unstaged)),
     revision = head_tag,
     needs_update = needs_update
   ))

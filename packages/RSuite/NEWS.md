@@ -1,7 +1,9 @@
 # RSuite 0.36 (2019-03-??)
   * #184: detecting declaration of dependencies in scripts with "library (...)".
   * handling of branches in Git RC adapter fixed.
-  * #183: local Git repository is created while starting project if not RC detected 
+  * #183: local Git repository is created while starting project if not RC detected
+  * then checking for changes in Git repository only changes in project folder are
+    considered.
   
 # RSuite 0.35 (2019-01-07)
   * Fix in dependecy resolving process. Upper requirements enforse subdependencies
