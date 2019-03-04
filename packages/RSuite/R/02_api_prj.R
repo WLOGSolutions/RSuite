@@ -216,6 +216,12 @@ prj_start <- function(name = NULL, path = getwd(), skip_rc = FALSE, tmpl = "buil
 
   if (!skip_rc) {
     rc_adapter <- detect_rc_adapter(prj_dir)
+    if (is.null(rc_adapter)) {
+      git2r::init(prj_dir) # initilize local Git repo
+      pkg_loginfo("Local GIT repository created for the project")
+      rc_adapter <- detect_rc_adapter(prj_dir)
+    }
+
     if (!is.null(rc_adapter)) {
       pkg_loginfo("Puting project %s under %s control ...", basename(prj_dir), rc_adapter$name)
       rc_adapter_prj_struct_add(rc_adapter, prj$load_params())
