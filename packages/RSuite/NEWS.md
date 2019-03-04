@@ -1,4 +1,4 @@
-# RSuite 0.36 (2019-02-??)
+# RSuite 0.36 (2019-03-??)
   * #184: detecting declaration of dependencies in scripts with "library (...)".
   * handling of branches in Git RC adapter fixed.
   
