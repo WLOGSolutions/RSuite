@@ -24,12 +24,33 @@
 #' @keywords internal
 #' @noRd
 #'
-detect_zip_version <- function(params, zip_ver) {
+detect_zip_version <- function(params, zip_ver, zip_rev = NULL) {
   if (!is.null(zip_ver)) {
     assert(is_nonempty_char1(zip_ver), "Non empty character(1) expected for zip_ver")
     assert(grepl("^\\d+(\\D\\d+)*$", zip_ver), "Please, provide zip_ver of form DD.DD")
-    return(list(ver = paste0(zip_ver, "x"),
-                rev = NULL))
+  }
+
+  if (!is.null(zip_rev)) {
+    assert(is_nonempty_char1(zip_rev), "Non empty character(1) expected for zip_rev")
+    assert(grepl("^\\d+$", zip_rev),
+           paste0("Enforced revision(%s) is invalid:",
+                  " it must contain digits only as it is appended to project packages version numbers."),
+           zip_rev)
+  }
+
+  if (!is.null(zip_ver)) {
+    if (!is.null(zip_rev)) {
+      return(list(ver = paste0(zip_ver, "_", zip_rev, "x"), rev = zip_rev))
+    }
+    return(list(ver = paste0(zip_ver, "x"), rev = NULL))
+  }
+
+  prjinfo <- retrieve_consistent_prjinfo(params) # from 19_pack_helpers.R
+  if (!is.null(prjinfo$ver)) {
+    if (!is.null(zip_rev)) {
+      prjinfo$rev <- zip_rev # overwrite with enforced revision
+    }
+    return(prjinfo)
   }
 
   zip_ver <- params$zip_version
@@ -47,30 +68,44 @@ detect_zip_version <- function(params, zip_ver) {
     zip_ver <- denorm_version(max(norm_version(pkg_vers)))
   }
 
-  build_number <- detect_ci_build_number()
-  if (!is.null(build_number)) {
-    assert(grepl("^\\d+$", build_number),
-           paste0("CI build number detected(%s) is invalid:",
-                  " it must contain digits only as it is appended to project packages version numbers."),
-           build_number)
-    return(list(ver = paste0(zip_ver, "_", build_number), rev = build_number))
+  stopifnot(!is.null(zip_ver))
+  # we have zip_ver, now detect revision number
+
+  if (!is.null(zip_rev)) {
+    # zip_rev enforced; it has been checked for validity already
+    return(list(ver = paste0(zip_ver, "_", zip_rev, "x"), rev = zip_rev))
   }
 
-  revision <- detect_consistent_revision(params)
-  if (!is.null(revision)) {
-    assert(grepl("^\\d+$", revision),
+  revision <- NULL
+  if (!is.null(prjinfo$rev)) {
+    # revision stored in prjinfo
+    revision <- prjinfo$rev
+    stopifnot(grepl("^\\d+$", revision)) # validity insured while preparing prjinfo
+  }
+
+  if (is.null(revision)) {
+    # CI build number
+    revision <- detect_ci_build_number()
+    assert(is.null(revision) || grepl("^\\d+$", revision),
+           paste0("CI build number detected(%s) is invalid:",
+                  " it must contain digits only as it is appended to project packages version numbers."),
+           revision)
+  }
+
+  if (is.null(revision)) {
+    # RC revision
+    revision <- detect_consistent_revision(params)
+    assert(is.null(revision) || grepl("^\\d+$", revision),
            paste0("RC revision detected(%s) is invalid:",
                   " it must contain digits only as it is appended to project packages version numbers."),
            revision)
-    return(list(ver = paste0(zip_ver, "_", revision), rev = revision))
   }
 
-  prjinfo_rev <- retrieve_consistent_prjinfo_rev(params) # from 19_pack_helpers.R
-  if (!is.null(prjinfo_rev)) {
-    return(list(ver = paste0(zip_ver, "_", prjinfo_rev), rev = prjinfo_rev))
+  if (is.null(revision)) {
+    return(list(ver = paste0(zip_ver, "x"), rev = NULL))
   }
 
-  return(list(ver = paste0(zip_ver, "x"), rev = NULL))
+  return(list(ver = paste0(zip_ver, "_", revision), rev = revision))
 }
 
 #'

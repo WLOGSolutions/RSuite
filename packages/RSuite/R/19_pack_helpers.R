@@ -124,19 +124,21 @@ export_prj <- function(params, rver, pkgs, inc_master, dest_dir) {
 #'   consistency.
 #'
 #' @param params parameters of project to create .prjinfo for. (type: rsuite_project_params)
+#' @param verinfo named list of structure as detect_zip_version returns.
 #'
 #' @keywords internal
 #' @noRd
 #'
-create_prjinfo <- function(params, revision) {
+create_prjinfo <- function(params, verinfo) {
   prjinfo_fpath <- file.path(params$prj_path, ".prjinfo")
 
   rev <- "-"
-  if (!is.null(revision)) {
-    rev <- revision
+  if (!is.null(verinfo$rev)) {
+    rev <- verinfo$rev
   }
 
-  prjinfo_lines <- c(sprintf("rev: %s", rev))
+  prjinfo_lines <- c(sprintf("rev: %s", rev),
+                     sprintf("ver: %s", verinfo$ver))
 
   # TODO: add project consistency info
 
@@ -156,21 +158,29 @@ create_prjinfo <- function(params, revision) {
 #' @keywords internal
 #' @noRd
 #'
-retrieve_consistent_prjinfo_rev <- function(params) {
+retrieve_consistent_prjinfo <- function(params) {
   prjinfo_fpath <- file.path(params$prj_path, ".prjinfo")
   if (!file.exists(prjinfo_fpath)) {
-    return(NULL)
+    return(list(rev = NULL, ver = NULL))
   }
 
-  rev_line <- readLines(prjinfo_fpath, n = 1, warn = FALSE)
-  assert(grepl("^rev:\\s*([0-9]+|-)\\s*$", rev_line),
-         "Invalid .taginfo file format detected: no rev marker found")
+  prjinfo_lines <- readLines(prjinfo_fpath, warn = FALSE)
 
-  # TODO: check file consistency
-
+  rev_line <- prjinfo_lines[grepl("^rev:\\s*([0-9]+|-)\\s*$", prjinfo_lines)]
+  assert(length(rev_line) == 1,
+         "Invalid .prjinfo file format detected: no rev marker found")
   rev <- gsub("^rev:\\s*([0-9]+|-)\\s*$", "\\1", rev_line)
   if (rev == "-") {
-    return(NULL)
+    rev <- NULL
   }
-  return(rev)
+
+  ver_line <- prjinfo_lines[grepl("^ver:\\s*(.+)\\s*$", prjinfo_lines)]
+  if (length(ver_line) == 1) {
+    ver <- gsub("^ver:\\s*(.+)\\s*$", "\\1", ver_line)
+  } else {
+    ver <- NULL
+  }
+  # TODO: check file consistency
+
+  return(list(rev = rev, ver = ver))
 }

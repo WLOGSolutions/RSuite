@@ -381,7 +381,7 @@ repo_upload_prj_packages <- function(repo_manager,
   if (!skip_rc) {
     revision <- detect_consistent_revision(params) # from 15_zip_project.R
     if (is.null(revision)) {
-      revision <- retrieve_consistent_prjinfo_rev(params) # from 19_pack_helpers.R
+      revision <- retrieve_consistent_prjinfo(params)$rev # from 19_pack_helpers.R
     }
     assert(!is.null(revision),
            "Project is not under revision control so revision number cannot be detected")

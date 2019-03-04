@@ -696,13 +696,13 @@ prj_zip <- function(prj = NULL, path = getwd(), zip_ver = NULL) {
 #'    the default whichever exists. Will init default project from the working
 #'    directory if no default project exists. (type: rsuite_project, default: NULL)
 #' @param path folder path to put output pack into. The folder must exist.
-#'    (type: character, default: \code{getwd()})
+#'    (type: character(1), default: \code{getwd()})
 #' @param pkgs names of packages to include in the pack. If NULL will include all
 #'    project packages (type: character, default: NULL)
 #' @param inc_master if TRUE will include master scripts in the pack.
-#'    (type: logical, default: TRUE)
+#'    (type: logical(1), default: TRUE)
 #' @param pack_ver if passed enforce the version of the pack to the passed value.
-#'    Expected form of version is DD.DD. (type: character, default: NULL)
+#'    Expected form of version is DD.DD. (type: character(1), default: NULL)
 #' @param rver if passed enforce destination R version of the pack.
 #'    (type: character(1), default: NULL)
 #'
@@ -733,8 +733,10 @@ prj_pack <- function(prj = NULL, path = getwd(),
                      rver = NULL) {
   assert(dir.exists(path), "Existing folder expected for path")
   assert(is.logical(inc_master), "Logical value expected for inc_master")
+  assert(is.null(pack_ver) || is_nonempty_char1(pack_ver),
+         "Non empty character(1) expected for pack_ver")
   assert(is.null(rver) || (is.character(rver) && length(rver) == 1),
-         "Character(1) expected for rver")
+         "character(1) expected for rver")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -756,7 +758,17 @@ prj_pack <- function(prj = NULL, path = getwd(),
                    paste(setdiff(pkgs, prj_packages), collapse = ", ")))
     pkgs <- prj_packages[prj_packages == pkgs]
   }
-  ver_inf <- detect_zip_version(params, pack_ver) # from 15_zip_project.R
+
+  if (!is.null(pack_ver) && grepl("^_\\d+$", pack_ver)) {
+    # pack_ver contains only pack_rev enforcement
+    ver_inf <- detect_zip_version(params, # from 15_zip_project.R
+                                  zip_ver = NULL,
+                                  zip_rev = gsub("_", "", pack_ver))
+  } else {
+    ver_inf <- detect_zip_version(params,  # from 15_zip_project.R
+                                  zip_ver = pack_ver,
+                                  zip_rev = NULL) # no revision enforcement
+  }
 
   tmp_dir <- tempfile("pkgpack_")
   on.exit({
@@ -771,7 +783,7 @@ prj_pack <- function(prj = NULL, path = getwd(),
                            tmp_dir)
   assert(!is.null(exp_params), "Failed to create project export")
 
-  create_prjinfo(exp_params, ver_inf$rev) # from 19_pack_helpers.R
+  create_prjinfo(exp_params, ver_inf) # from 19_pack_helpers.R
 
   prj_name <- gsub("[\\/\"\'<>]+", "_", params$project)
   pack_fpath <- file.path(rsuite_fullUnifiedPath(path),
