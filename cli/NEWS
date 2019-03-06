@@ -1,6 +1,9 @@
 VERSION 0.36 (2019-03-??)
   * fixed 'docker stop' to remove also stopped containers.
   * #185(rt): `repo init` fixed
+  * handling `docker .. --packages` parameter fixed: value was not considered
+  * `proj build` and `docker build` have new option '--tag' which enforces
+    tagging packages with RC revision number.
 
 VERSION 0.35 (2019-01-17)
   * 'docker pack' command added. It copies project pack into running docker

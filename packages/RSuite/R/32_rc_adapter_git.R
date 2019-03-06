@@ -212,11 +212,15 @@ rc_adapter_get_version.rsuite_rc_adapter_git <- function(rc_adapter, dir) {
   # in git2r > 0.21.0 head is deprecated and causes warnings: repository_head should be used
   # in earlier versions repository_head is not available and check will complain if referencing it directly
   git2r_ver <- paste0(utils::packageVersion("git2r"))
-  head_branch <- if (utils::compareVersion(git2r_ver, "0.21.0") > 0) {
+  head_branch <- if (utils::compareVersion(git2r_ver, "0.22.0") > 0) {
+    git2r::repository_head(repo)
+  } else if (utils::compareVersion(git2r_ver, "0.21.0") > 0) {
     get_pkg_intern("git2r", "repository_head")() # from 99_rpatches.R
   } else {
     git2r::head(repo)
   }
+  assert(!is.null(head_branch), "Failed to find HEAD branch. Is it fresh repository?")
+
   if (class(head_branch) == "git_commit") {
     head_target <- ifelse(isS4(head_branch), head_branch@sha, head_branch$sha)
   } else {

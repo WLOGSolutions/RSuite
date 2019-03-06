@@ -1,9 +1,9 @@
-#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------#
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #
 # Package API related to projects.
-#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------#
 
 #'
 #' Bind to rstudio project creation menu. Creates an R Suite project.
@@ -549,6 +549,8 @@ prj_clean_deps <- function(prj = NULL) {
 #'    changes detected (type: logical)
 #' @param vignettes if FALSE will not build vignettes which can highly decrease
 #'    package building time (type: logical, default: TRUE)
+#' @param tag if TRUE will tag packages with RC revision. Enforces rebuild.
+#'   (type: logical; default: FALSE)
 #'
 #' @family in project management
 #'
@@ -573,8 +575,10 @@ prj_clean_deps <- function(prj = NULL) {
 #'
 #' @export
 #'
-prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE) {
+prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE, tag = FALSE) {
   assert(is.logical(rebuild), "logical expected for rebuild")
+  assert(is.logical(vignettes), "logical expected for vignettes")
+  assert(is.logical(tag), "logical expected for tag")
 
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
@@ -591,8 +595,14 @@ prj_build <- function(prj = NULL, type = NULL, rebuild = FALSE, vignettes = TRUE
     skip_build_steps <- "vignettes"
   }
 
+  revision <- NULL
+  if (any(tag)) {
+    ver_info <- detect_zip_version(params, NULL) # from 15_zip_project.R
+    revision <- ver_info$rev
+    rebuild <- TRUE
+  }
   build_install_tagged_prj_packages(params, # from 12_build_install_prj_pacakges.R
-                                    revision = NULL,
+                                    revision = revision,
                                     build_type = type,
                                     rebuild = rebuild,
                                     skip_build_steps = skip_build_steps)

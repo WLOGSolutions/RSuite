@@ -1,9 +1,9 @@
-#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------#
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #
 # Handles 'pkgzip' command of CLI utility.
-#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------#
 
 args <- commandArgs()
 base <- dirname(gsub("--file=", "", args[grepl("^--file=", args)]))[1]
@@ -14,6 +14,7 @@ source(file.path(base, "command_mgr.R"), chdir = T)
 source(file.path(base, "docker_utils.R"))
 
 sub_commands <- list(
+  # zip ----
   zip = list(
     help = "Build project and generate deployment zip in docker container.",
     options = list(
@@ -73,6 +74,7 @@ sub_commands <- list(
       return(invisible(zip_fpath))
     }
   ),
+  # img ----
   img = list(
     help = "Build docker image containg deployed project.",
     options = list(
@@ -221,6 +223,7 @@ sub_commands <- list(
       }
     }
   ),
+  # run ----
   run = list(
     help = "Run RSuite build container.",
     options = list(
@@ -259,6 +262,7 @@ sub_commands <- list(
       return(invisible(cont_name))
     }
   ),
+  # list ----
   list = list(
     help = "List RSuite build containers.",
     options = list(),
@@ -267,6 +271,7 @@ sub_commands <- list(
       cat(output$out_lines, sep = "\n")
     }
   ),
+  # stop ----
   stop = list(
     help = "Stop (and remove) RSuite build container(s).",
     options = list(
@@ -297,6 +302,7 @@ sub_commands <- list(
       loginfo("Container(s) stopped: %s", paste(cont_names, collapse = " "))
     }
   ),
+  # pack ----
   pack = list(
     help = "Put project package into RSuite build container",
     options = list(
@@ -323,7 +329,7 @@ sub_commands <- list(
       cont_name <- names(cont_infos)
 
       prj <- RSuite::prj_init()
-      pkgs <- if (!is.null(opts$packages)) { trimws(unlist(strsplit(opts$packages, ","))) }
+      pkgs <- if (!is.null(opts$pkgs)) { trimws(unlist(strsplit(opts$pkgs, ","))) }
 
       ver_output <- exec_docker_cmd(c("exec", cont_name, "Rscript", "--version"), # from docker_utils.R
                                     "Detecting R version on the container")
@@ -354,6 +360,7 @@ sub_commands <- list(
       return(invisible(res))
     }
   ),
+  # build ----
   build = list(
     help = "Build project in RSuite build container",
     options = list(
@@ -370,12 +377,16 @@ sub_commands <- list(
       make_option(c("--exc-master"), dest = "exc_master", action="store_true", default=FALSE,
                   help="If passed will exclude master scripts from project pack created. (default: %default)"),
 
-      make_option(c("--no-cache"), dest = "no_cache", action="store_true", default=FALSE,
+      make_option(c("--no-cache"), dest = "no_cache", action = "store_true", default=FALSE,
                   help="If passed will not use or create cache while building. (default: %default)"),
 
-      make_option(c("-z", "--zip"), dest = "zip", default=NULL,
+      make_option(c("-z", "--zip"), dest = "zip", default = NULL,
                   help=paste("Accepts folder as argument. If passed after building will create deployment zip.",
                              "Created zip will be retrieved from the container. (default: %default)",
+                             sep = "\n\t\t")),
+      make_option(c("--tag"), dest = "tag", action = "store_true", default = FALSE,
+                  help=paste("If passed will tag built packages with RC revision. Unused if --zip passed.",
+                             "(default: %default)",
                              sep = "\n\t\t"))
     ),
     run = function(opts) {
@@ -388,7 +399,7 @@ sub_commands <- list(
 
       pack_res <- sub_commands$pack$run(opts = list(name = opts$name,
                                                     version = opts$version,
-                                                    packages = opts$packages,
+                                                    pkgs = opts$pkgs,
                                                     exc_master = opts$exc_master))
       cont_infos <- pack_res$cont_infos
       cont_name <- pack_res$cont_name
@@ -412,7 +423,11 @@ sub_commands <- list(
       }
 
       if (is.null(opts$zip)) {
-        run_incont_cmd(cont_name, sprintf("cd %s && rsuite proj build -v", prj_name)) # ...
+        build_cmd <- sprintf("cd %s && rsuite proj build -v", prj_name)
+        if (any(opts$tag)) {
+          build_cmd <- paste(build_cmd, "--tag")
+        }
+        run_incont_cmd(cont_name, build_cmd) # ...
         loginfo("Project %s is built in %s container.", prj_name, cont_name)
         return(invisible(NULL))
       }
@@ -434,6 +449,7 @@ sub_commands <- list(
       return(invisible(zip_fpath))
     }
   ),
+  # exec ----
   exec = list(
     help = "Execute command in RSuite build container in non interactive way.",
     options = list(
@@ -459,6 +475,7 @@ sub_commands <- list(
       cat(exec_output$out_lines, sep = "\n")
     }
   ),
+  # update ----
   update = list(
     help = "Update RSuite images",
     options = list(
@@ -505,6 +522,7 @@ sub_commands <- list(
   )
 )
 
+# handle ----
 handle_subcommands(
   sub_commands = sub_commands,
   cmd_help = "The command helps you handle building for other platform with use of docker."

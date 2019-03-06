@@ -2,8 +2,10 @@
   * #184: detecting declaration of dependencies in scripts with "library (...)".
   * handling of branches in Git RC adapter fixed.
   * #183: local Git repository is created while starting project if not RC detected
-  * then checking for changes in Git repository only changes in project folder are
+  * when checking for changes in Git repository only changes in project folder are
     considered.
+  * prj_build have new parameter tag which enforces tagging packages with RC revision
+    before build.
   
 # RSuite 0.35 (2019-01-07)
   * Fix in dependecy resolving process. Upper requirements enforse subdependencies

@@ -1,9 +1,9 @@
-#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------#
 # RSuite
 # Copyright (c) 2017, WLOG Solutions
 #
 # Handles 'proj' command of CLI utility.
-#----------------------------------------------------------------------------
+#----------------------------------------------------------------------------#
 
 args <- commandArgs()
 base <- dirname(gsub("--file=", "", args[grepl("^--file=", args)]))[1]
@@ -13,6 +13,7 @@ if (grepl("darwin", R.version$os)) {
 source(file.path(base, "command_mgr.R"), chdir = T)
 
 sub_commands <- list(
+  # start ----
   start = list(
     help = "Start new project or update structure of existing one.",
     options = list(
@@ -38,6 +39,7 @@ sub_commands <- list(
       RSuite::prj_start(name = opts$name, skip_rc = opts$skip_rc, tmpl = opts$tmpl)
     }
   ),
+  # pkgadd ----
   pkgadd = list(
     help = "Add package to the project.",
     options = list(
@@ -63,6 +65,7 @@ sub_commands <- list(
       RSuite::prj_start_package(name = opts$name, skip_rc = opts$skip_rc, tmpl = opts$tmpl)
     }
   ),
+  # depsinst ----
   depsinst = list(
     help = "Install required dependencies into project local environment.",
     options = list(
@@ -85,6 +88,7 @@ sub_commands <- list(
                                vanilla_sups = opts$vanilla_sups)
     }
   ),
+  # build ----
   build = list(
     help = "Build the project.",
     options = list(
@@ -93,14 +97,18 @@ sub_commands <- list(
       make_option(c("-f", "--force"), dest = "rebuild", action="store_true", default=FALSE,
                   help="If passed all project packages will be rebuilded even if no changes occured (default: %default)"),
       make_option(c("--no-vignettes"), dest = "no_vignettes", action="store_true", default=FALSE,
-                  help="If passed will skip building package's vignettes (default: %default)")
+                  help="If passed will skip building package's vignettes (default: %default)"),
+      make_option(c("--tag"), dest = "tag", action="store_true", default=FALSE,
+                  help="If passed will tag packages with RC revision (default: %default)")
     ),
     run = function(opts) {
       pkg_type <- get_pkg_type(opts$binary)
       RSuite::prj_build(type = pkg_type, rebuild = opts$rebuild,
-                        vignettes = !opts$no_vignettes)
+                        vignettes = !opts$no_vignettes,
+                        tag = opts$tag)
     }
   ),
+  # test ----
   test = list(
     help = "Run tests in tests folder.",
     options = list(
@@ -124,6 +132,7 @@ sub_commands <- list(
       }
     }
   ),
+  # depsclean ----
   depsclean = list(
     help = "Uninstall unused dependencies from project local environment.",
     options = list(),
@@ -131,6 +140,7 @@ sub_commands <- list(
       RSuite::prj_clean_deps()
     }
   ),
+  # zip ----
   zip = list(
     help = "Build project deployment zip package.",
     options = list(
@@ -190,6 +200,7 @@ sub_commands <- list(
       return(invisible(zip_fpath))
     }
   ),
+  # pack ----
   pack = list(
     help = "Build project sources pack.",
     options = list(
@@ -208,6 +219,7 @@ sub_commands <- list(
       RSuite::prj_pack(path = opts$path, pack_ver = opts$version)
     }
   ),
+  # lock ----
   lock = list(
     help = "Locks the project environment",
     options = list(
@@ -216,6 +228,7 @@ sub_commands <- list(
       RSuite::prj_lock_env()
     }
   ),
+  # unlock ----
   unlock = list(
     help = "Unlocks the project environment",
     options = list(
@@ -226,6 +239,7 @@ sub_commands <- list(
   )
 )
 
+# handle ----
 handle_subcommands(
   sub_commands = sub_commands,
   cmd_help = "The command helps you manage R projects."
