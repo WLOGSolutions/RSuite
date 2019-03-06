@@ -1,4 +1,4 @@
-VERSION 0.36 (2019-03-??)
+VERSION 0.36 (2019-03-06)
   * fixed 'docker stop' to remove also stopped containers.
   * #185(rt): `repo init` fixed
   * handling `docker .. --packages` parameter fixed: value was not considered
