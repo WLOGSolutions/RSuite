@@ -39,7 +39,7 @@ If you are stuck feel free to contact us:
 # Motivation
 Assume that you are writing some kind of software in R like, for example, a Shiny application or a complicated predictive model. Your solution is finished, well documented and tested. Now comes the time of running your program on the target platform. You start by preparing the production environment: installing R and required packages. The longly anticipated moment of running your software has arrived. You start your program and you receive an error message or perhaps your solution works differently than on your computer. 
 
-![https://xkcd.com/234/](./media/deployment_xkcd.PNG "Reproducibility comic")
+![https://xkcd.com/234/](media/deployment_xkcd.PNG "Reproducibility comic")
 
 The above-described process is deployment - activities concerning making your software available for use. An often occurring challenge during this procedure is providing reproducibility. Reproducibility is the ability to run your code repeatedly at different times, using different computers in such a way that giving the same inputs results in obtaining the same outputs. Assuring reproducibility is a difficult task as issues may come from several sources:
 
