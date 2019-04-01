@@ -39,7 +39,7 @@ If you are stuck feel free to contact us:
 # Motivation
 Assume that you are writing some kind of software in R like, for example, a Shiny application or a complicated predictive model. Your solution is finished, well documented and tested. Now comes the time of running your program on the target platform. You start by preparing the production environment: installing R and required packages. The longly anticipated moment of running your software has arrived. You start your program and you receive an error message or perhaps your solution works differently than on your computer. 
 
-![https://xkcd.com/234/](media/deployment_xkcd.PNG "Reproducibility comic")
+![https://xkcd.com/234/](https://github.com/WLOGSolutions/RSuite/raw/master/docs/media/deployment_xkcd.PNG "Reproducibility comic")
 
 The above-described process is deployment - activities concerning making your software available for use. An often occurring challenge during this procedure is providing reproducibility. Reproducibility is the ability to run your code repeatedly at different times, using different computers in such a way that giving the same inputs results in obtaining the same outputs. Assuring reproducibility is a difficult task as issues may come from several sources:
 
@@ -52,7 +52,7 @@ The above-described process is deployment - activities concerning making your so
 R Suite aims to enhance your deployment process by supporting the reproducibility of your projects with package versions, system requirements and repository management features. Additionally, R Suite facilitates automated deployment by using deployment zips and Docker images.
 
 <br><br>
-![Deployment diagram](media/deployment_diagram.png)
+![Deployment diagram](https://github.com/WLOGSolutions/RSuite/raw/master/docs/media/deployment_diagram.png)
 <br><br>
 
 In this article, you are going to deploy the [drinkR app](http://www.sumsar.net/blog/2014/07/estimate-your-bac-using-drinkr/) using the mentioned R Suite's deployment feature. The tutorial has the following prerequisites:
@@ -65,14 +65,12 @@ In this article, you are going to deploy the [drinkR app](http://www.sumsar.net/
 
 * make sure that Docker is installed and running on your computer, some of the commands that you will be using require Docker running in the background (you can use the following guide: https://docs.docker.com/install/#supported-platforms)
 
-* a
-
 # Deployment with ZIP packages
 Deployment zips are archives containing all the necessary information to run your software on a production environment. These are especially practical in cases when you want to share your solution with friends, colleagues or teachers, they only need to have the correct R version installed.
 
 
 <br><br>
-![Deployment zip diagram](media/deployment_zip_diagram.png)
+![Deployment zip diagram](https://github.com/WLOGSolutions/RSuite/raw/master/docs/media/deployment_zip_diagram.png)
 <br><br>
 
 It is important to point out that your target platform might be running a different operating system. Fortunately, R Suite allows us to create deployment zips for different systems, the following scenarios are supported:
@@ -93,7 +91,7 @@ Let's assume that you are using Windows as your development platform in that cas
 It will result in creating a deployment zip called `rsuite_drinkR_1.0x.zip`. The `--version` option is used to enforce a specific version of the project. If you are using Git or SVN for version control (which is highly recommended!) `rsuite proj zip` will automatically use the revision number of your repository. You also don't have to be in the project directory, you can pass the path to the project using the `-p` (short for `--path`) option.
 
 <br><br>
-![](media/deployment_win2win.png)
+![](https://github.com/WLOGSolutions/RSuite/raw/master/docs/media/deployment_win2win.png)
 <br><br>
 
 Now you can share your solution with Windows users using the freshly created deployment zip. Remember that the production environment has to have to proper R version installed! For the sake of this tutorial we will unzip it to a directory called production. After doin so, you can run your program with the following command
@@ -127,7 +125,7 @@ If your production environment supports Docker containers or the target platform
 > rsuite docker img -t drinkr_image:1.0
 ```
 <br><br>
-![](media/deployment_win2docker.png)
+![](https://github.com/WLOGSolutions/RSuite/raw/master/docs/media/deployment_win2docker.png)
 <br><br>
 
 This will create a Docker image called `drinkr_image:1.0`. The `-t` option (short for `--tag`) is used to set the name and the version of the image. If you are using Git or SVN for revision control (yes we will recommend it for the third time), you can omit the version number as R Suite will automatically use the revision number.
