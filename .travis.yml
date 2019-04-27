@@ -39,7 +39,7 @@ addons:
 
 install:
 - Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}' --no-init-file
-- Rscript -e 'devtools::install_deps(dep = T)' --no-init-file
+- Rscript -e 'devtools::install_deps(dep = T, upgrade = "never")' --no-init-file
 - Rscript -e 'devtools::document()'
 
 script:
