@@ -1,3 +1,6 @@
+VERSION 0.36.253 (2019-04-27)
+  * better support for cygwin (or msys) environment
+
 VERSION 0.36 (2019-03-06)
   * fixed 'docker stop' to remove also stopped containers.
   * #185(rt): `repo init` fixed

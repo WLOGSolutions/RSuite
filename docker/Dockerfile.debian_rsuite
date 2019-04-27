@@ -11,4 +11,6 @@ LABEL maintainer="WLOG Solutions <info@wlogsolutions.com>"
 RUN wget http://wlog-rsuite.s3.amazonaws.com/cli/debian/rsuitecli_${rsuite_ver}-1_all.deb \
     && dpkg -i rsuitecli_${rsuite_ver}-1_all.deb \
     && rm -rf rsuitecli_${rsuite_ver}-1_all.deb \
+    # installing glue required for v3.5 before installing usethis required for devtools
+    && Rscript -e "install.packages('glue')" \
     && rsuite install -v
