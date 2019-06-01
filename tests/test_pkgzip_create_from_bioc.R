@@ -13,8 +13,8 @@ source("R/pkgzip_management.R")
 
 
 test_that_managed("Create PKGZIP out of sources on Bioc (basic)", {
-  rver_36_cmp <- utils::compareVersion(RSuite:::current_rver(), "3.6")
-  skip_if_not(rver_36_cmp < 0) # BiocGenerics needs R3.6 up; remotes does not properly handles Bioc branches
+  rver_36plus <- utils::compareVersion(RSuite:::current_rver(), "3.6") >= 0
+  skip_if_not(rver_36plus) # BiocGenerics needs R3.6 up; remotes does not properly handles Bioc branches
 
   prj <- init_test_project(repo_adapters = c("CRAN"))
   pkgzip <- init_test_pkgzip()

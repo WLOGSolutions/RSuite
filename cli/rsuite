@@ -8,7 +8,7 @@ if [ -z "$rscript_path" ]; then
 fi
 
 basedir=$(dirname "$0")
-if [ ! -z "$(which cygpath)" ]; then
+if [ ! -z "$(which cygpath 2> /dev/null)" ]; then
     basedir="$(cygpath -dm $basedir)"
 fi
 basedir=$("$rscript_path" --no-init-file -e "cat(normalizePath('$basedir'))")
