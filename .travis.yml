@@ -22,6 +22,8 @@ matrix:
   exclude:
   - os: osx
     r: devel
+  - os: osx
+    r: oldrel
 
 before_install:
 - cd packages/RSuite
@@ -39,7 +41,7 @@ addons:
 
 install:
 - Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
-- Rscript -e 'install.packages(c("roxygen2", "git2r", "jsonlite", "processx", "httr", "logging"))'
+- Rscript -e 'devtools::install_deps()'
 - Rscript -e 'devtools::document()'
 
 script:
