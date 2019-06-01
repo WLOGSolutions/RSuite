@@ -26,6 +26,7 @@ matrix:
 
 before_install:
 - cd packages/RSuite
+- rm -rf .Rprofile
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then sudo chown -R $(whoami) /usr/local/share/man/man7; brew install libgit2; fi
 
 addons:
@@ -38,14 +39,14 @@ addons:
     - libgit2-dev
 
 install:
-- Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}' --no-init-file
-- Rscript -e 'devtools::install_deps(dep = T)' --no-init-file
+- Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
+- Rscript -e 'devtools::install_deps(dep = T)'
 - Rscript -e 'devtools::document()'
 
 script:
 - R CMD build .
 - R CMD check *tar.gz
-- Rscript -e 'devtools::install()' --no-init-file
+- Rscript -e 'devtools::install()'
 - cd ../../tests
 - sudo -E env "PATH=$PATH" Rscript run_tests.R
 
