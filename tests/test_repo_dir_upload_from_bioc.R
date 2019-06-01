@@ -13,7 +13,8 @@ source("R/repo_management.R")
 
 
 test_that_managed("Uploading Bioc (basic)", {
-  skip_if_not(RSuite:::current_rver() == "3.6") # BiocGenerics needs R3.6 and remotes does not properly handles Bioc branches
+  rver_36_cmp <- utils::compareVersion(RSuite:::current_rver(), "3.6")
+  skip_if_not(rver_36_cmp < 0) # BiocGenerics needs R3.6 up; remotes does not properly handles Bioc branches
 
   prj <- init_test_project(repo_adapters = c("CRAN"))
   mgr <- init_test_manager(prj)
