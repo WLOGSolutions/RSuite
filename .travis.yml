@@ -3,7 +3,6 @@
 language: r
 
 os:
-- linux
 - osx
 
 r:
@@ -40,7 +39,8 @@ addons:
 
 install:
 - Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
-- Rscript -e 'devtools::install_deps(dep = T)'
+- Rscript -e 'install.packages(c("roxygen2", "git2r", "jsonlite", "processx", "httr"))'
+- Rscript -e 'tryCatch({ devtools::install_deps(dep = T) }, error = function(e) { traceback(); stop() })'
 - Rscript -e 'devtools::document()'
 
 script:
