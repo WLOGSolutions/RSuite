@@ -55,7 +55,7 @@ if [ ! -e "\$rsuite_sh" ]; then
 	echo "RSuite CLI is not available any more."
 	exit 1
 fi
-"\$rsuite_sh" \\\$*
+"\$rsuite_sh" "\\\$@"
 EOLsh
 chmod +x rsuite
 EOL

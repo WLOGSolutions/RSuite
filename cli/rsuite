@@ -2,108 +2,108 @@
 
 rscript_path=`which Rscript 2> /dev/null`
 if [ -z "$rscript_path" ]; then
-	echo "ERROR: No R installation available."
-	echo "Please install R and verify its location added PATH environment variable."
-	exit 1
+    echo "ERROR: No R installation available."
+    echo "Please install R and verify its location added PATH environment variable."
+    exit 1
 fi
 
 basedir=$(dirname "$0")
 if [ ! -z "$(which cygpath)" ]; then
-	basedir="$(cygpath -dm $basedir)"
+    basedir="$(cygpath -dm $basedir)"
 fi
 basedir=$("$rscript_path" --no-init-file -e "cat(normalizePath('$basedir'))")
 
 cmd="$1"
 if [ -z "$cmd" ]; then
-	cmd="help";
+    cmd="help";
 elif [ "$cmd" == "-h" ]; then
-	cmd="help"
+    cmd="help"
 fi
 
 if [ "$OS" == "Windows_NT" ]; then
-	# This is required as MinGW bash uses different HOME than system
-	#  as a result R is not able to find user packages installed
-	export HOME=$HOME/Documents
+    # This is required as MinGW bash uses different HOME than system
+    #  as a result R is not able to find user packages installed
+    export HOME=$HOME/Documents
 fi
 
 case "$cmd" in
-	update)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_update.R" $* || exit 2
-		;;
-	install)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_install.R" $* || exit 2
-		;;
-	proj)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_proj.R" $* || exit 2
-		;;
-	tmpl)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_tmpl.R" $* || exit 2
-		;;
-	sysreqs)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_sysreqs.R" $* || exit 2
-		;;
-	repo)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_repo.R" $* || exit 2
-		;;
-	pkgzip)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_pkgzip.R" $* || exit 2
-		;;
-	docker)
-                "$rscript_path" --no-init-file "$basedir/R/cmd_docker.R" $* || exit 2
-		;;
-	version)
+    update)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_update.R" "$@" || exit 2
+        ;;
+    install)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_install.R" "$@" || exit 2
+        ;;
+    proj)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_proj.R" "$@" || exit 2
+        ;;
+    tmpl)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_tmpl.R" "$@" || exit 2
+        ;;
+    sysreqs)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_sysreqs.R" "$@" || exit 2
+        ;;
+    repo)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_repo.R" "$@" || exit 2
+        ;;
+    pkgzip)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_pkgzip.R" "$@" || exit 2
+        ;;
+    docker)
+                "$rscript_path" --no-init-file "$basedir/R/cmd_docker.R" "$@" || exit 2
+        ;;
+    version)
                 ver=`cat "${basedir}/version.txt"`
                 echo $ver
-		;;
-	help)
-	  ver=`cat "${basedir}/version.txt" | tr -d "\\\r"`
-		echo "Command line utility for R project management with RSuite (v$ver)"
-		echo "Usage: rsuite [command] [args]"
-		echo ""
-		echo ""
-		echo "Commands:"
-		echo "       update"
-		echo "          Checks if newest version of RSuite CLI is installed. If not"
-		echo "          installer for newest version is downloaded and installation"
-		echo "          is initiated."
-		echo ""
-		echo "       install"
-		echo "           Install RSuite with all the dependencies."
-		echo ""
-		echo "       proj"
-		echo "           Use it to manage project, its dependencies, and build"
-		echo "           project packages."
-		echo ""
-		echo "       tmpl"
-		echo "         Use it to manage  project and package templates"
-		echo ""
-		echo "       sysreqs"
-		echo "          The command helps you manage R projects system requirements"
-		echo "          like libraries and tools."
-		echo ""
-		echo "       repo"
-		echo "           Use to manage repositories. e.g. upload packages."
-		echo ""
-		echo "       pkgzip"
-		echo "           Use to create PKGZIP packages to fillup remove repository."
-		echo ""
-		echo "       docker"
-		echo "           Use to create docker image containing your solution."
-		echo ""
-		echo "       version"
-		echo "           Show RSuite CLI version."
-		echo ""
-		echo "       help (-h)"
-		echo "           Show this message and exit."
-		echo ""
-		echo "Call 'rsuite [command] help' to get information on acceptable [args]."
-		echo ""
-		;;
-	*)
-		echo "ERROR: Unexpected command $cmd passed."
-		echo "Please, call 'rsuite help' to see available commands."
-		exit 3
-		;;
+        ;;
+    help)
+      ver=`cat "${basedir}/version.txt" | tr -d "\\\r"`
+        echo "Command line utility for R project management with RSuite (v$ver)"
+        echo "Usage: rsuite [command] [args]"
+        echo ""
+        echo ""
+        echo "Commands:"
+        echo "       update"
+        echo "          Checks if newest version of RSuite CLI is installed. If not"
+        echo "          installer for newest version is downloaded and installation"
+        echo "          is initiated."
+        echo ""
+        echo "       install"
+        echo "           Install RSuite with all the dependencies."
+        echo ""
+        echo "       proj"
+        echo "           Use it to manage project, its dependencies, and build"
+        echo "           project packages."
+        echo ""
+        echo "       tmpl"
+        echo "         Use it to manage  project and package templates"
+        echo ""
+        echo "       sysreqs"
+        echo "          The command helps you manage R projects system requirements"
+        echo "          like libraries and tools."
+        echo ""
+        echo "       repo"
+        echo "           Use to manage repositories. e.g. upload packages."
+        echo ""
+        echo "       pkgzip"
+        echo "           Use to create PKGZIP packages to fillup remove repository."
+        echo ""
+        echo "       docker"
+        echo "           Use to create docker image containing your solution."
+        echo ""
+        echo "       version"
+        echo "           Show RSuite CLI version."
+        echo ""
+        echo "       help (-h)"
+        echo "           Show this message and exit."
+        echo ""
+        echo "Call 'rsuite [command] help' to get information on acceptable [args]."
+        echo ""
+        ;;
+    *)
+        echo "ERROR: Unexpected command $cmd passed."
+        echo "Please, call 'rsuite help' to see available commands."
+        exit 3
+        ;;
 esac
 
 exit 0

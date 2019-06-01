@@ -21,7 +21,7 @@ orig_file=rsuitecli-${ver}.tar.gz
 mkdir -p ${orig_dir}
 cp -R ${base_dir}/../R ${orig_dir}
 cp ${base_dir}/../rsuite ${orig_dir}/rsuite.sh
-echo -e "#!/bin/bash\n/usr/share/rsuitecli/rsuite.sh \$*\n" > ${orig_dir}/rsuite
+echo -e "#!/bin/bash\n/usr/share/rsuitecli/rsuite.sh \"\$@\"\n" > ${orig_dir}/rsuite
 cp ${base_dir}/../rsuite-bash-prompt ${orig_dir}/rsuite-bash-prompt
 echo -n $ver > ${orig_dir}/version.txt
 chmod +x ${orig_dir}/{rsuite.sh,rsuite,rsuite-bash-prompt}
