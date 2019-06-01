@@ -3,6 +3,7 @@
 language: r
 
 os:
+- linux
 - osx
 
 r:
