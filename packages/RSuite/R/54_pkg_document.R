@@ -220,10 +220,6 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
     }
   }
 
-  if (!dir.exists(file.path(pkg_path, "inst", "doc"))) {
-    unlink_paths <- c(unlink_paths, file.path(pkg_path, "inst", "doc"))
-  }
-
   vign_res <- run_rscript(c("devtools::build_vignettes(%s)"),
                           rscript_arg("pkg", pkg_path),
                           rver = rver, ex_libpath = ex_libpath)
@@ -245,10 +241,34 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
     })
   }
 
-  # copy contents of <pkg_dir>/doc to <pkg_dir>/inst/doc:
-  #   devtools builds vignettes for loading, we need them for installation
+  if (!exists(file.path(pkg_path, "Meta", "vignette.rds"))) {
+    # devtools created no vignette index: assume no vignettes in package to build
+    return(function() {
+      unlink(unlink_paths, recursive = TRUE, force = TRUE)
+    })
+  }
+
+  # devtools creates builds vignettes for loading, not for package building
+  # to build package they have to be moved arround:
+  #   - vignette index should be in build/vignette.rds instead of Meta/vignette.rds
+  #   - docks generated should be in inst/doc instread of doc
+
+  # first copy vignette index into proper location
+  if (!dir.exists(file.path(pkg_path, "build"))) {
+    dir.create(file.path(pkg_path, "build"), recursive = TRUE, showWarnings = FALSE)
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build"))
+  } else {
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build", "vignette.rds"))
+  }
+
+  file.copy(from = file.path(pkg_path, "Meta", "vignette.rds"),
+            to = file.path(pkg_path, "build", "vignette.rds"),
+            overwrite = TRUE)
+
+  # then contents of <pkg_dir>/doc into <pkg_dir>/inst/doc
   if (!dir.exists(file.path(pkg_path, "inst", "doc"))) {
     dir.create(file.path(pkg_path, "inst", "doc"), recursive = TRUE, showWarnings = FALSE)
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "inst", "doc"))
   }
 
   for(f in list.files(file.path(pkg_path, "doc"))) {
@@ -261,46 +281,6 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
     unlink_paths <- c(unlink_paths, dst_doc_file)
   }
 
-  # also copy vignettes index
-  if (!dir.exists(file.path(pkg_path, "build"))) {
-    dir.create(file.path(pkg_path, "build"), recursive = TRUE, showWarnings = FALSE)
-    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build"))
-  } else {
-    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build", "vignette.rds"))
-  }
-
-  if (exists(file.path(pkg_path, "Meta", "vignette.rds"))) {
-    file.copy(from = file.path(pkg_path, "Meta", "vignette.rds"),
-              to = file.path(pkg_path, "build", "vignette.rds"),
-              overwrite = TRUE)
-    return(function() {
-      unlink(unlink_paths, recursive = TRUE, force = TRUE)
-    })
-  }
-
-  # if devtools::build_vignetted did not create index, create it manually
-  docs_dir <- file.path(pkg_path, "inst", "doc")
-  vign_infos <- lapply(
-    X = list.files(docs_dir, pattern = "[.]Rmd$", full.names = TRUE),
-    FUN = function(vign_fpath) {
-      lines <- readLines(vign_fpath)
-      lines <- lines[grepl("^\\s*%\\\\VignetteIndexEntry\\{.+\\}$", lines)]
-      if (length(lines) > 0) {
-        pdf_file <- list.files(docs_dir, pattern = gsub("[.]Rmd$", ".(html|pdf)$", basename(vign_fpath)))[[1]]
-        r_file <- list.files(docs_dir, pattern = gsub("[.]Rmd$", ".(R|r)$", basename(vign_fpath)))[[1]]
-        vign_info <- data.frame(File = basename(vign_fpath),
-                                Title = gsub("^\\s*%\\\\VignetteIndexEntry\\{(.+)\\}$", "\\1", lines)[[1]],
-                                PDF = pdf_file,
-                                R = r_file,
-                                stringsAsFactors = FALSE)
-        vign_info$Depends <- list(character(0))
-        vign_info$Keywords <- list(character(0))
-        return(vign_info)
-      }
-    })
-
-  vignette <- do.call("rbind", vign_infos)
-  saveRDS(vignette, file = file.path(pkg_path, "build", "vignette.rds"))
 
   return(function() {
     unlink(unlink_paths, recursive = TRUE, force = TRUE)
