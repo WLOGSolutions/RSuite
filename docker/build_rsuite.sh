@@ -19,7 +19,7 @@ if [ ! -f "Dockerfile.${plat}_rsuite" ]; then
 fi
 
 
-for rver in 3.2 3.3 3.4 3.5; do 
+for rver in 3.2 3.3 3.4 3.5 3.6; do 
     echo "Building wlog/rsuite:${plat}_r${rver}_v${rsuite_ver} ..."
     docker rmi -f wlog/rsuite:${plat}_r${rver}_v${rsuite_ver} > /dev/nul 2>&1
     docker build -t wlog/rsuite:${plat}_r${rver}_v${rsuite_ver} -f Dockerfile.${plat}_rsuite . --build-arg rver=$rver --build-arg rsuite_ver=$rsuite_ver --no-cache

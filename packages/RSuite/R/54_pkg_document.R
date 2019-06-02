@@ -209,12 +209,17 @@ validate_package_imports <- function(pkg_name, pkg_path) {
 #' @noRd
 #'
 pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
-  has_vignettes <- length(tools::pkgVignettes(dir = pkg_path)$docs) > 0
-  if (!has_vignettes) {
-    return(NULL)
+  if (!dir.exists(file.path(pkg_path, "vignettes"))) {
+    return(NULL) # has no vignettes
   }
 
   unlink_paths <- c()
+  for(subdir in c("doc", "Meta", "inst")) {
+    if (!dir.exists(file.path(pkg_path, subdir))) {
+      unlink_paths <- c(unlink_paths, file.path(pkg_path, subdir))
+    }
+  }
+
   if (!dir.exists(file.path(pkg_path, "inst", "doc"))) {
     unlink_paths <- c(unlink_paths, file.path(pkg_path, "inst", "doc"))
   }
@@ -240,7 +245,40 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
     })
   }
 
-  # create vignette index as it probably will not be created
+  # copy contents of <pkg_dir>/doc to <pkg_dir>/inst/doc:
+  #   devtools builds vignettes for loading, we need them for installation
+  if (!dir.exists(file.path(pkg_path, "inst", "doc"))) {
+    dir.create(file.path(pkg_path, "inst", "doc"), recursive = TRUE, showWarnings = FALSE)
+  }
+
+  for(f in list.files(file.path(pkg_path, "doc"))) {
+    if (file.exists(file.path(pkg_path, "inst", "doc", f))) {
+      next
+    }
+
+    dst_doc_file <- file.path(pkg_path, "inst", "doc", f)
+    file.copy(file.path(pkg_path, "doc", f), dst_doc_file)
+    unlink_paths <- c(unlink_paths, dst_doc_file)
+  }
+
+  # also copy vignettes index
+  if (!dir.exists(file.path(pkg_path, "build"))) {
+    dir.create(file.path(pkg_path, "build"), recursive = TRUE, showWarnings = FALSE)
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build"))
+  } else {
+    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build", "vignette.rds"))
+  }
+
+  if (exists(file.path(pkg_path, "Meta", "vignette.rds"))) {
+    file.copy(from = file.path(pkg_path, "Meta", "vignette.rds"),
+              to = file.path(pkg_path, "build", "vignette.rds"),
+              overwrite = TRUE)
+    return(function() {
+      unlink(unlink_paths, recursive = TRUE, force = TRUE)
+    })
+  }
+
+  # if devtools::build_vignetted did not create index, create it manually
   docs_dir <- file.path(pkg_path, "inst", "doc")
   vign_infos <- lapply(
     X = list.files(docs_dir, pattern = "[.]Rmd$", full.names = TRUE),
@@ -260,14 +298,8 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
         return(vign_info)
       }
     })
-  vignette <- do.call("rbind", vign_infos)
-  if (!dir.exists(file.path(pkg_path, "build"))) {
-    dir.create(file.path(pkg_path, "build"), recursive = TRUE, showWarnings = FALSE)
-    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build"))
-  } else {
-    unlink_paths <- c(unlink_paths, file.path(pkg_path, "build", "vignette.rds"))
-  }
 
+  vignette <- do.call("rbind", vign_infos)
   saveRDS(vignette, file = file.path(pkg_path, "build", "vignette.rds"))
 
   return(function() {

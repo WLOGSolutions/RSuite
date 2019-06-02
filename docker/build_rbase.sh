@@ -10,7 +10,7 @@ if [ ! -f "Dockerfile.${plat}_rbase" ]; then
     exit 1
 fi
 
-for rver in 3.2 3.3 3.4 3.5; do 
+for rver in 3.2 3.3 3.4 3.5 3.6; do 
     echo "Building wlog/rsuite:${plat}_r${rver} ..."
     docker build --build-arg rver=$rver -t wlog/rsuite:${plat}_r${rver} -f Dockerfile.${plat}_rbase .
     if [ "$?" != "0" ]; then echo "Failed to build rbase $rver for $plat"; exit 1; fi
