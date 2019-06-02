@@ -37,6 +37,11 @@ test_that_managed("Create PKGZIP out of sources on GitHub (with deps)", {
                           || !grepl("darwin", R.version$os))
   skip_if_not(rver_33up_for_macos, "R >= 3.3 required to build rAzureBatch on MacOS")
 
+  rver_34up_for_win <- (compareVersion(paste0(R.version$major, ".", R.version$minor), "3.4.0") >= 0
+                        || .Platform$OS.type != "windows")
+  skip_if_not(rver_34up_for_win, "R before 3.4 has problems with SSL on Windows")
+
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   pkgzip <- init_test_pkgzip()
 

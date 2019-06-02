@@ -39,6 +39,11 @@ test_that_managed("Uploading GitHub (with deps)", {
                           || !grepl("darwin", R.version$os))
   skip_if_not(rver_33up_for_macos, "R >= 3.3 required to build rAzureBatch on MacOS")
 
+  rver_34up_for_win <- (compareVersion(paste0(R.version$major, ".", R.version$minor), "3.4.0") >= 0
+                        || .Platform$OS.type != "windows")
+  skip_if_not(rver_34up_for_win, "R before 3.4 has problems with SSL on Windows")
+
+
   prj <- init_test_project(repo_adapters = c("CRAN"))
   mgr <- init_test_manager(prj)
   RSuite::prj_config_set_repo_adapters(c("CRAN", sprintf("Dir[%s]", mgr$path)), prj = prj)

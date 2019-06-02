@@ -1,5 +1,7 @@
 VERSION 0.37 (2019-06-*)
   * better support for cygwin (or msys) environment
+  * passing parameters with $@ instead of $* in bash scripts to prevent
+    interpreting spaces in arguments as parameter separators.
 
 VERSION 0.36 (2019-03-06)
   * fixed 'docker stop' to remove also stopped containers.

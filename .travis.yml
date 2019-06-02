@@ -27,6 +27,7 @@ matrix:
     r: oldrel
 
 before_install:
+- export TZ=UTC
 - cd packages/RSuite
 - rm -rf .Rprofile
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then sudo chown -R $(whoami) /usr/local/share/man/man7; brew install libgit2; fi
@@ -43,6 +44,7 @@ addons:
 install:
 - Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
 - Rscript -e 'install.packages(c("knitr"));if (!all(c("knitr") %in% installed.packages())) { q(status = 1, save = "no")}'
+- Rscript -e 'install.packages(c("rmarkdown"));if (!all(c("rmarkdown") %in% installed.packages())) { q(status = 1, save = "no")}'
 - Rscript -e 'install.packages(c("testthat"));if (!all(c("testthat") %in% installed.packages())) { q(status = 1, save = "no")}'
 - Rscript -e 'devtools::install_deps(deps = T)'
 - Rscript -e 'devtools::document()'
