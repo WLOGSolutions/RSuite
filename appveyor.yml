@@ -35,9 +35,11 @@ environment:
 build_script:
   - cmd: >-
 
-      Rscript -e "install.packages(c('devtools'), repos='https://cran.r-project.org')" --no-init-file
+      del .Rprofile
 
-      Rscript -e "devtools::install_deps(pkg = 'packages/RSuite',dep = T)" --no-init-file
+      Rscript -e "install.packages(c('devtools'), repos='https://cran.r-project.org')"
+
+      Rscript -e "devtools::install_deps(pkg = 'packages/RSuite',dep = T)"
 
       Rscript -e "devtools::document(pkg = 'packages/RSuite')"
 

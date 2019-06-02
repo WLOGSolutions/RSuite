@@ -12,6 +12,11 @@ source("R/project_management.R")
 
 
 test_that_managed("Build package which dependents on stringr", {
+  rver_33up_for_macos <- (compareVersion(paste0(R.version$major, ".", R.version$minor), "3.3.0") >= 0
+                          || !grepl("darwin", R.version$os))
+  skip_if_not(rver_33up_for_macos, "R < 3.3 is too old for MacOS")
+
+
   prj <- init_test_project(repo_adapters = c("CRAN", "Dir"))
   create_test_package("TestPackage", prj, deps = "stringr (>= 1.3)")
 
