@@ -49,16 +49,20 @@ get_platform_desc <- function() {
   check_syslibs <- switch(
     os_info$platform,
     RedHat = paste("[shell]",
-                   "all_pkgs=$(rpm -qa | sed -e \"s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/\");",
-                   "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done"),
+                   "all_pkgs=($(rpm -qa | sed -e \"s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/\"));",
+                   "for lib in :params; do if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi done"),
     Debian = paste("[shell]",
-                   "all_pkgs=$(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\");",
-                   "for lib in :params; do if [[ ! \"${all_pkgs[@]}\" =~ ${lib} ]]; then echo $lib; fi done")
+                   "all_pkgs=($(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\"));",
+                   "for lib in :params; do if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi done")
+  )
+  instprep_syslibs <- switch(
+    os_info$platform,
+    Debian = "[shell] apt-get update"
   )
   install_syslibs <- switch(
     os_info$platform,
     RedHat = "[shell] yum install -y :params",
-    Debian = "[shell] apt-get update && apt-get install -y :params"
+    Debian = "[shell] apt-get install -y :params"
   )
 
   return(list(name = os_info$platform,
@@ -66,6 +70,7 @@ get_platform_desc <- function() {
               release = os_info$release,
               sysreq_type = sysreq_type,
               lib_tools = list(check = check_syslibs,
+                               instprep = instprep_syslibs,
                                install = install_syslibs),
               build = TRUE))
 }

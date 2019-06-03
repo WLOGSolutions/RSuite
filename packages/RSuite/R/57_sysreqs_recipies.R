@@ -165,26 +165,19 @@ perform.sysreqs_check_recipe <- function(recipe) {
                  paste(result$notools, collapse = ", "))
   }
 
-  required_syslibs <- unlist(lapply(recipe$syslibs, function(sl) sl$plat_deps))
-  if (is.null(required_syslibs)) {
+  syslib_names <- unlist(lapply(recipe$syslibs, function(sl) sl$plat_deps))
+  if (is.null(syslib_names)) {
     return(invisible(result))
   }
 
-  check_tool <- get_platform_desc()$lib_tools$check
+  plat_desc <- get_platform_desc()
+  check_tool <- plat_desc$lib_tools$check
   if (is.null(check_tool)) {
     pkg_loginfo("Checking for system libraries for the platform is not supported")
     return(invisible(result))
   }
-  assert(grepl("^\\[shell\\] ", check_tool),
-         "System libraries check handlers other than [shell] are not supported yet")
-  check_tool <- gsub("^\\[shell\\] ", "", check_tool)
 
-  cmd <- sprintf("bash -c '%s'", gsub(":params", paste(required_syslibs, collapse = " "), check_tool))
-  # TODO handle this situation (now temporarly using cmd_lines, but not sure if this is a good idea.)
-  result$nolibs <-
-    get_cmd_outlines(sprintf("checking for system libraries: %s", paste(required_syslibs, collapse = ", ")),
-                     cmd = cmd,
-                     log_debug = TRUE)
+  result$nolibs <- .detect_unavailable_syslibs(plat_desc, syslib_names)
 
   if (length(result$nolibs) > 0) {
     pkg_loginfo("Lack of required system libraries detected in environment: %s",
@@ -192,6 +185,36 @@ perform.sysreqs_check_recipe <- function(recipe) {
   }
 
   return(invisible(result))
+}
+
+#'
+#' Detects which syslibs are not available.
+#'
+#' Helper for perform.sysreqs_check_recipe. Used also by perform.sysreqs_install_recipe
+#' to detect libraries which are to be installed.
+#'
+#' @param check_tool description of the platform. Must not be NULL
+#' @param syslib_names names of libraries to check for availability
+#'
+#' @return vector of libraries not currently available in the system.
+#'
+#' @noRd
+#' @keywords internal
+#'
+.detect_unavailable_syslibs <- function(check_tool, syslib_names) {
+  stopifnot(!is.null(check_tool))
+
+  assert(grepl("^\\[shell\\] ", check_tool),
+         "System libraries check handlers other than [shell] are not supported yet")
+  check_tool <- gsub("^\\[shell\\] ", "", check_tool)
+
+  cmd <- sprintf("bash -c '%s'", gsub(":params", paste(syslib_names, collapse = " "), check_tool))
+  # TODO handle this situation (now temporarly using cmd_lines, but not sure if this is a good idea.)
+  unavail_syslibs <-
+    get_cmd_outlines(sprintf("checking for system libraries: %s", paste(syslib_names, collapse = ", ")),
+                     cmd = cmd,
+                     log_debug = TRUE)
+  return(unavail_syslibs)
 }
 
 
@@ -286,75 +309,20 @@ rm_satisfied.sysreqs_install_recipe <- function(recipe) {
 #' @noRd
 #'
 perform.sysreqs_install_recipe <- function(recipe) {
-  .is_retcode_failure <- function(cmd_ret_code, req_name) {
-    return(is.null(cmd_ret_code) || cmd_ret_code > 0)
-  }
   plat_desc <- get_platform_desc() # from 56_sysreqs_utils.R
 
   failed_reqs <- c()
 
-  required_syslibs <- unlist(lapply(recipe$install_specs, function(sl) sl$syslibs))
-  if (!is.null(required_syslibs)) {
-    install_tool <- plat_desc$lib_tools$install
-    if (is.null(install_tool)) {
-      pkg_loginfo("Installing of system libraries on the platform is not supported")
-    } else {
-      assert(grepl("^\\[shell\\] ", install_tool),
-             "System libraries install handlers other than [shell] are not supported yet")
-      install_tool <- gsub("^\\[shell\\]\\s*", "", install_tool)
-      cmd <- sprintf("bash -c '%s'",
-                     gsub(":params", paste(required_syslibs, collapse = " "), install_tool))
-
-      pkg_loginfo("Installing system libraries(%s) ...", paste(required_syslibs, collapse = ", "))
-      cmd_retcode <- get_cmd_retcode(sprintf("installing system libraries: %s",
-                                             paste(required_syslibs, collapse = ", ")),
-                                     cmd = cmd,
-                                     log_debug = TRUE)
-      if (.is_retcode_failure(cmd_retcode, "sys libs")) {
-        failed_reqs <- c(failed_reqs, "sys libs")
-        pkg_logwarn(paste("Something went wrong while installing system libraries.",
-                          "Installation process terminated with code: %s."),
-                    cmd_retcode)
-      } else {
-        pkg_loginfo("... done")
-        lapply(names(required_syslibs),
-               function(req_name) {
-                 lapply(required_syslibs[[req_name]],
-                        function(msg) pkg_loginfo("[%s]: %s", req_name, msg))
-               })
-      }
-    }
+  syslib_names <- unlist(lapply(recipe$install_specs, function(sl) sl$syslibs))
+  if (!is.null(syslib_names)) {
+    failed_reqs <- c(failed_reqs,
+                     .install_syslibs(plat_desc, syslib_names))
   }
 
   for (req_name in names(recipe$build_specs)) {
-    build_spec <- recipe$build_specs[[req_name]]
-
-    if (!file.exists(Sys.which(build_spec$tool))) {
-      pkg_logwarn("Tool %s for building %s is not available.", build_spec$tool, req_name)
+    success <- .install_sysreq(req_name, recipe$build_specs[[req_name]], recipe$prj_path)
+    if (!success) {
       failed_reqs <- c(failed_reqs, req_name)
-      next
-    }
-
-    pkg_loginfo("Building %s for %s ...", req_name, paste(build_spec$packages, collapse = ", "))
-
-    cmd <- gsub(":params", build_spec$params, build_spec$cmd, fixed = TRUE)
-
-    tool_wspace <- gsub("\\", "/", file.path(recipe$prj_path, req_name), fixed = TRUE)
-    cmd <- gsub(":path", tool_wspace, cmd, fixed = TRUE)
-    cmd <- gsub(":tool", build_spec$tool, cmd, fixed = TRUE)
-    cmd <- paste(cmd, "-v")
-
-    cmd_retcode <- get_cmd_retcode(sprintf("building %s for %s",
-                                           req_name, paste(build_spec$packages, collapse = ", ")),
-                                   cmd = cmd,
-                                   log_debug = TRUE)
-    if (.is_retcode_failure(cmd_retcode)) {
-      failed_reqs <- c(failed_reqs, req_name)
-      pkg_logwarn("Something went wrong while building %s. Building process terminated with code: %s.",
-                  req_name, cmd_retcode)
-    } else {
-      pkg_loginfo("... done")
-      lapply(build_spec$info, function(msg) pkg_loginfo("[%s]: %s", req_name, msg))
     }
   }
 
@@ -364,6 +332,142 @@ perform.sysreqs_install_recipe <- function(recipe) {
   } else {
     pkg_loginfo("All system requirements installed.")
   }
+}
+
+#'
+#' Installs system libraries.
+#'
+#' Helper for perform.sysreqs_install_recipe process
+#'
+#' Checks which of them are not available with .detect_unavailable_syslibs.
+#' Calls installation preparation utility and installs syslibs one by one.
+#'
+#' @param plat_desc description of the platform
+#' @param syslib_names vector if syslib names to install
+#'
+#' @noRd
+#' @keywords internal
+#'
+.install_syslibs <- function(plat_desc, syslib_names) {
+  install_tool <- plat_desc$lib_tools$install
+  if (is.null(install_tool)) {
+    pkg_loginfo("Installing of system libraries on the platform is not supported")
+    return(NULL)
+  }
+
+  assert(grepl("^\\[shell\\] ", install_tool),
+         "System libraries install handlers other than [shell] are not supported yet")
+  install_tool <- gsub("^\\[shell\\]\\s*", "", install_tool)
+
+  check_tool <- plat_desc$lib_tools$check
+  if (!is.null(check_tool)) {
+    # install only unavailable syslibs
+    unavail_syslibs <- .detect_unavailable_syslibs(check_tool, syslib_names)
+    if (is.null(unavail_syslibs) || length(unavail_syslibs) == 0) {
+      pkg_loginfo("It seems like all system libraries required are available already in the system.")
+      return(NULL)
+    }
+
+    syslib_names <- unavail_syslibs
+    pkg_loginfo("Following system libraries are not available (will install them): %s",
+                paste(syslib_names, collapse = ", "))
+  }
+
+  instprep_tool <- plat_desc$lib_tools$instprep
+  if (!is.null(instprep_tool)) {
+    instprep_tool <- gsub("^\\[shell\\]\\s*", "", instprep_tool)
+  }
+
+  if (Sys.info()["user"] != "root") {
+    pkg_logwarn("Only 'root' can update system (install system libraries)")
+    pkg_logwarn("If you have 'root' access, please install system packages on your own like this:")
+    if (!is.null(instprep_tool)) {
+      pkg_logwarn("root$ %s", instprep_tool)
+    }
+    pkg_logwarn("root$ %s", gsub(":params", paste(syslib_names, collapse = " "), install_tool))
+    return(syslib_names)
+  }
+
+  # prepare for syslibs installation
+  if (!is.null(instprep_tool)) {
+    cmd <- sprintf("bash -c '%s'", instprep_tool)
+    pkg_loginfo("Preparing for installation of system libs...")
+    cmd_retcode <- get_cmd_retcode("prepare for sys libs installation",
+                                   cmd = cmd,
+                                   log_debug = TRUE)
+    if (is.null(cmd_retcode) || cmd_retcode > 0) {
+      pkg_logwarn(paste("Something went wrong while preparing to install system libraries.",
+                        "Process terminated with code: %s."),
+                  cmd_retcode)
+      return("<inst_prepare>")
+    }
+    pkg_loginfo("... done")
+  }
+
+  # install them one by one
+  failed_syslibs <- c()
+  for (syslib in syslib_names) {
+    cmd <- sprintf("bash -c '%s'", gsub(":params", syslib, install_tool))
+    pkg_loginfo("Installing system library '%s' ...", syslib)
+
+    cmd_retcode <- get_cmd_retcode(sprintf("installing system library '%s'", syslib),
+                                   cmd = cmd,
+                                   log_debug = TRUE)
+    if (is.null(cmd_retcode) || cmd_retcode > 0) {
+      pkg_logwarn(paste("Failed to install system library '%s'.",
+                        "Installation process terminated with code: %s."),
+                  cmd_retcode)
+      failed_syslibs <- c(failed_syslibs, syslib)
+      next
+    }
+
+    pkg_loginfo("... done")
+  }
+
+  return(failed_syslibs)
+}
+
+#'
+#' Installs single sysreq.
+#'
+#' Helper for perform.sysreqs_install_recipe process
+#'
+#' @param req_name name of sysreq to install.
+#' @param build_spec build specification for the req
+#' @param prj_path extra infor to update project env; project path.
+#'
+#' @noRd
+#' @keywords internal
+#'
+.install_sysreq <- function(req_name, build_spec, prj_path) {
+  if (!file.exists(Sys.which(build_spec$tool))) {
+    pkg_logwarn("Tool %s for building %s is not available.", build_spec$tool, req_name)
+    return(FALSE)
+  }
+
+  pkg_loginfo("Building %s for %s ...", req_name, paste(build_spec$packages, collapse = ", "))
+
+  cmd <- gsub(":params", build_spec$params, build_spec$cmd, fixed = TRUE)
+
+  tool_wspace <- gsub("\\", "/", file.path(prj_path, req_name), fixed = TRUE)
+  cmd <- gsub(":path", tool_wspace, cmd, fixed = TRUE)
+  cmd <- gsub(":tool", build_spec$tool, cmd, fixed = TRUE)
+  cmd <- paste(cmd, "-v")
+
+  cmd_retcode <- get_cmd_retcode(sprintf("building %s for %s",
+                                         req_name, paste(build_spec$packages, collapse = ", ")),
+                                 cmd = cmd,
+                                 log_debug = TRUE)
+  if (is.null(cmd_retcode) || cmd_retcode > 0) {
+    pkg_logwarn("Something went wrong while building %s. Building process terminated with code: %s.",
+                req_name, cmd_retcode)
+    return(FALSE)
+  }
+
+  pkg_loginfo("... done")
+  lapply(build_spec$info, function(msg) pkg_loginfo("[%s]: %s", req_name, msg))
+
+  return(TRUE)
 }
 
 
@@ -523,6 +627,24 @@ build_bash_script <- function(recipe, plat_desc) {
                         sprintf("export syslibs_to_install=$(bash -c '%s')", cmd))
     }
 
+    instprep_tool <- plat_desc$lib_tools$instprep
+    if (!is.null(instprep_tool)) {
+      assert(grepl("^\\[shell\\] ", instprep_tool),
+             "System libraries install praparation handlers other than [shell] are not supported yet")
+      instprep_tool <- gsub("^\\[shell\\]\\s*", "", instprep_tool)
+      script_lines <- c(script_lines,
+                        "if [ -n \"${syslibs_to_install}\" ]; then",
+                        sprintf("     echo \"Preparing to install system libraries ...\""),
+                        sprintf("     %s", instprep_tool),
+                        sprintf("     if [ $? == 0 ]; then"),
+                        sprintf("         echo -e \"... done\\n\\n\""),
+                        sprintf("     else"),
+                        sprintf("         echo -e \"... failed\\n\\n\""),
+                        sprintf("         exitcode=1"),
+                        sprintf("     fi"),
+                        "fi")
+    }
+
     install_tool <- plat_desc$lib_tools$install
     if (is.null(install_tool)) {
       pkg_loginfo("Installing of system libraries on the platform is not supported")
@@ -532,6 +654,7 @@ build_bash_script <- function(recipe, plat_desc) {
       install_tool <- gsub("^\\[shell\\]\\s*", "", install_tool)
       cmd <- gsub(":params", "${syslibs_to_install}", install_tool)
       script_lines <- c(script_lines,
+                        "",
                         "if [ -z \"${syslibs_to_install}\" ]; then",
                         "     echo \"No system libraries to install\"",
                         "else",
