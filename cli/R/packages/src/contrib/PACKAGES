@@ -4,14 +4,17 @@ Suggests: testthat
 License: GPL (>= 2)
 MD5sum: 0f16ebdf98dd4babbb921d3869826c27
 NeedsCompilation: no
+File: getopt_1.20.0.tar.gz
 
 Package: logging
-Version: 0.7-103
-Depends: R (>= 2.12.0), methods
-Suggests: svUnit, XML
-License: GPL (>= 2)
-MD5sum: 09a72bed3d5368c05b80d33557e3d696
+Version: 0.9-107
+Depends: R (>= 3.2.0)
+Imports: methods
+Suggests: testthat, crayon
+License: GPL-3
+MD5sum: 48515d91c880356c44b7c3e78d6a1f92
 NeedsCompilation: no
+File: logging_0.9-107.tar.gz
 
 Package: optparse
 Version: 1.4.4
@@ -21,4 +24,4 @@ Suggests: knitr (>= 1.15.19), stringr, testthat
 License: GPL (>= 2)
 MD5sum: e8cbd599f047c6d4b14f218575045c4a
 NeedsCompilation: no
-
+File: optparse_1.4.4.tar.gz
