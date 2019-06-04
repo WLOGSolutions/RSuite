@@ -1,7 +1,6 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-rvm: system
 
 os:
 - linux
@@ -19,6 +18,7 @@ env:
 
 cache: packages
 warnings_are_errors: true
+rvm: system
 
 matrix:
   exclude:
