@@ -3,10 +3,12 @@
   * Fixed building vignettes: use devtools::build_vignettes and place generated
     files for building not just for loading. Also if vignettes index is generated
     use it instead of creating artificial.
-  * Sysreqs on windows detects if installation is possible (installation is under 
+  * Sysreqs on linux/osx detects if installation is possible (installation is under 
     root account). It detects also which sysreqs are installed already and do not
     try to install them again. Sysreqs are installed one by one so it is possible
     to find out which caused the problem while installing.
+  * Fixed default proj template to run properly on OSX
+  * Updated sysreqsdb to handle conda, python and make on OSX
 
 # RSuite 0.36 (2019-03-06)
   * #184: detecting declaration of dependencies in scripts with "library (...)".

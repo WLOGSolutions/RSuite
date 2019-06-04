@@ -40,7 +40,7 @@ get_platform_desc <- function() {
 
   sysreq_type <- switch(os_info$platform,
                         Windows = "Windows",
-                        MacOS = "Pkg",
+                        MacOS = "OSX/brew",
                         RedHat = "RPM",
                         Debian = "DEB",
                         NA_character_)
@@ -53,6 +53,9 @@ get_platform_desc <- function() {
                    "for lib in :params; do if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi done"),
     Debian = paste("[shell]",
                    "all_pkgs=($(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\"));",
+                   "for lib in :params; do if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi done"),
+    MacOS = paste("[shell]",
+                  "all_pkgs=($(brew list));",
                    "for lib in :params; do if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi done")
   )
   instprep_syslibs <- switch(
@@ -62,7 +65,8 @@ get_platform_desc <- function() {
   install_syslibs <- switch(
     os_info$platform,
     RedHat = "[shell] yum install -y :params",
-    Debian = "[shell] apt-get install -y :params"
+    Debian = "[shell] apt-get install -y :params",
+    MacOS = "[shell] brew install :params"
   )
 
   return(list(name = os_info$platform,
@@ -212,7 +216,6 @@ get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
   if (is.character(plat_specs) && length(plat_specs) == 1) {
     return(plat_specs)
   }
-
 
   req_type <- ifelse(plat_desc$build, "buildtime", "runtime")
   if (is.data.frame(plat_specs)

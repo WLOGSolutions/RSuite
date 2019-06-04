@@ -5,7 +5,8 @@
 		"platforms": {
 			"Windows": "conda.exe",
 			"DEB": "conda",
-			"RPM": "conda"
+			"RPM": "conda",
+			"OSX/brew": "conda"
 		},
 		"handlers": {
 		  "install": "[skip]",
