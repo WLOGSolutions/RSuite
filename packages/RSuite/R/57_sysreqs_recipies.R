@@ -177,7 +177,7 @@ perform.sysreqs_check_recipe <- function(recipe) {
     return(invisible(result))
   }
 
-  result$nolibs <- .detect_unavailable_syslibs(plat_desc, syslib_names)
+  result$nolibs <- .detect_unavailable_syslibs(check_tool, syslib_names)
 
   if (length(result$nolibs) > 0) {
     pkg_loginfo("Lack of required system libraries detected in environment: %s",
