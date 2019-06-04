@@ -48,13 +48,19 @@ get_platform_desc <- function() {
          "Platform %s is currently not supported by sysreqs.", os_info$platform)
   check_syslibs <- switch(
     os_info$platform,
-    RedHat = paste("[shell]",
-                   "all_pkgs=($(rpm -qa | sed -e \"s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/\"));",
-                   "for lib in :params; do if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi done"),
-    Debian = paste("[shell]",
-                   "all_pkgs=($(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\"));",
-                   "for lib in :params; do if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi done")
-  )
+    RedHat = list(cmd = paste("[shell]",
+                              "all_pkgs=($(rpm -qa | sed -e \"s/^\\(.\\+\\)-[0-9]\\+[.-][0-9].*$/\\1/\"));",
+                              "for lib in :params; do",
+                              " if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi",
+                              "done"),
+                  needs_root = NULL), # can be root or non root
+    Debian = list(cmd = paste("[shell]",
+                              "all_pkgs=($(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\"));",
+                              "for lib in :params; do",
+                              " if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi",
+                              "done"),
+                  needs_root = NULL)
+    )
   instprep_syslibs <- switch(
     os_info$platform,
     Debian = "[shell] apt-get update"
