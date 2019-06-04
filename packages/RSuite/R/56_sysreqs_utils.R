@@ -40,7 +40,7 @@ get_platform_desc <- function() {
 
   sysreq_type <- switch(os_info$platform,
                         Windows = "Windows",
-                        MacOS = "Pkg",
+                        MacOS = "OSX/brew",
                         RedHat = "RPM",
                         Debian = "DEB",
                         NA_character_)
@@ -53,22 +53,33 @@ get_platform_desc <- function() {
                               "for lib in :params; do",
                               " if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi",
                               "done"),
-                  needs_root = NULL), # can be root or non root
+                  under_root = NULL), # can be root or non root
     Debian = list(cmd = paste("[shell]",
                               "all_pkgs=($(dpkg -l | sed -e \"s/^..[ \\t]\\+\\([^ \\t:]\\+\\).\\+$/\\1/\"));",
                               "for lib in :params; do",
                               " if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi",
                               "done"),
-                  needs_root = NULL)
-    )
+                  under_root = NULL),
+    MacOS = list(cmd = paste("[shell]",
+                             "all_pkgs=($(brew list));",
+                             "for lib in :params; do",
+                             " if [[ ! \" ${all_pkgs[@]} \" =~ \" ${lib} \" ]]; then echo $lib; fi",
+                             "done"),
+                 under_root = FALSE)
+  )
   instprep_syslibs <- switch(
     os_info$platform,
-    Debian = "[shell] apt-get update"
+    Debian = list(cmd = "[shell] apt-get update",
+                  under_root = TRUE)
   )
   install_syslibs <- switch(
     os_info$platform,
-    RedHat = "[shell] yum install -y :params",
-    Debian = "[shell] apt-get install -y :params"
+    RedHat = list(cmd = "[shell] yum install -y :params",
+                  under_root = TRUE),
+    Debian = list(cmd = "[shell] apt-get install -y :params",
+                  under_root = TRUE),
+    MacOS = list(cmd = "[shell] brew install :params",
+                 under_root = FALSE)
   )
 
   return(list(name = os_info$platform,
@@ -79,6 +90,63 @@ get_platform_desc <- function() {
                                instprep = instprep_syslibs,
                                install = install_syslibs),
               build = TRUE))
+}
+
+#'
+#' Verifies libtool specification and retrieves real command to run.
+#'
+#' @param libtool_spec libtool specification as retrieved from get_platform_desc()$lib_tools
+#' @param libtool_desc description of libtool handler
+#'
+#' @return bare command to run or NULL if command cannot be executed.
+#'
+#' @noRd
+#' @keywords internal
+#'
+get_libtool_cmd <- function(libtool_spec, libtool_desc) {
+  if (is.null(libtool_spec) || is.null(libtool_spec$cmd)) {
+    return(NULL)
+  }
+
+  cmd <- libtool_spec$cmd
+  assert(grepl("^\\[shell\\] ", cmd),
+         "System libraries %s handlers other than [shell] are not supported yet", libtool_desc)
+  cmd <- gsub("^\\[shell\\]\\s*", "", cmd)
+  return(cmd)
+}
+
+#'
+#' Check if system user is appropriate to run libtool.
+#'
+#' @param libtool_spec libtool specification as retrieved from get_platform_desc()$lib_tools
+#' @param warn If TRUE warning will be displayed descrybing why user is not appropriate
+#'
+#' @return TRUE if user is appropriate and can run the tool
+#'
+#' @noRd
+#' @keywords internal
+#'
+is_libtool_user <- function(libtool_spec, warn = TRUE) {
+  if (is.null(libtool_spec) || is.null(libtool_spec$under_root)) {
+    # no preferences
+    return(TRUE)
+  }
+
+  if (libtool_spec$under_root && Sys.info()["user"] != "root") {
+    if (warn) {
+      pkg_logwarn("Only 'root' can update system (install system libraries)")
+    }
+    return(FALSE)
+  }
+
+  if (!libtool_spec$under_root && Sys.info()["user"] == "root") {
+    if (warn) {
+      pkg_logwarn("Only non 'root' can update system (install system libraries)")
+    }
+    return(FALSE)
+  }
+
+  return(TRUE)
 }
 
 #'
@@ -218,7 +286,6 @@ get_platform_spec <- function(dbent_platforms, dbent_name, plat_desc) {
   if (is.character(plat_specs) && length(plat_specs) == 1) {
     return(plat_specs)
   }
-
 
   req_type <- ifelse(plat_desc$build, "buildtime", "runtime")
   if (is.data.frame(plat_specs)

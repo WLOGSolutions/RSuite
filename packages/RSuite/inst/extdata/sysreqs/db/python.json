@@ -8,7 +8,7 @@
   	},
     "platforms": {
       "DEB": "python-minimal",
-      "OSX/brew": null,
+      "OSX/brew": "python",
       "RPM": "python"
     }
   }

@@ -241,7 +241,7 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
     })
   }
 
-  if (!exists(file.path(pkg_path, "Meta", "vignette.rds"))) {
+  if (!file.exists(file.path(pkg_path, "Meta", "vignette.rds"))) {
     # devtools created no vignette index: assume no vignettes in package to build
     return(function() {
       unlink(unlink_paths, recursive = TRUE, force = TRUE)
