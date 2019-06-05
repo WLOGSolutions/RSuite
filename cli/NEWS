@@ -3,6 +3,10 @@ VERSION 0.37 (2019-06-*)
   * passing parameters with $@ instead of $* in bash scripts to prevent
     interpreting spaces in arguments as parameter separators.
   * Preinstalled logging package upgraded to v0.9-107
+  * You can specify entrypoint command then running container with
+    'docker run'. It make possible using images without supervisord or any
+    other entry point. By default 'top -b' is used which makes it possible
+    to run container in background for subsequent operations.
 
 VERSION 0.36 (2019-03-06)
   * fixed 'docker stop' to remove also stopped containers.

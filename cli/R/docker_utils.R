@@ -126,7 +126,7 @@ exec_docker_cmd <- function(args, cmd_desc) {
 #'
 #' @return docker container name
 #'
-run_container <- function(docker_image, name) {
+run_container <- function(docker_image, name, entry_cmd) {
   if (is.null(name)) {
     cont_name <- basename(tempfile("rsbuild-"))
   } else {
@@ -136,7 +136,12 @@ run_container <- function(docker_image, name) {
   cmd_desc <- sprintf("Starting container %s based on %s", cont_name, docker_image)
   loginfo("%s ...", cmd_desc)
 
-  output <- exec_docker_cmd(c("run", "--name", cont_name, "-d", docker_image), cmd_desc)
+  args <- c("run", "--name", cont_name, "-d", docker_image)
+  if (!is.null(entry_cmd) && nchar(trimws(entry_cmd)) > 0) {
+    args <- c(args, "sh", "-c", entry_cmd)
+  }
+
+  output <- exec_docker_cmd(args, cmd_desc)
   .error_if(output$ret_code != 0,
             base_msg = sprintf("%s failed", cmd_desc),
             ext_errs = output$err_lines)

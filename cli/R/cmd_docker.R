@@ -241,13 +241,24 @@ sub_commands <- list(
       make_option(c("-n", "--name"), dest = "name", default=NULL,
                   help="If passed container will be started under specified name. (default: %default)"),
       make_option(c("--sh"), dest = "sh",
-                  help="Extra command to execute on container.")
+                  help="Extra command to execute on container."),
+      make_option(c("--cmd"), dest = "cmd", default = "top -b",
+                  help=paste("Command to use as entry point for container.",
+                             "Pass - if you want to use default container entry point.",
+                             "(default: %default).",
+                             sep = "\n\t\t"))
     ),
     run = function(opts) {
       if (is.null(opts$image)) {
         opts$image <- get_docker_rsuite_image(opts$rver, opts$platform) # from docker_utils.R
       }
-      cont_name <- run_container(opts$image, opts$name) # from docker_utils.R
+      if (is.null(opts$cmd)) {
+        opts$cmd <- "top -b"
+      } else if (trimws(opts$cmd) == "-") {
+        opts$cmd <- ""
+      }
+
+      cont_name <- run_container(opts$image, opts$name, opts$cmd) # from docker_utils.R
       loginfo("RSuite build container %s started ...", cont_name)
 
       if (!is.null(opts$sh)) {

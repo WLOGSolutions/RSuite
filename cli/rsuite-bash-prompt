@@ -492,20 +492,20 @@ _rsuite() {
 						;;
 					run)
 						if [[ $cur == --* ]]; then
-							opts="--image --platform --rver --name --sh $common_opts_long"
+							opts="--image --platform --rver --name --sh --cmd $common_opts_long"
 						else
 							case "${prev}" in
-								--image|-i|--name|-n|--sh)
+								--image|-i|--name|-n|--sh|--cmds)
 									return 0;
 									;;
 								--platform|-p)
 									opts="ubuntu centos debian"
 									;;
 								--rver|-r)
-									opts="3.2 3.3 3.4"
+									opts="3.2 3.3 3.4 3.5 3.6"
 									;;
 								*)
-									opts="-i -p -r -n --sh $common_opts_short"
+									opts="-i -p -r -n --sh --cmd $common_opts_short"
 									;;
 							esac
 						fi
