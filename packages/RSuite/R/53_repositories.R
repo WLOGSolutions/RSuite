@@ -88,7 +88,9 @@
       if (is.null(cache_fpath)) {
         return(NULL)
       }
-      if (!file.exists(cache_fpath) || .is_cache_too_old(cache_fpath)) {
+      if (!file.exists(cache_fpath)
+          || .is_cache_too_old(cache_fpath)
+          || .is_cache_too_small(cahce_fpath)) {
         return(NULL)
       }
 
@@ -354,7 +356,7 @@ get_curl_available_packages <- function(contrib_url) {
   pkgs_raw <- lapply(X = names(curl2cfile),
                      FUN = function(curl) {
                        cfile <- curl2cfile[[curl]]
-                       if (file.exists(cfile) && !.is_cache_too_old(cfile)) {
+                       if (file.exists(cfile) && !.is_cache_too_old(cfile) && !.is_cache_too_small(cfile)) {
                          # try to read it from cache
                          pkgs <- tryCatch({
                            readRDS(cfile)
@@ -369,7 +371,7 @@ get_curl_available_packages <- function(contrib_url) {
                        # really retrieve it
                        res <- tryCatch({
                          if (nchar(cfile) > 0) {
-                           pkg_logdebug("Trying to cache availables from %s ...", curl)
+                           pkg_logfinest("Trying to cache availables from %s ...", curl)
 
                            # remove R cache
                            r_cache_file <- file.path(tempdir(), paste0("repos_", utils::URLencode(curl, TRUE), ".rds"))
@@ -388,7 +390,7 @@ get_curl_available_packages <- function(contrib_url) {
                            # cache it for future
                            try({
                              saveRDS(pkgs, file = cfile)
-                             pkg_logdebug("Availables from %s cached.", curl)
+                             pkg_logfinest("Availables from %s cached.", curl)
                            },
                            silent = TRUE)
                          }
@@ -422,6 +424,23 @@ get_curl_available_packages <- function(contrib_url) {
   mtime <- file.mtime(fpath)
   age_days <- as.double(difftime(Sys.time(), mtime, units = "days"))
   return(age_days < 0.0 || age_days >= 7.0)
+}
+
+#'
+#' Checks if cache file is too small; recache will not take long time.
+#'
+#' @param fpath cache file path to check.
+#' @return FALSE if cache is still useable
+#'
+#' @keywords internal
+#' @noRd
+#'
+.is_cache_too_small <- function(fpath) {
+  if (!file.exists(fpath)) {
+    return(TRUE)
+  }
+
+  return(file.size(fpath) < 200 * 1024) # less than 200 kB
 }
 
 #'
