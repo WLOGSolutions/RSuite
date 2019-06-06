@@ -19,12 +19,21 @@ THIS_DIR=$(DIRNAME=$(dirname "$0"); cd "$DIRNAME"; pwd)
 THIS_FILE=$(basename "$0")
 THIS_PATH="$THIS_DIR/$THIS_FILE"
 
+if md5sum --help > /dev/null 2>&1; then
+        MD5CMD=md5sum
+elif cat "$THIS_PATH" | md5 > /dev/null 2>&1; then
+        MD5CMD=md5
+else
+        echo "Neither 'md5sum' nor 'md5' detected. Please, install one of them and rerun the script"
+        exit 1
+fi
+
 # some colors
 c_inf=$(tput setaf 2)
 c_deb=$(tput setaf 6)
 c_war=$(tput setaf 3)
 c_err=$(tput setaf 1)
-c_def=$(tput setaf 9)
+c_def=$(tput setaf default)
 
 # cursor moving
 cmv_beg=$(tput cub 80) # move to first columnt
@@ -43,7 +52,7 @@ zipfile=$temp_dir/${THIS_FILE/.sh/.zip}
 cat $THIS_PATH | tail -n +${script_end_line} > $zipfile
 
 # analyse file contents
-proj_and_libs=($(unzip -l $zipfile | grep -e "\s[^/]\+/\(libs/[^/]\+/\)\?$" | sed -e "s/^\s\+0\s\+[: 0-9-]\+//"))
+proj_and_libs=($(unzip -l $zipfile | grep -e "\s[^/]\+/\(libs/[^/]\+/\)\?$" | sed -e 's/^[ \t]*0[ \t]*[: 0-9-]*//'))
 proj=${proj_and_libs[0]}
 libs=(${proj_and_libs[@]:1})
 
@@ -51,7 +60,7 @@ libs=(${proj_and_libs[@]:1})
 if [ ! -f $proj/readme.txt ]; then
 	echo "==> ... installing ${c_inf}${proj}${c_def} ..."
 	echo -n "${c_deb}"
-	unzip $zipfile -x ${proj}libs/\*; errcode=$?
+	unzip $zipfile -x "${proj}libs/**"; errcode=$?
 	echo -n "${c_def}"
 	if [ $errcode -gt 0 ]; then
 		echo "${c_err}... failed to install base${c_def} (errcode: $errcode)"
@@ -59,7 +68,7 @@ if [ ! -f $proj/readme.txt ]; then
 	fi
 	echo "==> ... installing packages ..."
 	echo -n "${c_deb}"
-	unzip -oq $zipfile ${proj}libs/\*; errcode=$?
+	unzip -oq $zipfile "${proj}libs/**"; errcode=$?
 	if [ $errcode -gt 0 ]; then
 		echo "${c_err}... failed to install packages${c_def} (errcode: $errcode)"
 		cleanup_and_exit $errcode
@@ -70,7 +79,7 @@ if [ ! -f $proj/readme.txt ]; then
 fi
 
 # upgrade
-old_ver=$(cat ${proj}readme.txt | head -n 1 | sed -e "s/^.\+ \(v.\+\)$/\1/")
+old_ver=$(cat ${proj}readme.txt | head -n 1 | sed -e "s/^.* \(v.*\)$/\1/")
 echo "==> ... updating ${c_inf}$proj${c_def} from ${old_ver} ..."
 
 echo -n "${c_deb}"
@@ -88,10 +97,10 @@ safe_echo() {
 }
 check_update_lib() {
 	desc=$(unzip -p $zipfile ${lib}DESCRIPTION | tr -d "\r")
-	zip_hash=$(echo "$desc" | md5sum | sed -e "s/\s.*$//")
-	name=$(echo "$desc" | grep Package: | sed -e "s/^.*:\s\+//")
+	zip_hash=$(echo "$desc" | $MD5CMD | sed -e 's/[ \t].*$//')
+	name=$(echo "$desc" | grep Package: | sed -e 's/^.*:[ \t]*//')
 	if [ -f ${proj}libs/${name}/DESCRIPTION ]; then
-		old_hash=$(cat ${proj}libs/${name}/DESCRIPTION | tr -d "\r" | md5sum | sed -e 's/\s.*$//')
+		old_hash=$(cat ${proj}libs/${name}/DESCRIPTION | tr -d "\r" | $MD5CMD | sed -e 's/[ \t].*$//')
 		if [ "${old_hash}" == "${zip_hash}" ]; then
 			safe_echo "${c_def}... ${lib} ... ${c_inf}same${c_def}"
 			return 0

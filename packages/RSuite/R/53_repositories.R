@@ -90,7 +90,7 @@
       }
       if (!file.exists(cache_fpath)
           || .is_cache_too_old(cache_fpath)
-          || .is_cache_too_small(cahce_fpath)) {
+          || .is_cache_too_small(cache_fpath)) {
         return(NULL)
       }
 

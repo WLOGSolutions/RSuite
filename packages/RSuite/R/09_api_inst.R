@@ -65,5 +65,6 @@ inst_wrap_zip <- function(zip_fpath) {
   flush(dst_con)
 
   pkg_loginfo("Creating installation package into %s ... done", dst_fpath)
+  Sys.chmod(dst_fpath, "0755", use_umask = FALSE)
   return(invisible(dst_fpath))
 }
