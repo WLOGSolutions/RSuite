@@ -200,6 +200,26 @@ sub_commands <- list(
       return(invisible(zip_fpath))
     }
   ),
+  # inst ----
+  inst = list(
+    help = "Build project deployment installation package.",
+    options = list(
+      make_option(c("-p", "--path"), dest = "path",
+                  help="Directory to put built installation package into (default: current directory)"),
+      make_option(c("--version"), dest = "version",
+                  help="Version to use for package tagging (default: use ZipVersion form PARAMETERS and revision from RC)"),
+      make_option(c("--extras"), dest = "extras",
+                  help= paste("Comma separated list extra resources to include into installation package.",
+                              "The resource can folder or file which is put into extras subfolder into package.",
+                              sep = "\n\t\t"))
+    ),
+    run = function(opts) {
+      zip_fpath <- sub_commands$zip$run(opts)
+      on.exit(unlink(zip_fpath, force = TRUE))
+      inst_fpath <- RSuite::inst_wrap_zip(zip_fpath)
+      return(invisible(inst_fpath))
+    }
+  ),
   # pack ----
   pack = list(
     help = "Build project sources pack.",

@@ -74,6 +74,45 @@ sub_commands <- list(
       return(invisible(zip_fpath))
     }
   ),
+  # inst ----
+  inst = list(
+    help = "Build project in docker container and generate installation package.",
+    options = list(
+      make_option(c("-i", "--image"), dest = "image", default = NULL,
+                  help="Image to use for building project. (default: %default)"),
+      make_option(c("-p", "--platform"), dest = "platform", default = "ubuntu",
+                  help=paste("Build project for plaform passed. One of ubuntu, debian or centos.",
+                             "Used if image not specified. (default: %default)",
+                             sep = "\n\t\t")),
+      make_option(c("--rver"), dest = "rver", default=NULL,
+                  help="If passed will enforce project building for passed version of R. (default: %default)"),
+      make_option(c("--sh"), dest = "sh",
+                  help="Extra command to execute on container before building project."),
+      make_option(c("--dont-rm"), dest = "dont_rm", action="store_true", default=FALSE,
+                  help="If passed will not remove build container on error or success."),
+      make_option(c("--version"), dest = "version",
+                  help=paste("Version to use for project pack tagging.",
+                             "(default: use ZipVersion form PARAMETERS and revision from RC)",
+                             sep = "\n\t\t")),
+      make_option(c("--packages"), dest = "pkgs",
+                  help=paste("Comma separated list of project packages to include into project pack.",
+                             "If not passed all project packages will be included.",
+                             sep = "\n\t\t")),
+      make_option(c("--exc-master"), dest = "exc_master", action="store_true", default=FALSE,
+                  help="If passed will exclude master scripts from project pack created. (default: %default)"),
+      make_option(c("-d", "--dest"), dest = "dest",
+                  help=paste("Directory to put built installation package into. It must exist.",
+                             "(default: current directory)",
+                             sep = "\n\t\t"))
+    ),
+    run = function(opts) {
+      zip_fpath <- sub_commands$zip$run(opts)
+      on.exit(unlink(zip_fpath, force = TRUE))
+
+      inst_fpath <- RSuite::inst_wrap_zip(zip_fpath)
+      return(invisible(inst_fpath))
+    }
+  ),
   # img ----
   img = list(
     help = "Build docker image containg deployed project.",

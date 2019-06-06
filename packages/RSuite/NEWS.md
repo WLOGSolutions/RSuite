@@ -9,6 +9,7 @@
     to find out which caused the problem while installing.
   * Fixed default proj template to run properly on OSX
   * Updated sysreqsdb to handle conda, python and make on OSX
+  * Added ability to wrap deploymnet zip into bash installer package.
 
 # RSuite 0.36 (2019-03-06)
   * #184: detecting declaration of dependencies in scripts with "library (...)".

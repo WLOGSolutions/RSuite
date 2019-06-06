@@ -7,6 +7,8 @@ VERSION 0.37 (2019-06-*)
     'docker run'. It make possible using images without supervisord or any
     other entry point. By default 'top -b' is used which makes it possible
     to run container in background for subsequent operations.
+  * 'proj inst' sub-command added to create bash installer package out
+    RSuite project.
 
 VERSION 0.36 (2019-03-06)
   * fixed 'docker stop' to remove also stopped containers.

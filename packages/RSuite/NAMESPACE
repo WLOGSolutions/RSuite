@@ -3,6 +3,7 @@
 export(ci_adapter_create_base)
 export(ci_adapter_get_version)
 export(ci_adapter_is_building)
+export(inst_wrap_zip)
 export(pkgzip_build_bioc_package)
 export(pkgzip_build_ext_packages)
 export(pkgzip_build_github_package)
