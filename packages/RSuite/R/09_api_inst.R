@@ -16,7 +16,8 @@
 #' Shell script is created at the same location as zip package passed and will have
 #' the same name with sh extension.
 #'
-#' @return zip_fpath path to zip package to wrap. It must exist. (type: character)
+#' @param zip_fpath path to zip package to wrap. It must exist. (type: character)
+#' @return path to created bash installer script (invisible)
 #'
 #' @family in installer
 #'

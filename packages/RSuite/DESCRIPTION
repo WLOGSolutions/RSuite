@@ -8,6 +8,7 @@ Authors@R: c(
     person("Yulia", "Yakimechko", email = "yakimechko@wlogsolutions.com", role = "aut"),
     person("Mateusz", "Kalinowski", email = "m.kalinowski@wlogsolutions.com", role = "aut"),
     person("Ryszard", "Szymanski", email = "rszymanski@wlogsolutions.com", role = "aut"),
+    person("Alfonso", "Reyes", email = "alfonso.reyes@oilgainsanalytics.com", role = "ctb"),
     person("WLOG Solutions", role = "cph"),
     person("R Consortium", role = "ctb",
       comment = "Definitions of system requirements are taken from sysreqsdb project.")

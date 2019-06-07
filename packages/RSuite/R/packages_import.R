@@ -84,6 +84,14 @@ NULL
 #'   \item{\code{\link{pkgzip_build_bioc_package}}}{Builds PKGZIP out of a package on BioConductor.}
 #' }
 #'
+#' @section Bash installer:
+#' You can create bash installer script to deploy in optimized (intelligent & parallel) way you
+#' project.
+#'
+#' \describe{
+#'   \item{\code{inst_wrap_zip}}{Wraps deployment zip into bash installer script.}
+#' }
+#'
 #' @section RSuite miscellaneous:
 #'
 #' \describe{
