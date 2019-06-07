@@ -1,4 +1,4 @@
-VERSION 0.37 (2019-06-*)
+VERSION 0.37 (2019-06-07)
   * better support for cygwin (or msys) environment
   * passing parameters with $@ instead of $* in bash scripts to prevent
     interpreting spaces in arguments as parameter separators.

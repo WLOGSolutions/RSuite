@@ -1,4 +1,4 @@
-# RSuite 0.37 (2019-06-??)
+# RSuite 0.37 (2019-06-07)
   * Detection if vignettes are to build fixed.
   * Fixed building vignettes: use devtools::build_vignettes and place generated
     files for building not just for loading. Also if vignettes index is generated
