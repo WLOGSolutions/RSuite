@@ -178,7 +178,7 @@ perform.sysreqs_check_recipe <- function(recipe) {
   }
 
   check_tool_cmd <- get_libtool_cmd(check_tool, "check") # from 56_sysreqs_utils.R
-  if (!is_libtool_user(check_tool)) { # from 56_sysreqs_utils.R
+  if (!is_libtool_user(check_tool)) {
     return(invisible(result))
   }
   result$nolibs <- .detect_unavailable_syslibs(check_tool_cmd, syslib_names)

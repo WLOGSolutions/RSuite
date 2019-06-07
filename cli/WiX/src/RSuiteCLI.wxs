@@ -78,7 +78,7 @@
                                 <File Id='PACKAGES.gz' Name='PACKAGES.gz' DiskId='1' Source='../R/packages/src/contrib/PACKAGES.gz' />
                                 <File Id='getopt_1.20.0.tar.gz' Name='getopt_1.20.0.tar.gz' DiskId='1' Source='../R/packages/src/contrib/getopt_1.20.0.tar.gz'/>
                                 <File Id='optparse_1.4.4.tar.gz' Name='optparse_1.4.4.tar.gz' DiskId='1' Source='../R/packages/src/contrib/optparse_1.4.4.tar.gz' />
-                                <File Id='logging_0.9-107.tar.gz' Name='logging_0.9-107.tar.gz' DiskId='1' Source='../R/packages/src/contrib/logging_0.9-107.tar.gz' />
+                                <File Id='logging_0.9_107.tar.gz' Name='logging_0.9-107.tar.gz' DiskId='1' Source='../R/packages/src/contrib/logging_0.9-107.tar.gz' />
                             </Component>
                         </Directory>
                     </Directory>

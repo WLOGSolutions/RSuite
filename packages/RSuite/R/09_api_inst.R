@@ -50,7 +50,7 @@ inst_wrap_zip <- function(zip_fpath) {
   on.exit(close(src_con), add = TRUE)
 
   batch_size <- 5 * 1024 * 1024 # 5M
-  while(TRUE) {
+  while (TRUE) {
     in_dat <- readBin(src_con, raw(), n = batch_size)
     tryCatch(writeBin(in_dat, dst_con),
              error = function(e) {

@@ -214,7 +214,7 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
   }
 
   unlink_paths <- c()
-  for(subdir in c("doc", "Meta", "inst")) {
+  for (subdir in c("doc", "Meta", "inst")) {
     if (!dir.exists(file.path(pkg_path, subdir))) {
       unlink_paths <- c(unlink_paths, file.path(pkg_path, subdir))
     }
@@ -271,7 +271,7 @@ pkg_build_vignettes <- function(pkg_name, pkg_path, rver, ex_libpath) {
     unlink_paths <- c(unlink_paths, file.path(pkg_path, "inst", "doc"))
   }
 
-  for(f in list.files(file.path(pkg_path, "doc"))) {
+  for (f in list.files(file.path(pkg_path, "doc"))) {
     if (file.exists(file.path(pkg_path, "inst", "doc", f))) {
       next
     }
