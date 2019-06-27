@@ -40,6 +40,7 @@ addons:
     - libcurl4-openssl-dev
     - zlib1g-dev
     - libgit2-dev
+    - libcurl4-gnutls-dev
 
 install:
 - Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'
