@@ -142,6 +142,8 @@ Let's assume that we need to create a Docker image containing our project for th
 rsuite docker img -t my_image:1.0 -p ubuntu
 ```
 
+What this command does is downloading a pre-made Ubuntu Docker container (14.x), execute the container, and start building the `rsuite` project inside, with all its package dependencies as binaries. The original `rsuite` project, in the physical machine, remains unchanged with exception of a new zip file under the folder `deployment/docker_cache` containing all the packages dependencies just installed in the new Docker container. In other words, the `rsuite` project building process doesn't take place in the host machine but rather in the specified Docker container. This Docker image can later be uploaded to DockerHub, or an internal cloud, for distribution.
+
 The output should look like this:
 ```
 2018-07-19 10:58:18 INFO::Will use wlog/rsuite:ubuntu_r3.4 as base image!
