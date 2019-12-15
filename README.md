@@ -4,7 +4,7 @@
 
 # RSuite <img src="docs/media/r_suite_sticker_300px.png" align="right" height = 150/>
 
-R Suite an R package which together with R Suite CLI tool enables you to design deployment workflow that fits you and makes R your primary data science platform. It has beed developed by [WLOG Solutions](https://wlogsolutions.com) company to make their development and deployment data science process robust. 
+R Suite an R package which together with R Suite CLI tool enables you to design deployment workflow that fits you and makes R your primary data science platform. It has been developed by [WLOG Solutions](https://wlogsolutions.com) company to make their development and deployment data science process robust. 
 
 R Suite gives answers to the following challenges for any R based software and data science solution:
 
