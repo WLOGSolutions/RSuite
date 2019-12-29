@@ -951,7 +951,7 @@ repo_upload_bioc_package <- function(repo_manager, repo, ...,
   unlink(list.files(bld_prj$load_params()$script_path, # not to include default packages
                     pattern = ".+[.]R$", full.names = TRUE),
          force = TRUE)
-  prj_install_deps(bld_prj, vanilla_sups = TRUE)
+  prj_install_deps(bld_prj, sups = "vanilla")
 
   repo_upload_prj_packages(repo_manager, pkgs = pkg_info$name, prj = bld_prj,
                            skip_rc = TRUE, pkg_type = pkg_type,

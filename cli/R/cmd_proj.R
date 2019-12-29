@@ -85,7 +85,7 @@ sub_commands <- list(
     run = function(opts) {
       RSuite::prj_install_deps(clean = opts$clean,
                                relock = opts$relock,
-                               vanilla_sups = opts$vanilla_sups)
+                               sups = ifelse(opts$vanilla_sups, "vanilla", "all"))
     }
   ),
   # build ----

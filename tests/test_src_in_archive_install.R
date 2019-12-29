@@ -20,7 +20,7 @@ test_that_managed("glue in archive version is installed", {
   prj <- init_test_project(repo_adapters = c("Dir", "CRAN"))  # uses BaseTestProjectTemplate with logging 0.7-103
   create_test_package("TestPackage1", prj, imps = "glue (== 1.1)")
 
-  RSuite::prj_install_deps(prj)
+  RSuite::prj_install_deps(prj, sups = "none")
 
   expect_that_packages_installed(c("logging", "glue"), prj, c("0.7-103", "1.1.0")) # logging is always installed
 })

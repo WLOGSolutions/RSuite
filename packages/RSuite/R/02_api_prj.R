@@ -427,8 +427,13 @@ prj_unload <- function() {
 #'    project for working directory. (type: rsuite_project, default: NULL)
 #' @param clean if TRUE clear environment before installing package dependencies.
 #'   (type: logical, default: FALSE)
-#' @param vanilla_sups if TRUE install only base supportive packages (like devtools & roxygen2).
-#'   (type: logical, default: FALSE)
+#' @param sups specifies which supportive packages should be installed. One of
+#' \describe{
+#'  \item{none}{Do not install supportive packages}
+#'  \item{vanilla}{Install only base supportive packages(like devtools & roxygen2)}
+#'  \item{all}{Install all packages in suggests}
+#'  }
+#'  (type: character(1), default: all)
 #' @param relock if TRUE allows updating the env.lock file
 #'   (type: logical, default: FALSE)
 #'
@@ -453,8 +458,11 @@ prj_unload <- function() {
 #'
 prj_install_deps <- function(prj = NULL,
                              clean = FALSE,
-                             vanilla_sups = FALSE,
+                             sups = "all",
                              relock = FALSE) {
+  assert(is.character(sups) && length(sups) == 1, "character(1) expected for 'sups'")
+  assert(sups %in% c("none", "vanilla", "all"), "One of none,vanilla,all expected for 'sups'")
+
   prj <- safe_get_prj(prj)
   stopifnot(!is.null(prj))
 
@@ -477,7 +485,7 @@ prj_install_deps <- function(prj = NULL,
   }
 
   install_prj_deps(params, # from 11_install_prj_deps.R
-                   vanilla_sups = vanilla_sups,
+                   sups = sups,
                    relock = relock)
 }
 

@@ -13,8 +13,13 @@
 #' scripts.
 #'
 #' @param params project parameters. (type: rsuite_project_params)
-#' @param vanilla_sups if TRUE collects only base supportive packages.
-#'   (type: logical, default: FALSE)
+#' @param sups specifies which supportive packages should be installed. One of
+#' \describe{
+#'  \item{none}{Do not install supportive packages}
+#'  \item{vanilla}{Install only base supportive packages(like devtools & roxygen2)}
+#'  \item{all}{Install all packages in suggests}
+#'  }
+#'  (type: character(1), default: all)
 #' @param relock if TRUE allows to update the env.lock file
 #'   (type: logical, default: FALSE)
 #' @param check_repos_consistency if TRUE will prevent installing
@@ -24,7 +29,7 @@
 #' @noRd
 #'
 install_prj_deps <- function(params,
-                             vanilla_sups = FALSE,
+                             sups = "all",
                              relock = FALSE,
                              check_repos_consistency = is_r_stable()) {
   pkg_loginfo("Detecting repositories (for R %s)...", params$r_ver)
@@ -41,8 +46,11 @@ install_prj_deps <- function(params,
                        rver = params$r_ver,
                        check_repos_consistency = check_repos_consistency)
 
+  if (sups == "none") {
+    return(invisible())
+  }
 
-  avail_sup_vers <- resolve_prj_sups(repo_infos, params, vanilla = vanilla_sups)
+  avail_sup_vers <- resolve_prj_sups(repo_infos, params, vanilla = (sups == "vanilla"))
   if (!is.null(avail_sup_vers)) {
     install_support_pkgs(avail_sup_vers,
                          sbox_dir = params$sbox_path,

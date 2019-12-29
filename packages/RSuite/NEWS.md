@@ -1,3 +1,7 @@
+# RSuite 0.38 (2020-01-??)
+  * RSuite::prj_install_deps accepts sups (one of none, vanilla, all) instead of
+    vanilla_sups flag.
+    
 # RSuite 0.37 (2019-06-07)
   * Detection if vignettes are to build fixed.
   * Fixed building vignettes: use devtools::build_vignettes and place generated

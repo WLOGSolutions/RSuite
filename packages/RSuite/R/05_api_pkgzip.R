@@ -96,7 +96,7 @@
 #'   prj_start_package("mypackage", skip_rc = TRUE, prj = prj)
 #'
 #'   # build project environment and install supportives
-#'   prj_install_deps(prj = prj, vanilla_sups = TRUE)
+#'   prj_install_deps(prj = prj, sups = "vanilla")
 #'
 #'   # build PKGZIP
 #'   pkgzip_fpath <- pkgzip_build_prj_packages(prj = prj, path = tempdir())
@@ -640,7 +640,7 @@ pkgzip_build_bioc_package <- function(repo, ...,
 
   # not to include default packages
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = TRUE), force = TRUE)
-  prj_install_deps(bld_prj, vanilla_sups = TRUE)
+  prj_install_deps(bld_prj, sups = "none")
 
   pkg_ver <- read.dcf(file.path(bld_params$pkgs_path, pkg_info$dir, "DESCRIPTION"))[1, "Version"]
 

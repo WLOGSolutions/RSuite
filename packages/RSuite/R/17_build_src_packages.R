@@ -66,7 +66,7 @@ build_source_packages <- function(avail_pkgs, dest_dir, pkg_type, params, rver =
 
   # not to include default packages
   unlink(list.files(bld_params$script_path, pattern = ".+[.]R$", full.names = TRUE),  force = TRUE)
-  prj_install_deps(bld_prj, vanilla_sups = TRUE) # build environment
+  prj_install_deps(bld_prj, sups = "vanilla") # build environment
 
   # build packages itself
   build_install_prj_packages(bld_params, # from 12_build_install_prj_pacakges.R
