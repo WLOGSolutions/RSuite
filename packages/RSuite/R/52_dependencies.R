@@ -73,7 +73,8 @@ collect_uninstalled_direct_deps <- function(params, check_rver = TRUE) {
 collect_prj_direct_deps <- function(params) {
   pkg_vers <- collect_pkgs_direct_deps(params)
   msc_vers <- collect_mscs_direct_deps(params)
-  prj_vers <- vers.union(pkg_vers, msc_vers)
+  r_reqs <- vers.build("R", params$r_ver, params$r_ver) # enforce current R version requirement
+  prj_vers <- vers.union(pkg_vers, msc_vers, r_reqs)
   return(prj_vers)
 }
 
@@ -219,16 +220,6 @@ collect_pkgs_direct_deps <- function(params) {
   assert(length(unfeasibles) == 0,
          "Packages with unfeasible requirements detected: %s", paste(unfeasibles$pkg, collapse = ", "))
 
-  # Check R version
-  req_r_ver <- vers.get(pkgs_vers, "R")
-  if (nrow(req_r_ver)) {
-    cur_r_ver <- sprintf("%s.%s", R.version$major, R.version$minor)
-    assert( (is.na(req_r_ver$vmin) || req_r_ver$vmin <= cur_r_ver)
-            && (is.na(req_r_ver$vmax) || req_r_ver$vmax >= cur_r_ver),
-            "R version(%s) does not meet requirements: it must be in range %s .. %s",
-            cur_r_ver, req_r_ver$vmin, req_r_ver$vmax)
-  }
-
   pkgs_vers <- vers.rm_base(pkgs_vers)
   return(pkgs_vers)
 }
@@ -249,7 +240,18 @@ collect_pkgs_direct_deps <- function(params) {
 #'
 collect_single_pkg_direct_deps <- function(params, pkg_dir, pkg_name) {
   deps <- desc_retrieve_dependencies(params$pkgs_path, pkg_dir) # from 51_pkg_info.R
-  vers.from_deps(deps, pkg_name)
+  res <- vers.from_deps(deps, pkg_name)
+
+  r_reqs <- vers.get_r_reqs(res)
+  r_ver <- norm_version(params$r_ver)
+  assert(is.na(r_reqs$vmin) || r_reqs$vmin <= r_ver,
+         "Package '%s' requires R (>= %s) and cannot be built under R %s",
+         pkg_name, denorm_version(r_reqs$vmin), params$r_ver)
+  assert(is.na(r_reqs$vmax) || r_reqs$vmax >= r_ver,
+         "Package '%s' requires R (<= %s) and cannot be built under R %s",
+         pkg_name, denorm_version(r_reqs$vmax), params$r_ver)
+
+  return(res)
 }
 
 
@@ -313,10 +315,10 @@ collect_dir_script_deps <- function(dir, recursive = TRUE) {
 }
 
 #'
-#' Retrieves all subsequent dependencies for packages described by version
-#' object passed.
+#' Retrieves all subsequent dependencies for packages described by missings
+#' in provided check result object.
 #'
-#' @param vers version object describing packages to retrieve all subsequent
+#' @param cr check result object with missings to retrieve all subsequent
 #'    dependencies for.
 #' @param repo_info description of repository to search for
 #'    dependencies in. Unused if avail_pkgs passed. (object of rsuite_repo_info)
@@ -329,8 +331,9 @@ collect_dir_script_deps <- function(dir, recursive = TRUE) {
 #' @keywords internal
 #' @noRd
 #'
-collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extra_reqs = NULL) {
-  stopifnot(is.versions(vers))
+collect_all_subseq_deps <- function(cr, repo_info, type, all_pkgs = NULL, extra_reqs = NULL) {
+  stopifnot(is.check_result(cr))
+  stopifnot(check_res.has_missing(cr))
   stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
 
   resolve_in_archive <- function(cr) {
@@ -342,19 +345,21 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
 
     contrib_url <- repo_info$get_contrib_url(type)    # from 53_repositories.R
     avail_vers <- vers.collect(contrib_url)
+    avail_vers <- vers.union(avail_vers, check_res.get_found(cr))
     all_pkgs <- avail_vers$get_avails()
 
     if (type == "source") {
       resolve_in_archive <- function(cr) {
-        resolve_deps_in_src_archive(cr, repo_info)
+        resolve_deps_in_src_archive(cr, repo_info, all_pkgs)
       }
     }
   } else {
     avail_pkgs <- as.data.frame(all_pkgs, stringsAsFactors = FALSE)
+    avail_pkgs <- rbind(avail_pkgs, check_res.get_found(cr)$get_avails())
     avail_vers <- vers.collect(pkgs = avail_pkgs)
   }
 
-  vers <- vers.rm_base(vers)
+  vers <- vers.rm_base(check_res.get_missing(cr))
   vers_cr <- vers.check_against(vers, avail_vers, extra_reqs)
   vers_cr <- resolve_in_archive(vers_cr)
 
@@ -372,8 +377,8 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
     dep_vers <- vers.rm_base(dep_vers)
 
     # enforce previous requirements onto dependencies detected
-    dep_vers <- vers.union(dep_vers,
-                           vers.select(extra_reqs, vers.get_names(dep_vers)))
+    prev_req_names <- c(vers.get_names(dep_vers), "R")
+    dep_vers <- vers.union(dep_vers, vers.select(extra_reqs, prev_req_names))
 
     next_cr <- vers.check_against(dep_vers, avail_vers, extra_reqs)
     next_cr <- resolve_in_archive(next_cr)
@@ -384,13 +389,18 @@ collect_all_subseq_deps <- function(vers, repo_info, type, all_pkgs = NULL, extr
 }
 
 
-resolve_deps_in_src_archive <- function(cr, repo_info) {
+resolve_deps_in_src_archive <- function(cr, repo_info, base_avails) {
   missing_vers <- check_res.get_missing(cr)
 
   reqs <- vers.get(missing_vers, vers.get_names(missing_vers))
   pkg_avails <- by(reqs, seq_len(nrow(reqs)), FUN = function(req) {
-    if (is.na(req$vmin) && is.na(req$vmax)) {
+    if (!(req$pkg %in% base_avails$Package)) {
       return()
+    }
+    req_vmin <- req$vmin
+    req_vmax <- norm_version(base_avails[base_avails$Package == req$pkg, ]$Version[[1]])
+    if (!is.na(req$vmax) && req$vmax < req_vmax) {
+      req_vmax <- req$vmax
     }
 
     avails <- repo_info$get_arch_src_cache(req$pkg)
@@ -425,16 +435,29 @@ resolve_deps_in_src_archive <- function(cr, repo_info) {
     }
 
     avails$NVersion <- norm_version(avails$Version)
-    if (!is.na(req$vmin)) {
-      avails <- avails[avails$NVersion >= req$vmin, ]
+    if (!is.na(req_vmin)) {
+      avails <- avails[avails$NVersion >= req_vmin, ]
     }
-    if (!is.na(req$vmax)) {
-      avails <- avails[avails$NVersion <= req$vmax, ]
-    } else if (nrow(avails) > 1) {
-      # latest will surely be sufficient
-      avails <- avails[order(avails$NVersion, decreasing = T), ][1, ]
+    if (!is.na(req_vmax)) {
+      avails <- avails[avails$NVersion <= req_vmax, ]
     }
+    avails <- avails[order(avails$NVersion, decreasing = T), ]
 
+    # bin search max version which do not present missing dependency
+    # then checking against requirements
+    check_ver <- vers.select(missing_vers, c(req$pkg, "R"))
+    while(nrow(avails) > 1) {
+      mrow <- avails[(nrow(avails) +1) / 2, ]
+      mrow_avail <- dload_src_arch_avail_pkgs(mrow, repo_info$rver)
+      mrow_avail <- mrow_avail[mrow_avail$Version == mrow$Version, ]
+
+      mid_cr <- vers.check_against(check_ver, vers.collect(pkgs = mrow_avail))
+      if (check_res.has_missing(mid_cr)) {
+        avails <- avails[avails$NVersion < mrow$NVersion, ]
+      } else {
+        avails <- avails[avails$NVersion >= mrow$NVersion, ]
+      }
+    }
     return(avails)
   },
   simplify = FALSE)
@@ -525,7 +548,7 @@ collect_prj_required_dep_names <- function(params, installed) {
   installed$Repository <- rep(params$lib_path, nrow(installed))
   installed$File <- rep(NA, nrow(installed))
 
-  cr <- collect_all_subseq_deps(deps, all_pkgs = installed)
+  cr <- collect_all_subseq_deps(check_res.build(missing = deps), all_pkgs = installed)
 
   proj_pkgs <- build_project_pkgslist(params$pkgs_path) # from 51_pkg_info.R
   required <- c(cr$get_found_names(), proj_pkgs)

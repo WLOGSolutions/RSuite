@@ -137,7 +137,8 @@ get_closest_version <- function(ver, type) {
     avails <- avails[avails$Package %in% df$pkg, ]
     avails <- avails[!duplicated(avails[, c("Package", "Version")]), ]
 
-    stopifnot(all( (df$pkg %in% avails$Package)                                # present in avails
+    stopifnot(all( df$pkg == "R"                                               # R version limitation
+                   | (df$pkg %in% avails$Package)                              # present in avails
                    | (!is.na(df$vmin) & !is.na(df$vmax) & df$vmin > df$vmax))) # or infeasible
 
     avails$NVersion <- norm_version(avails$Version)
@@ -149,7 +150,8 @@ get_closest_version <- function(ver, type) {
     avails <- avails[, c(.standard_avail_columns(), "NVersion")]
   }
 
-  res <- list(pkgs = df, avails = avails)
+  res <- list(pkgs = df,
+              avails = avails)
   class(res) <- "versions"
 
   res$get_avails <- function() res$avails
@@ -167,9 +169,13 @@ get_closest_version <- function(ver, type) {
 #'
 print.versions <- function(ver) {
   cat("--- reqs --\n")
-  print(ver$pkgs)
-  cat("--- avails --\n")
-  print(ver$avails)
+  print(ver$pkgs[ver$pkgs$pkg != "R",])
+  cat("--- R ver --\n")
+  print(ver$pkgs[ver$pkgs$pkg == "R", c("vmin", "vmax")])
+  if (!is.null(ver$avails)) {
+    cat("--- avails --\n")
+    print(ver$avails)
+  }
 }
 
 
@@ -247,14 +253,14 @@ vers.check_against <- function(ver, oth, extra_reqs = NULL) {
   avails <- rbind(ver$get_avails(), oth$get_avails())
 
   # test against non availability
-  nonavail <- ver_diff[!(ver_diff$pkg %in% avails$Package), ]
+  nonavail <- ver_diff[!(ver_diff$pkg %in% avails$Package) & ver_diff$pkg != "R", ]
   ver_diff <- ver_diff[!(ver_diff$pkg %in% nonavail$pkg), ]
 
   # test against version availability and version requirements
   test_ver <- .df2ver(ver_diff, avails = avails)
   test_ver <- vers.filter_sub_deps(test_ver, extra_reqs)
 
-  nonavail <- rbind(nonavail, ver_diff[!(ver_diff$pkg %in% test_ver$get_avails()$Package), ])
+  nonavail <- rbind(nonavail, ver_diff[!(ver_diff$pkg %in% test_ver$get_avails()$Package) & ver_diff$pkg != "R", ])
   ver_diff <- ver_diff[!(ver_diff$pkg %in% nonavail$pkg), ]
 
   unfeasibles <- ver_diff[ver_diff$pkg %in% vers.get_unfeasibles(test_ver), ]
@@ -301,7 +307,7 @@ vers.get_unfeasibles <- function(ver) {
   stopifnot(is.versions(ver))
   unfeasibles <- ver$pkgs[!is.na(ver$pkgs$vmin) & !is.na(ver$pkgs$vmax) & ver$pkgs$vmin > ver$pkgs$vmax, ]$pkg
   if (ver$has_avails()) {
-    unfeasibles <- c(unfeasibles, ver$pkgs[!(ver$pkgs$pkg %in% ver$get_avails()$Package), ]$pkg)
+    unfeasibles <- c(unfeasibles, ver$pkgs[!(ver$pkgs$pkg %in% ver$get_avails()$Package) & ver$pkgs$pkg != "R", ]$pkg)
     unfeasibles <- unique(unfeasibles)
   }
   return(unfeasibles)
@@ -403,7 +409,7 @@ vers.rm_base <- function(ver) {
   stopifnot(is.versions(ver))
 
   base_pkgs <- utils::installed.packages(lib.loc = c(.Library.site, .Library), priority = "base")[, "Package"]
-  vers.rm(ver, c(base_pkgs, "R"))
+  vers.rm(ver, base_pkgs)
 }
 
 
@@ -476,7 +482,7 @@ vers.pick_available_pkgs <- function(ver) {
 #'
 vers.get_names <- function(ver) {
   stopifnot(is.versions(ver))
-  return(ver$pkgs$pkg)
+  return(setdiff(ver$pkgs$pkg, "R"))
 }
 
 #'
@@ -491,7 +497,26 @@ vers.get_names <- function(ver) {
 #'
 vers.is_empty <- function(ver) {
   stopifnot(is.versions(ver))
-  return(nrow(ver$pkgs) == 0)
+  return(nrow(ver$pkgs[ver$pkgs$pkg != "R", ]) == 0)
+}
+
+#'
+#' Retrieve R version requirements from version object
+#'
+#' @param ver version object to retrieve requirement from.
+#'
+#' @return data.frame with single row and columns pkg("R"), vmin, vmax.
+#'
+#' @keywords internal
+#' @noRd
+#'
+vers.get_r_reqs <- function(ver) {
+  stopifnot(is.versions(ver))
+  r_req <- ver$pkgs[ver$pkgs$pkg == "R", ]
+  if (nrow(r_req) == 0) {
+    r_req <- data.frame(pkg = "R", vmin = NA_character_, vmax = NA_character_, stringsAsFactors = FALSE)
+  }
+  return(head(r_req, 1))
 }
 
 #'
@@ -698,12 +723,22 @@ vers.filter_sub_deps <- function(ver, extra_reqs = NULL) {
     extra_reqs <- vers.union(vers.drop_avails(extra_reqs), vers.drop_avails(ver))
   }
 
+  r_reqs <- vers.get_r_reqs(ver)
 
   # Check dependency requirements of available packages
   is_compatible <- by(all_pkgs, seq_len(nrow(all_pkgs)), FUN = function(deps) {
     pkg_deps <- unname(unlist(deps[, c("Depends", "Imports", "LinkingTo")]))
     pkg_vers <- vers.from_deps(deps = paste(pkg_deps[!is.na(pkg_deps)], collapse = ", "),
                                pkg_name = deps$Package)
+
+    pkg_r_reqs <- vers.get_r_reqs(pkg_vers)
+    if (!is.na(r_reqs$vmin) && !is.na(pkg_r_reqs$vmax) & r_reqs$vmin > pkg_r_reqs$vmax) {
+      return(FALSE)
+    }
+    if (!is.na(r_reqs$vmax) && !is.na(pkg_r_reqs$vmin) & r_reqs$vmax < pkg_r_reqs$vmin) {
+      return(FALSE)
+    }
+
     pkg_vers$pkgs <- pkg_vers$pkgs[pkg_vers$pkgs$pkg %in% extra_reqs$pkgs$pkg, ] # keep only packages from vers
     dep_req_vers <- vers.union(pkg_vers, vers.drop_avails(extra_reqs))
 
@@ -711,7 +746,7 @@ vers.filter_sub_deps <- function(ver, extra_reqs = NULL) {
   })
 
   all_pkgs <- all_pkgs[is_compatible, ]
-  ver$pkgs <- ver$pkgs[ver$pkgs$pkg %in% all_pkgs$Package, ]
+  ver$pkgs <- ver$pkgs[ver$pkgs$pkg %in% all_pkgs$Package | ver$pkgs$pkg == "R", ]
   return(vers.add_avails(ver, all_pkgs))
 }
 

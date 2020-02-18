@@ -19,8 +19,10 @@ if (.Platform$OS.type == "windows") {
   tar_path <- Sys.which('tar')
   if (file.exists(tar_path)) {
     path <- unlist(strsplit(Sys.getenv('PATH'), .Platform$path.sep))
-    path <- path[gsub("\\\\$", "", path) != gsub('\\\\tar.exe$', '', tar_path)]
-    Sys.setenv(PATH = paste(path, collapse = .Platform$path.sep))
+    if (!("rtools" %in% tolower(path))) {
+      path <- path[gsub("\\\\$", "", path) != gsub('\\\\tar.exe$', '', tar_path)]
+      Sys.setenv(PATH = paste(path, collapse = .Platform$path.sep))
+    }
   }
 }
 

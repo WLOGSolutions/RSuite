@@ -397,21 +397,23 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
   stopifnot(is.null(extra_reqs) || is.versions(extra_reqs))
   stopifnot(is.character(pkg_types) && length(pkg_types) >= 1)
 
-
   curr_cr <- check_res.build(missing = vers.rm_base(vers))
-  all_deps <- check_res.get_missing(curr_cr)
-  curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
-  while (!setequal(vers.get_names(all_deps), curr_cr$get_found_names())) {
-    curr_missings <- vers.rm(all_deps, curr_cr$get_found_names())
+  while (check_res.has_missing(curr_cr)) {
     has_found_new_deps <- FALSE
     for (rp in repo_infos) {
       for (tp in pkg_types) {
-        tp_cr <- collect_all_subseq_deps(vers = curr_missings, # from 52_dependencies.R
+        if (!check_res.has_missing(curr_cr)) {
+          # all satisfied already
+          next
+        }
+
+        tp_cr <- collect_all_subseq_deps(cr = curr_cr, # from 52_dependencies.R
                                          repo_info = rp,
                                          type = tp,
                                          extra_reqs = extra_reqs)
 
-        if (!any(vers.get_names(curr_missings) %in% tp_cr$get_found_names())) {
+        if (!any(curr_cr$get_missing_names() %in% tp_cr$get_found_names())) {
+          # nothing found: check next pkg_type
           next
         }
 
@@ -438,23 +440,13 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
                        paste(infeasibles, collapse = ", ")))
         }
 
-
-        all_deps <- vers.union(all_deps,
-                               vers.drop_avails(check_res.get_found(tp_cr)),
-                               check_res.get_missing(tp_cr))
-
-        # remove new dependencies: these must be searched again from the beginning of pkg_types
-        new_deps_found <- setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings))
-        new_deps_missing <- setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings))
+        new_deps_found <- setdiff(tp_cr$get_found_names(), curr_cr$get_missing_names())
+        new_deps_missing <- setdiff(tp_cr$get_missing_names(), curr_cr$get_missing_names())
         if (length(c(new_deps_missing, new_deps_found)) != 0) {
           has_found_new_deps <- TRUE
         }
 
-        tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_found_names(), vers.get_names(curr_missings)))
-        tp_cr <- check_res.exclude(tp_cr, setdiff(tp_cr$get_missing_names(), vers.get_names(curr_missings)))
         curr_cr <- check_res.join(tp_cr, curr_cr)
-
-        curr_missings <- vers.rm(curr_missings, curr_cr$get_found_names())
       }
     }
 
@@ -463,9 +455,9 @@ resolve_dependencies <- function(vers, repo_infos, pkg_types, extra_reqs = NULL)
     }
   }
 
-  assert(vers.is_empty(curr_missings),
+  assert(!check_res.has_missing(curr_cr),
          "Required dependencies are not available: %s",
-         paste(vers.get_names(curr_missings), collapse = ", "))
+         paste(curr_cr$get_missing_names(), collapse = ", "))
 
   return(check_res.get_found(curr_cr))
 }

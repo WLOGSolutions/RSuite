@@ -46,7 +46,9 @@ has_package_changed <- function(pkg_dir, params, pkg_type) {
     return(FALSE)
   }
 
-  pkg_logfinest(sprintf("... changes detected in %s", changes$file))
+  for(rix in seq_len(nrow(changes))) {
+    pkg_logfinest("... changes detected in %s", changes[rix, ]$file)
+  }
   return(TRUE)
 }
 

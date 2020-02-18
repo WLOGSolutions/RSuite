@@ -272,7 +272,8 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   ou_file <- tempfile(fileext = ".RData")
   on.exit(unlink(ou_file, force = TRUE), add = TRUE)
 
-  bld_res <- run_rscript(c("library(devtools)",
+  bld_res <- run_rscript(c("library(rlang)", # to prevent version collision with older rlang
+                           "library(devtools)",
                            "library(rstudioapi)", # this is required for devtools >= 2.0.1
                            ".libPaths(%s)",
                            "setwd(%s)", # to prevent loading .Rprofile by R CMD

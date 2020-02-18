@@ -1,6 +1,12 @@
-# RSuite 0.38 (2020-01-??)
+# RSuite 0.38 (2020-02-??)
   * RSuite::prj_install_deps accepts sups (one of none, vanilla, all) instead of
     vanilla_sups flag.
+  * Then detecting source dependencies destination R version is considered and
+    if does not match archival versions (form 00Archive) are searched for match.
+  * Optimization performed while searching sub-dependencies: found versions are
+    used and not searched over and over again.
+  * SVN adapter fixed not to consider SVN warnings about invalid locale as 
+    changes on project working copy.
     
 # RSuite 0.37 (2019-06-07)
   * Detection if vignettes are to build fixed.

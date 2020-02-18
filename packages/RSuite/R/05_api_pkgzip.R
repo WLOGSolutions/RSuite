@@ -155,6 +155,9 @@ pkgzip_build_prj_packages <- function(pkgs = NULL,
                          collect_single_pkg_direct_deps(params, pkg_dir, pkgs[[pkg_dir]])
                        })
     dep_vers <- do.call("vers.union", raw_vers)
+    dep_vers <- vers.union(dep_vers, # add requirement over R version
+                           vers.build("R", vmin = params$r_ver, vmax = params$r_ver))
+
     inproj_deps <- intersect(prj_pkgs, vers.get_names(dep_vers))
     avail_vers <- collect_dependencies(vers.rm(dep_vers, inproj_deps), # from 18_repo_helpers.R
                                        pkg_type, params, filter_repo)

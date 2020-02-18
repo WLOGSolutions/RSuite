@@ -331,6 +331,7 @@ rc_adapter_get_version.rsuite_rc_adapter_svn <- function(rc_adapter, dir) {
 
   # detect if working copy needs update
   diff_lns <- .get_output_with_eng_lang("svn diff", "%s diff -r %s %s", svn_cmd, revision, dir)
+  diff_lns <- diff_lns[!grepl("^svn: warning:", diff_lns)] # get rid of svn warnings
   needs_update <- length(diff_lns) > 0
 
   return(list(

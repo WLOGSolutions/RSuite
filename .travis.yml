@@ -40,6 +40,7 @@ addons:
     - libcurl4-gnutls-dev
     - zlib1g-dev
     - libgit2-dev
+    - libaio1
 
 install:
 - Rscript -e 'install.packages(c("devtools"));if (!all(c("devtools") %in% installed.packages())) { q(status = 1, save = "no")}'

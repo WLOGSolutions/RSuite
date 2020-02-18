@@ -36,9 +36,10 @@ check_res.build <- function(found, missing) {
   }
   stopifnot(is.versions(missing))
 
+  r_req_ver <- vers.select(vers.union(vers.drop_avails(found), missing), "R")
   res <- list(
-    found = found,
-    missing = missing,
+    found = vers.union(found, vers.add_avails(r_req_ver, avails = found$avails)),
+    missing = vers.union(missing, r_req_ver),
 
     get_found_names = function() vers.get_names(found),
     get_missing_names = function() vers.get_names(missing)
@@ -60,8 +61,8 @@ check_res.build <- function(found, missing) {
 print.check_result <- function(cr) {
   cat("found:\n")
   print(cr$found)
-  cat("missing:\n")
-  print(cr$missing$pkgs)
+  cat("\nmissing:\n")
+  print(cr$missing)
 }
 
 
