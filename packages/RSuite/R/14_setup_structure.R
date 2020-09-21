@@ -261,7 +261,7 @@ create_project_structure <- function(prj_dir, prj_tmpl = "builtin") {
   assert(success, "Failed to copy template files.")
 
   # now replace markers in files
-  files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE)
+  files <- list.files(prj_dir, full.names = TRUE, include.dirs = FALSE, recursive = TRUE, all.files = TRUE, no.. = TRUE)
   files <- files[!file.info(files)$isdir]
 
   if (!file.exists(file.path(tmpl_dir, "PARAMETERS"))

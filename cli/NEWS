@@ -1,4 +1,4 @@
-VERSION 0.38 (2019-02-??)
+VERSION 0.38 (2019-09-21)
   * rsuite bash script uses cd hack to detect work folder instead of
     calling Rscript
   * on windows first tar path is removed unless it does not contain Rtools

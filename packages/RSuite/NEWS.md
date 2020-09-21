@@ -1,4 +1,5 @@
-# RSuite 0.38 (2020-02-??)
+# RSuite 0.38 (2020-09-21)
+  * RSuite::proj_start properly handles dot files in templates 
   * RSuite::prj_install_deps accepts sups (one of none, vanilla, all) instead of
     vanilla_sups flag.
   * Then detecting source dependencies destination R version is considered and
