@@ -54,7 +54,7 @@ install:
 script:
 - R CMD build .
 - R CMD check *tar.gz
-- Rscript -e 'devtools::install()'
+- Rscript -e 'devtools::install(repos = ${R_REPOS})'
 - cd ../../tests
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then Rscript run_tests.R; else sudo -E env "PATH=$PATH" Rscript run_tests.R; fi
 
