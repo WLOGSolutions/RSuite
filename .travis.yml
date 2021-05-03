@@ -44,11 +44,11 @@ addons:
 
 install:
 - if [ "$TRAVIS_R_VERSION" == "3.2.5" ]; then export R_REPOS="'https://mran.microsoft.com/snapshot/2020-07-01/'"; else export R_REPOS="getOption('repos')"; fi
-- Rscript -e "install.packages(c('devtools'), repos = ${R_REPO});if (!all(c('devtools') %in% installed.packages())) { q(status = 1, save = 'no')}"
-- Rscript -e "install.packages(c('knitr'), repos = ${R_REPO});if (!all(c("knitr") %in% installed.packages())) { q(status = 1, save = "no")}"
-- Rscript -e "install.packages(c('rmarkdown'), repos = ${R_REPO});if (!all(c("rmarkdown") %in% installed.packages())) { q(status = 1, save = "no")}"
-- Rscript -e "install.packages(c('testthat'), repos = ${R_REPO});if (!all(c("testthat") %in% installed.packages())) { q(status = 1, save = "no")}"
-- Rscript -e "devtools::install_deps(deps = T, repos = ${R_REPO})""
+- Rscript -e "install.packages(c('devtools'), repos = ${R_REPOS});if (!all(c('devtools') %in% installed.packages())) { q(status = 1, save = 'no')}"
+- Rscript -e "install.packages(c('knitr'), repos = ${R_REPOS});if (!all(c('knitr') %in% installed.packages())) { q(status = 1, save = 'no')}"
+- Rscript -e "install.packages(c('rmarkdown'), repos = ${R_REPOS});if (!all(c('rmarkdown') %in% installed.packages())) { q(status = 1, save = 'no')}"
+- Rscript -e "install.packages(c('testthat'), repos = ${R_REPOS});if (!all(c('testthat') %in% installed.packages())) { q(status = 1, save = 'no')}"
+- Rscript -e "devtools::install_deps(deps = T, repos = ${R_REPOS})""
 - Rscript -e "devtools::document()""
 
 script:
