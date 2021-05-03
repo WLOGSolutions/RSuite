@@ -10,6 +10,7 @@ init:
 install:
   - cmd: echo %RTOOLS_VERSION%
   - ps: Bootstrap
+  - cmd: choco install pandoc
 
 cache:
   - C:\RLibrary_20181125

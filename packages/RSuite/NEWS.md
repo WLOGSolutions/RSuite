@@ -1,6 +1,7 @@
 # RSuite 0.38 (2021-05-03)
   * adpoted to changes in pkgbuild: Rcpp::compileAttributes is used instead of 
-    pkgbuild:::compile_rcpp_attributes
+    pkgbuild:::compile_rcpp_attributes. In addition detection if package links to
+    Rcpp added, if so Rcpp atributes compilation is skipped at all.
   * RSuite::proj_start properly handles dot files in templates 
   * RSuite::prj_install_deps accepts sups (one of none, vanilla, all) instead of
     vanilla_sups flag.
