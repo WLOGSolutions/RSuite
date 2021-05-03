@@ -5,7 +5,7 @@ language: r
 os:
 - linux
 - osx
-  osx_image: xcode12u
+osx_image: xcode12u
 
 
 r:
