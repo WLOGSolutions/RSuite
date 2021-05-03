@@ -5,6 +5,8 @@ language: r
 os:
 - linux
 - osx
+  osx_image: xcode12u
+
 
 r:
 - oldrel
@@ -22,10 +24,8 @@ warnings_are_errors: true
 matrix:
   exclude:
   - os: osx
-    osx_image: xcode12u
     r: devel
   - os: osx
-    osx_image: xcode12u
     r: oldrel
 
 before_install:
