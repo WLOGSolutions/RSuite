@@ -218,7 +218,11 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
     return(NULL)
   }
 
-  if ("rcpp_attribs" %in% skip_build_steps) {
+  links_to_rcpp <- ("Rcpp" %in% get_package_desc_imports(pkg_path, field = "LinkingTo"))
+  if (!links_to_rcpp) {
+    pkg_logdebug("Skipping Rcpp attributes compilation: package does not use Rcpp")
+    rcpp_attribs_handle_cmd <- ""
+  } else if ("rcpp_attribs" %in% skip_build_steps) {
     pkg_loginfo("Skipping Rcpp attributes compilation")
     # if devtools version is below 2.0.0 we need to Skip Rcpp attributes inside devtools
     # for devtools > 2.0.1 it uses pkgbuild package which does not build Rcpp attributes by defailt
@@ -231,7 +235,8 @@ pkg_build <- function(pkg_path, dest_dir, binary, rver, libpath, sboxpath, skip_
   } else {
     rcpp_attribs_handle_cmd <- paste(
       "if (compareVersion(as.character(packageVersion('devtools')), '2.0.0') >= 0) {",
-      sprintf("pkgbuild:::compile_rcpp_attributes(%s)", rscript_arg("path", pkg_path)),
+        sprintf("unlink(file.path(%s, c('R/RcppExports.R', 'src/RcppExports.cpp')));", rscript_arg("path", pkg_path)),
+        sprintf("Rcpp:::compileAttributes(%s)", rscript_arg("pkgdir", pkg_path)),
       "}")
   }
 
