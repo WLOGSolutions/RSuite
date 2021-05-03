@@ -48,8 +48,8 @@ install:
 - Rscript -e "install.packages(c('knitr'), repos = ${R_REPOS});if (!all(c('knitr') %in% installed.packages())) { q(status = 1, save = 'no')}"
 - Rscript -e "install.packages(c('rmarkdown'), repos = ${R_REPOS});if (!all(c('rmarkdown') %in% installed.packages())) { q(status = 1, save = 'no')}"
 - Rscript -e "install.packages(c('testthat'), repos = ${R_REPOS});if (!all(c('testthat') %in% installed.packages())) { q(status = 1, save = 'no')}"
-- Rscript -e "devtools::install_deps(deps = T, repos = ${R_REPOS})""
-- Rscript -e "devtools::document()""
+- Rscript -e "devtools::install_deps(deps = T, repos = ${R_REPOS})"
+- Rscript -e "devtools::document()"
 
 script:
 - R CMD build .
