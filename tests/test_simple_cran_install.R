@@ -44,9 +44,7 @@ test_that_managed("Installing sub sub dependencies of from CRAN", {
 
   RSuite::prj_install_deps(prj)
 
-  expected_pkgs <- c("lubridate", "stringr", "stringi", "magrittr", "logging", "Rcpp", "glue")
-  if (RSuite:::current_rver() != "3.2") {
-    expected_pkgs <- c(expected_pkgs, "generics")
-  }
-  expect_that_packages_installed(expected_pkgs, prj)
+  expect_that_packages_installed(
+    c("lubridate", "stringr", "stringi", "magrittr", "logging", "Rcpp", "glue", "generics"),
+    prj)
 })
