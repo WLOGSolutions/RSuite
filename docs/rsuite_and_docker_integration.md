@@ -100,6 +100,9 @@ The following command can be used to create a deployment zip for a production en
 ```bash
 rsuite docker zip -p ubuntu 
 ``` 
+
+What this means is that `rsuite` will use the Ubuntu Docker container as an isolated platform to build a zip file, containing the original `rsuite` project plus all the binaries for the packages required by the project. The resulting *zip file* is not itself a container but rather another `rsuite` project (zipped) but with all its dependencies ready to run in another machine in Ubuntu without needing to install Docker.
+
 You should see the following output:
 ```
 2018-07-19 10:48:28 INFO::Retrieving RSuite CLI exposed on S3 package index ...
